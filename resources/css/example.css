@@ -1,0 +1,13 @@
+#exampleContainer {
+    position: absolute;
+    top: 150px;
+    left: 40px;
+    z-index: 20;
+    opacity: 1;
+
+}
+#frameContainer {
+    position: relative;
+    z-index: 8;
+
+}

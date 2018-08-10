@@ -1,0 +1,104 @@
+.login-box-wrapper {
+    padding: 85px 0;
+    background: url(../../images/tree.png) no-repeat center;
+    position: relative;
+    height: 450px;
+    z-index: 0;
+}
+
+.login-box-wrapper:after {
+    content: "";
+    background: #078A68 no-repeat;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    height: 450px;
+    width: 100%;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.login-box {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: solid 1px #979797;
+    z-index: 3;
+}
+
+@media screen and (min-width: 768px) {
+    .login-box {
+        width: 570px;
+        left: 50%;
+        margin-left: -285px;
+    }
+}
+
+.sign-in-up-box {
+    margin: 30px 10px 5px;
+}
+
+.information-box {
+    border-top: solid 1px #979797;
+    padding-top: 10px;
+}
+
+.login-form {
+    border-left: solid 1px #979797;
+}
+
+.signup-btn {
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-weight: bold;
+    outline: none;
+}
+
+.teacher-sign-up-btn,
+.teacher-sign-up-btn:active,
+.teacher-sign-up-btn:focus {
+    background: #f6a623;
+    border-color: #f6a623;
+}
+
+.teacher-sign-up-btn:hover {
+    background: #e2b33e;
+    border-color: #e2b33e;
+}
+
+.student-sign-up-btn,
+.student-sign-up-btn:active,
+.student-sign-up-btn:focus {
+    background: #38a186;
+    border-color: #38a186;
+}
+
+.student-sign-up-btn:hover {
+    background: #078a68;
+    border-color: #078a68;
+}
+
+.guest-try-out-btn,
+.guest-try-out-btn:active,
+.guest-try-out-btn:focus {
+    background: #ff6a79;
+    border-color: #ff6a79;
+}
+
+.guest-try-out-btn:hover {
+    background: #ed5060;
+    border-color: #ed5060;
+}
+
+.sign-in-btn,
+.sign-in-btn:active,
+.sign-in-btn:focus {
+    background: #2ecc71;
+    border-color: #2ecc71;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.sign-in-btn:hover {
+    background: #2a9c5a;
+    border-color: #2a9c5a;
+    color: #ffffff;
+}

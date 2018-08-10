@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("button").click(function(){
+            var txt = "test";
+            var obj = {emotions: [{name: "sad", value: 0.43}, {name: "joy", value: 9.3}],
+                facepoints: [{locationId: "lnostril", x:34, y:10}, {locationId: "leye", x:45, y:959}]};
+            var json = JSON.stringify(obj);
+            $.ajax({
+                url: "http://localhost:8080/mt/rest/affectiva/62046",
+                data: json,
+                contentType: "text/plain",
+                method: "POST",
+                success: function (a, status, c) {
+                    alert(status);
+                }
+            }); });
+
+    });
+</script>
+</head>
+<body>
+
+<button>Send an HTTP POST request to a page and get the result back</button>
+
+<input type="radio">blee</input>
+<input type="radio"><img src="http://latex.codecogs.com/gif.latex?1\frac{6}{12}"/></input>
+<input type="radio">Some very long text that is just too long to be of any use especially if it goes off the screen to the right but we want it anyway just to make life miserable for students who speak some other language</input>
+
+</body>
+</html>

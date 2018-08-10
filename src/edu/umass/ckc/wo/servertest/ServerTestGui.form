@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="edu.umass.ckc.wo.servertest.ServerTestGui">
+  <grid id="6b0be" binding="mainPanel" row-count="7" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="32" y="16" width="526" height="599"/>
+      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <scrollpane id="275fb">
+        <constraints>
+          <xy x="33" y="68" width="525" height="100"/>
+          <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="7" anchor="0" fill="3">
+            <preferred-size width="-1" height="100"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="78d43" class="javax.swing.JList" binding="baselineList">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+      <component id="a3d84" class="javax.swing.JButton" binding="runBut">
+        <constraints>
+          <xy x="33" y="173" width="264" height="23"/>
+          <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/>
+        </constraints>
+        <properties>
+          <text value="Run Test"/>
+        </properties>
+      </component>
+      <component id="5a5ea" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="33" y="46" width="94" height="13"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Select a baseline test:"/>
+        </properties>
+      </component>
+      <component id="2e600" class="javax.swing.JButton" binding="delTestDataBut">
+        <constraints>
+          <xy x="307" y="173" width="251" height="23"/>
+          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/>
+        </constraints>
+        <properties>
+          <text value="Delete Test Results"/>
+          <toolTipText value="Delete the temporary test user data"/>
+        </properties>
+      </component>
+      <component id="daa7b" class="javax.swing.JComboBox" binding="groupPulldown">
+        <constraints>
+          <xy x="140" y="16" width="418" height="22"/>
+          <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1"/>
+        </constraints>
+        <properties>
+          <toolTipText value="determines the problem/hint selector"/>
+        </properties>
+      </component>
+      <component id="520cb" class="javax.swing.JLabel" binding="groupLab">
+        <constraints>
+          <xy x="33" y="20" width="97" height="13"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Select Group Number"/>
+        </properties>
+      </component>
+      <scrollpane id="747c9">
+        <constraints>
+          <xy x="32" y="252" width="264" height="363"/>
+          <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="3" anchor="0" fill="3">
+            <preferred-size width="350" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d4a1e" class="javax.swing.JTextPane" binding="baselineOutputPane">
+            <constraints/>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <scrollpane id="f89b7">
+        <constraints>
+          <xy x="306" y="252" width="251" height="363"/>
+          <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="3">
+            <preferred-size width="350" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="1ae7c" class="javax.swing.JTextPane" binding="testOutputPane">
+            <constraints/>
+            <properties>
+              <editable value="false"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <component id="3005d" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="306" y="230" width="51" height="13"/>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Test Results"/>
+        </properties>
+      </component>
+      <component id="6f21" class="javax.swing.JLabel">
+        <constraints>
+          <xy x="32" y="230" width="68" height="13"/>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0"/>
+        </constraints>
+        <properties>
+          <text value="Baseline Results"/>
+        </properties>
+      </component>
+      <component id="f1b42" class="javax.swing.JLabel" binding="statusLabel">
+        <constraints>
+          <xy x="34" y="199" width="96" height="30"/>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0">
+            <minimum-size width="-1" height="30"/>
+            <preferred-size width="-1" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="                                "/>
+          <visible value="true"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

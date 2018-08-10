@@ -1,0 +1,77 @@
+.topic-list
+  &__item
+    margin: 30px 20px 30px 20px
+    perspective: 1000px
+    position: relative
+
+  &__item:hover &__flipper
+    transform: rotateY(-180deg)
+
+  &__item, &__front, &__back
+    width: 250px
+    height: 340px
+    border-radius: 5px
+
+  &__flipper
+    transition: 0.6s
+    transform-style: preserve-3d
+    position: relative
+
+  &__front, &__back
+    -webkit-backface-visibility: hidden
+    backface-visibility: hidden
+    position: absolute
+    top: 0
+    left: 0
+
+  &__front
+    z-index: 2
+    transform: rotateX(0)
+
+    &--0
+      background-color: rgba($progress-0, 0.9)
+      border: 1px solid darken($progress-0, 30%)
+    &--20
+      background-color: rgba($progress-20, 0.9)
+      border: 1px solid darken($progress-20, 30%)
+    &--40
+      background-color: rgba($progress-40, 0.9)
+      border: 1px solid darken($progress-40, 30%)
+    &--60
+      background-color: rgba($progress-60, 0.9)
+      border: 1px solid darken($progress-60, 30%)
+    &--80
+      background-color: rgba($progress-80, 0.9)
+      border: 1px solid darken($progress-80, 30%)
+
+  &__title, &__info
+    color: $font-dark-blue
+
+  &__title
+    padding: 0 5px 0 5px
+    text-align: center
+    height: 60px
+
+  &__info
+    font-size: 0.9em
+    margin-left: 15px
+
+  &__back
+    transform: rotateY(180deg)
+    background: white
+    border: 1px solid $font-dark-blue
+
+.pot
+  width: 128px
+  height: 166px
+  margin: 30px auto 0 auto
+  img
+    display: block
+    margin: auto
+    position: relative
+
+@keyframes animatedBackground
+  from
+    background-position: 0 0
+  to
+    background-position: 100% 0

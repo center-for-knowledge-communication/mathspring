@@ -1,0 +1,354 @@
+@import "font-awesome/css/font-awesome.min.css";
+@import url("https://fonts.googleapis.com/css?family=Raleway");
+
+body {
+  margin: 0;
+  font-family: Raleway, Helvetica, san-serif;
+  font-size: 0.9em;
+  position: relative;
+}
+
+.huytran-tutor {
+  /*background: #F8F8F8;*/
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: start;
+}
+
+.huytran-sitenav {
+  z-index: 2;
+  position: fixed;
+}
+
+.huytran-sitenav__menu {
+  width: 200px;
+  height: 50px;
+  background: white;
+  border-bottom: 1px solid lightgrey;
+}
+
+.huytran-sitenav__burger {
+  position: absolute;
+  top: 15px;
+  left: 25px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.huytran-sitenav__burger i {
+  font-size: 1.5em;
+  color: lightgrey;
+}
+
+.huytran-sitenav__burger i:hover {
+  color: black;
+  cursor: pointer;
+}
+
+.huytran-sitenav__main {
+  position: fixed;
+  min-height: calc(100vh - 50px);
+  width: 200px;
+  left: 0;
+  background: white;
+  transition: left 0.5s ease;
+  border-right: 1px solid lightgrey;
+  border-right-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.huytran-sitenav__button {
+  margin: 0 25px 0 25px;
+}
+
+.huytran-sitenav__button--first {
+  margin-top: 10px;
+}
+
+.huytran-practice {
+  z-index: 1;
+  left: 200px;
+  position: relative;
+  width: calc(100% - 200px);
+}
+
+.huytran-practice__menu {
+  position: fixed;
+  top: 0;
+  left: 200px;
+  background: white;
+  height: 50px;
+  min-width: calc(100vw - 200px);
+  border-bottom: 1px solid lightgrey;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.huytran-practice__menu .huytran-sitenav__button {
+  display: inline-block;
+}
+
+.huytran-practice__nav {
+  margin-top: 16px;
+}
+
+.huytran-practice__navitem {
+  text-decoration: none;
+  padding: 10px 15px;
+  color: #003364;
+}
+
+.huytran-practice__navitem:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
+.huytran-practice__navitem:active {
+  background: #2ECC71;
+  cursor: pointer;
+}
+
+.huytran-practice__navitem--last {
+  margin-right: 30px;
+}
+
+.huytran-practice__navitem span {
+  padding-right: 10px;
+}
+
+.huytran-practice__container {
+  position: relative;
+  top: 50px;
+  transition: left 0.5s ease;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+@media (min-width: 1440px) {
+  .huytran-practice__main {
+    margin: 30px auto 0 auto;
+    position: relative;
+    left: -150px;
+  }
+}
+.huytran-practice__main {
+  /*margin: 30px auto 0 auto;*/
+  padding: 15px 0 0 65px;
+  width: 600px;
+  height: auto;
+}
+
+.huytran-practice__character {
+  position: absolute;
+  right: 0;
+  margin: 0 30px 0 30px;
+}
+
+.huytran-practice__character.show {
+  display: block;
+}
+
+.huytran-practice__character.hide {
+  display: none;
+}
+
+.huytran-practice__character-collapse {
+  width: 200px;
+  height: 40px;
+  position: fixed;
+  bottom: 0;
+  right: 30px;
+  border: 1px solid #003364;
+  border-bottom: none;
+}
+
+.huytran-practice__show-button {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  border: 1px solid #003364;
+  color: #003364;
+  top: 10px;
+  left: 5px;
+  margin-right: 20px;
+  color: #003364;
+}
+
+.huytran-practice__show-button:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
+.huytran-practice__show-button:active,
+.huytran-practice__show-button:focus {
+  background: #2ECC71;
+}
+
+.huytran-practice__show-button span {
+  position: relative;
+  top: 0px;
+  left: 2px;
+}
+
+.huytran-practice__show-button + span {
+  color: #003364;
+  font-size: 1.1em;
+  position: relative;
+  top: 9px;
+}
+
+.huytran-practice__show-button .hide {
+  display: none;
+}
+
+.huytran-practice__hide-button-wrapper {
+  height: 30px;
+  width: 100%;
+}
+
+.huytran-practice__hide-button {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  border: 1px solid #003364;
+  color: #003364;
+  top: 300px;
+  left: 18px;
+  z-index: 2;
+}
+
+.huytran-practice__hide-button:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
+.huytran-practice__hide-button:active,
+.huytran-practice__hide-button:focus {
+  background: #2ECC71;
+}
+
+.huytran-practice__hide-button span {
+  position: relative;
+  top: 2px;
+  left: 4px;
+}
+
+.huytran-practice__hide-button .hide {
+  display: none;
+}
+
+.hide {
+  left: -200px;
+}
+
+.huytran-sitenav__button {
+  padding: 15px 5px;
+  background: white;
+  display: block;
+  text-decoration: none;
+  color: #003364;
+}
+
+.huytran-sitenav__button:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
+.huytran-sitenav__button:active,
+.huytran-sitenav__button:target {
+  background: #2ECC71;
+}
+
+span.huytran-sitenav__icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+span.huytran-sitenav__buttontitle {
+  margin-left: 5px;
+  padding-right: 5px;
+}
+
+.huytran-sitenav__showmore {
+  display: block;
+  margin-left: 30px;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #003364;
+}
+
+.huytran-sitenav__showmore-target {
+  display: block;
+  transition: all 0.25s ease;
+}
+
+.huytran-sitenav__showmore-state {
+  display: none;
+}
+
+.huytran-sitenav__showmore-state:checked ~ .huytran-sitenav__showmore-target {
+  display: none;
+}
+
+.huytran-sitenav__showmore-state ~ .huytran-sitenav__showmore-trigger:before {
+  content: 'show less...';
+}
+
+.huytran-sitenav__showmore-state:checked ~ .huytran-sitenav__showmore-trigger:before {
+  content: 'show more...';
+}
+
+.huytran-sitenav__showmore-trigger {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 30px;
+  text-decoration: none;
+  color: #003364;
+  cursor: pointer;
+}
+
+.huytran-practice__character-window {
+  width: 280px;
+  height: 594px;
+  overflow: hidden;
+}
+
+.learningCompanionContainer {
+  position: relative;
+  top: -2px;
+  left: -2px;
+  overflow: hidden;
+}
+
+.hint-green {
+  background: #92DDA3;
+}

@@ -1,0 +1,82 @@
+/* 
+  -----------------------------------
+  Accordion Panel Magic
+  by Project Seven Development
+  www.projectseven.com
+  Style Theme: 11 - FAQ-In-Blue
+  -----------------------------------
+*/
+
+.p7APM11 {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 12px;
+	padding: 0px;
+	border-bottom: 4px solid #0489B7;
+	margin: 0 auto;
+	width: auto;
+}
+.p7APM11 .p7APMtrig {
+	margin: 0;
+	padding: 0;
+}
+.p7APM11 .p7APMtrig h3, .p7APM11 .p7APMtrig h4 {
+	margin: 0 !important;
+	padding: 0 !important;
+	letter-spacing: normal !important;
+	font-size: 18px;
+}
+.p7APM11 .p7APMtrig a {
+	display: block;
+	text-decoration: none;
+	padding: 4px 8px 4px 20px;
+	color: #0489B7 !important;
+	font-weight: normal;
+	background-image: url(img/p7apm_plus_blue.gif);
+	background-repeat: no-repeat;
+	background-position: left center;
+	border-top: 1px solid #0489B7;
+}
+.p7APM11 .p7APMtrig .p7APM_ext, .p7APM11 .p7APMtrig .p7APM_ext.p7APMtrig_down {
+	background-image: url(img/p7apm_page_blue.gif) !important;
+	color: #0489B7 !important;
+	background-color: #FFF !important;
+	letter-spacing: normal !important;
+}
+.p7APM11 .p7APMtrig a:hover {
+	color: #035976 !important;
+	background-color: transparent !important;
+}
+.p7APM11 .p7APMtrig a:active, .p7APM11 .p7APMtrig a:focus {
+	outline: 1px dotted #ccc;
+}
+.p7APM11 .p7APMtrig .p7APMtrig_down {
+	background-image: url(img/p7apm_minus_blue.gif) !important;
+	background-repeat: no-repeat;
+	background-position: left center;
+	color: #0489B7 !important;
+	font-weight: bold;
+}
+.p7APM11 .p7APMcwrapper {
+	position: relative;
+}
+.p7APM11 .p7APMpanelcontent {
+	border-right: 1px solid #0489B7;
+	border-left: 1px solid #0489B7;
+	padding: 20px;
+	line-height: 1.5em;
+	color: #0489B7;
+	margin: 0 8px;
+}
+.p7APM11 .p7APMcontent h2, .p7APM11 .p7APMcontent h3, 
+.p7APM11 .p7APMcontent h4 {
+	font-size: 14px;
+	margin: 0px;
+	line-height: normal;
+	letter-spacing: 0.1em;
+}
+.p7APM11 .p7APMcontent p {
+	margin: 6px 0;
+}
+.p7APM11 .current_mark {
+	font-weight: bold !important;
+}

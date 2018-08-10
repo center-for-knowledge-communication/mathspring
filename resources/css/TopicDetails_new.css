@@ -1,0 +1,96 @@
+.topic-details-wrapper {
+    padding: 34px 74px;
+    background: url(../images/tree.png) no-repeat center;
+    position: relative;
+    z-index: 0;
+    height: 450px;
+}
+
+.topic-details-wrapper:after {
+    content: "";
+    background: #078A68 no-repeat;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    height: 450px;
+    width: 100%;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.topic-details-view {
+    padding: 10px 30px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: solid 1px #979797;
+}
+
+.topic-overview {
+    border: solid 1px #979797;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.topic-statistics {
+    border-bottom: solid 1px #979797;
+    text-align: center;
+}
+
+.problem-done-num {
+    font-size: 4em;
+}
+
+.plotArea {
+    margin: auto;
+}
+
+.detail-problem-view {
+    border-left: solid 1px #979797;
+    height: 450px;
+    padding: 20px;
+    text-align: center;
+    overflow-y: scroll;
+}
+
+#wrapperList {
+    padding: 10px;
+}
+
+#wrapperList > li {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.emptyCard,
+.giveupCard,
+.correctCard,
+.correctOnAttemptsCard,
+.correctWithHintsCard {
+    width: 30px;
+    height: 50px;
+    background: #FFE234;
+    text-align: center;
+}
+
+.giveupCard {
+    background: #CD4747;
+}
+
+.correctCard,
+.correctOnAttemptsCard,
+.correctWithHintsCard {
+    background: #2ECC71;
+}
+
+.non-selected-card {
+    border: solid 2px #fff;
+}
+
+.selected-card {
+    border: solid 2px #000;
+}
+
+#problemImage,
+#formalityProblemFrame {
+    display: block;
+    margin: 15px auto;
+}

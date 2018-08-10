@@ -1,0 +1,67 @@
+.onoffswitch
+  margin-top: 2px
+  position: relative
+  width: 70px
+  -webkit-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+
+  &-checkbox
+    display: none
+
+  &-label
+    display: block
+    overflow: hidden
+    cursor: pointer
+    border: 1px solid lightgrey
+    border-radius: 20px
+
+  &-inner
+    display: block
+    width: 100px
+    margin-left: -100%
+    transition: margin 0.3s ease-in 0s
+
+  &-inner:before, &-inner:after
+    display: block
+    float: left
+    width: 50%
+    height: 30px
+    padding: 0
+    line-height: 30px
+    font-size: 14px
+    color: white
+    box-sizing: border-box
+
+  &-inner:before
+    content: "Yes"
+    padding-left: 10px
+    color: #000
+
+  &-inner:after
+    content: "No"
+    background-color: white
+    color: #000
+    text-align: right
+    position: relative
+    left: 22px
+
+  &-switch
+    display: block
+    width: 20px
+    margin: 6px
+    background: lightgrey
+    position: absolute
+    top: 0
+    bottom: 9px
+    right: 37px
+    border-radius: 25px
+    transition: all 0.3s ease-in 0s
+
+  &-checkbox:checked + &-label &-inner
+    margin-left: 0
+
+  &-checkbox:checked + &-label &-switch
+    right: 0px
+    background: $main-green
+

@@ -1,0 +1,363 @@
+@charset "utf-8";
+body {
+	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	color: #000;
+	/* background-color: #b1c7d0 !important; */
+	background-color: #8ED8E0 !important; 
+	background-attachment: fixed;
+	background-repeat: no-repeat !important;
+	background-position: left top !important;
+	padding-top: 12px !important;
+	padding-right: 0px;
+	padding-bottom: 0;
+	padding-left: 0px;
+}
+
+/* ~~ Element/tag selectors ~~ */
+ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+	padding: 0;
+	margin: 0;
+	list-style-type: none !important;
+}
+h1, h2, h3, h4, h5, h6, p {
+	margin-top: 0;	 /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
+	padding-right: 15px;
+	padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
+}
+a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+	border: none;
+}
+/* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+a:link {
+	color: #003300;
+	text-decoration: none;
+	font-weight: bold;
+}
+a:visited {
+	color: #003300;
+	font-weight: bold;
+}
+a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+	font-weight: bold;
+	color: #C30;
+}
+
+/* ~~ this fixed width container surrounds all other elements ~~ */
+.container {
+	width: 1200px !important;
+	background:rgba(255,255,255, 0.6); 
+	margin-top: 0;
+	margin-right: auto;/* the auto value on the sides, coupled with the width, centers the layout */
+	margin-bottom: 0;
+	margin-left: auto;
+    position: relative;
+}
+
+/* ~~ This is the layout information. ~~ 
+
+1) Padding is only placed on the top and/or bottom of the div. The elements within this div have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+
+*/
+.content {
+    position: relative;
+	padding: 10px 0 !important;
+	overflow: hidden;
+}
+
+/* ~~ miscellaneous float/clear classes ~~ */
+.fltrt {  /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+	float: left;
+	margin-right: 8px;
+}
+.clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the overflow:hidden on the .container is removed */
+	clear:both;
+	height:0;
+	font-size: 1px;
+	line-height: 0px;
+}
+
+.leftCol {
+	float: left;
+	width: 180px;
+	padding-top: 12px;
+	padding-right: 6px;
+	padding-bottom: 12px;
+	padding-left: 6px;
+	overflow: hidden;
+	line-height: 1.2;
+	font-size: 13px;
+}
+
+.mntop {
+	width: 170px;
+	margin-right: auto;
+	margin-left: auto;
+	border-top-width: thin;
+	border-right-width: thin;
+	border-left-width: thin;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-top-color: #904740;
+	border-right-color: #904740;
+	border-left-color: #904740;
+	background-color: #4b6f19;
+	text-align: center;
+	padding: 2px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #FFFFD4;
+	line-height: -1px;
+	border-bottom-style: solid;
+	border-bottom-color: #904740;
+}
+
+.mnCNT {
+	width: 170px;
+	margin-right: auto;
+	margin-left: auto;
+	padding: 2px;
+	line-height: 48px;
+	font-size: 92%;
+	color: #030;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+.mnCNT ul li {
+	list-style-type: none;
+}
+.elb_read a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/read.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_read a:hover {
+	background-image:url(../img/read2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+
+.elb_hint a{
+	display: block;
+	height: 48px;
+	background-image: url(../img/hint1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+
+.elb_hint a:hover {
+	background-image:url(../img/hint2.png) !important;
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+.elb_replay a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/repayer1.png);  
+	padding-left: 60px;
+}
+.elb_replay a:hover {
+	background-image:url(../img/repayer2.png); 
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+.elb_solve a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/solve1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_solve a:hover {
+	background-image:url(../img/solve2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+
+.elb_show a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/show_example1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_show a:hover {
+	background-image:url(../img/show_example2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+.elb_vid a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/showvideo1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_vid a:hover {
+	background-image: url(../img/showvideo2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+
+.elb_formulas a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/formulas1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_formulas a:hover {
+	background-image: url(../img/formulas2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+.elb_glossary a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/glossary1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_glossary a:hover {
+	background-image: url(../img/glossary2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+.elb_mpp a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/myprogress1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_mpp a:hover {
+	background-image: url(../img/myprogress2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+
+.elb_home a {
+	display: block;
+	height: 48px;
+	background-image: url(../img/home1.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	padding-left: 60px;
+}
+.elb_home a:hover {
+	background-image: url(../img/home2.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	text-decoration: underline  !important;
+}
+	
+.leftcol {
+	padding: 8px;
+	float: right;
+	width: 1000px;
+}
+.empty {
+	width: 1200px;
+}
+
+.buttons {
+	width: 990px;
+	/*background:rgba(255,255,255, 0.3);*/
+	padding-top: 10px;
+	padding-right: 200px;
+	padding-bottom: 10px;
+	padding-left: 0px !important;
+	overflow: hidden;
+	float: right !important;
+}
+
+div.problemDiv {
+    vertical-align: top !important;
+}
+
+iframe.probWindow {
+    vertical-align: top !important;
+}
+
+#flashprobplayer {
+    vertical-align: top !important;
+}
+.wrapper {
+	width: 1200px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+@-webkit-keyframes change_background_color {
+    to {
+        background: linear-gradient(orangered, white) 50% 50% repeat-x; !important
+    }
+}
+
+@-moz-keyframes change_background_color {
+    to {
+        background: linear-gradient(orangered, white) 50% 50% repeat-x; !important
+    }
+}
+
+@-ms-keyframes change_background_color {
+    to {
+        background: linear-gradient(orangered, white) 50% 50% repeat-x; !important
+    }
+}
+
+@keyframes change_background_color {
+    to {
+        background: linear-gradient(orangered, white) 50% 50% repeat-x; !important
+    }
+}
+
+#pulsate_play_button {
+    -webkit-animation-name: change_background_color;
+    -moz-animation-name: change_background_color;
+    -ms-animation-name: change_background_color;
+    animation-name: change_background_color;
+    -webkit-animation-duration: 1s;
+    -moz-animation-duration: 1s;
+    -ms-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation-iteration-count: infinite;
+    -ms-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    -webkit-animation-direction: alternate;
+    -moz-animation-direction: alternate;
+    -ms-animation-direction: alternate;
+    animation-direction: alternate;
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-timing-function: ease-in-out;
+    -ms-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+}
+

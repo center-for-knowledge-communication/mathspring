@@ -1,0 +1,137 @@
+<lessons>
+
+    <lesson name="TopicNoIntroNoDemo" style="topics">
+    <controlParameters>
+
+        <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+        <contentFailureThreshold>1</contentFailureThreshold>
+        <mastery>1.2</mastery>
+        <minNumberProbs>3</minNumberProbs>
+        <maxNumberProbs>10</maxNumberProbs>
+        <minTimeInTopicSecs>120</minTimeInTopicSecs>
+        <difficultyRate>3</difficultyRate>
+        <!-- legal values never, oncePerSession, always-->
+        <!--<topicIntroFrequency>oncePerSession</topicIntroFrequency>-->
+        <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+        turns it on.   If false, intervention selector has no effect - it is always off-->
+    </controlParameters>
+
+    <interventions>
+        <interventionSelector onEvent="EndOfTopic" weight="1" class="TopicSwitchAskIS">
+            <config>
+                <ask val="false"></ask>
+            </config>
+        </interventionSelector>
+
+    </interventions>
+</lesson>
+
+
+    <lesson name="TopicWithInterleavedProblemSets" style="topics">
+        <controlParameters>
+
+            <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+            <contentFailureThreshold>1</contentFailureThreshold>
+            <mastery>1.2</mastery>
+            <minNumberProbs>3</minNumberProbs>
+            <maxNumberProbs>10</maxNumberProbs>
+            <minTimeInTopicSecs>120</minTimeInTopicSecs>
+            <difficultyRate>3</difficultyRate>
+            <interleavedProblemSets>
+                <everyNTopics>4</everyNTopics>
+                <!-- How many problems must have been solved in a past topic for it to be considered explored enough for review-->
+                <numProbsInExploredTopic>2</numProbsInExploredTopic>
+                <!-- The minimum time spent in a past topic to be considered explored enough for review -->
+                <minTimeInExploredTopic>1</minTimeInExploredTopic>
+                <!-- The number of problems to take from each reviewable topic-->
+                <numProbsPerTopic>2</numProbsPerTopic>
+            </interleavedProblemSets>
+        </controlParameters>
+
+        <interventions>
+            <interventionSelector onEvent="EndOfTopic" weight="1" class="TopicSwitchAskIS">
+                <config>
+                    <ask val="false"></ask>
+                </config>
+            </interventionSelector>
+
+        </interventions>
+    </lesson>
+
+
+    <lesson name="TopicWithIntro" style="topics">
+        <controlParameters>
+
+            <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+            <contentFailureThreshold>1</contentFailureThreshold>
+            <mastery>1.2</mastery>
+            <minNumberProbs>3</minNumberProbs>
+            <maxNumberProbs>10</maxNumberProbs>
+            <minTimeInTopicSecs>120</minTimeInTopicSecs>
+            <difficultyRate>3</difficultyRate>
+            <!-- legal values never, oncePerSession, always-->
+            <!--<topicIntroFrequency>oncePerSession</topicIntroFrequency>-->
+            <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+            turns it on.   If false, intervention selector has no effect - it is always off-->
+        </controlParameters>
+
+        <interventions>
+            <interventionSelector onEvent="EndOfTopic" weight="1" class="TopicSwitchAskIS">
+                <config>
+                    <ask val="false"></ask>
+                </config>
+            </interventionSelector>
+            <interventionSelector onEvent="BeginningOfTopic" weight="1" class="TopicIntroIS">
+                <config>
+                    <!-- legal values never, oncePerSession, always-->
+                    <topicIntroFrequency>always</topicIntroFrequency>
+                </config>
+            </interventionSelector>
+        </interventions>
+    </lesson>
+
+    <lesson name="TopicWithIntroAndDemo" style="topics">
+        <controlParameters>
+
+            <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+            <contentFailureThreshold>1</contentFailureThreshold>
+            <mastery>1.2</mastery>
+            <minNumberProbs>3</minNumberProbs>
+            <maxNumberProbs>10</maxNumberProbs>
+            <minTimeInTopicSecs>120</minTimeInTopicSecs>
+            <difficultyRate>3</difficultyRate>
+            <!-- legal values never, oncePerSession, always-->
+            <!--<topicIntroFrequency>oncePerSession</topicIntroFrequency>-->
+            <!--<topicExampleFrequency>oncePerSession</topicExampleFrequency>-->
+            <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+            turns it on.   If false, intervention selector has no effect - it is always off-->
+        </controlParameters>
+
+        <interventions>
+            <interventionSelector onEvent="EndOfTopic" weight="1" class="TopicSwitchAskIS">
+                <config>
+                    <ask val="false"></ask>
+                </config>
+            </interventionSelector>
+            <interventionSelector onEvent="BeginningOfTopic" weight="1" class="TopicIntroIS">
+                <config>
+                    <!-- legal values never, oncePerSession, always-->
+                    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+                </config>
+            </interventionSelector>
+            <interventionSelector onEvent="BeginningOfTopic" weight="2" class="DemoProblemIS">
+                <config>
+                    <!-- legal values never, oncePerSession, always-->
+                    <demoFrequency>always</demoFrequency>
+                </config>
+            </interventionSelector>
+
+
+
+
+        </interventions>
+    </lesson>
+
+    <lesson name="CommonCore" style="commonCore">
+    </lesson>
+</lessons>

@@ -1,0 +1,143 @@
+html
+  min-width: 1200px
+body
+  margin: 0
+  min-width: 1000px
+  font-family: Raleway, Helvetica, san-serif
+  font-size: 0.9em
+  position: relative
+
+.huytran-tutor
+  min-height: 100vh
+  display: flex
+  flex-direction: row
+  justify-content: start
+
+.huytran-sitenav
+  z-index: 2
+  position: fixed
+
+  &__menu
+    width: 200px
+    height: 50px
+    background: white
+    border-bottom: 1px solid lightgrey
+
+  &__burger
+    position: absolute
+    top: 15px
+    left: 25px
+    width: 30px
+    height: 30px
+    text-align: center
+
+    i
+      font-size: 1.5em
+      color: lightgrey
+
+      &:hover
+        color: black
+        cursor: pointer
+
+  &__main
+    position: fixed
+    min-height: calc(100vh - 50px)
+    width: 200px
+    left: 0
+    background: white
+    transition: left 0.5s ease
+    border-right: 1px solid lightgrey
+    border-right-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+
+  &__button
+    margin: 0 25px 0 25px
+
+    &--first
+      margin-top: 10px
+
+.huytran-practice
+  z-index: 1
+  left: 200px
+  position: relative
+  width: calc(100% - 200px)
+
+  &__menu
+    position: fixed
+    top: 0
+    left: 200px
+    background: white
+    height: 50px
+    min-width: calc(100vw - 200px)
+    border-bottom: 1px solid lightgrey
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    z-index: 2
+
+    .huytran-sitenav__button
+      display: inline-block
+
+  &__container
+    position: relative
+    top: 50px
+    transition: left 0.5s ease
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+
+  &__main
+    padding: 15px 0 0 65px
+    width: 600px
+    height: auto
+
+  &__info
+    width: 600px
+    margin-top: 20px
+
+  &__character
+    position: absolute
+    right: 0
+    margin: 0 30px 0 30px
+
+    &.show
+      display: block
+
+    &.hide
+      display: none
+
+    &-collapse
+      width: 200px
+      height: 40px
+      position: fixed
+      bottom: 0
+      right: 30px
+      border: 1px solid #003364
+      border-bottom: none
+
+    &-window
+      width: 280px
+      height: 594px
+      overflow: hidden
+
+
+@media (min-width: 1440px)
+  .huytran-practice__main
+    margin: 30px auto 0 auto
+    position: relative
+    left: -150px
+
+.learningCompanionContainer
+  position: relative
+  top: -2px
+  left: -2px
+  overflow: hidden
+
+.hide
+  left: -200px
+
+
+
+
+
+
+

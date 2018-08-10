@@ -1,0 +1,130 @@
+#ProblemEditor {
+    width: 595px;
+    height: 100%;
+    background-color: #999;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+}
+#BlockEditor {
+    flex: 1 0 auto;
+    margin: 5px;
+    background-color: transparent;
+    border-color: transparent;
+}
+#ProblemEditor div {
+    user-select: none;
+}
+.problem-container {
+    width: 600px;
+    height: 600px;
+    transform: scale(0.333);
+    transform-origin: top left;
+    box-sizing: border-box;
+    border-width: 2px;
+    background-color: #8ED8E0;
+    font-family: Georgia, serif;
+    font-size: 16px;
+}
+#TemplateSelector, #BlockSelector {
+    display: flex;
+    flex-direction: row;
+    margin: 5px 5px 10px 5px;
+}
+#BlockSelector div {
+    flex: 1 0 auto;
+}
+#LayoutEditor {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid white;
+    flex: 1 0 auto;
+    margin: 5px;
+    background-color: #8ED8E0;
+}
+.editor-panel {
+    background-color: #666;
+    border-radius: 10px;
+    border: 2px solid #444;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+.template-button {
+    width: 600px;
+    height: 600px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    margin: auto;
+    opacity: 1.00;
+}
+.selectable {
+    border: 2px solid transparent;
+    transition: opacity 0.25s;
+}
+.selectable:hover {
+    opacity: 0.50;
+}
+.problem-block {
+    background-clip: content-box;
+}
+.layout-block {
+    margin: 3px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    color: white;
+    font-family: Helvetica;
+    font-size: 20px;
+}
+.layout-column {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+}
+.layout-columns {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 255, 255, 0.5);
+    margin: 5px;
+    border-radius: 5px;
+}
+.layout-block-space {
+    border: 2px dashed #666;
+}
+.dragover {
+    border-style: solid;
+    border-color: black;
+}
+.header {
+    font-family: Helvetica;
+    font-weight: bold;
+    font-size: 24px;
+    color: white;
+    text-align: center;
+}
+.label {
+    font-family: Helvetica;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    text-align: left;
+    margin-top: 20px;
+}
+.disabled {
+    opacity: 0.25 !important;
+    border-color: black;
+}
+.selected {
+    border-color: black;
+}
+.row-container {
+    display: flex;
+    flex-direction: row;
+}
+.row-container * {
+    flex: 1 0 auto;
+}

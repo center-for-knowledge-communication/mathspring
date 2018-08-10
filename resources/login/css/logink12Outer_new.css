@@ -1,0 +1,25 @@
+.additional-form-wrapper {
+    padding: 85px 0;
+    background: url(../images/tree.png) no-repeat center;
+    position: relative;
+    height: 450px;
+    z-index: 0;
+}
+
+.additional-form-wrapper:after {
+    content: "";
+    background: #078A68 no-repeat;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    height: 450px;
+    width: 100%;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.additional-form-box {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: solid 1px #979797;
+    z-index: 3;
+}

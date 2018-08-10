@@ -1,0 +1,44 @@
+body
+  margin: 0 !important
+
+.existing
+  min-height: calc(100vh - 72px)
+  background-color: #3dc3e2
+  background-image: radial-gradient(#3dc3e2, #3dc3e2 0%, #1887a1 70%, #116275 100%)
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif
+  position: relative
+  color: $font-dark-blue
+
+  &__message-box
+    width: 700px
+    position: absolute
+    left: 0
+    right: 0
+    top: 200px
+    margin: 0 auto
+    padding: 20px
+    border-radius: 5px
+    color: $font-dark-blue
+    background: white
+
+  &__title
+    text-align: center
+    font-weight: 400
+
+  &__message
+    line-height: 1.5em
+
+  &__form-wrapper
+    display: flex
+    flex-direction: row
+    padding: 10px
+    height: 80px
+    width: 500px
+    margin: 0 auto
+
+  &__return-button, &__login-button
+    flex: 1 1 auto
+    margin: 30px
+
+
+

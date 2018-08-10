@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--<link href="css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet">-->
+<script src="js/jquery-1.9.1.js"></script>
+<script src="js/jquery-ui-1.10.3/ui/jquery-ui.js"></script>
+<link href="testframes.css" rel="stylesheet">
+<html>
+<head>
+    <title></title>
+</head>
+
+<script type="text/javascript">
+    $(document).ready( function() {
+        $("#frame2_container").draggable({
+            iframeFix: true,
+            start: function(e, ui) {
+            },
+            stop: function(e, ui) {
+                $( "lc_frame" ).css('z-index','0');
+            }
+        })
+    })
+</script>
+
+<body>
+<!--<div id="screen" class="screen"></div>-->
+<iframe class="frame" src="farewell.html" width="600" height="600"></iframe>
+
+
+    <div id="frame2_container" class="frame2_container">
+        <div class="wrapper">
+        <!--<img class="lc_frame" src="images/arrow.gif">-->
+            <iframe class="lc_frame" src="LearningCompanion/Jane/idle.html" width="240" height="390" scrolling="no" frameborder="yes" ></iframe>
+        </div>
+    </div>
+
+</body>
+</html>

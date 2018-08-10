@@ -1,0 +1,359 @@
+
+var globals;
+var sysGlobals;
+
+function getEdgeCompositionId () {
+    // TODO call js in inner to get Composition ID
+    return "EDGE-344631362";    // hardwired for now
+}
+
+// return the XML that is <elementName>xxx</elementName>
+// Note that we must use begin and end tags as above.   No short-cuts.
+function getXMLElement (xml, elementName)  {
+    debugAlert("in getXMLElemet" + xml);
+    var eltbegin = "<" + elementName ;
+    var eltend = "</" + elementName + ">"
+    var re = new RegExp("(<"  +elementName+ ".*(?:(?:</" +elementName+ ">)|(?:/>)))");
+    var m = re.exec(xml);
+    if (m == null) {
+        debugAlert("no match");
+        return null;
+    }
+    else {
+        debugAlert("match is " + m[0]);
+        return m[0];
+    }
+}
+
+
+function incrementTimers (globals) {
+    var now = new Date().getTime();
+    globals.probElapsedTime += now - globals.clock;
+    globals.elapsedTime += now - globals.clock;
+    globals.clock = now;
+}
+
+
+
+
+//function debugAlert(msg) {
+//    if (globals.debug || globals.trace) {
+//        alert(msg);
+//    }
+//}
+
+
+window.alertTest = function (arg) {
+    alert("AlertTest CALLED! with: " + arg);
+};
+
+
+// can be called to find out if we are waiting for results from server (and hence interface is in wait state)
+window.isWaiting = function() {
+    return globals.guiLock;
+}
+
+function showSpinWait () {
+    globals.guiLock = true;
+    // need to pop up a wait timer
+}
+
+function waitComplete () {
+    globals.guiLock = false;
+}
+
+
+// This function is called by iframe js when user attempts.
+window.answerChosen = function (choice) {
+    alert("answerChosen CALLED! with: " + choice);
+    if (!isWaiting()) {
+        transients.answerChoice= choice;  // must remember this for callback to problem js
+        incrementTimers(globals);
+        showSpinWait();
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=Attempt&sessionId=" + globals.sessionId + "&elapsedTime="
+            + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&userInput="+choice, processAnswerChosenResult);
+    }
+};
+
+function processAnswerChosenResult (responseText, textStatus, XMLHttpRequest) {
+    debugAlert("processAnswerChosenResult: Server returns " + responseText);
+    waitComplete();
+//    var re = new RegExp("&hint=(\w*)&*");  // collect the label out of the param string
+    var gradeXML = getXMLElement(responseText,"grade");
+    debugAlert("XML for grade " + gradeXML);
+    if (gradeXML != null) {
+        var dom = $.parseXML(gradeXML),
+            $xml = $(dom),
+            $grade = $xml.find("grade");
+        var isCorrect = $grade.attr("isCorrect");
+        debugAlert("iscorrect: " + isCorrect);
+        callProblemGrader(isCorrect, transients);
+    }
+}
+
+function requestHint (globals) {
+    if (!isWaiting()) {
+        showSpinWait();
+        incrementTimers(globals);
+        $.get(sysglobals.contextPath + "/TutorBrain?action=Hint&sessionId=" +globals.sessionId+ "&elapsedTime="
+            + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime, processRequestHintResult);
+    }
+}
+
+
+
+function processRequestHintResult (responseText, textStatus, XMLHttpRequest) {
+    debugAlert("Server returns " + responseText);
+    waitComplete();
+//    var re = new RegExp("&hint=(\w*)&*");  // collect the label out of the param string
+    var hintXML = getXMLElement(responseText,"hint");
+//    debugAlert("XML for hint " + hintXML);
+    if (hintXML != null) {
+        var dom = $.parseXML(hintXML),
+            $xml = $(dom),
+            $hint = $xml.find("hint");
+        var label = $hint.attr("label");
+//        debugAlert("Playing hint " + label);
+        callProblemPlayHint(label);
+    }
+
+}
+
+
+// This function is called when the hint link is clicked on.
+// It will call the hint function that lives within the document
+// in the iframe.  In order to access this function it has to
+// read the DOM for that page and find the hint function and then
+// pass it the hint label so it can jump to that label and start
+// playing
+function callProblemPlayHint (hintLabel) {
+    debugAlert("In callProblemPlayHint with " + hintLabel);
+    var wind = document.getElementById("iframe").contentWindow ;
+    // These Composition IDs are different for each problem.   So we need to figure out where to get from.
+    var Comp = wind.AdobeEdge.getComposition(getEdgeCompositionId());
+    Comp.getStage().play(hintLabel) ;
+}
+
+function callProblemGrader (isCorrect, transients) {
+    debugAlert("In callProblemGrade with " + isCorrect);
+    var wind = document.getElementById("iframe").contentWindow ;
+    var Comp = wind.AdobeEdge.getComposition(getEdgeCompositionId());
+    // for now we don't turn on hints associated with wrong answers
+    Comp.getStage().gradeAnswer(transients.answerChoice,isCorrect,false) ;
+}
+
+
+// don't send an endExternalActivity if the last prob was 4mality.  4mality sends its own begin/ends
+function sendEndEvent(globals) {
+    var now = new Date().getTime();
+    globals.probElapsedTime += now - globals.clock;
+    globals.elapsedTime += now - globals.clock;
+    globals.clock = now;
+    if (globals.lastProbType != '4Mality') {
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=EndExternalActivity&sessionId=" +globals.sessionId+ "&elapsedTime="
+            + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&xactId=" + globals.lastProbId);
+    }
+    else {
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=FormalityEndProblem&sessionId="+globals.sessionId+"&elapsedTime="
+            + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&probId=" + globals.lastProbId);
+    }
+}
+
+//send a BeginProblem event for HTMl5 problems.
+function sendBeginEvent(globals) {
+    incrementTimers(globals);
+    $.get("${pageContext.request.contextPath}/TutorBrain?action=BeginProblem&sessionId="+globals.sessionId+"&elapsedTime="
+        + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime);
+
+}
+
+
+function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
+    debugAlert("Server returns " + responseText);
+    var re = new RegExp("<activity>(.)*</activity>");
+    var m = re.exec(responseText);
+    if (m == null) {
+        debugAlert("no match");
+    }
+    else {
+        var activityXML = m[0];
+        debugAlert("activity is: " + activityXML);
+        var dom = $.parseXML(activityXML),
+            $xml = $(dom),
+            $prob = $xml.find("problemURL"),
+            $xact = $xml.find("externalURL"),
+            $topicIntro = $xml.find("topicIntro"),
+            $instr = $xml.find("instructions");
+
+        var instructions = $instr.text();
+        $("#instructionsP").text(instructions);
+        var now = new Date().getTime();
+        globals.probElapsedTime += now - globals.clock;
+        globals.elapsedTime += now - globals.clock;
+        globals.clock = now;
+
+        // got back XML that indicates its an external problem
+        if ($xact.length > 0) {
+            var pid = $xact.attr("id");
+            var resource = $xact.text();
+            debugAlert("Its an external problem.   Changing iframe src attribute to " + resource);
+            // Don't send an endExternalActivity if the last prob was 4mality.  They send their own begin/ends
+            sendEndEvent(globals);
+            globals.probElapsedTime = 0;
+            $.get("${pageContext.request.contextPath}/TutorBrain?action=BeginExternalActivity&sessionId="+globals.sessionId+"&elapsedTime="
+                + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&xactId=" + pid);
+            globals.lastProbId = pid;
+            globals.lastProbType = 'External';
+            $("#iframe").attr("src", resource);
+
+        }
+        else if ($prob.length > 0) {
+            var mode = $prob.attr("mode");
+            var form = $prob.attr("form");
+            if (mode == "4Mality") {
+                var pid = $prob.attr("id");
+                var resource = $prob.text();
+                debugAlert("Its a 4mality problem.  URL is " + resource);
+                sendEndEvent(globals);
+                globals.probElapsedTime = 0;
+                // formality problems call the servlet with their own begin /end events
+                globals.lastProbId = pid;
+                globals.lastProbType = '4Mality';
+                // Change the src of the iframe to be the Formality page.  The user ID for 4mality doesn't matter as long as it exists
+                $("#iframe").attr("src", "${formalityServlet}?fxn=wayang&mode=viewq&qID="
+                    + resource + "&un=1864&wayangProbId=" + pid +
+                    "&wayangStudId=${studId}&wayangSessId="+globals.sessionId+"&elapsedTime=" + globals.elapsedTime
+                    + "&wayangServletContext=" + '${wayangServletContext}');
+
+            }
+            else if (form == "html5") {
+                var pid = $prob.attr("id");
+                var resource = $prob.text();
+                var dir = resource.split(".")[0];
+                globals.probElapsedTime = 0;
+                // formality problems call the servlet with their own begin /end events
+                globals.lastProbId = pid;
+                // the name of the problem (e.g. problem090.html) is stripped off to find a directory (e.g. problem090)
+                globals.lastProbType = 'html5';
+                sendBeginEvent(globals);
+                //  $("#iframe").attr("src", "http://localhost/wayang2/html5/problem080/" + resource);
+                $("#iframe").attr("src", "${pageContext.request.contextPath}/html5Probs/" + dir + "/" + resource);
+
+            }
+            else {
+                var pid = $prob.attr("id");
+                var resource = $prob.text();
+
+                debugAlert("its a flash problem.   We need to call WoLogin or something");
+                // send an END for the first xAct
+                debugAlert("Calling servlet with EndExternalActivity");
+                // don't send an endExternalActivity if the last prob was 4mality bc 4mality sends its own begin/ends
+                sendEndEvent(globals);
+                lastProbType = 'Flash';
+                // not sure what the other params are for flash to show a problem in the tutor hut
+                <%--document.location.href = "${flashClientPath}?sessnum=${sessionId}&learningHutChoice=true&elapsedTime=" +elapsedTime+ "&learningCompanion=${learningCompanion}&force_first_problem=1&which_first_problem=" + resource;--%>
+                document.location.href = "${flashClientPath}?sessnum="+globals.sessionId+"&sessionId="+globals.sessionId+"&learningHutChoice=true&elapsedTime=" + globals.elapsedTime + "&learningCompanion=${learningCompanion}&problem_name=" + resource + "&problemId=" + pid + "&mode=practice"; // &topicId=" + topicId;
+                }
+                }
+                else if ($topicIntro.length > 0) {
+                    var resource = $topicIntro.find("resource").text();
+                    sendEndEvent(globals);
+                    globals.lastProbType = 'Flash';
+                    document.location.href = "${flashClientPath}?sessnum="+globals.sessionId+"&sessionId="+globals.sessionId+"&learningHutChoice=true&elapsedTime=" + globals.elapsedTime + "&learningCompanion=${learningCompanion}&problem_name=" + resource + "&mode=practice"; //&topicId=" + topicId;
+                }
+                // We got XML that we don't understand so it must be an intervention.   We call Flash and pass it the XML
+                else {
+                    sendEndEvent(globals);
+                    globals.lastProbType = 'Flash';
+                    debugAlert('Calling Flash for intervention XML: ' + activityXML);
+                    <%--document.location.href = "${flashClientPath}?sessnum=${sessionId}&sessionId=${sessionId}&learningHutChoice=true&elapsedTime=" +elapsedTime+ "&learningCompanion=${learningCompanion}&intervention=" + "ThisIsAnInterventionButItsNotXML" + "&mode=intervention"; // &topicId=" + topicId;--%>
+                document.location.href = "${flashClientPath}?sessnum="+globals.sessionId+"&sessionId="+globals.sessionId+"&learningHutChoice=true&elapsedTime=" + globals.elapsedTime + "&learningCompanion=${learningCompanion}&intervention=" + encodeURIComponent(activityXML) + "&mode=intervention"; // &topicId=" + topicId;
+                    <%--document.location.href = "${flashClientPath}?sessnum=${sessionId}&sessionId=${sessionId}&learningHutChoice=true&elapsedTime=" +elapsedTime+ "&learningCompanion=${learningCompanion}&topicId=" + topicId+"&mode=continue";--%>
+
+        }
+
+    }
+}
+
+function showHTML5Demo (globals) {
+    $.get("${pageContext.request.contextPath}/TutorBrain?action=NextProblem&sessionId="+globals.sessionId+"&elapsedTime="
+                   + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&probID=" + 800, processNextProblemResult);
+}
+
+function nextProb(globals) {
+    if (globals.trace)
+        alert("in NextProb ");
+    d = new Date();
+    var now = d.getTime();
+    globals.probElapsedTime += now - globals.clock;
+    globals.clock = now;
+    globals.elapsedTime += globals.probElapsedTime;
+    // For debugging we need to uncomment the input box that allows us to type in the id of the next problem we wish
+    // the server to return when we click "Next"
+    if (globals.debug) {
+        var nextProbId = $("#probId").val();
+        var wantExternal = $("#checkbox").prop('checked');
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=NextProblem&sessionId="+globals.sessionId+"&elapsedTime="
+                + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&probID=" + nextProbId + "&isExternal=" + wantExternal,
+                processNextProblemResult);
+    }
+    else {
+        // call the server with a nextProblem event and the callback fn processNextProblemResult will deal with result
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=NextProblem&sessionId="+globals.sessionId+"&elapsedTime="
+                + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime, processNextProblemResult);
+    }
+
+}
+
+function instructions() {
+    // probably want something slicker than this alert dialog.
+    <%--alert("Instructions: ${instructions}");--%>
+    $("#dialog").dialog('open');
+    return false;
+}
+
+function myprogress(globals, startTime) {
+    alert("in myprogress");
+    var d = new Date();
+    var now = d.getTime();
+    globals.probElapsedTime += now - startTime;
+    globals.elapsedTime += globals.probElapsedTime;
+    document.location.href = "${pageContext.request.contextPath}/TutorBrain?action=navigation&sessionId="+globals.sessionId+"&elapsedTime=" + globals.elapsedTime + "&from=sat_hut&to=my_progress";
+
+}
+
+function tutorhut_main(g, sysG) {
+    globals = g;
+    sysGlobals = sysG;
+    var d = new Date();
+    var startTime = d.getTime();
+
+    $("#nextProb").click(function () {nextProb(globals)});
+    $("#hint").click(function () {requestHint(globals)});
+    $("#html5test").click(function () {showHTML5Demo(globals)});
+    $('#dialog').dialog({
+        autoOpen: true,
+        width: 600,
+        buttons: {
+            "Ok": function () {
+                $(this).dialog("close");
+            },
+            "Cancel": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+    $("#instructions").click(instructions);
+
+    $("#myProg").click(function () {myprogress(globals,startTime)});
+    globals.clock = d.getTime();
+    var loadTime = clock - startTime;
+    globals.elapsedTime += loadTime;
+    globals.probElapsedTime = loadTime;
+    globals.lastProbType = '${probType}';
+
+    // send a BEGIN for the xAct if its not a 4mality prob.   4mality sends its own begin event
+    if (globals.lastProbType != '4Mality') {
+        $.get("${pageContext.request.contextPath}/TutorBrain?action=BeginExternalActivity&sessionId="+globals.sessionId+"&elapsedTime=" + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&xactId=${probId}");
+    }
+}

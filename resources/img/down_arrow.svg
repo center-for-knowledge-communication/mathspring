@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>Down arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Down-arrow">
+            <circle id="Oval" fill="#E5387A" cx="30" cy="30" r="30"></circle>
+            <g id="down-arrow-(1)" transform="translate(11.029412, 19.852941)" fill="#FFFFFF">
+                <path d="M37.8246606,0.526610644 C37.2997738,-5.82867088e-16 36.4468326,-5.82867088e-16 35.9219457,0.526610644 L19.1911765,17.3452381 L2.42760181,0.526610644 C1.90271493,-5.82867088e-16 1.04977376,-5.82867088e-16 0.524886878,0.526610644 C-5.55111512e-16,1.05322129 -5.55111512e-16,1.90896359 0.524886878,2.43557423 L18.2070136,20.1757703 C18.469457,20.4390756 18.7975113,20.5707283 19.158371,20.5707283 C19.4864253,20.5707283 19.8472851,20.4390756 20.1097285,20.1757703 L37.7918552,2.43557423 C38.3495475,1.90896359 38.3495475,1.05322129 37.8246606,0.526610644 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

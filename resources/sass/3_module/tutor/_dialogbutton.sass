@@ -1,0 +1,37 @@
+// Stylesheets to override styles of jquery-ui buttons and dialog pane
+
+.ui-dialog
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif !important
+
+.ui-button
+  background: white !important
+  border: 1px solid $font-dark-blue !important
+  border-radius: 0 !important
+  outline: none !important
+  padding: 5px 10px !important
+
+  &:hover
+    background: $progress-60 !important
+
+  &:active
+    background: $main-green !important
+
+  &-text
+    color: $font-dark-blue !important
+
+.ui-widget-header
+  background: $progress-60 !important
+  color: $font-dark-blue !important
+
+.ui-widget-content
+  border: 1px solid $font-dark-blue
+
+.ui-dialog-title
+  font-size: 1.2em
+
+.ui-widget-overlay
+  background: black
+  opacity: 0.7
+
+.slider .dragger
+  top: -6px !important

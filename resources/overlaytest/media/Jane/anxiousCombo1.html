@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CreateJS export from anxiousCombo1</title>
+
+<script src="createJs/easeljs.js"></script>
+<script src="createJs/tweenjs.js"></script>
+<script src="createJs/movieclip.js"></script>
+<script src="createJs/preloadjs.js"></script>
+<script src="createJs/soundjs.js"></script>
+<script src="anxiousCombo1.js"></script>
+
+<script>
+var canvas, stage, exportRoot;
+
+function init() {
+	canvas = document.getElementById("canvas");
+
+	var manifest = [
+		{src:"sounds/Female_AnxVerbalAck1.mp3", id:"Female_AnxVerbalAck1"},
+		{src:"sounds/Female_Connector4.mp3", id:"Female_Connector4"},
+		{src:"sounds/FemaleIncorrectAttribution1.mp3", id:"FemaleIncorrectAttribution1"}
+	];
+
+	var loader = new createjs.LoadQueue(false);
+	loader.installPlugin(createjs.Sound);
+	loader.addEventListener("complete", handleComplete);
+	loader.loadManifest(manifest);
+}
+
+function handleComplete() {
+	exportRoot = new lib.anxiousCombo1();
+
+	stage = new createjs.Stage(canvas);
+	stage.addChild(exportRoot);
+	stage.update();
+
+	createjs.Ticker.setFPS(24);
+	createjs.Ticker.addEventListener("tick", stage);
+}
+
+function playSound(id, loop) {
+	createjs.Sound.play(id, createjs.Sound.INTERRUPT_EARLY, 0, 0, loop);
+}
+</script>
+</head>
+
+<body onload="init();" style="background-color:#D4D4D4">
+	<canvas id="canvas" width="270" height="600" style="background-color:#FFFFFF;"></canvas>
+</body>
+</html>

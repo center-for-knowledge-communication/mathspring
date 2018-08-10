@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/">
+
+  <Resource name="jdbc/wodbcadmium" type="javax.sql.DataSource"
+            auth="Container" description="Mysql database for wayang"
+            maxActive="100" maxIdle="30" maxWait="10000" username="xxxxxxx"
+            password="xxxxxx" removeAbandoned="true" removeAbandonedTimeout="60"
+            logAbandoned="true"  testWhileIdle="true"
+            testOnBorrow="true"
+            testOnReturn="true"
+            timeBetweenEvictionRunMillis="600000"
+            numTestsPerEvictionRun="10"
+            validationQuery="SELECT 1"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://xxxxx.xxx.xxxx.xxx/xxxxxx?autoReconnect=true" />
+
+  <Resource name="jdbc/wodbrose" type="javax.sql.DataSource"
+            auth="Container" description="Mysql database for wayang"
+            maxActive="100" maxIdle="30" maxWait="10000" username="xxxxxx"
+              password="xxxxxx" removeAbandoned="true" removeAbandonedTimeout="60"
+            logAbandoned="true"  testWhileIdle="true"
+            testOnBorrow="true"
+            testOnReturn="true"
+            timeBetweenEvictionRunMillis="600000"
+            numTestsPerEvictionRun="10"
+            validationQuery="SELECT 1"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://xxxx.xxx.xx.xx/xxxxxxxx?autoReconnect=true" />
+ 
+  <Resource name="jdbc/wodblocal" type="javax.sql.DataSource"
+            auth="Container" description="Mysql database for Mathforum"
+            maxActive="100" maxIdle="30" maxWait="10000" username="xxxxx"
+            password="xxxxx" removeAbandoned="true" removeAbandonedTimeout="60"
+            logAbandoned="true"  testWhileIdle="true"
+            testOnBorrow="true"
+            testOnReturn="true"
+            timeBetweenEvictionRunMillis="600000"
+            numTestsPerEvictionRun="10"
+            validationQuery="SELECT 1"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://xxxxxx/xxxxxx?autoReconnect=true" />
+
+</Context>

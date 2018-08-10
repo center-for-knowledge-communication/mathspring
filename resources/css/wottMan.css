@@ -1,0 +1,8 @@
+@charset "utf-8";
+body {
+	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	margin: 0;
+	color: #000;
+	background-attachment: fixed;
+	background-color: #FFF0A3;
+}

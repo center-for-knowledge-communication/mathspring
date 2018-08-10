@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html>
+<!--
+   This is a jQuery Tools standalone demo. Feel free to copy/paste.
+   http://flowplayer.org/tools/demos/
+
+   Do *not* reference CSS files and images from flowplayer.org when in
+   production Enjoy!
+-->
+<head>
+    <title>jQuery Tools standalone demo</title>
+
+    <!-- include the Tools -->
+    <script src="http://cdn.jquerytools.org/1.2.6/full/jquery.tools.min.js"></script>
+
+    <!-- standalone page styling (can be removed) -->
+    <link rel="shortcut icon" href="http://jquerytools.github.io/media/img/favicon.ico">
+    <link rel="stylesheet" type="text/css"
+          href="http://jquerytools.github.io/media/css/standalone.css"/>
+
+    <link rel="stylesheet" type="text/css"
+          href="http://jquerytools.github.io/media/css/overlay-apple.css"/>
+    <style>
+
+        /* the overlayed element */
+        .simple_overlay {
+
+            /* must be initially hidden */
+            display:none;
+
+            /* place overlay on top of other elements */
+            z-index:10000;
+
+            /* styling */
+            /* You can have a transparent overlay if omit the background-color*/
+            background-color:#FFF;
+
+            width:675px;
+            min-height:200px;
+            border:1px solid #666;
+
+            /* CSS3 styling for latest browsers */
+            -moz-box-shadow:0 0 90px 5px #000;
+            -webkit-box-shadow: 0 0 90px #000;
+        }
+
+        /* close button positioned on upper right corner */
+        .simple_overlay .close {
+            background-image:url(http://jquerytools.github.io/media/img/overlay/close.png);
+            position:absolute;
+            right:-15px;
+            top:-15px;
+            cursor:pointer;
+            height:35px;
+            width:35px;
+        }
+    </style>
+
+</head>
+<body><!-- trigger elements -->
+
+<button id="lcb">Open LC</button>
+<button id="lcib">Open LC with iframe</button>
+
+
+
+
+<div class="simple_overlay" style="width:270px; height:610px" id="lci">
+    <div class="details">
+        <iframe id="lciframe" style="width:268px; height:600px" scrolling="no" onload="lcLoaded(this)"></iframe>
+        <p>
+            This is an iframe containing some stuff
+        </p>
+    </div>
+</div>
+
+<div style="height: 620px; width: 300px" class="simple_overlay" id="lc">
+     <div id="lcDiv">
+
+     </div>
+</div>
+
+
+
+<!-- make all links with the 'rel' attribute open overlays -->
+<script>
+
+    function lcLoaded () {
+        var iframe = document.getElementById("lciframe");
+        var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+        var canvs = innerDoc.getElementsByTagName("canvas");
+        var canv = canvs[0];
+        canv.style.margin = "-10px -10px";
+    }
+
+    function viewLC (url) {
+        $("#lciframe").attr('src', url );
+        $("#lci").overlay().load();
+    }
+    
+    $(function() {
+        var w = Math.min(document.documentElement.clientWidth, window.innerWidth || 0);
+        var h = Math.min(document.documentElement.clientHeight, window.innerHeight || 0);
+        var x=w-268-10;
+
+
+        $("#lc").overlay({ left:"50%", top:"20%", closeOnEsc: false});
+        $("#lci").overlay({left:x+"px", top:"20%", closeOnEsc: false});
+//        $("#lc").overlay({effect: 'apple', top: 100});
+//        $("#apple img[rel]").overlay({effect: 'apple'});
+
+
+        $("#lcb").click(function() {
+//            $("#lcframe").attr('src', 'media/Jane/anxiousCombo1.html');
+            $("#lcDiv").load('media/Jane/simple.html');
+            $("#lc").overlay().load();
+        });
+        $("#lcib").click(function() {;
+//            $("#lciframe").attr('src', 'media/Jane/simple.html');
+               viewLC('media/Jane/anxiousCombo1.html');
+
+        });
+       
+        // select the overlay element - and "make it an overlay"
+        
+    });
+</script>
+</body>
+</html>

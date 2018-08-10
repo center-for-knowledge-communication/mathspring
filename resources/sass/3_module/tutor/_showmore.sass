@@ -1,0 +1,30 @@
+.huytran-sitenav__showmore
+  display: block
+  margin-left: 30px
+  margin-top: 10px
+  text-decoration: none
+  color: $font-dark-blue
+
+  &-target
+    display: block
+    transition: all 0.25s ease
+
+  &-state
+    display: none
+
+  &-state:checked ~ &-target
+    display: none
+
+  &-state ~ &-trigger:before
+    content: 'show less...'
+
+  &-state:checked ~ &-trigger:before
+    content: 'show more...'
+
+  &-trigger
+    display: inline-block
+    margin-top: 10px
+    margin-left: 30px
+    text-decoration: none
+    color: $font-dark-blue
+    cursor: pointer

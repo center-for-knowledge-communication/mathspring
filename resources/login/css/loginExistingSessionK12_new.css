@@ -1,0 +1,39 @@
+.system-message-box-wrapper {
+    padding: 25px 0;
+    background:
+            linear-gradient(
+                    rgba(7, 138, 104, 0.8),
+                    rgba(7, 138, 104, 0.8)),
+            url(../images/tree.png) no-repeat center;
+    position: relative;
+    height: 450px;
+}
+
+.system-message-box {
+    padding: 25px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: solid 1px #979797;
+}
+
+.return-home-btn,
+.return-home-btn:active,
+.return-home-btn:focus {
+    background: #f6a623;
+    border-color: #f6a623;
+}
+
+.return-home-btn:hover {
+    background: #e2b33e;
+    border-color: #e2b33e;
+}
+
+.system-message-title {
+    font-size: 2em;
+    text-align: center;
+}
+
+.system-message-content {
+    text-align: justify;
+}
+

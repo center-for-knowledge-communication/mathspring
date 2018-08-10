@@ -1,0 +1,86 @@
+body
+  margin: 0 !important
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif
+
+.main-content
+  background-image: radial-gradient(#3dc3e2, #3dc3e2 0%, #1887a1 70%, #116275 100%)
+
+.topic-details-wrapper
+  padding: 70px 70px
+  position: relative
+  z-index: 0
+
+.topic-details-view 
+  padding: 10px 30px
+  border-radius: 4px
+  background-color: rgba(255, 255, 255, 0.8)
+  border: solid 1px $font-dark-blue
+
+.topic-overview
+  border: solid 1px $font-dark-blue
+  border-radius: 4px
+  background: #fff
+
+.topic-statistics 
+  border-bottom: solid 1px $font-dark-blue
+  text-align: center
+
+
+.problem-done-num 
+  font-size: 4em
+
+.plotArea
+  margin: auto
+
+.detail-problem-view 
+  border-left: solid 1px $font-dark-blue
+  padding: 20px
+  text-align: center
+  height: 700px
+
+#wrapperList 
+  padding: 10px
+
+#wrapperList > li 
+  display: inline-block
+  margin-left: 5px
+  cursor: pointer
+
+.emptyCard,
+.giveupCard,
+.correctCard,
+.correctOnAttemptsCard,
+.correctWithHintsCard 
+  width: 30px
+  height: 50px
+  background: #FFE234 !important
+  text-align: center
+
+.giveupCard 
+  background: #CD4747 !important
+
+.correctCard,
+.correctOnAttemptsCard,
+.correctWithHintsCard 
+  background: #2ECC71 !important
+
+.non-selected-card
+  border: solid 2px #fff
+
+.selected-card 
+  border: solid 2px #000
+
+#problemImage,
+#formalityProblemFrame 
+  display: block
+  margin: 15px auto
+
+.try-problem-button
+  border-radius: 0 !important
+  color: $font-dark-blue
+  background: white
+  cursor: pointer
+  border: 1px solid $font-dark-blue !important
+
+  &:hover
+    background: $progress-60

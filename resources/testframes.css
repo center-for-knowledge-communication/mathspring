@@ -1,0 +1,50 @@
+
+
+div.frame2_container {
+    display: inline;
+    float: right;
+    margin: 5%;
+    background-color: red;
+    z-index: 3;
+    position: relative;
+}
+
+/*div.screen {*/
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    /*height: 100%;*/
+    /*width: 100%;*/
+    /*background-color: blue;*/
+    /*z-index: 1;*/
+    /*height: auto !important;*/
+    /*min-height: 100%;*/
+    /*display: block;*/
+    /*background-color: blue;*/
+    /*position: relative;*/
+    /*width: 100%;*/
+    /*z-index: 0;*/
+    /*align: top;*/
+/*}*/
+
+iframe.frame {
+    display: inline;
+    float: left;
+    margin: 5%;
+    z-index: 1;
+}
+
+div.wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+iframe.lc_frame {
+    position: relative;
+    z-index: 2;
+}
+
+image.lc_frame {
+    position: relative;
+    z-index: 0;
+}

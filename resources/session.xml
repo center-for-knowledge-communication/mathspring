@@ -1,0 +1,23 @@
+<sessions>
+
+    <session>
+        <interventions>
+            <intervention on="Login" weight="1" class="LoginGetUserName" showOnce="true">
+                <jsp>loginGetUserName.jsp</jsp>
+
+            </intervention>
+
+            <!--<intervention on="Login" weight="2" class="GetMathAttitudes" showOnce="true">-->
+                <!--<jsp>loginGetMathAttitudes.jsp</jsp>-->
+
+            <!--</intervention>-->
+
+            <intervention on="Login" weight="3" class="GetNeighbors" showOnce="true">
+                <jsp>loginGetNeighbors.jsp</jsp>
+
+            </intervention>
+        </interventions>
+
+    </session>
+
+</sessions>

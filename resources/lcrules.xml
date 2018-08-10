@@ -1,0 +1,411 @@
+<rules>
+    <lc_r name="2" priority="1" onEvent="Attempt">
+        <lc_c fnname="hintExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="68" media="HintUseful1">This is the moment where the Hint Button can be very useful</lc_a>
+    </lc_r>
+
+    <lc_r name="3" priority="1" onEvent="Attempt">
+        <lc_c fnname="videoExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="69" media="video1">How about we ask for a video to help us?</lc_a>
+    </lc_r>
+
+    <lc_r name="4" priority="1" onEvent="Attempt">
+        <lc_c fnname="hintExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="70" media="Hint1">Hey, let's click on the hint button! Maybe that will help us</lc_a>
+    </lc_r>
+
+    <lc_r name="5" priority="1" onEvent="Attempt">
+        <lc_c fnname="exampleExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="71" media="example1">How about we click on the example button?</lc_a>
+    </lc_r>
+
+
+    <lc_r name="7" priority="1" onEvent="Attempt">
+        <lc_c fnname="hintExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="HIGH" type="mastery"></lc_c>
+        <lc_a messageId="68" media="HintUseful1">This is the moment where the Hint Button can be very useful</lc_a>
+    </lc_r>
+
+    <lc_r name="8" priority="1" onEvent="Attempt">
+        <lc_c fnname="hintExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="MIDDLE" type="mastery"></lc_c>
+        <lc_a messageId="68" media="HintUseful1">This is the moment where the Hint Button can be very useful</lc_a>
+    </lc_r>
+
+
+    <lc_r name="11" priority="1" onEvent="Attempt">
+        <lc_c fnname="hintExists"/>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_a messageId="73" media="dontgiveup1">Don't give up yet, you can do this. Try asking for a hint</lc_a>
+    </lc_r>
+
+
+    <!-- If not reading the problem because hint was within 2 seconds-->
+    <lc_r name="13" priority="1" onEvent="Attempt">
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="timeToFirstHintSecs" relop="&lt;=" val="2.0" type="Double"></lc_c>
+        <lc_c fnname="timeToFirstHintSecs" relop="&gt;=" val="0.0" type="Double"></lc_c>
+        <lc_a messageId="75" media="compread1">How about we have the computer read the problem for us? You need to click
+            on "Read Problem"
+        </lc_a>
+    </lc_r>
+
+
+    <lc_r name="14" priority="1" onEvent="Attempt">
+        <lc_c fnname="currentEffort" relop="=" val="SOF" type="String"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&lt;=" val="10" type="Double"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="76" media="Amazing1">You are doing amazing."</lc_a>
+    </lc_r>
+
+    <lc_r name="15" priority="1" onEvent="Attempt">
+        <lc-c fname="numHintsGiven" relop="=" val="1" type="integer"/>
+        <lc_c fnname="isSolved"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="&gt;=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="78" media="HintsWork">Great job, see? the hints do work"</lc_a>
+    </lc_r>
+
+    <lc_r name="16" priority="1" onEvent="Attempt">
+        <lc-c fname="numHintsGiven" relop="=" val="1" type="integer"/>
+        <lc_c fnname="isSolved"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="&gt;=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="80" media="Dedication">
+            Very good job! Your effort and dedication are impressive, and it is paying off
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="17" priority="1" onEvent="Attempt">
+        <lc-c fname="numHintsGiven" relop="=" val="1" type="integer"/>
+        <lc_c fnname="isSolved"></lc_c>
+        <lc_c fnname="topicMasteryValue" relop="&gt;=" type="mastery" val="LOW"></lc_c>
+        <lc_a messageId="81" media="Sticking">
+            Even though these problems are hard, you are sticking with it! Your approach is the right one and I bet you
+            will soon be getting these problems without needing any hints
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="18" priority="2" onEvent="Attempt">
+        <lc_c fnname="hintExists"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="1" type="Integer"></lc_c>
+
+        <lc_a messageId="82" media="SecretWeapon">
+            Hey, Do you know about our secret weapon? It's the Hint Button. Students tell us it helps a lot. If the
+            first hint doesn't help, try another
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="19" priority="1" onEvent="Attempt">
+        <lc_c fnname="currentEffort" relop="=" val="SOF" type="String"></lc_c>
+        <lc_c fnname="effort1" relop="=" val="SHINT" type="String"></lc_c>
+        <lc_a messageId="77" media="SHINTANDSOF">
+            You SAW hints in the last problem and now got this one correct. I have to congratulate you --I think you
+            learned something with those hints!
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="20" priority="1" onEvent="Attempt">
+        <lc_c fnname="currentEffort" relop="=" val="SOF" type="String"></lc_c>
+        <lc_c fnname="effort1" relop="=" val="SOF" type="String"></lc_c>
+        <lc_c fnname="effort2" relop="=" val="SOF" type="String"></lc_c>
+        <lc_a messageId="90" media="THREECORRECT">
+            You got three correct in a row, congratulations!!!
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="21" priority="1" onEvent="Hint">
+        <lc_c fnname="numHintsGiven" relop="&gt;" val="2" type="Integer"></lc_c>
+        <lc_a messageId="79" media="GetAnswerFromHints">
+            Using a lot of hints is not bad at all, if we use them to learn something and apply what you learn to the
+            next problem
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="22" priority="1" onEvent="BeginProblem">
+        <override_metarule name="thisRuleNotFiredInPastMinutes" value="15" units="minutes"/>
+        <lc_a messageId="39" media="generalAttribution1">
+            Did you know that when we learn something new our BRAIN actually changes? It forms new connections inside
+            that help us solve problems in the future.
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="23" priority="1" onEvent="BeginProblem">
+        <override_metarule name="thisRuleNotFiredInPastMinutes" value="15" units="minutes"/>
+        <lc_a messageId="40" media="generalAttribution2">
+            Did you know that when we practice to learn new math skills our brain grows and gets stronger?
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="24" priority="1" onEvent="BeginProblem">
+        <override_metarule name="thisRuleNotFiredInPastMinutes" value="15" units="minutes"/>
+        <lc_a messageId="41" media="generalAttribution3">
+            Hey, I found out that people have myths about math, like, that only some people are 'good' at math.
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="25" priority="1" onEvent="BeginProblem">
+        <override_metarule name="thisRuleNotFiredInPastMinutes" value="15" units="minutes"/>
+        <lc_a messageId="42" media="generalAttribution4">
+            I think that the most important thing is to have an open mind and the belief that one can actually do math.
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="26" priority="1" onEvent="BeginProblem">
+        <override_metarule name="thisRuleNotFiredInPastMinutes" value="15" units="minutes"/>
+        <lc_a messageId="43" media="generalAttribution5">
+            I think that more important than getting the problem right is putting in the effort and keeping in mind the
+            fact that we can all be good at math if we try.
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="27" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c fnname="timeToSecondAttemptSecs" relop="&lt;" val="4" type="Double"></lc_c>
+        <lc_a messageId="59" media="incorrectNoEffort1">
+            Should we ask the computer for help?
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="28" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="59" media="incorrectNoEffort1">
+            Should we ask the computer for help?
+        </lc_a>
+    </lc_r>
+    <lc_r name="29" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="60" media="incorrectNoEffort2">
+            I know we can do better than this if we take our time to solve the problem.
+        </lc_a>
+    </lc_r>
+    <lc_r name="30" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="64" media="noEffortAttribution2">
+            There is no one single way to learn something new.
+        </lc_a>
+    </lc_r>
+    <lc_r name="31" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="47" media="incorrect1">
+            Hmm. Wrong. Shall we work it out on paper?
+        </lc_a>
+    </lc_r>
+    <lc_r name="32" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="48" media="incorrect2">
+            Mmmm…. Let’s give it another shot.
+        </lc_a>
+    </lc_r>
+    <lc_r name="33" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="49" media="incorrect3">
+            Let’s read again what the problem is asking.
+        </lc_a>
+    </lc_r>
+    <lc_r name="34" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="50" media="incorrect4">
+            Maybe asking for a hint will help us?
+        </lc_a>
+    </lc_r>
+    <lc_r name="35" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="51" media="incorrect5">
+        </lc_a>
+    </lc_r>
+    <lc_r name="36" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="52" media="incorrect6">
+        </lc_a>
+    </lc_r>
+    <lc_r name="37" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="57" media="incorrectEffort1">
+            There is an opportunity to learn. Let’s click on the help button.
+        </lc_a>
+    </lc_r>
+    <lc_r name="38" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="58" media="incorrectEffort2">
+            Let’s click on help, and I am sure we will learn something.
+        </lc_a>
+    </lc_r>
+    <lc_r name="39" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="58" media="effortAttribution1">
+            Keep in mind that when we are struggling with a new idea or skill we are learning and becoming smarter!
+        </lc_a>
+    </lc_r>
+    <lc_r name="40" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="26" media="effortAttribution1">
+            Keep in mind that when we are struggling with a new idea or skill we are learning and becoming smarter!
+        </lc_a>
+    </lc_r>
+    <lc_r name="41" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="27" media="effortAttribution2">
+            Struggling in problems is actually a good thing, because it means we are challenging ourselves to learn
+            something new and grow our intelligence!
+        </lc_a>
+    </lc_r>
+    <lc_r name="42" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="42" media="generalAttribution4">
+            I think that the most important thing is to have an open mind and the belief that one can actually do math.
+        </lc_a>
+    </lc_r>
+    <lc_r name="43" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="53" media="incorrectAttribution1">
+            Making a mistake isn't a bad thing. It's what learning is all about!
+        </lc_a>
+    </lc_r>
+    <lc_r name="44" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="54" media="incorrectAttribution2">
+            When we realize we don’t know why that was not the right answer, it helps us understand better what we need
+            to practice.
+        </lc_a>
+    </lc_r>
+    <lc_r name="45" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="55" media="incorrectAttribution3">
+            When we realize we don’t know why that was not the right answer, it helps us understand better what we need
+            to practice.
+        </lc_a>
+    </lc_r>
+    <lc_r name="46" priority="1" onEvent="Attempt">
+        <lc_c fnname="numIncorrectAttempts" relop="=" val="2" type="Integer"></lc_c>
+        <lc_c not="on" fnname="isSolved"></lc_c>
+        <lc_a messageId="56" media="incorrectAttribution5">
+            we may need to practice a lot. But our brains will develop with what we learn.
+        </lc_a>
+    </lc_r>
+    <lc_r name="47" priority="1" onEvent="Attempt">
+        <lc_c fnname="numAttemptsToSolve" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&gt;=" val="4" type="Double"></lc_c>
+        <lc_a messageId="16" media="correct1">
+            You got it! I didn’t know that one. Let’s move on now.
+        </lc_a>
+    </lc_r>
+    <lc_r name="48" priority="1" onEvent="Attempt">
+        <lc_c fnname="numAttemptsToSolve" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&gt;=" val="4" type="Double"></lc_c>
+        <lc_a messageId="17" media="correct2">
+            Excellent job!
+        </lc_a>
+    </lc_r>
+    <lc_r name="49" priority="1" onEvent="Attempt">
+        <lc_c fnname="numAttemptsToSolve" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&gt;=" val="4" type="Double"></lc_c>
+        <lc_a messageId="18" media="correct3">
+            Awesome! Let’s go ahead with the next question.
+        </lc_a>
+    </lc_r>
+    <lc_r name="50" priority="1" onEvent="Attempt">
+        <lc_c fnname="numAttemptsToSolve" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&gt;=" val="4" type="Double"></lc_c>
+        <lc_a messageId="19" media="correct4">
+            Very good,we got another one right!
+        </lc_a>
+    </lc_r>
+    <lc_r name="51" priority="1" onEvent="Attempt">
+        <lc_c fnname="numAttemptsToSolve" relop="=" val="1" type="Integer"></lc_c>
+        <lc_c fnname="timeToSolveSecs" relop="&lt;" val="4" type="Double"></lc_c>
+        <lc_a messageId="25" media="correctNoEffort2">
+            That was good!
+        </lc_a>
+    </lc_r>
+
+
+    <lc_r name="52" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="curProbHarderThanLastProb" type="Boolean"/>
+        <lc_c fnname="curProbTopicSameAsLastProbTopic" type="Boolean"/>
+        <lc_c fnname="curProbMode" type="String" relop="=" val="practice"/>
+        <lc_a  messageId="87" media="HarderThanLast">
+            Now, this problem is harder than the last one. Let's take it slowly and work on this one carefully
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="53" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="lastProblemIsExampleOrDemo" type="Boolean"/>
+        <lc_c fnname="curProbTopicSameAsLastProbTopic" type="Boolean"/>
+        <lc_c fnname="curProbMode" type="String" relop="=" val="practice"/>
+        <lc_a  messageId="86" media="YourTurnAfterExample">
+            Now it is your turn to solve a problem!
+        </lc_a>
+    </lc_r>
+
+    <lc_r name="54" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="effort1" relop="=" val="GIVEUP" type="String"></lc_c>
+        <lc_c fnname="effort2" relop="=" val="GIVEUP" type="String"></lc_c>
+        <lc_a messageId="93" media="NotAnsweringAnyMore">
+            You are not answering the problems anymore, are they too hard?. how about we click on "My Progress" and CHOOSE something different?
+        </lc_a>
+
+    </lc_r>
+
+    <lc_r name="55" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="effort1" relop="=" val="NOTR" type="String"></lc_c>
+        <lc_c fnname="effort2" relop="=" val="NOTR" type="String"></lc_c>
+        <lc_a messageId="93" media="NotAnsweringAnyMore">
+            You are not answering the problems anymore, are they too hard?. how about we click on "My Progress" and CHOOSE something different?
+        </lc_a>
+
+    </lc_r>
+
+    <lc_r name="56" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="isFirstProblemInTopic" type="Boolean"></lc_c>
+        <lc_c fnname="lastTopicMasteryValue" relop="=" val="HIGH" type="mastery"></lc_c>
+        <lc_a messageId="96" media="SWITCHNOHARDER">
+            Ok, here goes a new set of problems. I think we are doing very well, what do you think?
+        </lc_a>
+
+    </lc_r>
+
+    <lc_r name="57" priority="1" onEvent="BeginProblem">
+        <lc_c fnname="isFirstProblemInTopic" type="Boolean"></lc_c>
+        <lc_c fnname="lastTopicMasteryValue" relop="=" val="LOW" type="mastery"></lc_c>
+        <lc_a messageId="97" media="SWITCHNOEASIER">
+            Ok, let's stop for a moment and think. How about we take this set of problems slowwwly, and ask for hints when necessary . Deal?
+        </lc_a>
+
+    </lc_r>
+
+</rules>

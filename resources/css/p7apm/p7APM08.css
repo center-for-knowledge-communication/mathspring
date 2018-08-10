@@ -1,0 +1,89 @@
+/* 
+  -----------------------------------
+  Accordion Panel Magic
+  by Project Seven Development
+  www.projectseven.com
+  Style Theme: 08 - Emerald
+  -----------------------------------
+*/
+
+.p7APM08 {
+
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding: 1px;
+	border: 1px dotted #FFE88E;
+	font-size: 14px;
+	margin: 0 auto;
+	width: auto;
+}
+.p7APM08 .p7APMtrig {
+	margin: 0;
+	padding: 0;
+	background-repeat: repeat-x;
+	background-color: #5A9D56;
+	background-image: url(img/p7apm_emerald.jpg);
+}
+.p7APM08 .p7APMtrig h3, .p7APM08 .p7APMtrig h4 {
+	margin: 0 !important;
+	padding: 0 !important;
+	letter-spacing: normal !important;
+	font-size: 14px;
+}
+.p7APM08 .p7APMtrig a {
+	display: block;
+	text-decoration: none;
+	padding: 8px 18px 8px 20px;
+	color: #FFF0A3 !important;
+	font-weight: normal;
+	background-image: url(img/p7apm_east_black.gif);
+	background-repeat: no-repeat;
+	background-position: left center;
+	/*border-bottom: 1px solid #5A9D56;
+	border-top: 1px solid #5A9D56;*/
+}
+.p7APM08 .p7APMtrig .p7APM_ext, .p7APM08 .p7APMtrig .p7APM_ext.p7APMtrig_down {
+	background-image: url(img/p7apm_page_black.gif) !important;
+	background-color: transparent !important;
+	color: #000 !important;
+	/*border-bottom: 1px solid #5A9D56 !important;
+	border-top: 1px solid #5A9D56 !important;*/
+}
+.p7APM08 .p7APMtrig a:hover {
+	color: #FFF !important;
+	background-color: transparent !important;
+}
+.p7APM08 .p7APMtrig a:active, .p7APM08 .p7APMtrig a:focus {
+	/*outline: 1px dotted #ccc;*/
+}
+.p7APM08 .p7APMtrig .p7APMtrig_down, .p7APM08 .p7APMtrig .p7APMtrig_down:hover {
+	letter-spacing: 0.15em;
+	background-image: url(img/p7apm_emerald_down.jpg) !important;
+	background-repeat: no-repeat;
+	background-position: left center;
+	background-color: #fff0a3 !important;
+	color: #000 !important;
+	/*border-color: #FFD040 !important;*/
+}
+.p7APM08 .p7APMcwrapper {
+	position: relative;
+}
+.p7APM08 .p7APMpanelcontent {
+	padding: 20px;
+	line-height: 1.5em;
+	background-image: url(img/p7apm_bevel_white.jpg);
+	background-repeat: repeat-x;
+	background-color: #FFF;
+}
+.p7APM08 .p7APMcontent h2, .p7APM08 .p7APMcontent h3, 
+.p7APM08 .p7APMcontent h4 {
+	font-size: 16px;
+	margin: 0px;
+	line-height: normal;
+	letter-spacing: 0.1em;
+}
+.p7APM08 .p7APMcontent p {
+	margin: 6px 0;
+}
+.p7APM08 .current_mark {
+	font-weight: bold !important;
+}

@@ -1,0 +1,20 @@
+<lc_ruleset name="BasedOnCurrentProblem" description="Based on Current Problem" notes="created by Dave in XML file lc_curProblem.xml">
+    <meta_rule name="thisRuleNotFiredInPastMinutes" value="8" units="minutes" />
+    <meta_rule name="noMessageFiredInPastMinutes" value="30" units="seconds" />
+    <rule>2</rule>
+    <rule>3</rule>
+    <rule>4</rule>
+    <rule>5</rule>
+    <rule>7</rule>
+    <rule>8</rule>
+    <rule>11</rule>
+    <rule>13</rule>
+    <rule>14</rule>
+    <rule>15</rule>
+    <rule>16</rule>
+    <rule>17</rule>
+    <rule>18</rule>
+    <rule>19</rule>
+    <rule>20</rule>
+    <rule>21</rule>
+</lc_ruleset>

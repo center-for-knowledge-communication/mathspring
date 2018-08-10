@@ -1,0 +1,65 @@
+$teacher: #f6a623
+$student: #38a186
+
+.main-content
+  min-height: calc(100vh - 72px)
+  background-color: #3dc3e2
+  background-image: radial-gradient(#3dc3e2, #3dc3e2 0%, #1887a1 70%, #116275 100%)
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif !important
+  position: relative
+  color: $font-dark-blue
+  padding: 50px
+
+.registration-box
+  background-color: white
+  border: 1px solid $font-dark-blue
+
+.vertical-center
+  display: flex
+  align-items: center
+  min-height: 75vh
+
+.teacher-registration-form
+  padding-bottom: 70px
+  padding-right: 35px
+
+.bootstrap .teacher-button
+  background: $teacher
+  border-radius: 0
+  color: white
+  border: 1px solid $font-dark-blue
+  padding: 10px 30px
+
+  &:hover, &:active
+    background: $teacher - 20
+    color: white
+
+.bootstrap .student-button
+  background: $student
+  border-radius: 0
+  color: white
+  border: 1px solid $font-dark-blue
+  padding: 10px 30px
+
+  &:hover, &:active
+    background: $student - 20
+    color: white
+
+.bootstrap .form-title
+  margin-bottom: 20px
+  font-weight: 300
+
+footer
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  text-align: center
+  background-color: $main-green
+  padding: 10px 0 10px 0
+  color: white
+  font-size: 0.9em
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif
+
+.msg-bar
+  margin-top: 20px

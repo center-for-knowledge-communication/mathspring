@@ -1,0 +1,272 @@
+
+
+
+
+<!DOCTYPE HTML>
+<html><head>
+    <meta charset="utf-8">
+    <title>UMass Math Tutor</title>
+    <link href="css/wanDutBG.css" rel="stylesheet" type="text/css">
+    <link href="css/menu.css" rel="stylesheet" type="text/css">
+    <link href="css/navlog.css" rel="stylesheet" type="text/css">
+    <link href="css/wayang.css" rel="stylesheet" type="text/css">
+    <link href="css/button.css" rel="stylesheet" type="text/css">
+    <link href="css/simple-slider.css" rel="stylesheet" type="text/css">
+
+
+
+    <link href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
+    <script src="js/jquery-1.10.2.js"></script>
+
+    <script src="js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="js/simple-slider.js"></script>
+
+    <script type="text/javascript" src="js/tutorutils.js"></script>
+    <script type="text/javascript" src="js/tutorAnswer.js"></script>
+    <script type="text/javascript" src="js/tutorhint.js"></script>
+    <script type="text/javascript" src="js/tutorhut.js"></script>
+    <script type="text/javascript" src="js/tutorintervention.js"></script>
+    <script type="text/javascript" src="js/intervhandlers.js"></script>
+    <script type="text/javascript" src="js/swfobject.js"></script>
+    <script type="text/javascript">
+        var globals = {
+            lastProbType: 'TopicIntro',
+            isBeginningOfSession: false,
+            sessionId: 50990,
+            elapsedTime: 6707,
+            probElapsedTime: 0,
+            clock: 0,
+            curHint: null,
+            exampleCurHint: null,
+            hintSequence: null,
+            exampleHintSequence: null,
+            lastProbId: 999,
+            trace: false,
+            debug: false,
+            topicId: 1,
+            guiLock: false,
+            learningCompanion: 'Jane',
+            studId : 26449 ,
+            probType : 'flash',
+            exampleProbType : null,
+            probId : 96,
+            probMode: 'practice',
+            tutoringMode: 'practice',
+            instructions : '',
+            resource : 'problem_050',
+            answer : '',
+            interventionType: null,
+            isInputIntervention: false ,
+            learningCompanionClip: null,
+            activityJSON: '{"activityType":"flash","id":96,"isExternalActivity":false,"mode":"practice","topicId":-1,"topicName":"","answer":"d","type":"flash","resource":"problem_050","instructions":"This is a problem about PolygonPerimeter"}',
+            showMPP: true,
+
+            showSelectProblemButton: true,
+            showAnswer: true
+        }
+
+        var sysGlobals = {
+            isDevEnv: true,
+            wayangServletContext: 'mt',
+            problemContentDomain : '',
+            problemContentPath : '/mt/mathspring',
+            webContentPath : 'http://localhost:8080/mathspring/',
+
+            servletName : 'TutorBrain',
+            probplayerPath : 'http://localhost:8080/mt/mathspring/Problems/probplayer.swf',
+            wait: false
+
+        }
+
+        var transients = {
+            answerChoice: null  ,
+            selectedButton: null ,
+            answersChosenSoFar: []
+        }
+
+
+        // Unfortunately the back button will run this function too which means that it can generate a BeginExternalActivity
+        $(document).ready(
+                function () {
+                    tutorhut_main(globals,sysGlobals,transients, "mathspring/LearningCompanion/Jane/idle.html");
+                }
+        );
+    </script>
+
+
+    <style type="text/css">
+        .leftcol {
+            padding: 8px;
+            float: right;
+            width: 1000px;
+        }
+
+        .empty {
+        }
+
+    </style>
+    <style type="text/css" media="screen">#flashContainer2 {visibility:hidden}</style></head>
+
+<body>
+<audio id="questionaudio" name="questionaudio"><source id="questionogg" src="" type="audio/ogg"><source id="questionmp3" src="" type="audio/mpeg">Your browser does not support the audio element.</audio>
+
+
+
+
+
+
+
+
+
+
+<div class="wrapper">
+    <div style="position:relative" class="container">
+        <img src="img/header3.png" width="1200" height="106" alt="mathematics">
+        <div id="userDisplay" style="position:absolute; top:10px; right:10px; width:300px; height:50px; z-index:2;">Logged in as: marshall</div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+
+            <ul class="buttons">
+                <li class="prob1">
+                    <a id="nextProb" href="#" class="button">New Problem</a>
+                </li>
+                <li class="inst2">
+                    <a id="instructions" href="#" class="button">Instructions</a>
+                </li>
+                <li id="mppButton" class="inst2">
+                    <a id="myProg" href="#" class="button">My Progress</a>
+                </li>
+
+                <li id="selectProblemButton" class="probSel">
+                    <a id="selectProb" href="#" class="button">Select Problem</a>
+                </li>
+
+
+            </ul>
+
+            <div class="leftCol">
+                <div class="mntop">
+                    Help
+                </div>
+                <ul class="mnCNT">
+                    <li class="elb_read">
+                        <a id="read" href="#">Read Problem</a>
+                    </li>
+                    <li class="elb_hint">
+                        <a id="hint" href="#">Hint</a>
+                    </li>
+                    <li class="elb_replay">
+                        <a id="replay" href="#">Replay Hint</a>
+                    </li>
+
+
+
+
+
+
+                </ul>
+                <br>
+                <div class="mntop">
+                    Resources
+                </div>
+                <ul class="mnCNT">
+                    <li class="elb_show">
+                        <a id="example" href="#">Show Example</a>
+                    </li>
+                    <li class="elb_vid">
+                        <a id="video" href="#">Show Video</a>
+                    </li>
+                    <li class="elb_formulas">
+                        <a id="formulas" href="#">Formulas</a>
+                    </li>
+                    <li class="elb_glossary">
+                        <a id="glossary" href="#">Glossary</a>
+                    </li>
+                </ul>
+                <br>
+                <div class="mntop">
+                    Places
+                </div>
+                <ul class="mnCNT">
+                    <li class="elb_mpp">
+                        <a id="prefs" href="#">Preferences</a>
+                    </li>
+                    <li class="elb_home">
+                        <a id="home" href="#">Home</a>
+                    </li>
+                    <li class="elb_pid">
+                        <div id="pid">96:problem_050</div>
+                    </li>
+                    <li class="elb_pid">
+                        <div id="effort">?-INTRO-SKIP</div>
+                    </li>
+
+                    <li class="elb_pid">
+                        <div id="answer">Answer: d</div>
+                    </li>
+                </ul>
+                <p>&nbsp;
+
+                </p>
+            </div>
+            <div style="position:absolute; width:300; height:200; top:550px; right:400px">Topic: Foundations of Mathematics<br/>Standards:6.ns.3.a, 7.ps.5.b, 8.NS.C.1, 7.CS.4.c, 9.adf.44.c</div>
+            <div id="flashContainer1">
+                <object type="application/x-shockwave-flash" id="flashprobplayer" name="flashprobplayer" data="http://localhost:8080/mt/mathspring/Problems/probplayer.swf?questionNum=050" width="600" height="475"><param name="wmode" value="transparent"><param name="allowscriptaccess" value="always"><param name="flashvars" value="hostURL=mathspring/&amp;correctAnswer=d&amp;readAloud=false&amp;isExample=false"></object>
+            </div>
+
+            <div id="frameContainer" class="problemDiv">
+                <iframe id="problemWindow" class="probWindow" name="iframe1" width="600" height="600" src="" frameborder="no" scrolling="no" kwframeid="1" style="display: none;">
+                </iframe>
+            </div>
+
+
+
+
+
+
+
+
+
+            <!-- end .content -->
+        </div>
+        <!-- end .container -->
+    </div>
+    <!--<div class="container">
+    -->
+
+
+
+
+
+
+
+    <!-- end .container -->
+    <!--</div>-->
+    <!-- end .content -->
+</div>
+
+
+
+
+
+<div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="learningCompanionContainer" aria-labelledby="ui-id-1" style="position: absolute; height: auto; width: 300px; top: 188px; left: 1248px; display: block;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-1" class="ui-dialog-title">&nbsp;</span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="learningCompanionContainer" class="ui-dialog-content ui-widget-content" style="width: auto; min-height: 0px; max-height: none; height: 636px;">
+    <iframe id="learningCompanionWindow" name="lciframe" width="260" height="600" src="mathspring/LearningCompanion/Jane/idle.html" frameborder="yes" scrolling="no" kwframeid="2">
+    </iframe>
+</div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="instructionsDialog" aria-labelledby="ui-id-2" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-2" class="ui-dialog-title">Instructions</span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div style="z-index:100;" id="instructionsDialog" class="ui-dialog-content ui-widget-content">
+    <p id="instructionsP"></p>
+
+    <div class="empty"></div>
+</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Close</span></button></div></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="selectProblemDialog" aria-labelledby="ui-id-3" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-3" class="ui-dialog-title">Select Problem</span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="selectProblemDialog" class="ui-dialog-content ui-widget-content">
+    <iframe id="selectProblemDialogIframe" width="500" height="500" kwframeid="3"></iframe>
+</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Cancel</span></button></div></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="interventionDialog" aria-labelledby="ui-id-4" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-4" class="ui-dialog-title"></span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="interventionDialog" class="ui-dialog-content ui-widget-content">
+    <div id="interventionDialogContent"></div>
+
+</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" id="see_progress_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">See Progress</span></button><button type="button" id="no_thanks_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">No thanks</span></button><button type="button" id="ok_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">OK</span></button></div></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="exampleContainer" aria-labelledby="ui-id-5" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-5" class="ui-dialog-title">Watch/listen to this example. Use 'Play Next Step' to move along</span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="exampleContainer" width="600" height="600" class="ui-dialog-content ui-widget-content">
+
+    <iframe id="exampleFrame" name="iframe2" width="600" height="600" src="" frameborder="no" scrolling="no" kwframeid="4">
+    </iframe>
+</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" id="play_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Play next step</span></button><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Done</span></button></div></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-dialog-buttons ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="utilDialog" aria-labelledby="ui-id-6" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-6" class="ui-dialog-title"></span><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" style="display: none;"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="utilDialog" class="ui-dialog-content ui-widget-content">
+    <iframe id="utilDialogIframe" width="675" height="675" kwframeid="5"> </iframe>
+</div><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Close</span></button></div></div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div></body></html>

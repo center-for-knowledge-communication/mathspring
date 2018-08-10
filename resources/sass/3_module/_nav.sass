@@ -1,0 +1,75 @@
+.nav
+  display: -ms-flexbox
+  display: flex
+  -ms-flex-direction: row
+  flex-direction: row
+  -ms-flex-pack: justify
+  justify-content: space-between
+  padding: 10px
+  font-family: Raleway, Helvetica, Arial, "Lucida Grande", sans-serif
+
+  &__logo-image
+    margin: 5px 10px 0 10px
+    border-radius: 5px
+    width: 40px
+    height: 40px
+
+  &__logo-text
+    font-size: 2em
+    position: relative
+    top: -8px
+    font-weight: 300
+
+  &__logo-text--green-letter
+    color: #2ECC71
+
+  &__list
+    margin-top: 18px
+    list-style: none
+    display: flex
+    flex-direction: row
+
+  &__dropdown:hover &__dropdown-content
+    display: block
+
+  &__dropdown-button
+    color: #003364
+    cursor: pointer
+
+  &__dropdown-button:hover
+    background: #92DDA3
+
+  &__dropdown-button:focus
+    background: #2ECC71
+
+  &__dropdown-content
+    display: none
+    position: absolute
+    min-width: 120px
+    top: 60px
+    background: white
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2)
+    z-index: 1
+
+  &__dropdown-content a
+    float: none
+    text-align: center
+    color: $font-dark-blue
+    text-decoration: none
+    display: block
+
+  &__item--last
+    margin-right: 20px
+
+  &__item a
+    padding: 15px 25px
+    text-decoration: none
+    color: $font-dark-blue
+
+  &__item span
+    padding-right: 15px
+
+  &__item a:hover
+    cursor: pointer
+    background-color: $progress-60
+    box-shadow: inset 0 0 10px #7ec98f

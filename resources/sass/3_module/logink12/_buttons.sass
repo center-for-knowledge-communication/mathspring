@@ -1,0 +1,27 @@
+$teacher: #f6a623
+$student: #38a186
+$guest: #ff6a79
+
+.bootstrap .signup-btn
+  margin-bottom: 5px
+  color: white
+  outline: none
+  border-radius: 0
+
+  &--teacher
+    @extend .signup-btn
+    background: $teacher
+    &:hover
+      background: $teacher - 20
+
+  &--student
+    @extend .signup-btn
+    background: $student
+    &:hover
+      background: $student - 20
+
+  &--guest
+    @extend .signup-btn
+    background: $guest
+    &:hover
+      background: $guest - 20

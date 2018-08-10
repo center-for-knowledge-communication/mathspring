@@ -1,0 +1,218 @@
+body {
+    background-color: #8ED8E0;
+    margin: 0;
+}
+.clear{
+    clear: both;
+}
+.problem-block {
+    width: 100%;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: black;
+    box-sizing: border-box;
+    border: 5px solid transparent;
+}
+#ProblemContainer {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    border: 8px solid transparent;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.6);
+    transform-origin: top left;
+}
+#ProblemStatement{
+}
+#ProblemFigure{
+}
+#HintContainer{
+    border: rgba(0,0,0,0) solid 5px;
+}
+.columnL{
+    overflow: hidden;
+}
+.columnR{
+    float: right;
+    width: 50%;
+    overflow: hidden;
+}
+#HintThumbs{
+    display: flex;
+    flex-direction: row;
+    margin: -5px 5px 0 -5px;
+    font-size: 20px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    text-align: center;
+}
+.hint-thumb{
+    flex: 1 0 auto;
+    background-color: transparent;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    cursor: pointer;
+}
+#HintContent{
+    position: relative;
+    margin: 0 5px -5px -5px;
+    background-color: rgba(255,255,255,0.5);
+    border: 5px solid transparent;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+.hint-thumb:hover, .hint-thumb-selected:hover{
+    background-color: rgba(255,255,255,0.9);
+}
+.hint-thumb-selected{
+    flex: 1 0 auto;
+    background-color: rgba(255,255,255,0.5);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    cursor: pointer;
+}
+.play-hint-button{
+    position: absolute;
+    width: 100px;
+    height: 600px;
+    box-sizing: border-box;
+    line-height: 600px;
+    font-size: 20px;
+    background-color: #444;
+    padding: 5px;
+    color: white;
+}
+.play-hint-button:hover{
+    background-color: #666;
+    transition: background-color 0.25s;
+}
+.hint{
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    font-size: 14px;
+}
+.hint img{
+    max-width: 100%;
+}
+/* These .hint.blah are not used anymore, but just in case... */
+.hint.slide_left{
+    -o-transition: left 1s ease, top 0s ease;
+    -moz-transition: left 1s ease, top 0s ease;
+    -webkit-transition: left 1s ease, top 0s ease;
+    transition: left 1s ease, top 0s ease;
+    left: 270px;
+    top: 92px;
+}
+.hint.slide_up{
+    -o-transition: left 0s ease, top 1s ease;
+    -moz-transition: left 0s ease, top 1s ease;
+    -webkit-transition: left 0s ease, top 1s ease;
+    transition: left 0s ease, top 1s ease;
+    left: 270px;
+    top: 92px;
+}
+.hint.default{
+    left: 270px;
+    top: 92px;
+}
+.answer-row{
+    margin: 0 0 10px 20px;
+    line-height: 27px;
+    height: 27px;
+}
+.button{
+    display: inline-block;
+    width: 27px;
+    height: 27px;
+    margin-right: 20px;
+}
+.ellipse{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    border: 1px solid rgb(0,0,0);
+    background-color: rgb(232,241,160);
+    z-index: 1;
+}
+.button_text{
+    position: absolute;
+    width: 27px;
+    height: 19px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 14px;
+    color: rgb(0,0,0);
+    font-weight: normal;
+    font-style: normal;
+    text-align: center;
+    z-index: 2;
+}
+.multiselect-checkbox{
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+}
+.answer_text{
+    display: inline-block;
+    height: 27px;
+    position: relative;
+    vertical-align: top;
+}
+.answer_text a{
+    vertical-align: middle;
+}
+.answer_text a img{
+    position: absolute;
+    margin: auto 0;
+    top: 0;
+    bottom: 0;
+}
+.x{
+    position: absolute;
+    left: 20px;
+    margin-top: -4px;
+    width: 42px;
+    height: 33px;
+    background-image: url(../images/x.png);
+    background-size: 100% 100%;
+    display: none;
+    z-index: 3;
+}
+.check{
+    position: absolute;
+    left: 18px;
+    margin-top: -16px;
+    width: 65px;
+    height: 42px;
+    background-image: url(../images/check.png);
+    background-size: 100% 100%;
+    display: none;
+    z-index: 3;
+}
+#ShortAnswerBox{
+    margin: 0 auto 10px auto;
+    display: table;
+}
+#SubmitAnswerBox{
+    margin-top: 30px;
+}
+#submit_answer{
+    height: 31px;
+}
+.short_answer_check{
+    vertical-align: bottom;
+    width: 46px;
+    height: 31px;
+    background-image: url(../images/check.png);
+    background-size: 100% 100%;
+    display: none;
+    z-index: 2;
+}
+.short_answer_x{
+    vertical-align: bottom;
+    width: 33px;
+    height: 31px;
+    background-image: url(../images/x.png);
+    background-size: 100% 100%;
+    display: none;
+    z-index: 2;
+}

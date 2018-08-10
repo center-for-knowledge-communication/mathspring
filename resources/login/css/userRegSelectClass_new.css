@@ -1,0 +1,17 @@
+html {
+    min-height: 700px;
+}
+
+.school-list-wrapper {
+    padding: 25px 25px;
+    background:
+            linear-gradient(
+                    rgba(7, 138, 104, 0.8),
+                    rgba(7, 138, 104, 0.8)),
+            url(../images/tree.png) no-repeat center;
+    position: relative;
+}
+
+.school-table {
+    background: #fff;
+}

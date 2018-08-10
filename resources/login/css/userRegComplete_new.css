@@ -1,0 +1,42 @@
+html {
+    min-height: 700px;
+}
+
+.account-creation-announcement-wrapper {
+    padding: 25px 0;
+    background:
+            linear-gradient(
+                    rgba(7, 138, 104, 0.8),
+                    rgba(7, 138, 104, 0.8)),
+            url(../images/tree.png) no-repeat center;
+    position: relative;
+    height: 650px;
+}
+
+.account-creation-announcement {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: solid 1px #979797;
+}
+
+.account-creation-announcement > h1 {
+    font-size: 2em;
+}
+
+@media screen and (min-width: 768px) {
+    html {
+        min-height: 605px;
+    }
+
+    .account-creation-announcement {
+        width: 550px;
+        left: 50%;
+        margin-left: -275px;
+    }
+
+    .account-creation-announcement-wrapper,
+    .account-creation-announcement-wrapper:after {
+        height: 550px;
+    }
+}
+

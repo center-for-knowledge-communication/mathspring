@@ -1,0 +1,5 @@
+    <script src="createJs/easeljs.js"></script>
+    <script src="createJs/tweenjs.js"></script>
+    <script src="createJs/movieclip.js"></script>
+    <script src="createJs/preloadjs.js"></script>
+    <script src="createJs/soundjs.js"></script>

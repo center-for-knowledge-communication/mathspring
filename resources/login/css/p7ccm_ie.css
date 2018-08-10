@@ -1,0 +1,27 @@
+/* 
+  ------------------------------------------------
+  PVII CSS Column Composer Magic
+  Copyright (c) 2011 Project Seven Development
+  www.projectseven.com
+  CSS Fixes for IE 7 and under
+  ------------------------------------------------
+*/
+
+.p7ccm-col {
+	overflow: hidden;
+}
+.p7ccm01-2col-auto-column2, .p7ccm02-2col-auto-column2, .p7ccm03-2col-auto-column2, .p7ccm04-2col-auto-column2, .p7ccm05-2col-auto-column2, .p7ccm06-2col-auto-column2, .p7ccm07-2col-auto-column2, .p7ccm08-2col-auto-column2, .p7ccm09-2col-auto-column2 {
+	width: 49% !important;
+}
+.p7ccm01-3col-auto-column3, .p7ccm02-3col-auto-column3, .p7ccm03-3col-auto-column3, .p7ccm04-3col-auto-column3, .p7ccm05-3col-auto-column3, .p7ccm06-3col-auto-column3, .p7ccm07-3col-auto-column3, .p7ccm08-3col-auto-column3, .p7ccm09-3col-auto-column3 {
+	width: 32% !important;
+}
+.p7ccm01-4col-auto-column4, .p7ccm02-4col-auto-column4, .p7ccm03-4col-auto-column4, .p7ccm04-4col-auto-column4, .p7ccm05-4col-auto-column4, .p7ccm06-4col-auto-column4, .p7ccm07-4col-auto-column4, .p7ccm08-4col-auto-column4, .p7ccm09-4col-auto-column4 {
+	width: 24% !important;
+}
+.p7ccm01-5col-auto-column5, .p7ccm02-5col-auto-column5, .p7ccm03-5col-auto-column5, .p7ccm04-5col-auto-column5, .p7ccm05-5col-auto-column5, .p7ccm06-5col-auto-column5 .p7ccm07-5col-auto-column5, .p7ccm08-5col-auto-column5, .p7ccm09-5col-auto-column5 {
+	width: 19% !important;
+}
+.p7ccm01-3col-sidebar-left-right-column3, .p7ccm02-3col-sidebar-left-right-column3, .p7ccm03-3col-sidebar-left-right-column3, .p7ccm04-3col-sidebar-left-right-column3, .p7ccm05-3col-sidebar-left-right-column3, .p7ccm06-3col-sidebar-left-right-column3, .p7ccm07-3col-sidebar-left-right-column3, .p7ccm08-3col-sidebar-left-right-column3, .p7ccm09-3col-sidebar-left-right-column3 {
+	width: 19% !important;
+}

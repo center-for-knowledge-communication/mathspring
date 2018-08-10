@@ -1,0 +1,29 @@
+.huytran-practice__hide-button
+  border-radius: 50%
+  width: 20px
+  height: 20px
+  position: relative
+  border: 1px solid $font-dark-blue
+  color: $font-dark-blue
+  top: 300px
+  left: 18px
+  z-index: 2
+
+  &-wrapper
+    height: 30px
+    width: 100%
+
+  &:hover
+    background: $progress-60
+    cursor: pointer
+
+  &:active, &focus
+    background: $main-green
+
+  span
+    position: relative
+    top: 2px
+    left: 4px
+
+  .hide
+    display: none

@@ -1,0 +1,1300 @@
+
+<pedagogy  default="true">
+    <id>2</id>
+    <active>true</active>
+    <name>Jake Full Empathy</name>
+    <comment>highlight hint, warn about guessing, ask about topic switching</comment>
+    <pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+    <studentModelClass>AffectStudentModel</studentModelClass>
+    <problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+    <reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+    <challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+    <controlParameters>
+        <lessonStyle>topics</lessonStyle>
+
+        <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+        <contentFailureThreshold>1</contentFailureThreshold>
+        <mastery>1.2</mastery>
+        <minNumberProbs>3</minNumberProbs>
+        <maxNumberProbs>10</maxNumberProbs>
+        <minTimeInTopicSecs>120</minTimeInTopicSecs>
+        <difficultyRate>3</difficultyRate>
+        <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+        <showTopicIntro>true</showTopicIntro>
+        <showExampleFirst>true</showExampleFirst>
+        <!-- number of sessions that determines when solved problems and demos can be given again-->
+        <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+        <problemReuseIntervalDays>10</problemReuseIntervalDays>
+        <!-- legal values never, oncePerSession, always-->
+        <topicIntroFrequency>always</topicIntroFrequency>
+        <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+        <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+       turns it on.   If false, intervention selector has no effect - it is always off-->
+        <displayMyProgressPage>true</displayMyProgressPage>
+    </controlParameters>
+
+    <hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+    <package>pedModel2</package>
+    <nextProblemInterventionSelector class="NextProblemListCombinerIS">
+        <nextProblemInterventionSelector class="TopicSwitchAskIS">
+            <config>
+                <ask val="false"></ask>
+            </config>
+        </nextProblemInterventionSelector>
+        <nextProblemInterventionSelector class="AskEmotionIS">
+
+            <config>
+                <inputType>radio</inputType>
+                <numVals>5</numVals>
+                <interruptIntervalMin>5</interruptIntervalMin>
+                <interruptIntervalProblems>8</interruptIntervalProblems>
+                <emotion name="Frustration">
+                    <label val="1">Not at all Frustrated</label>
+                    <label val="2">A little Frustrated</label>
+                    <label val="3">Somewhat Frustrated</label>
+                    <label val="4">Quite a bit Frustrated</label>
+                    <label val="5">Extremely Frustrated</label>
+                </emotion>
+                <emotion name="Confidence">
+                    <label val="1">Not at all Confident</label>
+                    <label val="2">A little Confident</label>
+                    <label val="3">Somewhat Confident</label>
+                    <label val="4">Quite a bit Confident</label>
+                    <label val="5">Extremely Confident</label>
+                </emotion>
+                <askWhy>true</askWhy>
+            </config>
+
+        </nextProblemInterventionSelector>
+
+        <nextProblemInterventionSelector class="MyProgressNavigationAskIS">
+            <config>
+
+                <!--  This IS will ASK the student if they want to go to the MPP on certain conditions being true-->
+                <dialogType ask="true"/>
+                <minIntervalBetweenMPPQueriesBasedOnAffect>10</minIntervalBetweenMPPQueriesBasedOnAffect>
+                <intervalCriteria type="affect" emotion="Frustration" lowerBound="3" upperBound="3"/>
+                <!-- If confidence is <= 2 show the MPP-->
+                <intervalCriteria type="affect" emotion="Confidence" lowerBound="3" upperBound="3"/>
+                <intervalCriteria type="affect" emotion="Excitement" upperBound="3"/>
+                <!-- If confidence is <= 2 show the MPP-->
+                <intervalCriteria type="affect" emotion="Interested" upperBound="3"/>
+            </config>
+        </nextProblemInterventionSelector>
+    </nextProblemInterventionSelector>
+    <attemptInterventionSelector class="AttemptListCombinerIS">
+        <attemptInterventionSelector class="HighlightHintButtonIS">
+            <param name="threshold">1</param>
+        </attemptInterventionSelector>
+        <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+    </attemptInterventionSelector>
+    <learningCompanionClass>JakeEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+
+<pedagogy  default="true">
+<id>3</id>
+<active>true</active>
+<name>Jane Semi Empathy</name>
+<comment>highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Frustration">
+                <label val="1">Not at all Frustrated</label>
+                <label val="2">A little Frustrated</label>
+                <label val="3">Somewhat Frustrated</label>
+                <label val="4">Quite a bit Frustrated</label>
+                <label val="5">Extremely Frustrated</label>
+            </emotion>
+            <emotion name="Confidence">
+                <label val="1">Not at all Confident</label>
+                <label val="2">A little Confident</label>
+                <label val="3">Somewhat Confident</label>
+                <label val="4">Quite a bit Confident</label>
+                <label val="5">Extremely Confident</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneSemiEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="true">
+<id>4</id>
+<active>true</active>
+<name>Jake Semi Empathy</name>
+<comment>highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Frustration">
+                <label val="1">Not at all Frustrated</label>
+                <label val="2">A little Frustrated</label>
+                <label val="3">Somewhat Frustrated</label>
+                <label val="4">Quite a bit Frustrated</label>
+                <label val="5">Extremely Frustrated</label>
+            </emotion>
+            <emotion name="Confidence">
+                <label val="1">Not at all Confident</label>
+                <label val="2">A little Confident</label>
+                <label val="3">Somewhat Confident</label>
+                <label val="4">Quite a bit Confident</label>
+                <label val="5">Extremely Confident</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeSemiEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="true">
+<id>5</id>
+<active>true</active>
+<name>Jane No Empathy</name>
+<comment>highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Frustration">
+                <label val="1">Not at all Frustrated</label>
+                <label val="2">A little Frustrated</label>
+                <label val="3">Somewhat Frustrated</label>
+                <label val="4">Quite a bit Frustrated</label>
+                <label val="5">Extremely Frustrated</label>
+            </emotion>
+            <emotion name="Confidence">
+                <label val="1">Not at all Confident</label>
+                <label val="2">A little Confident</label>
+                <label val="3">Somewhat Confident</label>
+                <label val="4">Quite a bit Confident</label>
+                <label val="5">Extremely Confident</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="true">
+<id>6</id>
+<active>true</active>
+<name>Jake No Empathy</name>
+<comment>highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <!--We should give a param to the below IS telling it how long to wait before generating extern acts rather than as a control param-->
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Frustration">
+                <label val="1">Not at all Frustrated</label>
+                <label val="2">A little Frustrated</label>
+                <label val="3">Somewhat Frustrated</label>
+                <label val="4">Quite a bit Frustrated</label>
+                <label val="5">Extremely Frustrated</label>
+            </emotion>
+            <emotion name="Confidence">
+                <label val="1">Not at all Confident</label>
+                <label val="2">A little Confident</label>
+                <label val="3">Somewhat Confident</label>
+                <label val="4">Quite a bit Confident</label>
+                <label val="5">Extremely Confident</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="false">
+<id>7</id>
+<active>true</active>
+<name>Common Core Pedagogy</name>
+<comment>use CC content - no interventions, no problem selection</comment>
+<pedagogicalModelClass>CCPedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>CC</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+    turns it on.   If false, intervention selector has no effect - it is always off-->
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+</pedagogy>
+
+        <!--Affect Study 10/14  Eight pedagogies requested by Ivon-->
+        <!--
+                - Pedagogy 1) SPP button is present. In addition, Offer students the
+        opportunity to see the Student Progress Page via a dialog window,
+        allowing rejection, when interest=1,2,3   or when excitement=3,4,5
+        (because excitement is reversed .I mean low excitement or neutral
+        excitement)
+
+        let's call these two pedagogies:
+
+        JaneOfferSPP
+        JakeOfferSPP
+
+        I don't know when you are offering the SPP right now? When clicking on
+        the next problem button? That would be ideal.
+
+        However, let's add the extra restriction that the SPP should not be
+        offered after every problem, it should be at least every 3 PROBLEMS,
+        otherwise it will be offered all the time after the student reported
+        boredom, too much.
+
+        DM - notes we have a 5 minute restriction rather than every 3 problems.
+        -->
+<pedagogy  default="true">
+<id>8</id>
+<active>true</active>
+<name>Jane Offer SPP</name>
+<comment>SPP button present along with asking if they want to see it when interest is low-neutral and excitement is low-neutral.  The companion is low empathy.
+    Interventions include highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+    turns it on.   If false, intervention selector has no effect - it is always off-->
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interested">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+
+    <nextProblemInterventionSelector class="MyProgressNavigationAskIS">
+        <config>
+            <!--  This IS will ASK the student if they want to go to the MPP on certain conditions being true-->
+            <dialogType ask="true"/>
+            <minIntervalBetweenMPPQueriesBasedOnAffect>5</minIntervalBetweenMPPQueriesBasedOnAffect>
+            <!-- If excitement is low-neutral (<= 3) ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Excitement" upperBound="3"/>
+            <!-- If interest is (low-neutral) <= 3 ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Interested" upperBound="3"/>
+        </config>
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+
+<pedagogy  default="true">
+<id>9</id>
+<active>true</active>
+<name>Jake Offer SPP</name>
+<comment>SPP button present along with asking if they want to see it when interest is low-neutral and excitement is low-neutral.  The companion is low empathy.
+    Interventions include highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+    turns it on.   If false, intervention selector has no effect - it is always off-->
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+
+    <nextProblemInterventionSelector class="MyProgressNavigationAskIS">
+        <config>
+            <!--  This IS will ASK the student if they want to go to the MPP on certain conditions being true-->
+            <dialogType ask="true"/>
+            <minIntervalBetweenMPPQueriesBasedOnAffect>5</minIntervalBetweenMPPQueriesBasedOnAffect>
+            <!-- If excitement is low-neutral (<= 3) ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Excitement" upperBound="3"/>
+            <!-- If interest is (low-neutral) <= 3 ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Interest" upperBound="3"/>
+        </config>
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+        <!--   Forcing SPP
+          b) Second pedagogy: SPP button is present. In addition, we tell
+    students that they are going to go see their progress ("let's go see
+    how much progress we are making"). This is when interest=1,2,3   or
+    when excitement=3,4,5 (because excitement is reversed . I mean low
+    excitement or neutral excitement)
+
+
+    JakeForceSPP
+    JaneForceSPP
+    (same thing as before, only that there is not a reject button)
+
+
+        -->
+
+
+<pedagogy  default="true">
+<id>10</id>
+<active>true</active>
+<name>Jane Force SPP</name>
+<comment>SPP button present along with forcing student to see it when interest is low-neutral and excitement is low-neutral.  The companion is low empathy.
+    Interventions include highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+    turns it on.   If false, intervention selector has no effect - it is always off-->
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+
+    <nextProblemInterventionSelector class="MyProgressNavigationAskIS">
+        <config>
+            <!--  This IS will force the student to go to the MPP on certain conditions being true-->
+            <dialogType ask="false"/>
+            <minIntervalBetweenMPPQueriesBasedOnAffect>5</minIntervalBetweenMPPQueriesBasedOnAffect>
+            <!-- If excitement is low-neutral (<= 3) ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Excitement" upperBound="3"/>
+            <!-- If interest is (low-neutral) <= 3 ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Interest" upperBound="3"/>
+        </config>
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+
+<pedagogy  default="true">
+<id>11</id>
+<active>true</active>
+<name>Jake Force SPP</name>
+<comment>SPP button present along with forcing student to see it when interest is low-neutral and excitement is low-neutral.  The companion is low empathy.
+    Interventions include highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>oncePerSession</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector
+    turns it on.   If false, intervention selector has no effect - it is always off-->
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+
+    <nextProblemInterventionSelector class="MyProgressNavigationAskIS">
+        <config>
+            <!--  This IS will force the student to the MPP on certain conditions being true-->
+            <dialogType ask="false"/>
+            <minIntervalBetweenMPPQueriesBasedOnAffect>5</minIntervalBetweenMPPQueriesBasedOnAffect>
+            <!-- If excitement is low-neutral (<= 3) ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Excitement" upperBound="3"/>
+            <!-- If interest is (low-neutral) <= 3 ask to show the MPP-->
+            <intervalCriteria type="affect" emotion="Interest" upperBound="3"/>
+        </config>
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+
+        <!-- c) Third pedagogy (already done), the button of "My Progress"
+    available ALL THE TIME, our standard thing. These would be our
+    current:
+
+    JaneNoEmpathy (pedagogy number 5)
+    JakeNoEmpathy (pedagogy number 6)
+
+    You could create copies of these and call them:
+
+    JaneYesSPPButton
+    JakeYesSPPButton-->
+
+<pedagogy  default="true">
+<id>12</id>
+<active>true</active>
+<name>Jane MPP-On No-Empathy</name>
+<comment>No empathy Jane LC.  MPP always on. highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="true">
+<id>13</id>
+<active>true</active>
+<name>Jake SPP-On No-Empathy</name>
+<comment>Jake with no empathy, with SPP always on. highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>true</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <!--We should give a param to the below IS telling it how long to wait before generating extern acts rather than as a control param-->
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+        <!--   d) Fourth pedagogy is not having the "My progress" button present at all.
+
+    JaneNoSPPButton
+    JakeNoSPPButton-->
+
+
+<pedagogy  default="true">
+<id>14</id>
+<active>true</active>
+<name>Jane MPP-OFF No-Empathy</name>
+<comment>No empathy Jane LC. SPP always OFF. highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>false</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JaneNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy  default="true">
+<id>15</id>
+<active>true</active>
+<name>Jake SPP-OFF No-Empathy</name>
+<comment>Jake with no empathy, with SPP always OFF. highlight hint, warn about guessing, ask about topic switching</comment>
+<pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>
+<challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>
+<controlParameters>
+    <lessonStyle>topics</lessonStyle>
+
+    <maxTimeInTopicSecs>900</maxTimeInTopicSecs>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <mastery>1.2</mastery>
+    <minNumberProbs>3</minNumberProbs>
+    <maxNumberProbs>10</maxNumberProbs>
+    <minTimeInTopicSecs>120</minTimeInTopicSecs>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>10</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>false</displayMyProgressPage>
+</controlParameters>
+
+<hintSelectorClass>PercentageHintSelector</hintSelectorClass>
+<package>pedModel2</package>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="false"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <!--We should give a param to the below IS telling it how long to wait before generating extern acts rather than as a control param-->
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Interest">
+                <label val="1">Not at all Interested</label>
+                <label val="2">A little Interested</label>
+                <label val="3">Somewhat Interested</label>
+                <label val="4">Quite a bit Interested</label>
+                <label val="5">Extremely Interested</label>
+            </emotion>
+            <emotion name="Excitement">
+                <label val="1">Not at all Excited</label>
+                <label val="2">A little Excited</label>
+                <label val="3">Somewhat Excited</label>
+                <label val="4">Quite a bit Excited</label>
+                <label val="5">Extremely Excited</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <!--<attemptInterventionSelector class="GuessingAskAffectIS"/>-->
+</attemptInterventionSelector>
+<learningCompanionClass>JakeNoEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+        <!-- End of pedagogies for affect study-->
+
+
+<pedagogy default="false">
+<id>16</id>
+<active>true</active>
+<name>Jane Teach One topic for Assistments</name>
+<comment>for Assistments</comment>
+<controlParameters>
+    <externalActivityTimeThresholdMins>60</externalActivityTimeThresholdMins>
+    <lessonStyle>topics</lessonStyle>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>30</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>true</displayMyProgressPage>
+
+</controlParameters>
+<pedagogicalModelClass>SingleTopicPM</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<!--<problemSelectorClass>SingleTopicProblemSelector</problemSelectorClass>-->
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+</attemptInterventionSelector>
+<learningCompanionClass>JaneSemiEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+<pedagogy default="false">
+<id>17</id>
+<active>true</active>
+<name>Jane Teach a Common Core Lesson for Assistments With Jane</name>
+<comment>for Assistments</comment>
+<controlParameters>
+    <externalActivityTimeThresholdMins>60</externalActivityTimeThresholdMins>
+    <lessonStyle>CC</lessonStyle>
+    <difficultyRate>3</difficultyRate>
+    <externalActivityTimeThresholdMins>30</externalActivityTimeThresholdMins>
+    <showTopicIntro>true</showTopicIntro>
+    <showExampleFirst>true</showExampleFirst>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>6</problemReuseIntervalSessions>
+    <problemReuseIntervalDays>10</problemReuseIntervalDays>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+    <displayMyProgressPage>true</displayMyProgressPage>
+
+</controlParameters>
+<pedagogicalModelClass>CCPedagogicalModel</pedagogicalModelClass>
+<studentModelClass>AffectStudentModel</studentModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<!--<problemSelectorClass>SingleTopicProblemSelector</problemSelectorClass>-->
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+</attemptInterventionSelector>
+<learningCompanionClass>JaneSemiEmpathicLC</learningCompanionClass>
+</pedagogy>
+
+
+<pedagogy default="false">
+<id>41</id>
+<active>true</active>
+<name>No LC Teach One topic for Assistments</name>
+<comment>for Assistments</comment>
+<controlParameters>
+    <externalActivityTimeThresholdMins>60</externalActivityTimeThresholdMins>
+</controlParameters>
+<pedagogicalModelClass>SingleTopicPM</pedagogicalModelClass>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<!--<problemSelectorClass>SingleTopicProblemSelector</problemSelectorClass>-->
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+</attemptInterventionSelector>
+
+</pedagogy>
+
+
+<pedagogy default="false">
+<id>43</id>
+<active>true</active>
+<name>Highlight hint buttons, Ask about topic switch, ask emotions, warn about guessing</name>
+<name>Alpha Testing</name>
+<controlParameters>
+    <contentFailureThreshold>1</contentFailureThreshold>
+    <!-- number of sessions that determines when solved problems and demos can be given again-->
+    <problemReuseIntervalSessions>3</problemReuseIntervalSessions>
+    <!-- legal values never, oncePerSession, always-->
+    <topicIntroFrequency>always</topicIntroFrequency>
+    <topicExampleFrequency>oncePerSession</topicExampleFrequency>
+</controlParameters>
+<problemSelectorClass>BaseProblemSelector</problemSelectorClass>
+<!--Required student model if asking student to report affect -->
+<studentModelClass>AffectStudentModel</studentModelClass>
+<nextProblemInterventionSelector class="NextProblemListCombinerIS">
+    <nextProblemInterventionSelector class="TopicSwitchAskIS">
+        <config>
+            <ask val="true"></ask>
+        </config>
+    </nextProblemInterventionSelector>
+    <nextProblemInterventionSelector class="AskEmotionIS">
+
+        <config>
+            <inputType>radio</inputType>
+            <numVals>5</numVals>
+            <interruptIntervalMin>5</interruptIntervalMin>
+            <interruptIntervalProblems>8</interruptIntervalProblems>
+            <emotion name="Frustration">
+                <label val="1">Not at all Frustrated</label>
+                <label val="2">A little Frustrated</label>
+                <label val="3">Somewhat Frustrated</label>
+                <label val="4">Quite a bit Frustrated</label>
+                <label val="5">Extremely Frustrated</label>
+            </emotion>
+            <emotion name="Confidence">
+                <label val="1">Not at all Confident</label>
+                <label val="2">A little Confident</label>
+                <label val="3">Somewhat Confident</label>
+                <label val="4">Quite a bit Confident</label>
+                <label val="5">Extremely Confident</label>
+            </emotion>
+            <askWhy>true</askWhy>
+        </config>
+
+    </nextProblemInterventionSelector>
+</nextProblemInterventionSelector>
+<attemptInterventionSelector class="AttemptListCombinerIS">
+    <attemptInterventionSelector class="HighlightHintButtonIS">
+        <param name="threshold">1</param>
+    </attemptInterventionSelector>
+    <attemptInterventionSelector class="GuessingAskAffectIS"/>
+</attemptInterventionSelector>
+
+</pedagogy>

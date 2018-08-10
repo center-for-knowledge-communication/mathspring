@@ -1,0 +1,25 @@
+.plotArea {
+    position: relative;
+    clear: both;
+    background: #E7EBee;
+    width: 180px;
+    height: 30px;
+    margin-bottom: 16px;
+}
+
+.barArea {
+    position: relative;
+    clear: both;
+    background: #2ECC71;
+    height: 30px;
+    margin: 0px;
+    padding: 0px;
+    font-size: 12px;
+}
+
+.barValue {
+    position: absolute;
+    top: 0;
+    left: 75px;
+    font-size: 1.5em;
+}
