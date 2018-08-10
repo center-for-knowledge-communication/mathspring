@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.sql.*;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 
 public class SqlQuery {
 

@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.handler;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;

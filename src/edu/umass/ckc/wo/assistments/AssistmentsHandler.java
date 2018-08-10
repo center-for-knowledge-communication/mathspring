@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.assistments;
 
-import ckc.servlet.servbase.BaseServlet;
+import edu.umass.ckc.servlet.servbase.BaseServlet;
 import edu.umass.ckc.wo.admin.PedagogyRetriever;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Topic;

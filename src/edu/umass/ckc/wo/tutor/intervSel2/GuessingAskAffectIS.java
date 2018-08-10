@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.intervSel2;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.event.tutorhut.AttemptEvent;
 import edu.umass.ckc.wo.event.tutorhut.ContinueAttemptInterventionEvent;
 import edu.umass.ckc.wo.event.tutorhut.InputResponseAttemptInterventionEvent;

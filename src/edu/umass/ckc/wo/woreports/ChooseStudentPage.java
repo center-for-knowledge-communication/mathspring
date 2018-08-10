@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.woreports;
 
 
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

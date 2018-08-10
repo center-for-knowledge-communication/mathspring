@@ -3,7 +3,7 @@ package edu.umass.ckc.wo.handler;
 
 import edu.umass.ckc.wo.event.NavigationEvent;
 import edu.umass.ckc.wo.smgr.SessionManager;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.db.DbClass;
 
 import javax.servlet.ServletContext;

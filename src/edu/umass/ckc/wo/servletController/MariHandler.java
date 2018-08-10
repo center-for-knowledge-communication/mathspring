@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.servletController;
 
-import ckc.servlet.servbase.BaseServlet;
+import edu.umass.ckc.servlet.servbase.BaseServlet;
 import edu.umass.ckc.wo.admin.PedagogyRetriever;
 import edu.umass.ckc.wo.assistments.CoopUser;
 import edu.umass.ckc.wo.cache.ProblemMgr;

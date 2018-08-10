@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.myprogress;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;

@@ -6,7 +6,7 @@ import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.event.admin.AdminProblemSelectionEvent;
 import edu.umass.ckc.wo.event.admin.AdminSelectTopicProblemsEvent;
 import edu.umass.ckc.wo.event.admin.AdminActivateProblemsEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.beans.SATProb;

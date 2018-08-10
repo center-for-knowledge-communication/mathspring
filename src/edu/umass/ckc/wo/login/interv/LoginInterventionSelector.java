@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.login.interv;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.content.Hint;
 import edu.umass.ckc.wo.content.Problem;

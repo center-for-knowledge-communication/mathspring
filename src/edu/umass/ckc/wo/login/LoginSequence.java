@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.login;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.config.LoginXML;
 import edu.umass.ckc.wo.event.SessionEvent;
 import edu.umass.ckc.wo.login.interv.LoginIntervention;

@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbClass;

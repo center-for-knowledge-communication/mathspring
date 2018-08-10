@@ -8,7 +8,7 @@ import java.util.*;
 import java.text.DecimalFormat;
 
 //import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.beans.ClassInfo;

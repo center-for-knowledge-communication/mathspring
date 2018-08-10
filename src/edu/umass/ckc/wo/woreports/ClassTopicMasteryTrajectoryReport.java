@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.woreports;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.db.DbClass;

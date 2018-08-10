@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.smgr;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.admin.PedagogyRetriever;
 import edu.umass.ckc.wo.admin.StrategyAssigner;
 import edu.umass.ckc.wo.beans.ClassConfig;
@@ -9,7 +9,7 @@ import edu.umass.ckc.wo.db.*;
 import edu.umass.ckc.wo.event.AdventurePSolvedEvent;
 import edu.umass.ckc.wo.event.tutorhut.LogoutEvent;
 import edu.umass.ckc.wo.exc.DeveloperException;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.handler.NavigationHandler;
 import edu.umass.ckc.wo.login.LoginResult;
 import edu.umass.ckc.wo.mrcommon.Names;

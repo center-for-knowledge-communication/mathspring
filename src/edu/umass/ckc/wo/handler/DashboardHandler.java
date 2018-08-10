@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.handler;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.db.DbStudentComment;
 import edu.umass.ckc.wo.db.DbTopics;

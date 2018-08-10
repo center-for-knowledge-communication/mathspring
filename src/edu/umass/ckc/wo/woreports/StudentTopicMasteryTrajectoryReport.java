@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.woreports;
 
 //import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbProblem;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;

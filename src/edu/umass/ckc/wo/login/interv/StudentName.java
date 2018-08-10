@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.login.interv;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.event.SessionEvent;
 import edu.umass.ckc.wo.login.LoginParams;

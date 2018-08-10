@@ -1,8 +1,8 @@
 package edu.umass.ckc.wo.login;
 
 import edu.umass.ckc.wo.db.DbSession;
-import ckc.servlet.servbase.ServletAction;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletAction;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.db.DbClass;

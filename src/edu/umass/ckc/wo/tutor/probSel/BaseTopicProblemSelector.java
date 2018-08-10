@@ -10,7 +10,7 @@ import edu.umass.ckc.wo.tutormeta.StudentModel;
 import edu.umass.ckc.wo.interventions.SelectProblemSpecs;
 import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
 import edu.umass.ckc.wo.cache.ProblemMgr;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;

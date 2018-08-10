@@ -4,7 +4,7 @@ import edu.umass.ckc.wo.event.EndActivityEvent;
 import edu.umass.ckc.wo.event.NavigationEvent;
 import edu.umass.ckc.wo.event.StudentActionEvent;
 import edu.umass.ckc.wo.event.StudentActivityEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.AdventurePedagogicalModel;
 import edu.umass.ckc.wo.tutor.PrePostPedagogicalModel;

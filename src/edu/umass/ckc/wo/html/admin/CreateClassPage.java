@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.html.admin;
 
 import edu.umass.ckc.wo.event.admin.AdminActions;
 import edu.umass.ckc.wo.event.admin.AdminSubmitClassFormEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 public class CreateClassPage implements View {
 

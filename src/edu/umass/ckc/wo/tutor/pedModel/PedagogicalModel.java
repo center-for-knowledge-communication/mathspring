@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
-import ckc.servlet.servbase.BaseServlet;
+import edu.umass.ckc.servlet.servbase.BaseServlet;
 import edu.umass.ckc.email.Emailer;
 import edu.umass.ckc.wo.config.LessonXML;
 import edu.umass.ckc.wo.db.DbClass;

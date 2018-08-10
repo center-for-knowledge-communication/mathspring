@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 import edu.umass.ckc.wo.beans.ClassInfo;

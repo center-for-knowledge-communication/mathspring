@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.handler;
 
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.content.TopicMgr;
 import edu.umass.ckc.wo.db.DbProblem;
 import edu.umass.ckc.wo.event.admin.AdminEditTopicsEvent;

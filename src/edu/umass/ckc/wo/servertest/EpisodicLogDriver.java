@@ -4,7 +4,7 @@ import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.event.EndActivityEvent;
 import edu.umass.ckc.wo.event.StudentActionEvent;
 import edu.umass.ckc.wo.event.NavigationEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.handler.StudentActionHandler;
 import edu.umass.ckc.wo.handler.NavigationHandler;
 

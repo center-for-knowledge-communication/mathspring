@@ -1,8 +1,8 @@
 package edu.umass.ckc.wo.login;
 
-import ckc.servlet.servbase.ActionEvent;
-import ckc.servlet.servbase.ServletParams;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.ActionEvent;
+import edu.umass.ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.woserver.ServletInfo;
 
 

@@ -3,7 +3,7 @@ package edu.umass.ckc.wo.html.admin;
 import edu.umass.ckc.wo.enumx.Actions;
 
 import edu.umass.ckc.wo.event.admin.UserRegistrationEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 /**
  * Generate an HTML page that gets authentication info from a user that is registering.

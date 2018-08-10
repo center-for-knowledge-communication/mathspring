@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.servletController;
 
-import ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
 import edu.umass.ckc.wo.exc.AssistmentsBadInputException;
 import edu.umass.ckc.wo.woserver.ServletInfo;
 

@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.event.tutorhut;
 
 import edu.umass.ckc.wo.event.SessionEvent;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

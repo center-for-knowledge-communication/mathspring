@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.response;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import net.sf.json.JSONObject;
 
 /**

@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.assistments.AssistmentsHandler;
 import edu.umass.ckc.wo.assistments.CoopUser;
 import edu.umass.ckc.wo.beans.Topic;

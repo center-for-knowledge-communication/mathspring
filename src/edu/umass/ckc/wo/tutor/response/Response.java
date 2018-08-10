@@ -4,7 +4,7 @@ package edu.umass.ckc.wo.tutor.response;
 import edu.umass.ckc.wo.tutormeta.Activity;
 import edu.umass.ckc.wo.tutormeta.StudentEffort;
 import edu.umass.ckc.wo.tutormeta.TopicMastery;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import net.sf.json.JSONObject;
 
 import java.util.List;

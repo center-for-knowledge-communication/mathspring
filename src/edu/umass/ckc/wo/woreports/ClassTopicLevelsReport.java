@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.woreports;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.db.DbClass;

@@ -1,5 +1,5 @@
 package edu.umass.ckc.wo.event.tutorhut;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.content.Problem;
 
 /**

@@ -4,7 +4,7 @@ import edu.umass.ckc.wo.admin.ClassContentSelector;
 import edu.umass.ckc.wo.beans.*;
 import edu.umass.ckc.wo.db.*;
 import edu.umass.ckc.wo.event.admin.*;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 
 
 import edu.umass.ckc.wo.strat.TutorStrategy;

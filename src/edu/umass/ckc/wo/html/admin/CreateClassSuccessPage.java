@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.html.admin;
 
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.event.admin.AdminActions;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 
 import java.util.Collection;

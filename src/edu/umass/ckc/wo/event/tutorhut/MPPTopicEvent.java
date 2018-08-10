@@ -8,7 +8,7 @@ package edu.umass.ckc.wo.event.tutorhut;
  * To change this template use File | Settings | File Templates.
  */
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 
 public class MPPTopicEvent extends TutorHutEvent {

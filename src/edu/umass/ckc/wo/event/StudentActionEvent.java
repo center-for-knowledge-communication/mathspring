@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.event;
 
 import edu.umass.ckc.wo.enumx.StudentInputEnum;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 
 public class StudentActionEvent extends SessionEvent implements StudentActivityEvent {

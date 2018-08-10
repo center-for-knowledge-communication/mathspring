@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.handler;
 
 import edu.umass.ckc.wo.event.tutorhut.TutorHutEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.state.StudentState;
 import edu.umass.ckc.wo.tutor.pedModel.PedagogicalModel;

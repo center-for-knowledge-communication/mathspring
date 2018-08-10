@@ -4,7 +4,7 @@ import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.event.tutorhut.ClickCharacterEvent;
 import edu.umass.ckc.wo.event.tutorhut.EliminateCharacterEvent;
 import edu.umass.ckc.wo.event.tutorhut.MuteCharacterEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.tutor.hintSel.StrategicHintSelector;
 import edu.umass.ckc.wo.tutor.response.HintResponse;
 import edu.umass.ckc.wo.tutor.response.Response;

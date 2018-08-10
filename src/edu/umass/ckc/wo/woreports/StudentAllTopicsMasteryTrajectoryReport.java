@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.woreports;
 
 //import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;

@@ -15,7 +15,7 @@ import edu.umass.ckc.wo.myprogress.TopicSummary;
 import edu.umass.ckc.wo.myprogress.TopicDetails;
 import edu.umass.ckc.wo.myprogress.problemDetails;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.pedModel.TopicSelectorImpl;

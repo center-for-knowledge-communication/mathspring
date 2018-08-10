@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.db;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.ClassConfig;
 import edu.umass.ckc.wo.exc.AdminException;

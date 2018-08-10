@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.html.admin;
 
 import edu.umass.ckc.wo.event.admin.UserRegistrationEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

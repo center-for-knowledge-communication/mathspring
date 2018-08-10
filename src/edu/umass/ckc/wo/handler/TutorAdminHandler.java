@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.handler;
 
-import ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Teacher;
 import edu.umass.ckc.wo.cache.ProblemMgr;

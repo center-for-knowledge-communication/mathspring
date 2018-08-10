@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.woreports;
 
 import java.sql.*;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 
 import javax.servlet.http.HttpServletRequest;

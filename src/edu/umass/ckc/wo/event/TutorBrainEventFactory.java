@@ -5,9 +5,9 @@ import edu.umass.ckc.wo.enumx.Actions;
 import edu.umass.ckc.wo.event.tutorhut.LogoutEvent;
 import edu.umass.ckc.wo.event.tutorhut.TopicDetailEvent;
 import edu.umass.ckc.wo.exc.UnknownEventException;
-import ckc.servlet.servbase.ActionEvent;
-import ckc.servlet.servbase.ServletEvent;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ActionEvent;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

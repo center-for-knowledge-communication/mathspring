@@ -8,7 +8,7 @@ import edu.umass.ckc.wo.smgr.SessionManager;
 
 import edu.umass.ckc.wo.interventions.SelectHintSpecs;
 import edu.umass.ckc.wo.tutormeta.HintSelector;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 
 import java.sql.Connection;

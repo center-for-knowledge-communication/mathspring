@@ -1,8 +1,8 @@
 package edu.umass.ckc.wo.woserver;
 
 
-import ckc.servlet.servbase.ServletEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.*;
 import edu.umass.ckc.wo.event.tutorhut.TutorHomeEvent;
 import edu.umass.ckc.wo.event.tutorhut.TutorHutEvent;

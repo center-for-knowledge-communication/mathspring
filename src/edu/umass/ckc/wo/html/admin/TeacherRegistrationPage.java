@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.html.admin;
 import edu.umass.ckc.wo.event.admin.AdminActions;
 import edu.umass.ckc.wo.event.admin.AdminTeacherRegistrationEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 public class TeacherRegistrationPage implements View {
     private String msg;

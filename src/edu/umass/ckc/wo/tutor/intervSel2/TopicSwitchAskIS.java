@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.tutor.intervSel2;
 
-import ckc.servlet.servbase.ServletParams;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.event.tutorhut.*;
 import edu.umass.ckc.wo.interventions.InterleavedTopicSwitchIntervention;
 import edu.umass.ckc.wo.interventions.NextProblemIntervention;

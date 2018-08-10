@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.intervSel2;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.xml.JDOMUtils;

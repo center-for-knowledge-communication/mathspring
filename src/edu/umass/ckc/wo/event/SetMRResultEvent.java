@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.event;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 
 /**

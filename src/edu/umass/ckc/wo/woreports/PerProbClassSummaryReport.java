@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminActions;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 import edu.umass.ckc.wo.util.ProbPlayer;

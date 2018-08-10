@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.event;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 
 /** A convenience class so that the userInput may be accessed as a String. */

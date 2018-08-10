@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.html.admin;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.pedModel.TopicSelectorImpl;

@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.handler;
 
 import edu.umass.ckc.wo.event.SetPrePostResultEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 import java.sql.*;
 

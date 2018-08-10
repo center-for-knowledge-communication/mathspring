@@ -3,9 +3,9 @@ package edu.umass.ckc.wo.woserver;
 
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.event.WoAdminEventFactory;
-import ckc.servlet.servbase.BaseServlet;
-import ckc.servlet.servbase.ServletEvent;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.BaseServlet;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.mrcommon.Names;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.probSel.BaseExampleSelector;

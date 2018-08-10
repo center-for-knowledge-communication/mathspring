@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.event.tutorhut;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 /**
  * <p> One of the first events upon entering the tutoring hut.  This requests a set of configuration switches

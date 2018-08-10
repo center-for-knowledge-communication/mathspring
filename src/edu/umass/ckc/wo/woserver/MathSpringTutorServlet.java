@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.woserver;
 
-import ckc.servlet.servbase.BaseServlet;
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.BaseServlet;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.db.DbUtil;
 import edu.umass.ckc.wo.mrcommon.Names;

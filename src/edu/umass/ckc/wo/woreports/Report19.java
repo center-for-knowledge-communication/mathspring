@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 //import edu.umass.ckc.wo.event.admin.AdminActions;
 //import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminActions;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 

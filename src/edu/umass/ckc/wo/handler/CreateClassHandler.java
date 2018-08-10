@@ -7,8 +7,8 @@ import edu.umass.ckc.wo.db.*;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.PretestPool;
 import edu.umass.ckc.wo.event.admin.*;
-import ckc.servlet.servbase.ServletEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.View;
 //import edu.umass.ckc.wo.handler.ClassAdminHelper;
 
 import javax.servlet.ServletContext;

@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.event.admin;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 public class AdminViewReportEvent extends AdminEvent {
   public static final String STATE = "state";

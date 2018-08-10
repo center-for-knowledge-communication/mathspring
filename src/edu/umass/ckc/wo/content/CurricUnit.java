@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.content;
 
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import org.apache.log4j.Logger;
 

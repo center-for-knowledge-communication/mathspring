@@ -2,7 +2,7 @@ package edu.umass.ckc.wo.tutormeta;
 
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.smgr.SessionManager;
-import ckc.servlet.servbase.ActionEvent;
+import edu.umass.ckc.servlet.servbase.ActionEvent;
 
 import java.sql.SQLException;
 

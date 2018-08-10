@@ -1,7 +1,7 @@
 package edu.umass.ckc.wo.login.interv;
 
-import ckc.servlet.servbase.ServletParams;
-import ckc.servlet.servbase.UserException;
+import edu.umass.ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.content.PrePostProblemDefn;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.db.DbPrePost;

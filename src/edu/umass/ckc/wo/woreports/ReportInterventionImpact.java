@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 
 //import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.event.admin.AdminViewReportEvent;
 
 import edu.umass.ckc.wo.util.ProblemActivityRecord;

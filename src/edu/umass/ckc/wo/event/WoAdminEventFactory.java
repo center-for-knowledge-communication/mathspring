@@ -2,9 +2,9 @@ package edu.umass.ckc.wo.event;
 
 
 import edu.umass.ckc.wo.event.admin.AdminTeacherLoginEvent;
-import ckc.servlet.servbase.ServletEvent;
-import ckc.servlet.servbase.ServletParams;
-import ckc.servlet.servbase.ActionEvent;
+import edu.umass.ckc.servlet.servbase.ServletEvent;
+import edu.umass.ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ActionEvent;
 
 import java.lang.reflect.Constructor;
 

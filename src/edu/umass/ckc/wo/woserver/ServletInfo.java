@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.woserver;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;

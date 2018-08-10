@@ -1,6 +1,6 @@
 package edu.umass.ckc.wo.tutor.intervSel2;
 
-import ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbEmotionResponses;
 import edu.umass.ckc.wo.event.tutorhut.*;

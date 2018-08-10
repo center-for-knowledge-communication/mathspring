@@ -4,7 +4,7 @@ package edu.umass.ckc.wo.html.admin;
 import edu.umass.ckc.wo.enumx.Actions;
 import edu.umass.ckc.wo.event.admin.UserRegistrationClassSelectionEvent;
 import edu.umass.ckc.wo.handler.UserRegistrationHandler;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.util.ThreeTuple;
 
 import java.sql.Connection;

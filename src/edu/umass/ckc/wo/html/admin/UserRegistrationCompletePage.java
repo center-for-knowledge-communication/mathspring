@@ -3,7 +3,7 @@ package edu.umass.ckc.wo.html.admin;
 
 
 import edu.umass.ckc.wo.event.admin.UserRegistrationEvent;
-import ckc.servlet.servbase.View;
+import edu.umass.ckc.servlet.servbase.View;
 
 public class UserRegistrationCompletePage implements View {
     String uri;
