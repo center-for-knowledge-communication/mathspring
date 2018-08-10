@@ -1,0 +1,15 @@
+Linux stuff:
+
+to zip a dir:
+
+zip -r myfiles.zip mydir
+
+To zip files:
+
+zip a.zip file1 file2 file3
+
+
+to move files from local to remote:
+
+scp filename marshall@rose.cs.umass.edu:/mnt/net/filename
+

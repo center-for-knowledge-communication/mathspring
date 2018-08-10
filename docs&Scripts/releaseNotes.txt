@@ -1,0 +1,504 @@
+
+
+10/27/16
+To Build releases:
+   - Use Ant Build:  Sugaree Master Ant Builder
+       Run DeployRose_WOJ_WarWithoutContent
+       This will build and put a woj.war in <projdir>/out/artifacts/war-rose-beta/woj.war
+       Copy this to rose: /mnt/net
+       On rose cd to /mnt/net and run ./deploywar to move the woj.war into place for Tomcat
+       Use the Tomcat admin manager to undeploy woj
+       Select the new woj.war and deploy it.
+
+   Production wars should be built from the production branch (see below for how to check out).
+   Should build and push production and then use ant script  DeployRose_PRODUCTION_WarWithoutContent
+
+Database compatibility:
+
+Note: Some versions of MySQL are not happy with importing files exported on rose.  You may
+have to search from strings like ROW_FORMAT=FIXED in the .sql file and replace
+with empty string if MySQL complains about these options not being available
+
+
+Notes:
+To make sure production is updated with master branch
+1.  commit and push master
+2.  checkout the local production branch from IDEA lower right
+3.  merge the local master branch
+4.  run it to make sure it works.  Fix as necessary
+5.  commit and push to production
+
+See https://git-scm.com/book/en/v2/Git-Basics-Tagging about tagging commits in Git.  Good
+for release numbers.
+
+Git command to ignore files that constantly change locally (e.g. workspace.xml)
+git update-index --assume-unchanged .idea\workspace.xml
+
+Goal:  Make sure that production branch represents the code in the ms release and that master branch
+represents the woj release.   I think I can then fix bugs in each and merge one branch into the other.
+
+Release Management (begun 11/28/16 - better late than never)
+  It would be nice to name and number each release and to know each of the new commits that go into it
+ come with GitHub issues numbers.   THis way I could say that release v2.3.4 fixed such and such bugs
+ So here is how one must work to achieve this:
+
+    - Require that before I do anything (bug fix or feature), it be entered into GitHub as an issue with a number.
+    -  I'd then have to do a commit that contains code for only a single issue.
+    -  The commit comment should BEGIN with the ISSUE NUMBER!
+    -  When closing out the issue I would know the next release # (based on the last one) so it should be mentioned
+    - Release numbers should go like v2.1.X when bugs are fixed and 2.X.0 when new features go in (and maybe bug fixes too).
+    -  Tag the final commit before releasing (VCS | Git | Tag... and then commit/push tag button selected)
+         OR git tag -a v2.1.4 -m 'message' )
+    -  If I want to know what issues have been taken care of in a release I can look at the
+       commits since a given tag. (git log v2.1.4..HEAD --oneline)
+
+    https://git-scm.com/book/en/v2/Git-Basics-Tagging
+    Commands to tag a release:
+    After the last commit:  use git tag -a v2.1 -m "comment here" OR tag a specific commit by using
+    git log --pretty=oneline to see all commits and then git tag -a v1.2 9fceb02 with first 7 digits of commit #.
+    git show v2.1 will give info about the tagged commit.
+
+
+  After the last commit:  use
+     git tag -a v2.1 -m "comment here" OR tag a specific commit by using
+       git tag -a v2.1
+
+    git tag will show all the tags
+
+   How to find all the commits after a particular tag (v2.1)
+
+    git log v2.1..HEAD  or git log v2.1..HEAD --oneline
+
+
+   To show all commits with tags since a given tag and put in file:
+     git log v2.1.5..HEAD --oneline --decorate > u:/mathspring/fixes.txt
+
+git log v2.1.13..HEAD --oneline
+git tag -a v2.1.14 -m "comment here"
+
+
+Releases (test again)
+8/25/17 v2.1.15
+    f50264e Merge branch 'master' into production
+    9451d86 artifact cleanup
+    06e6d80 Merge branch 'master' into production
+    9899262 Incorrect standard/cluster on ROLL OVER on standard (PER PROBLEM REPORT) (NTT) #368
+    7d23db2 Inconsistency of problem nubmers (NTT) #366
+    d30f6ff DROP hint constraint in Per Common Core Cluster Report (NTT) #363 Inconsistency of problem nubmers (NTT) #366
+    b082024 Fixed: Updating username of a student (NTT) #365
+    ef1978b Fixed : Launching problem, for CC cluster report also (NTT) #364
+    7969a71 Merge remote-tracking branch 'origin/master'
+    7089e2b Fixes to open window to show Html and flash problems + minor cosmetic changes
+    82a1f5c my localhost artifact definition for dev machine.
+    3077248 Cosmetic Defect Fixes
+    28513a3 Cosmetic fixes/ Login to new Teacher Tools
+    1d1ac61 Cosmetic Defect Fixes
+    48e2a46 Fixes: Link New Teacher Tools to the Actual Teacher Login (NTT)
+    58d93b6 Fixes: Mastery trajectory chart bug (NTT) #358 Reset Password should allow user choice #357 and additional
+    fcb2340 NTT Create class failed with 1001 error #356 fix : Introduced Bootstrap Validator Framework. Made sure Year is always greater than or equal to current year but no greater than 2050
+    242bc71 Bug Fix for popover container handling and new label for efforts
+    8e43262 Merge remote-tracking branch 'origin/master'
+    327cd02 Teacher Tools New Version one Second Draft
+    10397fc Merge remote-tracking branch 'origin/master'
+    1ab850c Merge branch 'fix-issue-352' of https://github.com/mathspringwpi/mathspring into mathspringwpi-fix-issue-352
+    4781ddf Minor changes to config  and move child assent form to correct place
+    ff6b91f set some global vars in javascript to indicate if its new gui or old so that pretest can send back var=b or var=a depending on val of global
+    d5b02cd Fixed session manager when instantiating from pedagogy so it sets student model after ped model is built within the ped model construction Changed overload method to take a ClassTutorConfigParams object
+    67f887d Merge branch 'strategy'
+    fefd156 commons cli lib
+    795a365 Merge remote-tracking branch 'origin/master'
+    5ef1ded stubbed in some svc stuff for moving Mathspring services from Jersey to SPring
+    cbc5b77 QuickAuth: Fixed #354 (javascript crash when problem had only one hint with no audio)
+    68abdae rever web.xml to master
+    02d7011 checkout master web.xml
+    9fe93bb remove staging woServer/web files
+    8669705 reverta again
+    8210233 Merge branch 'fix-issue-352' of https://github.com/mathspringwpi/mathspring into fix-issue-352
+    bd0d279 add var b to form eureka
+    9cce297 another attempt
+    0e673ce ignore .idea/codeStyleSettings.xml
+    4701b4a reset config file
+    b03a522 change style for outer login page
+    6250e82 change existing session style
+    e161f8c finish details page
+    dbf4256 finsih dialog box
+    e3dbe9d finish tutor page, start styling dialog
+    29ed60c edit gitignore
+    c1aa786 ignore maven libraries
+    50c3e53 integrate sass to main tutor
+    5ca7a67 integrate sass to dashboard page
+    d5140ea change config files
+    53325a4 revert .idea and web/ to neerja commit
+    b61ea18 add var b to form eureka
+    464b6cf another attempt
+    c721c70 revert config file to master
+    08d9a0f ignore .idea/codeStyleSettings.xml
+    5c3de60 reset config file
+    5945128 change style for outer login page
+    cf5309e change existing session style
+    37f7ccb finish details page
+    05a0c3d finsih dialog box
+    d9ab82f finish tutor page, start styling dialog
+    e97eef1 edit gitignore
+    5347872 ignore maven libraries
+    b3ffe54 integrate sass to main tutor
+    66a84a9 integrate sass to dashboard page
+    77aef9b change config files
+    0a79c6a added form to assent intervention
+    0156031 Eureka support files
+    3caf345 Added new assent form for Eureka test
+    91fbbdd Commented out some stuff that is about tutor strategies
+    0dfbe09 Merge remote-tracking branch 'origin/master'
+    fccedfa added form to assent intervention
+    41af9cc Added form elements to the Eureka Assent JSP.
+    32c3ae9 Merge remote-tracking branch 'origin/master'
+    e905757 Eureka support files
+    7601c34 Merge branch 'master' of https://github.com/marshall62/mathspring
+    2b31b8f Got it playing with a single working strategy
+    4f25278 Added new assent form for Eureka test
+    ee5b16e Got it playing with a single working strategy
+    159499d revert .idea and web/ to neerja commit
+    4be51b9 adjusted sugaree artifact
+    92742f3 added servlet-framework and emailer jars to libs
+    cf7c3b4 got rid of old artifacts and support files.   Moved beta/production into new location
+    df60e95 Fixed QuickAuth Problem Format Editor failing to initialize
+    5d580af rename artifact
+    40a5447 Added new build config for rose beta and production wars
+    3619d2e Updated the beta and production web.xml files to include the mathspring servlet that runs the spring stuff for teacher tools.
+    004344b Got local build working for debugging /mt servlet context
+    0bbdabe Changes to project files so I can build (again) after pulling Huys pull request.
+    d330468 Merge pull request #350 from mathspringwpi/dashboard-music
+    aec14a6 Teacher Tools New Version one Intial Draft
+    9e6e649 Teacher Tools New Version one Intial Draft
+    cad1878 fix link to var=b
+    d71be4a fix js files
+    fe7b149 Teacher Tools New Version Draft one
+    4092433 Teacher Tools New Version one Intial Draft
+    47279df Loads a TutorStrategy when the student uses one.
+    facdc37 merge master
+    7345ec0 add music control
+    ddd4e6f Beginning work of adding tutoring strategies
+    dd73dfc add audio control
+    302140e add styling to hint button
+    6820e23 add overwrite rules to bootstrap for developer mode styling
+    39460e5 Merge branch 'huy-current' of https://github.com/mathspringwpi/mathspring into huy-current
+    dcbc6c7 fix layout
+    8ce701c fix links in tutorhut_new
+    9902fe4 add developer view
+    21bb1f0 fix nav style
+    25f3669 fix small layout issue
+    ce7619b finish new user screen
+    8b8c0b9 borderless character, include links to navigation bar
+    348453d basically working tutoring area
+    f4d5f44 finish my progress
+    98b7659 finish dashboard
+    4cc2fec edit login css file
+    fc4637c Add dev view
+    81791c0 Update styles for pre-surveys
+    e705f0e Add animation to hint button
+    bab128a Replace svg logo with png one
+    2f25fc1 Center the flash problem in the problem container
+    aaa4e00 Fix css rules for dashboard overlay
+    03344e0 add overlay
+    c7172aa Add button labeling using balloon.css
+    e5e2274 Prevent Dashboard bubble from blocking tabs
+    dcd50b9 Override css rules of vex-dialog
+    cf08a92 Update build configuration and .gitignore
+    d3c144a Add review, challenge, continue buttons on Dashboard vex dialog
+    5135fb2 Use total problems to in dashboard dialog
+    efb4de7 Fix vex dialog
+    7ee9dc7 Add margin to dashboard pots
+    7e2f7b1 Update Dashboard layout
+    9b7c405 Remove slick.js and duplicate css rules
+    4fb3733 Change design of dashboard
+    c61b4b1 Add dropdown menu to tutoring page
+    e50d481 Restyle dialog box
+    cb0d015 Add tutoring system UI
+    a51ab09 Add build scripts
+    fbf0e75 Add favicons
+    204956a Add new design for pages except main tutoring system
+    5241547 Update copyright
+    3e8385a Make login form work for teacher
+    154fa57 Add new dashboard page
+    e00d6da Add Railway font
+    12c42b6 Add new design for existing session page
+    ab4a5d4 Add raleway font
+    3698ad4 Finish adding new design for login pages
+    b6731fc Improve responsiveness of login pages
+    c4111a7 Add registration links to entry page
+    d17dcb5 Add login page
+    157f2de Add new pages
+    74e19db Made sure that pretests show questions correctly with new multi-choice allowing images.   Also fixed bug in BasePedModel where learning companion media was not logged into event log.
+    9fc3266 update of touched xml files.
+    fb77090 Added to release notes and merged with master
+    7bca8f8 sync with master
+    dfc3f38 Synced production with master and did some testing
+    aac05dd Fixed null pointer bug in collabIS
+    fe8cbe3 Some debugging statements and small fixes to get jcharts reports working
+    4199644 fix layout
+    aa71ad9 fix links in tutorhut_new
+    b6e4fbe add developer view
+    717426e Merge branch 'master' of https://github.com/marshall62/mathspring
+    920383f removing deleted workspace
+    ac0b774 Delete workspace.xml
+    6e44d69 workspace
+    e89b6ed Delete workspace.xml
+    ca68f73 two .idea xml files
+    99b3e6c Why does this want to commit workspace???
+    fec82cc Delete workspace.xml
+    5dae695 Delete context.xml
+    98baab1 Fixed bug in video load code and report error if not found
+    ef281b6 Fixed bug with videos not being shown.   Problem table now has ID of video in Video table rather than a URL. So it looks up the video from the ID if its there.
+    5b1c1c6 Added return of JSON that includes error info from server so the client can try to inform user or bail out.  Did this for expired sessions.
+    6601d08 Merge remote-tracking branch 'origin/master'
+    b288620 added digital clock and beep when problem is shown if the classconfig.soundSync is set to 1
+    c058d0c fix nav style
+    907ff03 Merge remote-tracking branch 'origin/master'
+    5d954b7 QuickAuth: Huge code refactor to make use of the module pattern and better organize and name code
+    b2b73e8 Select Problem Dialog: automatically focus the search on load
+    01921dd Simplified ReadMe.MD, setup instructions to wiki
+    982b334 added search to Select Problem Dialog
+    e8264b5 QuickAuth: videos now work with side and overlay parameters; multiple side images are supported and scale to fit (not recommended)
+    13a3a53 QuickAuth: Hints no longer default to blue font color (now black)
+    e461888 QuickAuth: Disabled answer shuffling for preview, fixed layout editor and zoom in firefox
+    a856748 QuickAuth Format Editor: ignore colors/fonts/templates that are disabled in the database
+    b031c15 fix small layout issue
+    fb79adf finish new user screen
+    a57624e borderless character, include links to navigation bar
+    4094227 QuickAuth: made multiSelect problems work fully
+    ded555a QuickAuth Layout Editor: Fixed column width being initialized incorrectly sometimes
+    d8f7bb7 basically working tutoring area
+    afa8ce4 finish my progress
+    dd5be63 finish dashboard
+    f873310 edit login css file
+    6e598a1 Add dev view
+    0cedad9 Update styles for pre-surveys
+    a2cc642 Add animation to hint button
+    6859a09 Replace svg logo with png one
+    a861163 Center the flash problem in the problem container
+    55e1ac2 Fix css rules for dashboard overlay
+    494bf60 add overlay
+    da094b3 Add button labeling using balloon.css
+    019feed Prevent Dashboard bubble from blocking tabs
+    33b9e72 Override css rules of vex-dialog
+    17244b4 Update build configuration and .gitignore
+    f36ffc4 Add review, challenge, continue buttons on Dashboard vex dialog
+    2e85231 Use total problems to in dashboard dialog
+    7bbe94c Fix vex dialog
+    37130d9 Add margin to dashboard pots
+    e3ab6d3 Update Dashboard layout
+    f7ff006 Remove slick.js and duplicate css rules
+    b77e2c9 Change design of dashboard
+    1b6c0aa Add dropdown menu to tutoring page
+    d5bb724 Restyle dialog box
+    4481077 Add tutoring system UI
+    ef77720 Add build scripts
+    8d891bf Add favicons
+    9f4e8dc Add new design for pages except main tutoring system
+    c94073b Update copyright
+    fdfea4f Make login form work for teacher
+    a46f911 Add new dashboard page
+    ffbef42 Add Railway font
+    b301be2 Add new design for existing session page
+    26ab5f3 Add raleway font
+    5357a95 Finish adding new design for login pages
+    7e01ddc Improve responsiveness of login pages
+    dad4a33 Add registration links to entry page
+    227dda9 Add login page
+    2011ff7 Add new pages
+    15f1401 Made sure that pretests show questions correctly with new multi-choice allowing images.   Also fixed bug in BasePedModel where learning companion media was not logged into event log.
+    b3f792e update of touched xml files.
+    89984ca Added to release notes and merged with master
+    32620fb sync with master
+    1923d55 Synced production with master and did some testing
+    3014058 Fixed null pointer bug in collabIS
+    71e3bd7 Some debugging statements and small fixes to get jcharts reports working
+    dcd3c05 QuickAuth: Fixed missing size styling on videos and side-by-side images, reset videos when hint plays
+    2878019 QuickAuth: added \(...\) notation for inline LaTeX
+    36316d6 QuickAuth: Added support for displaying multiple-selection problems (still need backend, answer specification system, etc)
+    f28f76b Hid MathJax processing messages
+    4dfd772 corrected resources in localhost artifact . Added config options to ExternalActivityIS
+    855a022 QuickAuth: Rewrote answer shuffling to be client-side rather than server-side
+    e2ee2f5 QuickAuth Layout Editor: fixed hint block missing some default styling in the text preview
+    5deeac4 Fixed "session expired" on viewing QuickAuth problem preview
+    837e162 Merge remote-tracking branch 'origin/master'
+    df8d935 Added config features to ExternalActivityIS
+    1a5bb6f QuickAuth: disabled MathJax's custom right-click context menu
+    ccd794d QuickAuth: Added MathJax system for rendering LaTeX client-side
+    bfc9b66 Improved handling of givesAnswer hints
+    e0539f9 QuickAuth: Fixed expression parsing
+    c6aa088 fixed malformed js function declaration
+    acbda20 removed debug println
+    f0d8279 QuickAuth: Improved image/video file extension handling
+    e23e136 QuickAuth Layout Editor: added an "edited format" mode, to allow reselecting the base template to start over
+    e7e977d QuickAuth Layout Editor: fixed crash when NOT requesting a problemId, or when database problemFormat was empty
+    1d16c98 QuickAuth: Fixed layout editor not building the preview and editing panels from the database problemFormat
+    448f9a4 Merge remote-tracking branch 'origin/master'
+    ef3cc7c Removed org.json dependency
+    2a9ffa9 QuickAuth: propagated zoom parameter of problem preview to the play hint button
+    309fc96 QuickAuth: Problem Layout editor can now read problemFormat from the database
+    ff5717f QuickAuth: Added zoom parameter and "play hint" button to problem preview
+    bda9b60 QuickAuth: Added "block spacing" to layout editor
+    ac91883 QuickAuth: added hint figure parameters, added support for nested columns in layout
+    c5c25da Rewrote problem text parameterization
+    b63d0c1 fixed bug where hint thumb buttons would sometimes not show up
+    ffc376d Renamed getElementCorrespondingToHint to getIdCorrespondingToHint, because that's what it actually gets
+    10266b4 Removed some dead javascript code
+    ad93a7a Returned localhost datasource to wodblocal
+    c2088ac Eliminated the org.json dependency and recoded everything to use net.sf.json
+    1033aa4 ignoring woServer/webResources/
+    d91f9ca FIxed bug where going to MPP while in review or chall mode doesn't keep you in that mode if you return-to-hut.
+    fff37de Merge remote-tracking branch 'origin/master'
+    4879969 workspace
+    6ec21fd FIxed bug where going to MPP while in review or chall mode doesn't keep you in that mode if you return-to-hut.
+    be79b0d actually fixed gitignore for ignoring mscontent
+    82d30d3 Updated gitignore to ignore mscontent and be more specific in general
+    997f949 Merge remote-tracking branch 'origin/master'
+    fea720e Added single-problem reload from database functionality, and updated ProblemMgr to be more efficient
+    75053bb updated QuickAuth problem preview to better match in-tutor presentation
+    00e732d fixed drag and drop bug in QuickAuth format editor
+    19544e1 made thrown exception more precise (Exception -> SQLException)
+    769505f avoided overriding javascript format() function
+    7939252 got rid of mscontent
+    921ce5f Made changes to pom.xml to comment out libs that may not be necessary.   Moved mscontent to webResources so that I can have artifacts can be build more quickly. Alterred ant scripts to build differently for beta vs production and to correctly clean beforehand.
+    e1a942c Merge remote-tracking branch 'origin/master'
+    c8c2bf8 Created artifacts so that I can build for rose.production and rose.beta
+    d334d44 Added QuickAuth problemFormat system for layout and styling
+    52d89f8 Fixed issue 346 (HTML problems not previewing from per-problem report)
+    befd98b FIxed bug where going to MPP while in review or chall mode doesn't keep you in that mode if you return-to-hut.
+    6d56a22 insert file that was missing
+    92052f6 Merge remote-tracking branch 'origin/master'
+    9144a7a Fixed a variety of bugs in the MPP topic details and topic summary.
+    570ffc8 Fixed a variety of bugs in the MPP topic details and topic summary.
+    640e4bc QuickAuth: switch to dynamic layout with hints floating right (temporary)
+    8665ae6 pointed localhost launch config back to localhost server
+    cc392c3 deleted dead code
+    3ddc0a4 reverted password for rose db in context
+    8912ba5 Merge remote-tracking branch 'origin/master'
+    10bd36b reverted password for rose db in context
+    c6bada3 save workspace
+    cd9632f alterred artifacts to include codehaus.org stuff and regenerated ant build
+    a85919f reverted password for rose db in context
+    6530f67 Fixed bug 341
+    d7fd88d Added new AdminSetTopicMOdelParametersEvent so that the orderTopics page will correctly submit those parameters only when that button is clicked.
+    06fc731 Merge branch 'master' into production
+    7612486 screwed up merge with master because of workspace
+    d193c72 Merge branch 'master' into production
+    2915339 Merge branch 'master' into production
+    bb47f08 Merge branch 'master' into production
+    8b81147 Merge branch 'master' into production
+    443655b Made sure that pretests show questions correctly with new multi-choice allowing images.   Also fixed bug in BasePedModel where learning companion media was not logged into event log.
+    e9293a6 Merge branch 'master' into production
+    a238e82 Merge branch 'master' into production
+    7c06122 update of touched xml files.
+    9bd283d Merge branch 'master' into production
+    7523260 Added to release notes and merged with master
+    a62f23b Merge branch 'master' into production
+    4a38db6 sync with master
+    7bc1989 Synced production with master and did some testing
+    b0da2fe Merge branch 'master' into production
+    ba254a1 Merge branch 'master' into production
+    e05c64b Fixed null pointer bug in collabIS
+    f68bfe9 Merge branch 'master' into production
+    d157d48 Merge branch 'master' into production
+    035db9d Merge branch 'master' into production
+    3e42b6b Merge branch 'master' into production
+    c53ca72 Merge branch 'master' into production
+    df82d42 Merge branch 'master' into production
+    72b9510 Some debugging statements and small fixes to get jcharts reports working
+
+3/12/17 v2.1.14
+   8ee9952 Fixed typo in DbClass where it put difficultyRate in column 6 .
+   150ca02 UI Changes for new .ogin screen
+   5fbc995 Css files for new login
+3/7/17 v2.1.13
+     WPI login stuff
+     16e4595 Changes to icorporate welcome and login pages from mathseeds.wpi.edu
+     db3ca9a fixed the layout of the buttons across the top
+3/3/17 v2.1.12
+    bc6c6e4 FIxed bug 333
+3/3/17: v2.1.11
+    374d5a2 Fixed bugs 334,335,336
+    a7619d5 Merge remote-tracking branch 'origin/master'
+    4d0699e Corrected the overloading of lessondefinition parameters with classconfig parameters
+    e8e8538 Moved CSS for drag and drop tables from wottMan.css to dragrdroptable.css, and included it on pages that use similar tables
+    d64887c Bug 337: Fixed error when removing a topic from a class
+    629806e Merge remote-tracking branch 'origin/master'
+    dc866d8 Merge remote-tracking branch 'origin/master'
+    aa76ae3 fixed cerulean ant properties.
+2/28/17: v2.1.10
+     Added libraries to artifacts so that ant builds have the full set of dependencies.
+2/20/17: v2/1/9
+    Added neeraj's code to system and released.
+ 2/17/17: tag v2.1.8
+    I changed the database password on rose and am putting in a new context.xml that has this password in the release and have
+    removed context.xml from github and only keep local copies.
+    a6e32e8 (HEAD, origin/master, origin/HEAD, master) added pom.xmls to maven structure and hoping that this commit retains that definition
+    0a6c91f Merge remote-tracking branch 'origin/master'
+    aa726b3 added main module files to project
+    6d6318c updated ant build scripts so they are correct for both machines.
+    7cfa440 added main module files to project
+    c9b56b9 added main module back to the project and fixed ant and pom files.
+    6ffc6b9 getting rid overlay
+    4e628c3 eliminated gson from problem state files because I cannot get ant to build
+    c1e8b00 Merge remote-tracking branch 'origin/master'
+    5945b59 Added useCaseTests.txt for showing the use-cases that have tests and log results.
+    1ffbc8c Bug 330:  tutorhut was not updating timers before sending the readProblem event.
+    c49adcb Bug 329:  Some logged entries did not have the isCorrect value set correctly.   All events now log the value for isCorrect based on whether the current problem is solved or not.
+    67d3535 Bug 328:   When logging attempts, no hintstep or hintid is put in the log.
+    13684d0 Bug 327:   When logging attempts, the attempt is marked isCorrect=true if the problem has been solved or if the current attempt is correct.
+    455841a Merge remote-tracking branch 'origin/master'
+    39389eb Fix bug 306; better handling of the classlessonplan table, to be followed by cleaning that table in the database
+    785aa51 added in case gson dependency is and maven stuff is in here.
+    19f36e4 BeginIntervention events were logged with probElapsedTime of 0.   Made it pull the probElapsed from the event and add to db.
+    72ac161 Fixed problem with generated test-users not having hashed passwords.
+    ff0d830 removed workspace.xml from git repo and added to gitignore.   Goes with the change in previous commit to read the db user stuff from the context.xml file.
+    c517099 adding jquery ui extensions for dialogs that close and minimize
+    b87dcd4 Merge remote-tracking branch 'origin/master'
+    539d377 adding jquery ui extensions for dialogs that close and minimize
+2/5/17: tag v2.1.7
+ fad3ba9 Added extension for Jquery UI so that I can make the learning companion dialog minimize or close and then reopen automatically when it has something to say.
+ 6aca1a7 Fixed unreported bug where MPP would cause failure when trying or resuming a topic because the last problem mode was no longer stored in the student state because it had been reset
+ 46d8ee4 got rid of main module, redid ant builds, made release notes
+TODO:  Change eventlog.clickTime to (datetime(3) on rose db after updating Mysql to new version.
+2/3/17 : tag v2.1.6
+    8da031a FIx bug 320.   External activities only play once per request.   After that they will not be played again.
+    c5a4667 FIx bug 315.  Errors surrounding the use of the Home button. Many problems were encountered including loss of probId, topicId, getting these values from the topicState rather than lessonState, etc. Added UseCases.txt to contain tests run to verify fixes work.
+    b34d92e FIx bug 316.   ReadProblem events now correctly set the isCorrect field.
+    ba34661 Fix for bug 317.  Eliminated the close X button in the upper right of the demo-problem dialog.
+    8db897a Fix for bug 318.  TopicIntro events in eventLog are now all set to problemID = 899 a dummy problem. StudentState was not saved after being inited during EnterTutor events.
+    eb6ef27 Merge remote-tracking branch 'origin/master'
+    212eec7 Changed class ordering on new user class selection screen to show recent classes first
+    b89321f Changed class ordering on new user class selection screen to show recent classes first
+    f721533 Merge branch 'master' of https://github.com/marshall62/mathspring
+    67651c8 Fixed bug going to reports if logged in as teacher
+    3637d75 MARi local-context included
+    de921b8 Teacher Tools: fixed issue where topic selection crashed when class had no grade
+    cb51ba2 added drag and drop images to version control
+1/12/17: tag v2.1.5  Write back to MARi now includes local-context JSON for stuff like probDiff, effort, numHints
+1/11/17: tag 2.1.4.  Added MathspringService with URL /rest/admin/username/{uname}/pw/{pw} as a restful service so that testauth can use it to
+login admins rather than having to recode the PasswordAuthentication stuff.
+1/10/17:  tag 2.1.3.  Has fixes to quickAuth playing as example/demo and automatically read-aloud on Edge probs playing as demo/example
+1/3/17:  Changed administrator and teacher table to have an encrypted password.  Added an edit-teacher page
+in the admin side of teacher tools.  Added password editing in teacher tools in the edit-student page.
+12/22/16:  Put in eventlog clickTime which is the time in Javascript of click in an event.  Added timeTOsecondhint, timetoThirdHint,
+timeToSecondAttempt, timeToThirdAttempt in stduentproblemhistory.  Made passwords encrypted with salt.
+11/28/16: First Git Release (tag v2.1)    Has fixes to the FullEmpathicLC and SemiEmpathicLC which were
+completely non-working.  Also a fix to make AskEmotion wait correctly after user response.
+11/28/16:  Both systems.  Added in a fix so that img tags can be put in pretest multichoice area.
+Fixed bug in event logging (had first call learning companion and THEN log in most events).
+11/24/16 (Thanksgiving):  Have fixed all reported bugs in pretests and ask-emotion queries.  New pedaogies
+that include Meta-cognitive (rule-based) LCs.  Both MS and WOJ system are the same and checked into git.
+11/8/16:  Added LC rules from Ivon which includes some fixes to the XMLLCRule tool for adding to the db and making rules and rulesets
+that have one rule file and many ruleset files that just point to rules.   Tested the rules coming from oldLCBehavior.   This release also
+includes Rafaels additions to the topic editor in the teacher tools.   Built some new ant scripts (auto-gened)  and then wrote buildSugaree.xml
+which is a master script that imports the auto-gened ones.   The auto-gened ant scripts need to be done more frequently (i.e. when new Maven
+dependencies are added ) because the Maven libs are part of the ant scripts.
+Released both WOJ and MS systems and pushed to master and production
+
+10/27/16:   Fixed bugs related to login interventions not behaving well with missing config.xml.
+Also added long answers to surveys.
+
+ Released WOJ and MS systems.
+ Pushed both Repos (master and production) so that woj=master and production=ms
+

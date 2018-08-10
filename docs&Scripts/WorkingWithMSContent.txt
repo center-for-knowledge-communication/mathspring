@@ -1,0 +1,90 @@
+The directory resources/mathspring/mscontent does not live in the github mathspring repo for
+several reasons.  One, it is very large (~4GB) and can't fit in the repo, two is that Java developers do not
+need to edit these files or push them.   So the solution is to empty the mscontent folder on github
+and place it elsewhere in the cloud.
+
+In my marshallumass google drive (password m4thspr1ng) there is:
+
+mscontent is the mscontent directory with files removed that are unecessary for Java developers.
+Removed Flash .fla files,   Removed Edge .an files.    This makes a smaller directory structure.
+This directory structure should probably be for download only.   This will have to get remade if anything is added
+to the mscontent git repo.
+
+Ideally, I'd like to remove the git repo and host a full mscontent dir on google drive.  I'd then need a download
+script that gets just the stuff I need (omit the .FLA and the .an files).
+
+
+
+Because the original directories for mscontent are on rose,  I've used a command line tool called
+gdrive to put the stuff into the google shared drive.   gdrive is a good tool for linux environments.
+
+http://olivermarshall.net/how-to-upload-a-file-to-google-drive-from-the-command-line/
+
+1.
+cd ~
+wget https://docs.google.com/uc?id=0B3X9GlR6EmbnWksyTEtCM0VfaFE&export=download
+
+2.
+mv uc\?id\=0B3X9GlR6EmbnWksyTEtCM0VfaFE gdrive
+
+3.
+chmod +x gdrive
+
+4.
+sudo install gdrive /usr/local/bin/gdrive
+
+5.
+gdrive list
+
+   - copy past this output into a browser window.   It will give back a code to copy.
+   Return to the list area and paste the code.
+
+Done.
+
+Windows:
+Download gdrive from github https://docs.google.com/uc?id=0B3X9GlR6EmbncWNLOS1KYWhLVFE&export=download
+copy downloads\gdrive-windows-x64.exe c:\windows
+gdrive-windows-x64.exe list
+do the same as above to get code from web
+
+
+Documentation:
+https://github.com/prasmussen/gdrive
+
+Common Commands:
+UPload
+
+gdrive upload --recursive mscontent
+
+gdrive [global] upload [options] <path>
+
+global:
+  -c, --config <configDir>         Application path, default: /Users/<user>/.gdrive
+  --refresh-token <refreshToken>   Oauth refresh token used to get access token (for advanced users)
+  --access-token <accessToken>     Oauth access token, only recommended for short-lived requests because of short lifetime (for advanced users)
+
+options:
+  -r, --recursive           Upload directory recursively
+  -p, --parent <parent>     Parent id, used to upload file to a specific directory, can be specified multiple times to give many parents
+  --name <name>             Filename
+  --no-progress             Hide progress
+  --mime <mime>             Force mime type
+  --share                   Share file
+  --delete                  Delete local file when upload is successful
+  --chunksize <chunksize>   Set chunk size in bytes, default: 8388608
+
+Download
+gdrive [global] download [options]
+
+global:
+  -c, --config          Application path, default: /Users//.gdrive
+  --refresh-token    Oauth refresh token used to get access token (for advanced users)
+  --access-token      Oauth access token, only recommended for short-lived requests because of short lifetime (for advanced users)
+
+options:
+  -f, --force       Overwrite existing file
+  -r, --recursive   Download directory recursively, documents will be skipped
+  --path      Download path
+  --delete          Delete remote file when download is successful
+  --no-progress     Hide progress
+  --stdout          Write file content to stdout

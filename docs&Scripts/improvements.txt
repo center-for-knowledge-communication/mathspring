@@ -1,0 +1,86 @@
+Ways to Improve server performance
+
+1.  SSD on rose.
+2.  Use Tomcat workers (perhaps adding in a new server)
+3.  Imrove DB and/or db connector to obtain some automatic caching
+
+4.  Analyze and refactor software:
+
+1.  Look for queries that usually return the same thing (e.g. omitted problems for a class).  Store these things in memory.
+In general, build up caches like this where the first time we need them, we get from the db, but subsequant requests
+get it from the cache.    Goal:  maintain crash tolerance.   Have different caches that can be flushed if necessary.
+
+2.  Try to only query transient data from database and keep the rest in cache.   All the content including pedagogies is
+non-transient.   The only transient data is student-state and model.   Some transient data only changes by small increments
+so rather than reloading entire data from db each request.  List of unsolved problems in a topic is example of this.
+The list is the same except when an attempt event comes in indicating isCorrect=true.  At that point the problem can be removed
+from the list in cache.    Some caches can be persisted to db at regular intervals but not on every request such that a server restart
+will cause some amount of non-critical data to be lost (e.g. the list of unsolved problems might be missing the last few problems).
+
+
+
+Ways to improve Functionality
+
+Bugs in My Progress Page
+
+The problem is that MPP is trying to be too many things and so it does none of them well.
+
+Perhaps the MPP could have two tabs:
+
+Tab 1:  Topic Status:
+
+We need a page that allows a student to view the available topics and select them.   Basic data
+about problem-solving is provided in this page as numbers.
+
+Modes of viewing topics.   A topic should only have the try/continue button on it if it has not been completed (recently).  If it has been completed,
+then only the review and challenge buttons are shown.   Review shows the entire topic in sequential order.   Challenge might start at a particular point in
+the topic (options might be: mid-point, difficulty-level=user-mastery, get problems at next grade-level, etc).  Then it would go through them sequentially.
+Mastery bars can be shown but it would be better to see raw numbers like:
+Seen: N
+Solved: M
+Remaining that are required for Completion: R  (this could be a hyperlink so the user could click on it to be taken to one of the remaining problems)
+
+Topics can be fully opened up to reveal the problems within them.  All problems in the topic are shown with one of 4 status indicators:
+1. Not seen, 2. Skipped (date/time of last view) 3. Attempted (correctly answered with help/not answered correctly), 4. Solved (correct & no help) (date/time).
+ Problems may be selected to try.   This will put the student back in that topic (so if they click "new problem" afterward, it shows another problem in that topic)
+
+Tab 2:  Topic Progress:
+
+A second "progress" page can be given that uses all these soft metrics such as mastery, effort, etc.  Plants and mastery bars can be shown.   Topics
+can be continued from here.  If you want to be able to display the details of a topic (i.e. all the problems you've seen within it), this can be shown here.
+This could use the card representation to show how a student did on each problem.  I don't think it should include problems a student hasn't seen since the emphasis
+in this tab is on "progress".    The user can choose to work on an individual problem which has the effect of putting him in that topic.
+
+This tab can be turned off either as part of the pedagogy a student is assigned or as configured for the class the student is in.
+
+
+
+Bugs in Problem Selection:
+
+A problem should not be considered "solved" unless the user gets it correct with no hints.   A problem that a student sees and either views
+hints for or makes an attempt to answer will be considered "tried".  A problem that is viewed but not tried is considered "skipped".
+Currently we don't really "design" our topic content in such a way that we consider how the set
+of problems works together to teach the entire topic.  More often we just dump a bunch of problems into a topic and label them "triangle problems".
+Given our difficulty ratings, problem selection algorithm, and topic-switching algorithm we have no idea what elements of the topic the
+user actually sees and thus we really don't know if someone has mastered a topic.
+
+Too much content is eliminated based on our overly generous policy of what is solved.   Problems may repeat if they are not solved.  The only thing
+that should factor into when to repeat is recency.  So recently shown problems are less likely to be selected.
+If topics are built with grade-level problems (see below) then jumping around using our splitting-in-half method doesn't make sense.
+We should move from easiest to hardest sequentially.  This means we need to be careful about creating bunches of problems that are all the same but
+with different numbers because they would all get shown in sequence.  The best way to handle this is to create one parameterized problem.  If it isn't solved
+by the student it can be repeated (perhaps relaxing recency restrictions on it) with different numbers.
+
+Bugs in Topic switching:
+
+Topic switching happens at strange times often inconsistent with a users goals (e.g. they asked to work on a topic and the system
+switches out of it).  Topics should switch based on a simpler, well-understood criteria:  having solved certain designated problems
+that necessary for topic completion.   Once these problems are solved (i.e. meaning no hints used) the system should OFFER to switch topics and the user
+can elect to stay in the topic if they want.   Topics should be composed of grade-level problems.  We can use the grade part of the
+CCSS to decide if the problem belongs in the topic.   Our authoring tool would have to allow us to mark certain problems
+within each topic as "this problem must be solved in order for the topic to be completed."   So the auth tool would need to be able
+show a topic's problems at a certain grade level so that the author could then select which problems must be solved for completion
+at the particular grade level.   Perhaps those problems would need to follow certain design criteria so it isn't easy for the user
+to "cheat" to get their solutions.  So maybe no hints would be offered for these problems (other similar problems might have a full/partial sets of hints).
+Perhaps these problems would need to be short-answer because multiple choice problems can be attempted multiple times with wrong
+answers eliminated from consideration the next time it is seen.

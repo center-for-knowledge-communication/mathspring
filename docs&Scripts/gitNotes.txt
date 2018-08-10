@@ -1,0 +1,15 @@
+Files that are in the repo on github but need to be different on the local machine:
+
+workspace.xml
+context.xml
+
+The commands below tell git to not stage these local files on commit and shouldn't pull down the version
+from github on update.
+
+git update-index --assume-unchanged .idea/workspace.xml
+git update-index --assume-unchanged woServer/web/META-INF/context.xml
+
+git update-index --assume-unchanged file
+To undo and start tracking again:
+
+git update-index --no-assume-unchanged [<file> ...]

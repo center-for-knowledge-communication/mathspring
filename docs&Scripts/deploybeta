@@ -1,0 +1,25 @@
+#!/bin/bash -v
+# after doing git pull in mathspring dir, this script can be run 
+# builds a new woj.war in ./woServer/release/woj.war
+#/usr/local/maven/bin/mvn clean
+#cd emailer
+#/usr/local/maven/bin/mvn install
+#cd ..
+#cd servletFramework
+#/usr/local/maven/bin/mvn install
+#cd ..
+/usr/local/maven/bin/mvn -Denv=beta package
+cd /mnt/net/mathspring-war-files
+fdate=`stat -c %y woj.war`
+IFS=" " read -ra a <<< "$fdate"
+echo ${a[0]}
+newfile="woj-${a[0]}.war"
+echo $newfile
+# move current woj.war to a file with its date in same dir for safekeeping
+mv woj.war $newfile
+cp /mnt/net/proj/mathspring/woServer/release/woj.war .
+rm -f /opt/tomcat8/webapps/woj.war
+rm -rf /opt/tomcat8/webapps/woj
+cp woj.war /opt/tomcat8/webapps
+/etc/init.d/tomcat8 stop
+/etc/init.d/tomcat8 start

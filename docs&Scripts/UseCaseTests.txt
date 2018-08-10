@@ -1,0 +1,115 @@
+Involving the Home Button:
+
+User in a problem that is NOT solved clicks Home | Resume Tutor
+On Screen: Should go to Dashboard Page (with tree) and back to the problem they were in.
+Internal:
+Event log: Note that probId remains as 411 throughout
+'1470382', '28436', '62164', 'BeginProblem', NULL, '0', '78781', '0', '411', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-02 09:16:47', '10', NULL, '2017-02-02 09:16:47.323'
+'1470383', '28436', '62164', 'Attempt', 'A', '0', '100533', '21752', '411', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-02 09:17:09', '10', NULL, '2017-02-02 09:17:09.075'
+'1470384', '28436', '62164', 'ShowIntervention', NULL, '0', '100655', '0', '411', NULL, NULL, 'idle', 'HighlightHintButton', NULL, NULL, '2017-02-02 09:17:09', '10', NULL, '2017-02-02 09:17:09.197'
+'1470385', '28436', '62164', 'EndProblem', NULL, '0', '107962', '29181', '411', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 09:17:17', '10', NULL, '2017-02-02 09:17:16.504'
+'1470386', '28436', '62164', 'Home', NULL, '0', '107962', '0', '411', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 09:17:17', NULL, NULL, '2017-02-02 09:17:16.804'
+'1470387', '28436', '62164', 'MPPReturnToHut', NULL, '0', '0', '0', '411', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 09:17:19', NULL, NULL, '2017-02-02 09:17:19.158'
+'1470388', '28436', '62164', 'ResumeProblem', NULL, '0', '0', '0', '411', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 09:17:19', '10', NULL, '2017-02-02 09:17:19.352'
+'1470389', '28436', '62164', 'Attempt', 'B', '0', '6055', '6055', '411', NULL, NULL, 'incorrect6', NULL, NULL, NULL, '2017-02-02 09:17:25', '10', NULL, '2017-02-02 09:17:25.407'
+
+User in a problem that IS solved clicks Home | Resume Tutor
+On Screen: Should go to Dashboard Page (with tree) and back to the next thing in the topic (may be a problem or an intervention)
+Internal: from solved problem 153 it goes to next problem 456
+'1470499', '28436', '62165', 'Attempt', 'C', '1', '113759', '72103', '153', NULL, NULL, 'correct6', NULL, NULL, NULL, '2017-02-02 11:21:23', '12', NULL, '2017-02-02 11:21:22.829'
+'1470500', '28436', '62165', 'EndProblem', NULL, '1', '118664', '77008', '153', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:21:28', '12', NULL, '2017-02-02 11:21:27.734'
+'1470501', '28436', '62165', 'Home', NULL, '0', '118664', '0', '153', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:21:28', NULL, NULL, '2017-02-02 11:21:28.102'
+'1470502', '28436', '62165', 'NextProblem', NULL, '1', '0', '0', '153', NULL, NULL, 'idle', 'PracticeProblem', NULL, NULL, '2017-02-02 11:21:31', '12', NULL, '2017-02-02 11:21:31.483'
+'1470503', '28436', '62165', 'MPPReturnToHut', NULL, '0', '0', '0', '153', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:21:32', NULL, NULL, '2017-02-02 11:21:31.534'
+'1470504', '28436', '62165', 'EndProblem', NULL, '1', '1', '1', '153', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:21:32', '12', NULL, '2017-02-02 11:21:31.769'
+'1470505', '28436', '62165', 'BeginProblem', NULL, '0', '262', '0', '456', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-02 11:21:32', '12', NULL, '2017-02-02 11:21:32.030'
+'1470506', '28436', '62165', 'ReadProblem', NULL, '0', '262', '0', '456', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:21:38', '12', NULL, '2017-02-02 11:21:32.030'
+
+Internal:
+Event log: Note: When we return it selects an intervention and then goes to problem 1352
+'1470390', '28436', '62164', 'Attempt', 'C', '1', '405150', '405150', '411', NULL, NULL, 'correct4', NULL, NULL, NULL, '2017-02-02 09:24:05', '10', NULL, '2017-02-02 09:24:04.502'
+'1470391', '28436', '62164', 'EndProblem', NULL, '1', '414370', '414370', '411', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 09:24:14', '10', NULL, '2017-02-02 09:24:13.722'
+'1470392', '28436', '62164', 'Home', NULL, '0', '414370', '0', '411', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 09:24:14', NULL, NULL, '2017-02-02 09:24:14.000'
+'1470393', '28436', '62164', 'NextProblem', NULL, '1', '0', '0', '411', NULL, NULL, 'idle', 'AskEmotionIntervention-Confidence', NULL, NULL, '2017-02-02 09:24:19', '10', NULL, '2017-02-02 09:24:18.632'
+'1470394', '28436', '62164', 'MPPReturnToHut', NULL, '0', '0', '0', '411', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 09:24:19', NULL, NULL, '2017-02-02 09:24:18.652'
+'1470395', '28436', '62164', 'EndProblem', NULL, '1', '0', '0', '411', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 09:24:19', '10', NULL, '2017-02-02 09:24:18.837'
+'1470396', '28436', '62164', 'ShowIntervention', NULL, '1', '104', '0', '411', NULL, NULL, 'idle', 'AskEmotionIntervention', NULL, NULL, '2017-02-02 09:24:19', '10', NULL, '2017-02-02 09:24:18.941'
+'1470397', '28436', '62164', 'InputResponse', '<interventionInput class="AskEmotionIS"><emotion name="Confidence" level="-1">', '0', '3944', '3944', '214', NULL, NULL, 'idle', 'PracticeProblem', NULL, NULL, '2017-02-02 09:24:23', '10', NULL, '2017-02-02 09:24:22.781'
+'1470398', '28436', '62164', 'EndProblem', NULL, '1', '4105', '4105', '411', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 09:24:23', '10', NULL, '2017-02-02 09:24:22.942'
+'1470399', '28436', '62164', 'BeginProblem', NULL, '0', '4272', '0', '1352', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-02 09:24:23', '10', NULL, '2017-02-02 09:24:23.109'
+'1470400', '28436', '62164', 'Attempt', '6', '0', '12426', '8154', '1352', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-02 09:24:31', '10', NULL, '2017-02-02 09:24:31.263'
+'1470401', '28436', '62164', 'ShowIntervention', NULL, '0', '12516', '0', '1352', NULL, NULL, 'idle', 'HighlightHintButton', NULL, NULL, '2017-02-02 09:24:31', '10', NULL, '2017-02-02 09:24:31.353'
+
+3: Go from unsolved problem to Home | MPP | go-back-to-tutor : Should return to unsolved problem
+Internal: goes from 456 back to 456
+'1470507', '28436', '62165', 'Attempt', 'B', '0', '10813', '10551', '456', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-02 11:21:43', '12', NULL, '2017-02-02 11:21:42.581'
+'1470508', '28436', '62165', 'ShowIntervention', NULL, '0', '10912', '0', '456', NULL, NULL, 'idle', 'HighlightHintButton', NULL, NULL, '2017-02-02 11:21:43', '12', NULL, '2017-02-02 11:21:42.680'
+'1470509', '28436', '62165', 'EndProblem', NULL, '0', '188279', '188017', '456', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:24:40', '12', NULL, '2017-02-02 11:24:40.047'
+'1470510', '28436', '62165', 'Home', NULL, '0', '188279', '0', '456', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:24:41', NULL, NULL, '2017-02-02 11:24:40.649'
+'1470511', '28436', '62165', 'MyProgressPage', NULL, '0', '0', '0', '456', NULL, NULL, NULL, 'mpp', NULL, NULL, '2017-02-02 11:24:42', '12', NULL, '2017-02-02 11:24:42.499'
+'1470512', '28436', '62165', 'MPPReturnToHut', NULL, '0', '1694', '0', '456', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:24:46', NULL, NULL, '2017-02-02 11:24:45.615'
+'1470513', '28436', '62165', 'ResumeProblem', NULL, '0', '1695', '1', '456', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:24:46', '12', NULL, '2017-02-02 11:24:45.917'
+'1470514', '28436', '62165', 'ReadProblem', NULL, '0', '1695', '0', '456', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:24:51', '12', NULL, '2017-02-02 11:24:45.917'
+
+4: Go from solved problem to Home | MPP | go-back-to-tutor : Should return to next problem or intervention
+
+Internal: This example shows going from a solved problem 175 | Home | MPP | Return to tutor | Ask Emotion interv | Force-to-MPP interv | Return to tutor | problem 83
+'1471070', '28436', '62173', 'BeginProblem', NULL, '0', '851842', '0', '175', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-03 14:26:13', '6', NULL, '2017-02-03 14:26:12.550'
+'1471071', '28436', '62173', 'Attempt', 'B', '1', '859896', '8054', '175', NULL, NULL, 'correct1', NULL, NULL, NULL, '2017-02-03 14:26:21', '6', NULL, '2017-02-03 14:26:20.604'
+'1471072', '28436', '62173', 'EndProblem', NULL, '1', '862603', '10761', '175', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:26:23', '6', NULL, '2017-02-03 14:26:23.311'
+'1471073', '28436', '62173', 'Home', NULL, '0', '862603', '0', '175', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-03 14:26:24', '6', NULL, '2017-02-03 14:26:23.568'
+'1471074', '28436', '62173', 'MyProgressPage', NULL, '1', '0', '0', '175', NULL, NULL, NULL, 'mpp', NULL, NULL, '2017-02-03 14:26:26', '6', NULL, '2017-02-03 14:26:26.287'
+'1471075', '28436', '62173', 'NextProblem', NULL, '1', '2437', '0', '175', NULL, NULL, 'idle', 'AskEmotionIntervention-Confidence', NULL, NULL, '2017-02-03 14:26:39', '6', NULL, '2017-02-03 14:26:39.325'
+'1471076', '28436', '62173', 'MPPReturnToHut', NULL, '0', '2437', '0', '175', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-03 14:26:39', '6', NULL, '2017-02-03 14:26:39.357'
+'1471077', '28436', '62173', 'EndProblem', NULL, '1', '2437', '0', '175', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:26:40', '6', NULL, '2017-02-03 14:26:39.591'
+'1471078', '28436', '62173', 'ShowIntervention', NULL, '1', '2539', '0', '175', NULL, NULL, 'idle', 'AskEmotionIntervention', NULL, NULL, '2017-02-03 14:26:40', '6', NULL, '2017-02-03 14:26:39.693'
+'1471079', '28436', '62173', 'InputResponse', '<interventionInput class="AskEmotionIS"><emotion name="Confidence" level="3">', '0', '11848', '9411', '175', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-03 14:26:55', '6', NULL, '2017-02-03 14:26:49.002'
+'1471080', '28436', '62173', 'ShowIntervention', NULL, '1', '17486', '0', '175', NULL, NULL, 'idle', 'MyProgressNavigation', NULL, NULL, '2017-02-03 14:26:55', '6', NULL, '2017-02-03 14:26:54.640'
+'1471081', '28436', '62173', 'MyProgressPage', NULL, '1', '17486', '15049', '175', NULL, NULL, NULL, 'mpp', NULL, NULL, '2017-02-03 14:27:00', '6', NULL, '2017-02-03 14:27:00.406'
+'1471082', '28436', '62173', 'NextProblem', NULL, '1', '24145', '0', '175', NULL, NULL, 'generalAttribution5', 'PracticeProblem', NULL, NULL, '2017-02-03 14:27:10', '6', NULL, '2017-02-03 14:27:10.190'
+'1471083', '28436', '62173', 'MPPReturnToHut', NULL, '0', '24145', '0', '175', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-03 14:27:10', '6', NULL, '2017-02-03 14:27:10.217'
+'1471084', '28436', '62173', 'EndProblem', NULL, '1', '24145', '0', '175', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:27:11', '6', NULL, '2017-02-03 14:27:10.440'
+'1471085', '28436', '62173', 'BeginProblem', NULL, '0', '24240', '0', '83', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-03 14:27:11', '6', NULL, '2017-02-03 14:27:10.535'
+'1471086', '28436', '62173', 'Attempt', 'D', '1', '29078', '4838', '83', NULL, NULL, 'correct2', NULL, NULL, NULL, '2017-02-03 14:27:15', '6', NULL, '2017-02-03 14:27:15.373'
+
+Internal: goes from 18 to Home to MPP back to tutor and problem 33.
+
+'1470555', '28436', '62165', 'Attempt', 'A', '1', '125302', '121332', '18', NULL, NULL, 'correct5', NULL, NULL, NULL, '2017-02-02 11:58:20', '14', NULL, '2017-02-02 11:58:19.964'
+'1470556', '28436', '62165', 'EndProblem', NULL, '1', '128172', '124202', '18', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:58:23', '14', NULL, '2017-02-02 11:58:22.834'
+'1470557', '28436', '62165', 'Home', NULL, '0', '128172', '0', '18', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:58:23', NULL, NULL, '2017-02-02 11:58:23.063'
+'1470558', '28436', '62165', 'MyProgressPage', NULL, '1', '0', '0', '18', NULL, NULL, NULL, 'mpp', NULL, NULL, '2017-02-02 11:58:25', '14', NULL, '2017-02-02 11:58:24.795'
+'1470559', '28436', '62165', 'NextProblem', NULL, '1', '1303', '0', '18', NULL, NULL, 'idle', 'PracticeProblem', NULL, NULL, '2017-02-02 11:58:27', '14', NULL, '2017-02-02 11:58:26.864'
+'1470560', '28436', '62165', 'MPPReturnToHut', NULL, '0', '1303', '0', '18', NULL, NULL, NULL, NULL, NULL, NULL, '2017-02-02 11:58:27', NULL, NULL, '2017-02-02 11:58:26.894'
+'1470561', '28436', '62165', 'EndProblem', NULL, '1', '1303', '0', '18', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:58:27', '14', NULL, '2017-02-02 11:58:27.095'
+'1470562', '28436', '62165', 'BeginProblem', NULL, '0', '1383', '0', '33', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-02 11:58:27', '14', NULL, '2017-02-02 11:58:27.175'
+'1470563', '28436', '62165', 'ReadProblem', NULL, '0', '1383', '0', '33', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-02 11:58:57', '14', NULL, '2017-02-02 11:58:27.175'
+
+5: Go from problem 833 to next problem 80 with ask-emotion intervention in-between.
+Internal:
+'1471085', '28436', '62173', 'BeginProblem', NULL, '0', '24240', '0', '83', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-03 14:27:11', '6', NULL, '2017-02-03 14:27:10.535'
+'1471086', '28436', '62173', 'Attempt', 'D', '1', '29078', '4838', '83', NULL, NULL, 'correct2', NULL, NULL, NULL, '2017-02-03 14:27:15', '6', NULL, '2017-02-03 14:27:15.373'
+'1471087', '28436', '62173', 'NextProblem', NULL, '1', '236014', '211774', '83', NULL, NULL, 'idle', 'AskEmotionIntervention-Confidence', NULL, NULL, '2017-02-03 14:31:01', '6', NULL, '2017-02-03 14:30:42.309'
+'1471088', '28436', '62173', 'ShowIntervention', NULL, '1', '254465', '0', '83', NULL, NULL, 'idle', 'AskEmotionIntervention', NULL, NULL, '2017-02-03 14:31:01', '6', NULL, '2017-02-03 14:31:00.760'
+'1471089', '28436', '62173', 'InputResponse', '<interventionInput class="AskEmotionIS"><emotion name="Confidence" level="2">', '0', '259426', '235186', '83', NULL, NULL, 'idle', 'PracticeProblem', NULL, NULL, '2017-02-03 14:31:09', '6', NULL, '2017-02-03 14:31:05.721'
+'1471090', '28436', '62173', 'EndProblem', NULL, '1', '262254', '238014', '83', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:31:09', '6', NULL, '2017-02-03 14:31:08.549'
+'1471091', '28436', '62173', 'BeginProblem', NULL, '0', '262354', '0', '80', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-03 14:31:09', '6', NULL, '2017-02-03 14:31:08.649'
+'1471092', '28436', '62173', 'Attempt', 'A', '0', '281468', '19114', '80', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-03 14:31:28', '6', NULL, '2017-02-03 14:31:27.763'
+'1471093', '28436', '62173', 'ShowIntervention', NULL, '0', '281572', '0', '80', NULL, NULL, 'idle', 'HighlightHintButton', NULL, NULL, '2017-02-03 14:31:28', '6', NULL, '2017-02-03 14:31:27.867'
+
+6: Go from one problem 80 to intervention about switching topics to Topic Intro 899 to Demo 220 to problem 530
+Going from topic 6 to topic 9
+Note that probId 899 is used for topic intro. It is a dummy prob id.
+Internal
+'1471094', '28436', '62173', 'Attempt', 'D', '1', '389430', '127076', '80', NULL, NULL, 'correct5', NULL, NULL, NULL, '2017-02-03 14:33:16', '6', NULL, '2017-02-03 14:33:15.725'
+'1471095', '28436', '62173', 'NextProblem', NULL, '1', '391783', '129429', '80', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-03 14:33:18', '6', NULL, '2017-02-03 14:33:18.078'
+'1471096', '28436', '62173', 'ShowIntervention', NULL, '1', '391950', '0', '80', NULL, NULL, 'idle', 'TopicSwitch', NULL, NULL, '2017-02-03 14:33:18', '6', NULL, '2017-02-03 14:33:18.245'
+'1471097', '28436', '62173', 'EndProblem', NULL, '1', '394149', '131795', '80', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:33:21', '6', NULL, '2017-02-03 14:33:20.444'
+'1471098', '28436', '62173', 'InputResponse', NULL, '0', '394149', '131795', '899', NULL, NULL, 'idle', 'TopicIntro', NULL, NULL, '2017-02-03 14:33:21', '9', NULL, '2017-02-03 14:33:20.444'
+'1471099', '28436', '62173', 'ShowIntervention', NULL, '1', '395016', '0', '899', NULL, NULL, 'idle', 'TopicIntro', NULL, NULL, '2017-02-03 14:33:21', '9', NULL, '2017-02-03 14:33:21.311'
+'1471100', '28436', '62173', 'InputResponse', NULL, '0', '396915', '2332', '899', NULL, NULL, 'idle', 'demo 220', NULL, NULL, '2017-02-03 14:33:23', '9', NULL, '2017-02-03 14:33:23.210'
+'1471101', '28436', '62173', 'BeginProblem', NULL, '0', '397047', '0', '220', NULL, NULL, 'idle', 'demo', NULL, NULL, '2017-02-03 14:33:23', '9', NULL, '2017-02-03 14:33:23.342'
+'1471102', '28436', '62173', 'NextProblem', NULL, '0', '404083', '7036', '220', NULL, NULL, 'idle', 'PracticeProblem', NULL, NULL, '2017-02-03 14:33:33', '9', NULL, '2017-02-03 14:33:30.378'
+'1471103', '28436', '62173', 'EndProblem', NULL, '0', '406894', '9847', '220', NULL, NULL, 'idle', '', NULL, NULL, '2017-02-03 14:33:33', '9', NULL, '2017-02-03 14:33:33.189'
+'1471104', '28436', '62173', 'BeginProblem', NULL, '0', '407026', '0', '530', NULL, NULL, 'idle', 'practice', NULL, NULL, '2017-02-03 14:33:33', '9', NULL, '2017-02-03 14:33:33.321'
+'1471105', '28436', '62173', 'Attempt', 'A', '0', '414677', '7651', '530', NULL, NULL, 'idle', NULL, NULL, NULL, '2017-02-03 14:33:41', '9', NULL, '2017-02-03 14:33:40.972'
+'1471106', '28436', '62173', 'ShowIntervention', NULL, '0', '414780', '0', '530', NULL, NULL, 'idle', 'HighlightHintButton', NULL, NULL, '2017-02-03 14:33:41', '9', NULL, '2017-02-03 14:33:41.075'

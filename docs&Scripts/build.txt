@@ -1,0 +1,69 @@
+How to build and release:
+
+Assuming you are using Intellij IDEA with a project configured as it comes out of github:
+
+1.  VCS | Commit Changes  Do PUSH to Git
+    -  Make sure PUSH succeeds.   If not there are probably new commits in Github and you will need to do
+       VCS | Update Project to get the new changes.
+
+Build war files:
+2.   Build | Build Artifacts | woServer:Web-BETA WAR | Build
+3.   Build | Build Artifacts | woServer:Web-PRODUCTION WAR | Build
+
+Note:  THere are other options on these menus such as clean, rebuild, etc.  I don't usually
+need to use these if I've debugged the code but in rare occasions I may do clean rebuilds.
+
+Move war files to rose:
+4.  Open Terminal window
+    cd /mathspring/out/artifacts/woServer_Web_Beta_WAR
+
+    check that woj.war is new
+
+5.  scp woj.war marshall@rose.cs.umass.edu:/mnt/net/woj.war
+    wait...
+
+6.  cd /mathspring/out/artifacts/woServer_Web_Production_WAR
+
+7.  scp woj.war marshall@rose.cs.umass.edu:/mnt/net/woj.war
+    wait...
+
+Get on rose and release the war files.
+
+8.   ssh rose
+
+cd to /mnt/net
+verify that woj.war and ms.war are new and are similar bytes to what was on local machine.
+
+Option 1 (No X Windows)
+
+cd /opt/tomcat8/webapps
+sudo rm -f woj.war
+sudo rm -f ms.war
+sudo rm -rf woj
+sudo rm -rf ms
+cd /mnt/net
+./deploywar   # this just copies the woj.war into a sub-folder where woj.war files are
+./deployms  # this just copies the ms.war into a sub-folder where ms.war files are
+sudo cp woj.war /opt/tomcat8/webapps
+sudo cp ms.war /opt/tomcat8/webapps
+
+Tomcat will see the presence of the war files and will automatically expand them and begin
+running them.  Verify this by checking that
+/opt/tomcat8/webapps/woj  and opt/tomcat8/webapps/ms   are present.
+
+
+
+Option 2 (Have X Windows connection to rose)
+
+cd /mnt/net
+firefox&
+./deploywar
+./deployms
+In Firefox:
+Use tomcat manager to undeploy woj and ms
+deploy war file from /mnt/net/production_wars/ms.war
+deploy war file from /mnt/net/mathspring-war-file/woj.war
+
+
+Note:  logs  containing useful error messages that take place in the server are in
+/opt/tomcat8/logs/  ms.log and woj.log

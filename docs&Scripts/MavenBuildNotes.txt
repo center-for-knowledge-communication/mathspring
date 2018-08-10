@@ -1,0 +1,42 @@
+Maven is being used for dependencies and for building the system on rose.
+
+On rose:
+
+/mnt/net/proj/
+
+Did git clone of mathspring project
+
+Installed maven in /usr/local following these instructions:
+https://tecadmin.net/install-apache-maven-on-centos/#
+
+cd mathspring
+copied by hand META-INF/context.xml into correct location
+
+cd emailer
+mvn install
+cd ..
+cd servletFramework
+mvn install
+cd ..
+mvn -Denv=beta package
+mvn -Denv=production package
+
+
+To successfully use scripts that use maven:
+
+1.  maven relies on dependencies being installed in the users repo.  THis means
+that I must run maven targets with sudo
+sudo /usr/local/maven/bin/mvn package
+do for emailer and servletFramework
+
+Now can run sudo ./deploybeta which will include maven commands and will find the dependencies in the
+sudo repo
+
+To do releases now:
+
+login to rose and go to /mnt/net/proj/mathspring
+sudo git pull
+sudo ./deploybeta
+sudo ./deployprod
+
+
