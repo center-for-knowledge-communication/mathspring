@@ -29,6 +29,10 @@ Mathspring developers: Clone the repository on your local machine.
 
 
 2. You will need to install Tomcat 8 (apache-tomcat-8.0.53 recommended) and configure eclipse to find its installation directory.
+<<<<<<< HEAD
+=======
+
+>>>>>>> branch 'master' of https://github.com/nsmenon/mathspring-V2
 
 
 3.  Make sure your Eclipse project points at the correct Java JDK 
@@ -79,6 +83,7 @@ The result should be /woServer/webResources/mathspring/mscontent.  If you run
 mathspring and get a bunch of 404 errors so that it doesn't show the learning companion
 and math problems, it will be because you didn't do this right.
 
+<<<<<<< HEAD
 7. Once you have created the project, add the server and configured them to your project in eclipse. Go to project settings
 and open the deployment asssembly tab and make sure you have the following entries there
 Source					Deploy Path
@@ -86,3 +91,19 @@ Source					Deploy Path
 /resources				/
 /web					/
 Maven Dependencies		WEB-INF/lib
+=======
+7.  Now you should be able to run the system.  Click the Run | Edit Configurations
+menu and create a new Tomcat Server (local).  It should be pointing at your 
+installation tomcat if you followed step 2 correctly.  In the lower right
+you will see a button that says "Warning no artifacts marked for deployment" with a 
+"Fix" button .  Click the button and select woServer web-localhost exploded.
+Now go to the deployment tab of this dialog and give it a deployment context
+of /mt.  Return to the main tab and make sure the URL to main page is now:
+http://localhost:8080/mt/  and that it will automatically open a browser (Chrome is best
+for mathspring) to this page when you run.   Call this runtime configuration "Mathspring"
+.  You should now be able to Click Run | Run Mathspring or Run | Debug Mathspring
+and it will pop up a browser that takes you to an index.html with links
+to various parts of the system.  Note this index.html lives in /woServer/resources/index.html
+where you will find much of the front-end support for the system including JSPs, Javascript,
+HTML, CSS and images.
+>>>>>>> branch 'master' of https://github.com/nsmenon/mathspring-V2
