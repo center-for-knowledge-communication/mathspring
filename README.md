@@ -29,6 +29,10 @@ Mathspring developers: Clone the repository on your local machine.
 
 
 2. You will need to install Tomcat 8 (apache-tomcat-8.0.53 recommended) and configure eclipse to find its installation directory.
+<<<<<<< HEAD
+=======
+
+>>>>>>> branch 'master' of https://github.com/nsmenon/mathspring-V2
 
 
 3.  Make sure your Eclipse project points at the correct Java JDK 
