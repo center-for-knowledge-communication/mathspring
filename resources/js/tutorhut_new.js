@@ -843,6 +843,10 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
             showLearningCompanion(activity);
     }
     showHourglassCursor(false);
+    
+    if(isHTML5Problem() && mode == MODE_PRACTICE){
+    	document.getElementById(PROBLEM_WINDOW).contentWindow.postMessage(globals,"*"); //send the message and target URI
+    }
 }
 
 function newBrowserWindow (url,w, h) {
@@ -880,13 +884,13 @@ function successfulLCResult (url) {
 // When the iframe is done loading the HTML file, we need to go into it and find the canvas element and change its margins because
 // its not well laid out to fit inside the iframe without having some gray space around it.
 function lcLoaded () {
-    var iframe = document.getElementById(LEARNING_COMPANION_WINDOW);
+   /* var iframe = document.getElementById(LEARNING_COMPANION_WINDOW);
     var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
     var canvs = innerDoc.getElementsByTagName("canvas");
     var canv = canvs[0];
     // TODO not working in some cases.   The iframe probably has no content at the time this was called
     if (canv)
-        canv.style.margin = "-10px -10px";
+        canv.style.margin = "-10px -10px";*/
 }
 
 function failureLCResult (url) {

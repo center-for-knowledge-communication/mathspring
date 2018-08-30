@@ -119,14 +119,18 @@ function servletGetWait (action, args, callbackFn) {
 
 function httpHead(url, successCallbackFn, failureCallbackFn) {
     $.ajax({
-        type: "HEAD",
+        type: "GET",
+        dataType: "HTML",
+        crossDomain: true,
         async: true,
-        success: function (data, textStatus, jqXHR) { successCallbackFn(url);} ,
-        error: function (jqXHR, textStatus, errorThrown) { failureCallbackFn(url);} ,
-        url: url
+        url: url,
+        success: function (data, textStatus, jqXHR) { 
+        	successCallbackFn(url);
+        	} ,
+        error: function (jqXHR, textStatus, errorThrown) { 
+        }
     });
 }
-
 
 // return the XML that is <elementName>xxx</elementName>
 // Note that we must use begin and end tags as above.   No short-cuts.

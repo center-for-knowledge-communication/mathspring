@@ -59,7 +59,7 @@ The results of this go into out/artifacts/MathSpring_exploded
     <context-param>
         <param-name>wodb.datasource</param-name>
         <!--<param-value>jdbc/wodbrose</param-value>-->
-        <param-value>jdbc/wodblocal</param-value>
+        <param-value>jdbc/wodbrose</param-value>
     </context-param>
 
     <context-param>
@@ -72,20 +72,27 @@ The results of this go into out/artifacts/MathSpring_exploded
         <param-value>8080</param-value>
     </context-param>
 
-    <context-param>
-        <param-name>webContentPath</param-name>
-        <param-value>http://localhost:8080/mt/mathspring/mscontent/</param-value>
-        <!--<param-value>http://cadmium.cs.umass.edu/mathspring/</param-value>-->
-        <!--<param-value>http://rose.cs.umass.edu/mathspring/</param-value>-->
-    </context-param>
-    <context-param>
-        <param-name>probplayerPath</param-name>
-        <param-value>mathspring/mscontent/Problems/probplayer.swf</param-value>
-    </context-param>
-    <context-param>
-        <param-name>probPreviewerPath</param-name>
-        <param-value>mathspring/mscontent/Problems/problem_checker.swf</param-value>
-    </context-param>
+	<context-param>
+		<param-name>webContentPath</param-name>
+		<param-value>https://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
+	</context-param>
+  <context-param>
+    <param-name>probplayerPath</param-name>
+    <param-value>Problems/probplayer.swf</param-value>
+  </context-param>
+  <context-param>
+    <param-name>probPreviewerPath</param-name>
+    <param-value>Problems/problem_checker.swf</param-value>
+  </context-param>
+  <context-param>
+    <param-name>html5Probs</param-name>
+    <param-value>html5Probs/</param-value>
+  </context-param>
+  <context-param>
+    <param-name>isDevelopmentEnv</param-name>
+    <param-value>false</param-value>
+  </context-param>
+    
     <!--Relative to the webContentPath setting-->
     <!--<context-param>-->
         <!--<param-name>flashClientPath</param-name>-->
@@ -100,20 +107,11 @@ The results of this go into out/artifacts/MathSpring_exploded
     N.B. The same is true for Flash Problems.   They are loaded by swfobject from javascript and they have to have matching hosts
     in order to avoid security issues.
     -->
-    <context-param>
-        <param-name>isDevelopmentEnv</param-name>
-        <param-value>true</param-value>
-    </context-param>
+  
     <!--Sets whether it is using the 'classic' Flash tutor or the 'new' Javascript tutor-->
     <context-param>
         <param-name>useHybridTutor</param-name>
         <param-value>true</param-value>
-    </context-param>
-
-
-    <context-param>
-        <param-name>html5Probs</param-name>
-        <param-value>mathspring/mscontent/html5Probs/</param-value>
     </context-param>
 
     <!-- end of wayang context stuff -->

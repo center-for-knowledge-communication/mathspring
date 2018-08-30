@@ -29,9 +29,9 @@
     <param-value>/pedagogies.xml</param-value>
   </context-param>
   <context-param>
-    <param-name>webContentPath</param-name>
-    <param-value>http://tutor.mathspring.org/mathspring/mscontent/</param-value>
-  </context-param>
+		<param-name>webContentPath</param-name>
+		<param-value>https://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
+	</context-param>
   <context-param>
     <param-name>probplayerPath</param-name>
     <param-value>Problems/probplayer.swf</param-value>
