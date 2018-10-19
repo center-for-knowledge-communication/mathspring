@@ -1,5 +1,14 @@
 package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Service;
+
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.SATProb;
 import edu.umass.ckc.wo.beans.Topic;
@@ -17,15 +26,6 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ProblemsView;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by nsmenon on 4/14/2017.
@@ -44,9 +44,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     @Override
     public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId) throws TTCustomException {
         ProblemsView view= new ProblemsView();
+        DbProblem dbProb = new DbProblem();
         try {
             Topic problemSet = ProblemMgr.getTopic(problemId);
             List<Problem> problems = ProblemMgr.getWorkingProblems(problemId);
+            dbProb.filterproblemsBasedOnLanguagePreference(connection.getConnection(), problems, classId);
             List<SATProb> satProbs = new DbProblem().getTopicOmittedProblems(connection.getConnection(), classId, problems, problemId);
             view.setProblemLevelId(String.valueOf(problemSet.getId()));
             view.setTopicName(problemSet.getName());

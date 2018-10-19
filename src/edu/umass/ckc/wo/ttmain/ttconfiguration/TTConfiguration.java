@@ -2,6 +2,8 @@ package edu.umass.ckc.wo.ttmain.ttconfiguration;
 
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
+import edu.umass.ckc.wo.tutor.Settings;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +37,7 @@ public class TTConfiguration implements ServletContextAware {
         try {
             JndiTemplate jndiTemplate = new JndiTemplate();
             String dataSourceLookup = this.servletContext.getInitParameter("wodb.datasource");
+            Settings.webContentPath = this.servletContext.getInitParameter("webContentPath");
             DataSource ds = (DataSource) jndiTemplate.lookup("java:comp/env/" + dataSourceLookup);
             return ds.getConnection();
         } catch (Exception e) {

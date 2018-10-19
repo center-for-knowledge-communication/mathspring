@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -202,10 +203,10 @@ public class ClassContentSelector {
                 System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " has " + numRemaining + " problems");
                 // Hmm.. Removing a topic after problems have been deactivated is different than
                 // just removing a topic.  Need to verify that teacher can easily turn on topic and its problem by hand
-                if (numRemaining <= 3)  {
+                if (numRemaining <= 1)  {
                     topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
                     tms = (System.currentTimeMillis() - tm) / 1000.0;
-                    System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " eliminated because <= 3 problems remain");
+                    System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " eliminated because <= 1 problems remain");
 
                 }
 
@@ -223,9 +224,10 @@ public class ClassContentSelector {
 
     // returns the number of problems remaining the topic after we've deleted ones that are out of range.
     private int removeProblemsFromTopic(int classId, Topic t, String grade, String lowDiff, String highDiff) throws SQLException {
-        List<Problem> probs = ProblemMgr.getTopicProblems(t.getId());
+    List<Problem> probs = ProblemMgr.getTopicProblems(t.getId()); 
         List<Integer> deactivatedIds = new ArrayList<Integer>();
         DbProblem probMgr = new DbProblem();
+        List<Integer> removedProblems = probMgr.filterproblemsBasedOnLanguagePreference(conn,probs,classId);
         for (Problem p: probs) {
             // If the problem has one or more standard within the bounds of the desired range, keep it.
             if (hasStandardWithinBounds(p.getStandards().iterator(),grade,lowDiff,highDiff))
@@ -233,11 +235,14 @@ public class ClassContentSelector {
             else
                 deactivatedIds.add(p.getId());
         }
+        if(removedProblems != null && !removedProblems.isEmpty())
+        	deactivatedIds.addAll(removedProblems);
+        deactivatedIds = deactivatedIds.stream().distinct().collect(Collectors.toList());	
         probMgr.setClassTopicOmittedProblems(conn, classId, t.getId(), deactivatedIds);
         return probs.size() - deactivatedIds.size();
     }
 
-    private boolean hasStandardWithinBounds(Iterator ccstds, String grade, String lowDiff, String highDiff) {
+  private boolean hasStandardWithinBounds(Iterator ccstds, String grade, String lowDiff, String highDiff) {
 
         while (ccstds.hasNext()) {
             CCStandard c = (CCStandard) ccstds.next();

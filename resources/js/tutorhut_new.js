@@ -508,8 +508,6 @@ function showFlashProblem (resource,ans,solution, containerElement, mode) {
     // send an END for the first xAct
     debugAlert("Calling servlet with EndExternalActivity");
 
-
-    // This replaces a <div> (typically FLASH_CONTAINER_INNER)  with the actual swf object.
     swfobject.embedSWF(sysGlobals.probplayerPath + "?questionNum=" + questionNum, containerElement,
         "600", "475", "8", "#FFFFFF", flashvars, params, attributes);
 
@@ -844,8 +842,10 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     }
     showHourglassCursor(false);
     
-    if(isHTML5Problem() && mode == MODE_PRACTICE){
-    	document.getElementById(PROBLEM_WINDOW).contentWindow.postMessage(globals,"*"); //send the message and target URI
+    if(isHTML5Problem()){
+    	setTimeout(function(){
+    		document.getElementById(PROBLEM_WINDOW).contentWindow.postMessage(globals,"*"); //send the message and target URI
+    	},6000);
     }
 }
 

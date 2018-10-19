@@ -5,6 +5,11 @@
 <head>
     <meta charset="utf-8">
     <title>MathSpring | Tutoring</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="img/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="img/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="css/manifest.json">
+    <meta name="theme-color" content="#ffffff">
     <link href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 
     <link href="sass_compiled/tutor.css" rel="stylesheet">

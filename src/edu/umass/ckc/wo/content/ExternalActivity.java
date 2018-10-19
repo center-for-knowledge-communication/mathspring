@@ -24,7 +24,7 @@ public class ExternalActivity extends Problem implements NextProblemIntervention
 
     public ExternalActivity(int id, String name, String descr, String url, String instructions, double difficultyRating) {
         //super(id,url,null,name,descr,false,null,instructions,null);
-        super(id, url, null, name, descr, false, 0, null, null, instructions, null, "ready", null, null, QuestType.multiChoice, null, null,null, null, null, -1, -1, true);
+        super(id, url, null, name, descr, false, 0, null, null, instructions, null, "ready", null, null, QuestType.multiChoice, null, null,null, null, null, -1, -1, true,null);
         setType("ExternalActivity");
         this.setDiff_level(difficultyRating);
     }

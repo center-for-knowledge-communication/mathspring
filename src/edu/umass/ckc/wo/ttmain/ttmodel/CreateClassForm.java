@@ -19,8 +19,19 @@ public class CreateClassForm {
     private String highEndDiff;
     private String classId;
     private String reportType;
+    private String classLanguage;
+    
+    
 
-    public String getReportType() {
+    public String getClassLanguage() {
+		return classLanguage;
+	}
+
+	public void setClassLanguage(String classLanguage) {
+		this.classLanguage = classLanguage;
+	}
+
+	public String getReportType() {
         return reportType;
     }
 

@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.cache;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.content.*;
 import edu.umass.ckc.wo.db.DbVideo;
+import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.probSel.StandardExampleSelector;
 import edu.umass.ckc.wo.tutor.vid.StandardVideoSelector;
 import edu.umass.ckc.wo.tutormeta.ExampleSelector;
@@ -166,7 +167,7 @@ public class ProblemMgr {
         String s = "select p.id, answer, animationResource, p.name, nickname," +
                 " strategicHintExists, hasVars, screenShotURL, diff_level, form," +
                 " isExternalActivity, type, video, example, p.status, p.questType," +
-                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample" +
+                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,prob_language" +
                 " from Problem p, OverallProbDifficulty o" +
                 " where p.id=o.problemid" + problemFilter +
                 " and (status='Ready' or status='ready' or status='testable')" +
@@ -240,10 +241,11 @@ public class ProblemMgr {
         if (problemFormat == null) {
             problemFormat =Problem.defaultFormat ;
         }
-
+        String prob_language = rs.getString("prob_language");
+        
         Problem p = new Problem(id, resource, answer, name, nname, stratHint,
                 diff, null, form, instructions, type, status, vars, ssURL,
-                questType, statementHTML, imgURL, audioRsc, units, problemFormat, imageFileId, audioFileId, isUsableAsExample); // DM 1/23/18 added imageFileId and audioFileId
+                questType, statementHTML, imgURL, audioRsc, units, problemFormat, imageFileId, audioFileId, isUsableAsExample,prob_language); // DM 1/23/18 added imageFileId and audioFileId
 
         p.setExternalActivity(isExternal);
         List<Hint> hints = DbHint.getHintsForProblem(conn,id);
@@ -719,7 +721,7 @@ public class ProblemMgr {
 
     }
 
-    public static List<Topic> getAllTopics () {
+    public static List<Topic> getAllTopics () throws SQLException {
         return allTopics;
     }
 

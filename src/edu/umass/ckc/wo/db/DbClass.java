@@ -34,11 +34,13 @@ public class DbClass {
     public static ClassInfo getClass(Connection conn, int classId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement s = null;
+        ResultSet rs2 = null;
+        PreparedStatement s2 = null;
 
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -68,6 +70,18 @@ public class DbClass {
                 boolean showPostSurvey = rs.getBoolean(22);
                 boolean showPreSurvey = true;
                 String getPreSurvey = rs.getString(23);
+                String getClassLanguage = rs.getString(24);
+                if("English".equals(getClassLanguage)) {
+                	getClassLanguage = "en:"+getClassLanguage;
+                } else {
+                	String getQueryCode = "select language_code from ms_language where language_name = ?";
+                	s2 = conn.prepareStatement(getQueryCode);
+                    s2.setString(1, getClassLanguage);
+                    rs2 = s2.executeQuery();
+                     if (rs2.next()) {
+                    	 getClassLanguage = rs2.getString("language_code")+":"+getClassLanguage;
+                     }
+                }
                 if(getPreSurvey == null || ("".equals(getPreSurvey)))
                     showPreSurvey = false;
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
@@ -80,6 +94,7 @@ public class DbClass {
                 ci.setSimpleDiffRate(simpleDiffRate);
                 ci.setShowPostSurvey(showPostSurvey);
                 ci.setShowPreSurvey(showPreSurvey);
+                ci.setClassLanguageCode(getClassLanguage);
                 return ci;
             }
             return null;
@@ -88,6 +103,11 @@ public class DbClass {
                 s.close();
             if (rs != null)
                 rs.close();
+            if (s2 != null)
+            	s2.close();
+            if (rs2 != null)
+            	rs2.close();
+
         }
     }
 
@@ -277,14 +297,15 @@ public class DbClass {
 
     public static int insertClass(Connection conn, String className,
                                   String school, String schoolYear,
-                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade) throws Exception {
+                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId) throws Exception {
         ResultSet newid = null;
         PreparedStatement s = null;
         try {
+        	String languageDescription = languageId.split(":")[1];
             String teacherName = getTeacherName(conn, Integer.parseInt(teacherId));
             String q = "insert into Class (teacherId,school,schoolYear,name,town,section,isActive," +
-                    "teacher,propGroupId,logtype,pretestPoolId,grade) " +
-                    "values (?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "teacher,propGroupId,logtype,pretestPoolId,grade,class_language) " +
+                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
             s = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
             s.setString(1, teacherId);
             s.setString(2, school);
@@ -302,6 +323,7 @@ public class DbClass {
             s.setInt(10, 2);  // default log type is 2 indicating the eventlog table is where we store events for this class
             s.setInt(11, pretestPool);
             s.setString(12,grade);
+            s.setString(13,languageDescription);
             s.execute();
             newid = s.getGeneratedKeys();
             newid.next();
@@ -323,7 +345,9 @@ public class DbClass {
     }
 
 
-    public static void insertClassConfig(Connection conn, int classId) throws SQLException {
+ 
+
+	public static void insertClassConfig(Connection conn, int classId) throws SQLException {
         PreparedStatement stmt = null;
         try {
             // relying on the default values defined in DB for the fields pretest,posttest,mfr,

@@ -1,19 +1,23 @@
 package edu.umass.ckc.wo.ttmain.ttservice.util;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.CCStandard;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbProblem;
-import edu.umass.ckc.wo.db.DbTopics;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Neeraj on 4/5/2017.
@@ -64,6 +68,16 @@ public class TTUtil {
     public static final String EMOTION_REPORT = "select e.userInput from eventlog e where studId =(:studId) and action='InputResponse' and userInput != 'null' and userInput not like '%howDoYouFeel%' and userInput not like '%-1%'";
     public static final String EMOTION_REPORT_DOWNLOAD = "select e.studId,e.userInput,s.userName,e.problemId,e.time,pr.name,pr.nickname, pr.standardID, round(od.diff_level,2)as diff_level,e.curTopicId,pg.description from eventlog e, problem pr,overallprobdifficulty od, student s, problemgroup pg   where studId =(:studId) and action='InputResponse' and  userInput != 'null' and userInput not like '%howDoYouFeel%' and e.problemId = od.problemId and e.problemId = pr.id  and e.curTopicId=pg.id and s.id=e.studId and userInput not like '%-1%'";
 
+    public static final String JSON_PROBLEM_SET_DETAILS = "select probGroupId,json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as description,\r\n" + 
+    		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as summary,seqPos\r\n" + 
+    		"from classlessonplan,problemgroup_description_multi_language pgl\r\n" + 
+    		"where probGroupId=pgl.pg_pg_grp_id and classId=(:classId);";
+    
+    public static final String JSON_PROBLEM_SET_INACTIVE_DETAILS = "select id, \r\n" + 
+    		"json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as description,\r\n" + 
+    		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as summary\r\n" + 
+    		"from problemgroup,problemgroup_description_multi_language pgl where active=1 and id=pgl.pg_pg_grp_id and id not in (:activeIds);";
+    
     /* A private Constructor prevents any other
     * class from instantiating.
     */
@@ -79,6 +93,7 @@ public class TTUtil {
     public void setNumProblemsForProblemSet(DbProblem probMgr,Integer classId ,Connection conn,List<Topic> problemSets) throws SQLException {
         for (Topic t : problemSets) {
             List<Problem> problems = ProblemMgr.getWorkingProblems(t.getId());
+            probMgr.filterproblemsBasedOnLanguagePreference(conn, problems, classId);
             List<String> ids = probMgr.getClassOmittedTopicProblemIds(conn, classId, t.getId());
             Map<String,Integer> gradewiseProblemMap = new HashMap<String,Integer>();
             int availabProblem = 0;
@@ -106,7 +121,8 @@ public class TTUtil {
             t.setGradewiseProblemDistribution(gradewiseProblemMap);
         }
     }
-
+    
+ 
     public void resetSequenceNosForTheClass( List<Topic> classActiveTopics,int classId, NamedParameterJdbcTemplate namedParameterJdbcTemplate){
         int resetSeq = 1;
         for(Topic classTopic : classActiveTopics) {
@@ -126,5 +142,56 @@ public class TTUtil {
             headerGradeMap.putIfAbsent(gradeEntry.getKey(),gradeEntry.getValue());
         return headerGradeMap;
     }
+
+	public List<Topic> updateTopicNameAndDescription(List<Topic> activeproblemSet, Integer classId,
+			Connection connection, NamedParameterJdbcTemplate namedParameterJdbcTemplate, boolean isActiveProblemSet) {
+		MapSqlParameterSource sqlSurce = new MapSqlParameterSource();
+		sqlSurce.addValue("classId", classId);
+		List<Topic> activeList = new ArrayList<>();
+		if (isActiveProblemSet) {
+			List<Topic> activeListTopics = namedParameterJdbcTemplate.query(TTUtil.JSON_PROBLEM_SET_DETAILS, sqlSurce,
+					(ResultSet mappedrow) -> {
+						while (mappedrow.next()) {
+							Topic tp = new Topic(mappedrow.getInt("probGroupId"), mappedrow.getString("summary"),
+									mappedrow.getString("description"));
+							tp.setSeqPos(mappedrow.getInt("seqPos"));
+							tp.setOldSeqPos(tp.getSeqPos());
+							 String topicDescription = mappedrow.getString("description");
+			                    if("".equals(topicDescription) || topicDescription == null)
+			                    	topicDescription = "The problemset does not have a description in Spanish";
+			                tp.setSummary(topicDescription);
+			                // We get the set of CCStandards for this topic from the ProblemMgr
+			                Set<CCStandard> stds = ProblemMgr.getTopicStandards(tp.getId());
+			                tp.setCcStandards(stds);
+							activeList.add(tp);
+						}
+						return activeList;
+					});
+			return activeListTopics;
+
+		} else {
+			List<Integer> activeProblemSetIds = activeproblemSet.stream().map(x -> x.getId())
+					.collect(Collectors.toList());
+			sqlSurce.addValue("activeIds", activeProblemSetIds);
+			List<Topic> inactiveTopicList = new ArrayList<>();
+			List<Topic> inActiveTopics = namedParameterJdbcTemplate.query(TTUtil.JSON_PROBLEM_SET_INACTIVE_DETAILS,
+					sqlSurce, (ResultSet mappedrow) -> {
+						while (mappedrow.next()) {
+							Topic tp = new Topic(mappedrow.getInt("id"), mappedrow.getString("summary"),
+									mappedrow.getString("description"));
+							 String topicDescription = mappedrow.getString("description");
+			                    if("".equals(topicDescription) || topicDescription == null)
+			                    	topicDescription = "The problemset does not have a description in Spanish";
+			                tp.setSummary(topicDescription);
+			                // We get the set of CCStandards for this topic from the ProblemMgr
+			                Set<CCStandard> stds = ProblemMgr.getTopicStandards(tp.getId());
+			                tp.setCcStandards(stds);
+							inactiveTopicList.add(tp);
+						}
+						return inactiveTopicList;
+					});
+			return inActiveTopics;
+		}
+	}
 
 }

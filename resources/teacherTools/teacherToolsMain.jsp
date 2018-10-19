@@ -47,7 +47,6 @@
             src="<c:url value="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js" />"></script>
-
     <script type="text/javascript">
         var servletContextPath = "${pageContext.request.contextPath}";
         $(document).ready(function () {
@@ -56,7 +55,7 @@
             $("#form-wrapper").hide();
             handleclickHandlers();
         });
-
+      
         function handleclickHandlers() {
             $("#create_class_form").bootstrapValidator({
                 // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
@@ -271,7 +270,20 @@
                             <div class="panel-heading">
                                 Part one : Class Configuration
                             </div>
-                            <div class="panel-body">
+                             <div class="panel-body">
+                               <div class="form-group">
+                                    <label for="classGrade">Class Grade</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i
+                                                class="glyphicon glyphicon-education"></i></span>
+                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
+                                                           name="classLanguage">
+                                            <springForm:option value="">Select language preference for your class</springForm:option>
+                                            <springForm:option value="en:English">English</springForm:option>
+                                            <springForm:option value="es:Spanish">Spanish</springForm:option>
+                                        </springForm:select>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label for="className">Class Name</label>
                                     <div class="input-group">

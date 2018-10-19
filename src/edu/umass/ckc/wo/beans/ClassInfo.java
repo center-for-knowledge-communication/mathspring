@@ -28,7 +28,8 @@ public class ClassInfo {
     private String simpleHighDiff;
     private boolean showPostSurvey;
     private boolean showPreSurvey;
-
+    private String classLanguageCode;
+    
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
                      int logType, int emailStatusInterval, int statusReportPeriodDays, int studentEmailIntervalDays,
@@ -236,4 +237,13 @@ public class ClassInfo {
     public void setShowPreSurvey(boolean showPreSurvey) {
         this.showPreSurvey = showPreSurvey;
     }
+
+	public String getClassLanguageCode() {
+		return classLanguageCode;
+	}
+
+	public void setClassLanguageCode(String classLanguageCode) {
+		this.classLanguageCode = classLanguageCode;
+	}
+    
 }

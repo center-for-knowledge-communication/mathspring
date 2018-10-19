@@ -1,11 +1,5 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
-import edu.umass.ckc.wo.beans.ClassInfo;
-import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
-import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
-import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
-import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
-import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -13,6 +7,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import edu.umass.ckc.wo.beans.ClassInfo;
+import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
+import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
+import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
+import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 
 /**
  * Created by Neeraj on 3/26/2017.
@@ -54,7 +54,7 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/ttCloneClass", method = RequestMethod.POST)
     public String cloneExistingClass(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
-        int newClassId = createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
+        createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
         return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
 
     }
@@ -63,7 +63,7 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/ttResetSurvey", method = RequestMethod.POST)
     public String resetSurveySettings(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
-        boolean restSurveySettings = createClassAssistService.restSurveySettings(Integer.valueOf(classId.trim()), classForm);
+         createClassAssistService.restSurveySettings(Integer.valueOf(classId.trim()), classForm);
         return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
 
     }

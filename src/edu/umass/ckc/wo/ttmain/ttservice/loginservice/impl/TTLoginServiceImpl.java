@@ -70,6 +70,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("teacherName", teacherName);
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
+            
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
                 ClassInfo classInfo = DbClass.getClass(connection.getConnection(), classId);

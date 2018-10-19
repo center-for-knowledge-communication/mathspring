@@ -4,6 +4,8 @@ import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.db.DbTopics;
 //import edu.umass.ckc.wo.event.admin.AdminReorderTopicsEvent;
 import edu.umass.ckc.wo.event.admin.AdminReorderTopicsEvent;
+import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
+import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +15,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
  * <p> Created by IntelliJ IDEA.
@@ -38,6 +45,8 @@ public class TopicMgr {
         }
 
     }
+    
+   
 
     public List<Topic> omitTopic (Connection conn,  int classId, int topicId) throws SQLException {
         List<Topic> topics = DbTopics.getClassActiveTopics(conn, classId);

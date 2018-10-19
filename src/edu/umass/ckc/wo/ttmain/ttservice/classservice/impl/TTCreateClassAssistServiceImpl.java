@@ -12,6 +12,8 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
+import edu.umass.ckc.wo.tutor.Settings;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -55,6 +57,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         map.addAttribute("classInfo", classInfo);
         map.addAttribute("activeSurveys",activeSurveys );
         map.addAttribute("prepostIds",prepostIds[0]+"~~"+prepostIds[1] );
+        map.addAttribute("webContentpath", Settings.webContentPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,7 +69,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             // Make sure to check initial fields of create class are validated before proceeding ahead
             int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
             int newid = DbClass.insertClass(connection.getConnection(), createForm.getClassName(), createForm.getSchoolName(), createForm.getSchoolYear(), createForm.getTown(), createForm.getGradeSection(), tid,
-                    defaultPropGroup, 0, createForm.getClassGrade());
+                    defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage());
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newid);
                 ClassInfo info = DbClass.getClass(connection.getConnection(), newid);
@@ -128,19 +131,23 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             DbProblem probMgr = new DbProblem();
 
             List<Topic> activeproblemSet = DbTopics.getClassActiveTopics(connection.getConnection(), classId);
+            List<Topic> activeproblemSetModified = TTUtil.getInstance().updateTopicNameAndDescription(activeproblemSet,classId,connection.getConnection(),namedParameterJdbcTemplate, true);
+            
             DbTopics.clearClassLessonPlan(connection.getConnection(), classId);
 
-            TTUtil.getInstance().resetSequenceNosForTheClass(activeproblemSet, classId, namedParameterJdbcTemplate);
-            TTUtil.getInstance().setNumProblemsForProblemSet(probMgr, classId, connection.getConnection(), activeproblemSet);
+            TTUtil.getInstance().resetSequenceNosForTheClass(activeproblemSetModified, classId, namedParameterJdbcTemplate);
+            TTUtil.getInstance().setNumProblemsForProblemSet(probMgr, classId, connection.getConnection(), activeproblemSetModified);
 
-            List<Topic> inactiveproblemSets = DbTopics.getClassInactiveTopics(connection.getConnection(), activeproblemSet);
+            //DbTopics.getClassInactiveTopics(connection.getConnection(), activeproblemSet);
+            List<Topic> inactiveproblemSets = TTUtil.getInstance().updateTopicNameAndDescription(activeproblemSetModified,classId,connection.getConnection(),namedParameterJdbcTemplate, false);
+		            
             TTUtil.getInstance().setNumProblemsForProblemSet(probMgr, classId, connection.getConnection(), inactiveproblemSets);
 
 
             Map<String, Integer> gradewiseProblemMapActive = new HashMap<String, Integer>();
             Map<String, Integer> gradewiseProblemMapInActive = new HashMap<String, Integer>();
 
-            for (Topic probSet : activeproblemSet)
+            for (Topic probSet : activeproblemSetModified)
                 gradewiseProblemMapActive = TTUtil.getInstance().getMaxGradesforClassPerHashMap(probSet.getGradewiseProblemDistribution(), gradewiseProblemMapActive);
 
 
@@ -148,7 +155,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                 gradewiseProblemMapInActive = TTUtil.getInstance().getMaxGradesforClassPerHashMap(probSet.getGradewiseProblemDistribution(), gradewiseProblemMapInActive);
 
             map.addAttribute("inActiveproblemSetHeaders", gradewiseProblemMapInActive);
-            map.addAttribute("activeproblemSet", activeproblemSet);
+            map.addAttribute("activeproblemSet", activeproblemSetModified);
             map.addAttribute("inactiveproblemSets", inactiveproblemSets);
             map.addAttribute("activeproblemSetHeaders", gradewiseProblemMapActive);
 
@@ -159,7 +166,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         }
     }
 
-    @Override
+	@Override
     public boolean reOrderProblemSets(Integer classId, List<Integer> sequencesNosToBeRemoved,Map<Integer,Integer> sequenceNosToBeAdded) throws TTCustomException {
         try {
 
@@ -194,9 +201,10 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             if ("deactivate".equals(activateFlag)) {
                 //Deactivate ProblemSets
                 List<Topic> topics = DbTopics.getClassActiveTopics(connection.getConnection(), classId);
+                List<Topic> activeproblemSetModified = TTUtil.getInstance().updateTopicNameAndDescription(topics,classId,connection.getConnection(),namedParameterJdbcTemplate, true);
                 DbTopics.removeClassActiveTopics(connection.getConnection(), classId);
                 int seqPos = 1;
-                for (Topic problemSet : topics) {
+                for (Topic problemSet : activeproblemSetModified) {
                     if (problemSetsToReorder.contains(problemSet.getId())) {
                         Map<String, Integer> insertParams = new HashMap<String, Integer>();
                         insertParams.put("classId", classId);

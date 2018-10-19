@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -463,6 +464,38 @@ public class DbProblem extends BaseMgr {
             closeQuery(ps);
         }
     }
+    
+	/**
+	 * Remove all the <classId,topicId,problemId> rows for a given class, topic
+	 * 
+	 * @param conn
+	 * @param classId
+	 * @param probs
+	 * @throws SQLException
+	 */
+	public List<Integer> filterproblemsBasedOnLanguagePreference(Connection conn, List<Problem> probs, int classId)
+			throws SQLException {
+		PreparedStatement ps = null;
+		List<Integer> elementsToBeRemoved = null;
+		try {
+			String class_Language_Query = "select class_language from class c where c.id=?";
+			ps = conn.prepareStatement(class_Language_Query);
+			ps.setInt(1, classId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				final String class_language = rs.getString("class_language");
+				elementsToBeRemoved = probs.stream()
+                        .filter(listrmv -> !(listrmv.getProblemLanguage().equals(class_language))).map(Problem::getId)
+                        .collect(Collectors.toList());
+				probs.removeIf(listrmv -> !(listrmv.getProblemLanguage().equals(class_language)));
+				return elementsToBeRemoved;
+			}
+
+		} finally {
+			closeQuery(ps);
+		}
+		return elementsToBeRemoved;
+	}
 
     /**
      * Refresh the the activated problems list for a class and topic.   Remove the old and then reinsert.

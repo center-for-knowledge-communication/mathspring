@@ -186,7 +186,7 @@ public class CreateClassHandler  {
             // When a class is first created, we use the default prop group.
             // We'll allow it to be altered in the page that allows the user to edit the class fields.
             newid = DbClass.insertClass(conn,className, school, schoolYear, town, section,tid,
-                    defaultPropGroup, 0, grade);
+                    defaultPropGroup, 0, grade,"en:English");
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(conn,newid);
                 ClassInfo info = DbClass.getClass(conn,newid);
@@ -254,7 +254,7 @@ public class CreateClassHandler  {
             // When a class is first created, we use the default prop group.
             // We'll allow it to be altered in the page that allows the user to edit the class fields.
             newid = DbClass.insertClass(conn,className, school, schoolYear, town, section,tid,
-                    defaultPropGroup, 0, grade);
+                    defaultPropGroup, 0, grade,"en:English");
             if (newid != -1) {
                 Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
                 req.setAttribute("sideMenu",adminId != null ? "adminSideMenu.jsp" : "teacherSideMenu.jsp"); // set side menu for admin or teacher

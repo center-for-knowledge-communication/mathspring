@@ -52,16 +52,13 @@
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/ttReportScripts.js" />"></script>
-
     <script type="text/javascript">
         var servletContextPath = "${pageContext.request.contextPath}";
         var pgContext = '${pageContext.request.contextPath}';
         var classID = '${classInfo.classid}';
         var teacherID = '${teacherId}';
-        var prePostIds = '${prepostIds}'.split("~~");
-
-        var problem_imageURL = "http://rose.cs.umass.edu/mathspring/mscontent/problemSnapshots/prob_";
-
+        var prePostIds = '${prepostIds}'.split("~~");		
+        var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
@@ -307,11 +304,8 @@
                             <tr>
                                 <td>${i.index + 1}</td>
                                 <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-                                <td>
-                                    <label style="width: 50%;">${problemSet.numProbs}</label>
-                                    <a  class="passive" aria-expanded="true" aria-controls="collapseOne">
-                                        <i class="glyphicon glyphicon-menu-down"></i>
-                                    </a>
+                               <td>
+                                   ${problemSet.numProbs}
                                 </td>
                                 <td>${problemSet.id}</td>
                                 <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">

@@ -963,6 +963,9 @@ function registerAllEvents(){
                 "targets": [ 2 ],
                 orderable: false,
                 "width": "10%",
+				'render': function (data, type, full, meta){
+					return '<label style="width: 50%;">'+data+'</label><a  class="passive" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+				}
             },
             {
                 "width": "30%",

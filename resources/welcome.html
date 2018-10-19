@@ -19,10 +19,21 @@
     <script src="js/bootstrap/js/bootstrap.min.js"></script>
     <script src="js/bootstrap/js/parallax.js"></script>
     <script src="js/bootstrap/js/custom-animate.js"></script>
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+		new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+    </script>
+    <style>
+		.goog-te-gadget-icon {display:none;}
+		.goog-te-gadget-simple a {text-decoration: none !important;}
+		.goog-te-banner-frame.skiptranslate {display: none !important;}
+		.body { top: 0px !important; }
+		</style>
 </head>
 
 <body>
-
+<div id="google_translate_element"></div>
 <!-- NAVIGATION BAR -->
 <header class="site-header" role="banner">
     <div id="wrapper">
@@ -46,7 +57,7 @@
                     <a
                             class="btn btn-default"
                             id="signup-button"
-                            href="WoLoginServlet?action=LoginK12_1&var=b">GET STARTED</a>
+                            href="/ms/WoLoginServlet?action=LoginK12_1&var=b">GET STARTED</a>
                 </div><!-- col-md-offset-9 -->
             </div><!-- row -->
         </div><!-- container clearfix -->

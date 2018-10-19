@@ -34,7 +34,7 @@ public class ClassCloner {
         ClassInfo info = DbClass.getClass(conn,classId);
         int newClassId= DbClass.insertClass(conn,newClassName,info.getSchool(), Integer.toString(info.getSchoolYear()),
                         info.getTown(),newClassSection, Integer.toString(info.getTeachid()),
-                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade());
+                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade(),info.getClassLanguageCode());
          DbClass.removeConfig(conn,newClassId);
         if (newClassId != -1) {
             // clone the lesson plan (if there is one)
