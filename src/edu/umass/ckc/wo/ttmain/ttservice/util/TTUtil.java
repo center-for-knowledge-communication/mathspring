@@ -71,7 +71,7 @@ public class TTUtil {
     public static final String JSON_PROBLEM_SET_DETAILS = "select probGroupId,json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as description,\r\n" + 
     		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as summary,seqPos\r\n" + 
     		"from classlessonplan,problemgroup_description_multi_language pgl\r\n" + 
-    		"where probGroupId=pgl.pg_pg_grp_id and classId=(:classId);";
+    		"where probGroupId=pgl.pg_pg_grp_id and classId=(:classId) order by seqPos;";
     
     public static final String JSON_PROBLEM_SET_INACTIVE_DETAILS = "select id, \r\n" + 
     		"json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as description,\r\n" + 
@@ -97,7 +97,7 @@ public class TTUtil {
             List<String> ids = probMgr.getClassOmittedTopicProblemIds(conn, classId, t.getId());
             Map<String,Integer> gradewiseProblemMap = new HashMap<String,Integer>();
             int availabProblem = 0;
-            if (problems != null) {
+            if (problems != null && !problems.isEmpty()) {
                 for (Problem p : problems) {
                     if (!ids.contains("" + p.getId())) {
                         availabProblem++;
@@ -172,8 +172,9 @@ public class TTUtil {
 		} else {
 			List<Integer> activeProblemSetIds = activeproblemSet.stream().map(x -> x.getId())
 					.collect(Collectors.toList());
-			sqlSurce.addValue("activeIds", activeProblemSetIds);
 			List<Topic> inactiveTopicList = new ArrayList<>();
+			if(activeProblemSetIds != null && !activeProblemSetIds.isEmpty()) {
+			sqlSurce.addValue("activeIds", activeProblemSetIds);
 			List<Topic> inActiveTopics = namedParameterJdbcTemplate.query(TTUtil.JSON_PROBLEM_SET_INACTIVE_DETAILS,
 					sqlSurce, (ResultSet mappedrow) -> {
 						while (mappedrow.next()) {
@@ -191,6 +192,8 @@ public class TTUtil {
 						return inactiveTopicList;
 					});
 			return inActiveTopics;
+			}
+			return inactiveTopicList;
 		}
 	}
 

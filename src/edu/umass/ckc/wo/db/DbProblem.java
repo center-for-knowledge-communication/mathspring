@@ -473,10 +473,9 @@ public class DbProblem extends BaseMgr {
 	 * @param probs
 	 * @throws SQLException
 	 */
-	public List<Integer> filterproblemsBasedOnLanguagePreference(Connection conn, List<Problem> probs, int classId)
+	public void filterproblemsBasedOnLanguagePreference(Connection conn, List<Problem> probs, int classId)
 			throws SQLException {
 		PreparedStatement ps = null;
-		List<Integer> elementsToBeRemoved = null;
 		try {
 			String class_Language_Query = "select class_language from class c where c.id=?";
 			ps = conn.prepareStatement(class_Language_Query);
@@ -484,17 +483,11 @@ public class DbProblem extends BaseMgr {
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				final String class_language = rs.getString("class_language");
-				elementsToBeRemoved = probs.stream()
-                        .filter(listrmv -> !(listrmv.getProblemLanguage().equals(class_language))).map(Problem::getId)
-                        .collect(Collectors.toList());
 				probs.removeIf(listrmv -> !(listrmv.getProblemLanguage().equals(class_language)));
-				return elementsToBeRemoved;
 			}
-
 		} finally {
 			closeQuery(ps);
 		}
-		return elementsToBeRemoved;
 	}
 
     /**

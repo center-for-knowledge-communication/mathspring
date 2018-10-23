@@ -227,7 +227,7 @@ public class ClassContentSelector {
     List<Problem> probs = ProblemMgr.getTopicProblems(t.getId()); 
         List<Integer> deactivatedIds = new ArrayList<Integer>();
         DbProblem probMgr = new DbProblem();
-        List<Integer> removedProblems = probMgr.filterproblemsBasedOnLanguagePreference(conn,probs,classId);
+        probMgr.filterproblemsBasedOnLanguagePreference(conn,probs,classId);
         for (Problem p: probs) {
             // If the problem has one or more standard within the bounds of the desired range, keep it.
             if (hasStandardWithinBounds(p.getStandards().iterator(),grade,lowDiff,highDiff))
@@ -235,11 +235,8 @@ public class ClassContentSelector {
             else
                 deactivatedIds.add(p.getId());
         }
-        if(removedProblems != null && !removedProblems.isEmpty())
-        	deactivatedIds.addAll(removedProblems);
-        deactivatedIds = deactivatedIds.stream().distinct().collect(Collectors.toList());	
         probMgr.setClassTopicOmittedProblems(conn, classId, t.getId(), deactivatedIds);
-        return probs.size() - deactivatedIds.size();
+        return Math.abs(probs.size() - deactivatedIds.size());
     }
 
   private boolean hasStandardWithinBounds(Iterator ccstds, String grade, String lowDiff, String highDiff) {

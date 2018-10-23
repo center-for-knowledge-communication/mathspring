@@ -55,7 +55,6 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/reOrderProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String  reOrderProblemSets(ModelMap map, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
-        Map<String, Object> responseMap = new HashedMap();
         List<Integer> sequenceNosToBeRemoved = new ArrayList<>();
         Map<Integer, Integer> insertSequences = new HashMap<>();
         for (String probsetEntries : problemSets) {

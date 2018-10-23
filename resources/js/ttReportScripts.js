@@ -895,7 +895,8 @@ function registerAllEvents(){
             },
         ]
     } );
-
+var activeProblemSetsize = $('#activeproblemSetSize').val();
+    if(activeProblemSetsize != 0){
     activetable = $('#activateProbSetTable').DataTable({
         "bPaginate": false,
         "bFilter": false,
@@ -937,8 +938,73 @@ function registerAllEvents(){
         ]
 
     });
+	
+	 $(".active").click(function () {
+        $(this).children(':first').toggleClass('rotate-icon');
+        var tr = $(this).closest('tr');
+        var row = activetable.row( tr );
 
-    var inactiveProblemSetsize = $('#problemSetSize').val();
+        if ( row.child.isShown() ) {
+            row.child.hide();
+        }else{
+            var rowID = '#'+row.data()[0];
+            $.ajax({
+                type : "POST",
+                url :pgContext+"/tt/tt/getProblemForProblemSets",
+                data : {
+                    problemID: row.data()[3],
+                    classid: classID
+                },
+                success : function(response) {
+                    if (response.includes("***")) {
+                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                        $('#errorMsgModelPopup').modal('show');
+                    }else {
+                        var child = problemDetails(row.data(), response);
+                        row.child(child).show();
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $(rowID).toggleClass('zoomIn zoomOut');
+                    }
+                }
+            });
+
+        }
+    });
+	
+	activetable.on( 'row-reorder', function ( e, diff, edit ) {
+        activetable.$('input').removeAttr( 'checked' );
+        var result = [];
+        for ( var i=0; i< diff.length ; i++ ) {
+            var rowData = activetable.row( diff[i].node ).data();
+            result[i] = rowData[3]+'~~'+ diff[i].newData+'~~'+diff[i].oldData;
+        }
+        $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/reOrderProblemSets",
+            data : {
+                problemSets: result,
+                classid: classID
+            },
+            success : function(response) {
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }
+            }
+        });
+    } );
+
+	}
+
+    var inactiveProblemSetsize = $('#inactiveproblemSetSize').val();
     if(inactiveProblemSetsize != 0){
     inactivetable = $('#inActiveProbSetTable').DataTable({
         "bPaginate": false,
@@ -963,8 +1029,12 @@ function registerAllEvents(){
                 "targets": [ 2 ],
                 orderable: false,
                 "width": "10%",
-				'render': function (data, type, full, meta){
-					return '<label style="width: 50%;">'+data+'</label><a  class="passive" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+                'render': function (data, type, full, meta){
+					var labelHtml = '<label style="width: 50%;">'+data+'</label>';
+					if(data != 0)
+						labelHtml+='<a  class="passive" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+					
+					return labelHtml;
 				}
             },
             {
@@ -978,12 +1048,57 @@ function registerAllEvents(){
                 "width": "20%",
                 'className': 'dt-body-center',
                 'render': function (data, type, full, meta){
+                	if(full[2] != 0)
                     return '<input type="checkbox">';
+                	else
+                	return '<input type="checkbox" disabled>';	
                 }
             },
         ]
 
     });
+	
+	
+    $(".passive").click(function () {
+        $(this).children(':first').toggleClass('rotate-icon');
+        var tr = $(this).closest('tr');
+        var row = inactivetable.row( tr );
+
+        if ( row.child.isShown() ) {
+            row.child.hide();
+        }else{
+            var rowID = '#'+row.data()[0];
+            $.ajax({
+                type : "POST",
+                url :pgContext+"/tt/tt/getProblemForProblemSets",
+                data : {
+                    problemID: row.data()[3],
+                    classid: classID
+                },
+                success : function(response) {
+                    if (response.includes("***")) {
+                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                        $('#errorMsgModelPopup').modal('show');
+                    }else {
+                        var child = problemDetails(row.data(), response);
+                        row.child(child).show();
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $(rowID).toggleClass('zoomIn zoomOut');
+                    }
+                }
+            });
+
+        }
+    });
+	
     }
 
     var studentRosterSize = $('#studentRosterSize').val();
@@ -1106,87 +1221,7 @@ function registerAllEvents(){
         var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;
         $(location).attr('href', newlocation);
     });
-
-
-    $(".active").click(function () {
-        $(this).children(':first').toggleClass('rotate-icon');
-        var tr = $(this).closest('tr');
-        var row = activetable.row( tr );
-
-        if ( row.child.isShown() ) {
-            row.child.hide();
-        }else{
-            var rowID = '#'+row.data()[0];
-            $.ajax({
-                type : "POST",
-                url :pgContext+"/tt/tt/getProblemForProblemSets",
-                data : {
-                    problemID: row.data()[3],
-                    classid: classID
-                },
-                success : function(response) {
-                    if (response.includes("***")) {
-                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                        $('#errorMsgModelPopup').modal('show');
-                    }else {
-                        var child = problemDetails(row.data(), response);
-                        row.child(child).show();
-                        $('a[rel=popoverPerProblem]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'top',
-                            container: 'body',
-                            content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                        $(rowID).toggleClass('zoomIn zoomOut');
-                    }
-                }
-            });
-
-        }
-    });
-
-    $(".passive").click(function () {
-        $(this).children(':first').toggleClass('rotate-icon');
-        var tr = $(this).closest('tr');
-        var row = inactivetable.row( tr );
-
-        if ( row.child.isShown() ) {
-            row.child.hide();
-        }else{
-            var rowID = '#'+row.data()[0];
-            $.ajax({
-                type : "POST",
-                url :pgContext+"/tt/tt/getProblemForProblemSets",
-                data : {
-                    problemID: row.data()[3],
-                    classid: classID
-                },
-                success : function(response) {
-                    if (response.includes("***")) {
-                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                        $('#errorMsgModelPopup').modal('show');
-                    }else {
-                        var child = problemDetails(row.data(), response);
-                        row.child(child).show();
-                        $('a[rel=popoverPerProblem]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'top',
-                            container: 'body',
-                            content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                        $(rowID).toggleClass('zoomIn zoomOut');
-                    }
-                }
-            });
-
-        }
-    });
+	
     var myLineChart;
     $('body').on('click', 'div.getMastery-trajectory-for-problemset', function () {
 
@@ -1628,29 +1663,6 @@ var completeDataChart;
         });
 
     });
-
-    activetable.on( 'row-reorder', function ( e, diff, edit ) {
-        activetable.$('input').removeAttr( 'checked' );
-        var result = [];
-        for ( var i=0; i< diff.length ; i++ ) {
-            var rowData = activetable.row( diff[i].node ).data();
-            result[i] = rowData[3]+'~~'+ diff[i].newData+'~~'+diff[i].oldData;
-        }
-        $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/reOrderProblemSets",
-            data : {
-                problemSets: result,
-                classid: classID
-            },
-            success : function(response) {
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }
-            }
-        });
-    } );
 
     /** Report Handler Starts **/
 

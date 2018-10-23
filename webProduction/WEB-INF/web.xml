@@ -30,7 +30,7 @@
   </context-param>
   <context-param>
 		<param-name>webContentPath</param-name>
-		<param-value>https://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
+		<param-value>http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
 	</context-param>
   <context-param>
     <param-name>probplayerPath</param-name>

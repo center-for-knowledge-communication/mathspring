@@ -211,7 +211,9 @@
         <div id="content-conatiner" class="container-fluid">
 
             <div id="problem_set_content" style="width: 100%;">
-
+			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
+			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
+			<c:if test="${activeproblemSet.size() != 0}">
                 <div>
                     <h3 class="page-header">
                         <small>Active Problem Sets</small>
@@ -265,9 +267,19 @@
                             </tr>
                         </c:forEach>
                         </tbody>
+                       
                     </table>
+					 
                 </div>
-
+				</c:if>
+				<c:if test="${activeproblemSet.size() == 0}">
+				 <div>
+                    <h5 class="page-header">
+                        <big>No Active Problem Sets Found for the given combination of Grade and Language</big>
+                    </h5>
+					</div>
+				</c:if>
+				<c:if test="${inactiveproblemSets.size() != 0}">
                 <div>
                     <h3 class="page-header">
                         <small>Inactive Problem Sets</small>
@@ -298,7 +310,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <input type="hidden" id="problemSetSize" name="problemSetSize" value="${inactiveproblemSets.size()}">
                         <c:forEach var="problemSet" varStatus="i" items="${inactiveproblemSets}">
                             <c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
                             <tr>
@@ -317,7 +328,14 @@
                         </tbody>
                     </table>
                 </div>
-
+				</c:if>
+				<c:if test="${inactiveproblemSets.size() == 0}">
+				 <div>
+                    <h5 class="page-header">
+                        <big>No Inactive Problem Sets Found for the given combination of Grade and Language</big>
+                    </h5>
+					</div>
+				</c:if>
 
             </div>
 
