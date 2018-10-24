@@ -537,7 +537,7 @@ function problemLevelDetails(JSONData,problems){
         if(obj.type=='flash'){
             flash = '<td><a rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
         }else{
-            flash = '<td><a rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
+            flash = '<td><a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+obj.id+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer;" rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
         }
         if(obj.activated){
             checkBox =  "<tr><td><input type='checkbox' name='activated' checked='checked'></td>"

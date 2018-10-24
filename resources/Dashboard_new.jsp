@@ -17,7 +17,14 @@
     <script src="js/huy-slider.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
     <script>
+    
+    function loadFlashContent () {
+        $("#loadFlash").attr("title", title);
+        $("#loadFlashIFrame").attr("src","https://get.adobe.com/flashplayer");
+        $("#loadFlash").dialog("open");
 
+    }
+    
         var globals = {
             mouseSaveInterval: ${mouseSaveInterval},
             mouseHistory: [],

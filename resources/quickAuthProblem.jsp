@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:useBean id="problem" scope="request" type="edu.umass.ckc.wo.content.Problem"/>
+<jsp:useBean id="problem" scope="request" class="edu.umass.ckc.wo.content.Problem"/>
 <!DOCTYPE html>
 <html>
     <head>

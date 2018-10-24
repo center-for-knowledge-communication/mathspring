@@ -9506,6 +9506,7 @@ body {
 }
 
 .emptyCard,
+.warningCard,
 .giveupCard,
 .correctCard,
 .correctOnAttemptsCard,
@@ -9518,6 +9519,10 @@ body {
 
 .giveupCard {
   background: #CD4747 !important;
+}
+
+.warningCard {
+  background: #FD7E14 !important;
 }
 
 .correctCard,
