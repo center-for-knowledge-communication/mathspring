@@ -167,7 +167,7 @@ public class ProblemMgr {
         String s = "select p.id, answer, animationResource, p.name, nickname," +
                 " strategicHintExists, hasVars, screenShotURL, diff_level, form," +
                 " isExternalActivity, type, video, example, p.status, p.questType," +
-                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,prob_language" +
+                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,language" +
                 " from Problem p, OverallProbDifficulty o" +
                 " where p.id=o.problemid" + problemFilter +
                 " and (status='Ready' or status='ready' or status='testable')" +
@@ -241,7 +241,7 @@ public class ProblemMgr {
         if (problemFormat == null) {
             problemFormat =Problem.defaultFormat ;
         }
-        String prob_language = rs.getString("prob_language");
+        String prob_language = rs.getString("language");
         
         Problem p = new Problem(id, resource, answer, name, nname, stratHint,
                 diff, null, form, instructions, type, status, vars, ssURL,

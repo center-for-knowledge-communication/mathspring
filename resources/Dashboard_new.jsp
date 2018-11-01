@@ -281,6 +281,9 @@
         </c:forEach>
 
     </div>
+    <div id="loadFlash" title="Enabling Flash">
+    <iframe id="loadFlashIFrame" width="675" height="675"> </iframe>
+	</div>
 </div>
 
 
