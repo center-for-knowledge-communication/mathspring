@@ -884,7 +884,7 @@ function successfulLCResult (url) {
 // When the iframe is done loading the HTML file, we need to go into it and find the canvas element and change its margins because
 // its not well laid out to fit inside the iframe without having some gray space around it.
 function lcLoaded () {
-   /* var iframe = document.getElementById(LEARNING_COMPANION_WINDOW);
+/*   var iframe = document.getElementById(LEARNING_COMPANION_WINDOW);
     var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
     var canvs = innerDoc.getElementsByTagName("canvas");
     var canv = canvs[0];

@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/">
-
-  <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/">  
   <Resource name="jdbc/wodblocal" type="javax.sql.DataSource"
             auth="Container" description="Mysql database for Mathforum"
@@ -17,7 +14,5 @@
             url="jdbc:mysql://localhost/wayangoutpostdb?autoReconnect=true" />
             
 <ResourceLink name="jdbc/wodbrose" global="jdbc/aws"  type="javax.sql.DataSource"/> 
-
-</Context>
 
 </Context>
