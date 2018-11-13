@@ -78,6 +78,16 @@ public class TTUtil {
     		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as summary\r\n" + 
     		"from problemgroup,problemgroup_description_multi_language pgl where active=1 and id=pgl.pg_pg_grp_id and id not in (:activeIds);";
     
+    /**
+     * Query for summary report
+     */
+    public static final String SUM_SUR_REPORT ="Select ppt.name as surveyName, ppt.isActive as isSurveyActive,s.id AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName," + 
+    		"pptd.studentAnswer, s.pedagogyId, s.gender, s.age, pptd.probId, pptd.probName, pptd.isCorrect, pptd.studentAnswer, pptd.testType," + 
+    		"pptd.seqNum, pptd.skipped, ppptm.testId, ppptm.position as questionPosition, ppp.name as questionName, ppp.description, ppp.ansType," + 
+    		"ppp.answer, ppp.problemSet, ppp.aChoice, ppp.bChoice, ppp.cChoice, ppp.dChoice, ppp.eChoice " + 
+    		"from student s, preposttestdata pptd, preposttest ppt, prepostproblemtestmap ppptm, prepostproblem ppp " + 
+    		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
+    
     /* A private Constructor prevents any other
     * class from instantiating.
     */

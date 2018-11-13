@@ -124,6 +124,32 @@
             </thead>
         </table>
     </script>
+    
+    <script type="text/template"  id="student_table_Survey">
+        <table class="table table-striped table-bordered hover">
+            <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Username</th>
+				<th>Student Id</th>
+                
+            </tr>
+            </thead>
+        </table>
+    </script>
+    
+    <script type="text/template"  id="question_table_Survey">
+        <table class="table table-striped table-bordered hover">
+            <thead>
+            <tr>
+                <th>Question</th>
+                <th>Answer</th>
+				
+            </tr>
+            </thead>
+        </table>
+    </script>
+    
     <script type="text/template" id="editStudentInfoDiv">
         <div style="width: 50%">
             <!-- Nav tabs -->
@@ -587,6 +613,36 @@
                         </div>
                     </div>
 
+					<div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
+                                    Summary of surveys/tests report
+                                </a>
+                            </h4>
+                        </div>
+
+                        <div id="collapseFive" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <label>This table shows summary of survey/tests reports of students of this class.</label>
+                                <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerSummSurReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="Download this report" class="downLoadPerSummSurReport" aria-expanded="true" aria-controls="collapseOne">
+                                    <i class="fa fa-download fa-2x" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                            <div class="panel-body">
+                             
+                                <table id="surveyReport" class="table table-striped table-bordered hover" width="50%"></table>
+                            
+                           
+                                <div class="loader" style="display: none"></div>
+                            </div>
+
+                            
+ 
+                        </div>
+                    </div>
+                    
+                    
                 </div>
 
             </div>

@@ -1,5 +1,7 @@
 package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
+import edu.umass.ckc.wo.beans.StudentDetails;
+import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
@@ -180,6 +182,11 @@ public class TTReportServiceImpl implements TTReportService {
                     Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
+                    
+                case "summarySurveyReport":
+                	Map<String, Map<Integer, StudentDetails>> result1 = generateSurveyReport(classId);
+                    ObjectMapper perClusterReportMapper1 = new ObjectMapper();
+                    return perClusterReportMapper1.writeValueAsString(result1);
             }
         } catch (IOException e) {
            logger.error(e.getMessage());
@@ -188,8 +195,105 @@ public class TTReportServiceImpl implements TTReportService {
         return null;
     }
 
-
+    
     @Override
+    public Map<String, Map<Integer, StudentDetails>> generateSurveyReport(String classId){
+		
+    	Map<String, Map<Integer, StudentDetails>> surveyMap = new HashMap<>();
+    	SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+    	namedParameterJdbcTemplate.query(TTUtil.SUM_SUR_REPORT, namedParameters, (ResultSet mappedrow) -> {
+            while (mappedrow.next()) {
+            	
+            	String surveyName = mappedrow.getString("surveyName");
+            	
+            	Integer studentId = mappedrow.getInt("studentId");
+            	
+            	Map<Integer,StudentDetails> sDetails = surveyMap.get(surveyName); 
+            	if(sDetails!=null) {
+            	
+            		StudentDetails sDetail = sDetails.get(studentId);
+            		
+                  	 SurveyQuestionDetails sqd = getSurveyQuestionDetails(mappedrow);
+                  	            		
+            		if(sDetail!=null) {
+            		
+                   	 	sDetail.getQuestionset().add(sqd);
+                   	 
+            		} else {
+            			
+            			
+            			sDetail = getStudentDetail(mappedrow, studentId, sqd);
+                    	
+                    	sDetails.put(studentId, sDetail);
+                    	
+                    	surveyMap.put(surveyName, sDetails);
+            		}
+            	} else {
+            		
+            		SurveyQuestionDetails sqd = getSurveyQuestionDetails(mappedrow);
+            		StudentDetails sDetail = getStudentDetail(mappedrow, studentId, sqd);
+                	
+            		sDetails = new HashMap<>();
+            		
+                	sDetails.put(studentId, sDetail);
+                	
+                	surveyMap.put(surveyName, sDetails);
+            	}
+            	
+             }
+          return surveyMap;
+        });
+    	
+    	
+    	return surveyMap;
+    	
+    }
+    
+    private StudentDetails getStudentDetail(ResultSet mappedrow, Integer studentId, SurveyQuestionDetails sqd) throws SQLException {
+    	
+    	String studentName = mappedrow.getString("studentName");
+    	String studentUserName = mappedrow.getString("userName");
+    	Integer studentPedagogyId = mappedrow.getInt("pedagogyId");
+    	Integer studentAge = mappedrow.getInt("age");
+    	String studentGender = mappedrow.getString("gender");
+    	Set<SurveyQuestionDetails> questionset = new HashSet<>();
+    	
+    	questionset.add(sqd);
+    	
+    	StudentDetails sDetail = new StudentDetails();
+    	sDetail.setStudentId(studentId);
+    	sDetail.setStudentName(studentName);
+    	sDetail.setStudentUserName(studentUserName);
+    	sDetail.setStudentGender(studentGender);
+    	sDetail.setStudentAge(studentAge);
+    	sDetail.setStudentPedagogyId(studentPedagogyId);
+    	sDetail.setQuestionset(questionset);
+    	
+    	return sDetail;
+    }
+
+    private SurveyQuestionDetails getSurveyQuestionDetails(ResultSet mappedrow) throws SQLException {
+    	
+    	String questionName = mappedrow.getString("questionName");
+     	 String description = mappedrow.getString("description");
+     	 Integer problemSet = mappedrow.getInt("problemSet");
+     	 Integer ansType = mappedrow.getInt("ansType");
+     	 Integer skipped = mappedrow.getInt("skipped");
+     	 String studentAnswer = mappedrow.getString("studentAnswer");
+     	 
+     	             	 
+     	 SurveyQuestionDetails sqd = new SurveyQuestionDetails();
+     	 sqd.setQuestionName(questionName);
+     	 sqd.setDescription(description);
+     	 sqd.setProblemSet(problemSet);
+     	 sqd.setAnsType(ansType);
+     	 sqd.setSkipped(skipped);
+     	 sqd.setStudentAnswer(studentAnswer);
+     	 
+		return sqd;
+	}
+
+	@Override
     public Map<String, List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException {
         List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
         Map<String, List<String[]>> finalMapValues = new HashMap<>();
