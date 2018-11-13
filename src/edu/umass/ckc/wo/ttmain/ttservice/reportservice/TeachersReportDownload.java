@@ -1,20 +1,29 @@
 package edu.umass.ckc.wo.ttmain.ttservice.reportservice;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.web.servlet.view.document.AbstractXlsView;
+
+import edu.umass.ckc.wo.beans.StudentDetails;
+import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
-import org.apache.poi.common.usermodel.HyperlinkType;
-import org.apache.poi.ss.usermodel.*;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.web.servlet.view.document.AbstractXlsView;
-
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by nsmenon on 6/6/2017.
@@ -38,6 +47,8 @@ public class TeachersReportDownload extends AbstractXlsView {
             buildStudentTagsForDownload(map, workbook, httpServletRequest, httpServletResponse);
         else if(reportType.equals("perStudentEmotion"))
             buildEmotionReportForDownload(map, workbook, httpServletRequest, httpServletResponse);
+        else if(reportType.equals("perSummSurveyReport"))
+        	buildSummSurveyReport(map, workbook, httpServletRequest, httpServletResponse);
     }
 
     private void buildEmotionReportForDownload(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -646,4 +657,84 @@ public class TeachersReportDownload extends AbstractXlsView {
         }
 
     }
+
+
+
+    private void buildSummSurveyReport(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        try {
+            String classId = (String) map.get("classId");
+            httpServletResponse.setContentType("application/vnd.ms-excel");
+            httpServletResponse.setHeader("Content-Disposition", "attachment; filename=\"survey_report" + classId + ".xls\"");
+            
+            @SuppressWarnings("unchecked")
+			Map<String, Map<Integer, StudentDetails>> dataForProblemObjects = (Map<String, Map<Integer, StudentDetails>>) map.get("dataForProblem");
+            
+            Sheet sheet = workbook.createSheet(classId);
+            Row header = sheet.createRow(3);
+
+            Cell surveyName = header.createCell(2);
+            surveyName.setCellValue("Survey Name");
+
+
+            Cell studentName = header.createCell(3);
+            studentName.setCellValue("Student Name");
+
+
+            Cell userName = header.createCell(4);
+            userName.setCellValue("Username");
+
+
+            Cell question = header.createCell(5);
+            question.setCellValue("Question");
+
+
+            Cell studentAnswer = header.createCell(6);
+            studentAnswer.setCellValue("Student's Answer");
+
+            
+            AtomicInteger atomicIntegerForHeaderForData = new AtomicInteger(4);
+            dataForProblemObjects.forEach((name, studentDetails) -> {
+               
+                studentDetails.forEach((studentId, studentDetail) -> {
+                	
+                    Set<SurveyQuestionDetails> questions = new HashSet<>();
+                    questions = studentDetail.getQuestionset();
+                    
+                    questions.forEach((questionData) -> {
+                    	
+                    	Row dataRow = sheet.createRow(atomicIntegerForHeaderForData.getAndIncrement());
+                    	
+                    	Cell surveyNameData = dataRow.createCell(2);
+                        surveyNameData.setCellValue(name);
+                        
+                    	Cell studentNameData = dataRow.createCell(3);
+                    	studentNameData.setCellValue(studentDetail.getStudentName());
+
+
+                        Cell studentUsername = dataRow.createCell(4);
+                        studentUsername.setCellValue(studentDetail.getStudentUserName());
+
+                    	Cell questionDesc = dataRow.createCell(5);
+                    	questionDesc.setCellValue(questionData.getDescription());
+                        
+                        Cell studentAnswerData = dataRow.createCell(6);
+                        studentAnswerData.setCellValue(questionData.getStudentAnswer());
+                        
+                    });
+                    
+                    
+                });
+                
+            });
+
+            workbook.write(httpServletResponse.getOutputStream());
+            httpServletResponse.getOutputStream().flush();
+            httpServletResponse.getOutputStream().close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
 }

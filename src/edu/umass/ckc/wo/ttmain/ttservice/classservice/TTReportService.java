@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.ttmain.ttservice.classservice;
 
+import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
@@ -9,6 +10,7 @@ import org.w3c.dom.Document;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by nsmenon on 5/19/2017.
@@ -38,4 +40,6 @@ public interface TTReportService {
     public Map<String, PerProblemReportBean> generatePerProblemReportForClass(String classId) throws TTCustomException;
 
     public List<EditStudentInfoForm> printStudentTags(String studentPassword, String classId) throws TTCustomException;
+    
+    public Map<String, Map<Integer,StudentDetails>> generateSurveyReport(String classId) throws TTCustomException;
 }

@@ -26,6 +26,14 @@ var eachStudentData = [];
 var activetable;
 var inactivetable;
 var studentRosterTable;
+var surveyData;
+var surveyReportTable;
+var studentData;
+var surveyStudentTable;
+var surveyQuestionTable;
+
+//Summary report variable
+var summaryReport;
 
 var effortLabelMap = {"SKIP" : "The student SKIPPED the problem (didn't do anything on the problem)",
                        "NOTR" : "NOT even READING the problem --The student answered too fast, in less than 4 seconds",
@@ -2046,6 +2054,170 @@ var completeDataChart;
 
     });
 
+    
+    $('#collapseFive').on('show.bs.collapse', function ()  {
+    	
+    	$('#collapseFive').find('.loader').show();
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+            	
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'summarySurveyReport'
+            },
+            success : function(data) {
+            	$('#collapseFive').find('.loader').hide();
+            	
+                var jsonData = $.parseJSON(data);
+                surveyData = jsonData;
+                
+                
+                
+                var columNvalues = [
+                    
+                    { "title": "Survey Name", "name" : "SurveyName" , "targets" : [0],"render": function ( data, type, full, meta ) {
+                        return '<label style="width: 50%;">'+data+'</label><a  class="getStudentDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+                    }},
+                    
+                ];
+                
+                
+                var surveyList = [];
+                $.map(jsonData, function (item, key) {
+                    
+                    surveyList.push([key]);
+                    
+                });
+                
+                surveyReportTable = $('#surveyReport').DataTable({
+                    data: surveyList,
+                    destroy: true,
+                    "columns": [ { title: "Survey Name" , width: "30%"}],
+                    "columnDefs": columNvalues,
+                    "bFilter": false,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": true,
+                    
+                });
+                
+            },
+            error : function(e) {
+            	alert("error occured");
+                console.log(e);
+            }
+        });
+
+    });
+    
+    
+    
+    $('body').on('click', 'a.getQuestionDetail', function () {
+        $(this).children(':first').toggleClass('rotate-icon');
+        var tr = $(this).closest('tr');
+        var row = surveyStudentTable.row(tr);
+        if ( row.child.isShown() ) {
+            row.child.hide();
+        }else {
+        	
+            var studentId = row.data()[2];
+            var surveyStudent = studentData[studentId];
+            
+            var surveyQuestion = surveyStudent.questionset;
+            var questionList = [];
+            $.map(surveyQuestion, function (item, key) {
+                
+            	questionList.push([item.description, item.studentAnswer]);
+               
+            });
+            
+            var columNvalues = [
+            	{ "title": "Question", "name" : "Question" , "targets" : [0],"render": function ( data, type, full, meta ) {
+                    return '<label style="width: 90%;">'+data+'</label>';
+                }},
+                { "title": "Answer", "name" : "Answer" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                    return '<label style="width: 90%;">'+data+'</label>';
+                }}
+                
+                
+            ];
+            
+            var $perSurveyQuestiontable = $($('#question_table_Survey').html());
+            $perSurveyQuestiontable.css('width', '100%');
+            surveyQuestionTable = $perSurveyQuestiontable.DataTable({
+                data: questionList,
+                destroy: true,
+                "columns": [ { title: "Question" , width: "20%"}, { title: "Answer" , width: "20%"}],
+                "columnDefs": columNvalues,
+                "bFilter": false,
+                "bPaginate": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": true,
+                
+            });
+            
+            
+            surveyStudentTable.row(tr).child(surveyQuestionTable.table().container()).show();
+        }
+    });
+    
+    
+    $('body').on('click', 'a.getStudentDetail', function () {
+        $(this).children(':first').toggleClass('rotate-icon');
+        var tr = $(this).closest('tr');
+        var row = surveyReportTable.row(tr);
+        if ( row.child.isShown() ) {
+            row.child.hide();
+        }else {
+        	
+            var surveyName = row.data()[0];
+            var surveyStudents = surveyData[surveyName];
+            studentData = surveyStudents;
+            var studentList = [];
+            $.map(surveyStudents, function (item, key) {
+                
+            	studentList.push([item.studentName, item.studentUserName, item.studentId]);
+                
+            });
+            
+            var columNvalues = [
+            	{ "title": "Student Name", "name" : "Student Name" , "targets" : [0],"render": function ( data, type, full, meta ) {
+                    return '<label style="width: 90%;">'+data+'</label>';
+                }},
+                { "title": "Username", "name" : "Username" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                    return '<label style="width: 50%;">'+data+'</label><a  class="getQuestionDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+                }},
+                { "title": "Student Id", "name" : "StudentId" , "targets" : [2],"render": function ( data, type, full, meta ) {
+                    return '<label style="width: 50%;">'+data+'</label>';
+                }}
+                
+            ];
+            
+            var $perSurveyStudenttable = $($('#student_table_Survey').html());
+            $perSurveyStudenttable.css('width', '100%');
+            surveyStudentTable = $perSurveyStudenttable.DataTable({
+                data: studentList,
+                destroy: true,
+                "columns": [ { title: "Student Name" , width: "20%"}, { title: "Username" , width: "20%"}, { title: "StudentId" , width: "20%"}],
+                "columnDefs": columNvalues,
+                "bFilter": false,
+                "bPaginate": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": true,
+                
+            });
+            
+            surveyStudentTable.column(2).visible(false);
+            
+            surveyReportTable.row(tr).child(surveyStudentTable.table().container()).show();
+            
+        }
+    });
 
     /** Report Handler Ends **/
 

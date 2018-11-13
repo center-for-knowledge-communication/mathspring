@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
+import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
@@ -118,4 +119,13 @@ public class TeacherToolsReportController {
 
     }
 
+    @RequestMapping(value = "/tt/downLoadPerSummSurReport", method = RequestMethod.GET)
+    public ModelAndView downLoadPerPerSummSurReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId) throws TTCustomException {
+        Map<String, Map<Integer, StudentDetails>> perSummSurReport =  reportService.generateSurveyReport(classId);
+        map.addAttribute("classId", classId);
+        map.addAttribute("teacherId", teacherId);
+        map.addAttribute("dataForProblem",perSummSurReport);
+        map.addAttribute("reportType", "perSummSurveyReport");
+        return new ModelAndView("teachersReport", map);
+    }
 }
