@@ -483,7 +483,7 @@ public class DbProblem extends BaseMgr {
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				final String class_language = rs.getString("class_language");
-				probs.removeIf(listrmv -> !(listrmv.getProblemLanguage().equals(class_language)));
+				probs.removeIf(listrmv -> !(listrmv.getProblemLanguage().equalsIgnoreCase(class_language)));
 			}
 		} finally {
 			closeQuery(ps);
