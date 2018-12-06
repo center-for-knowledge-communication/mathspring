@@ -1,26 +1,40 @@
 package edu.umass.ckc.wo.cache;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.rank.Percentile;
+import org.apache.log4j.Logger;
+
 import edu.umass.ckc.wo.beans.Topic;
-import edu.umass.ckc.wo.content.*;
+import edu.umass.ckc.wo.content.CCStandard;
+import edu.umass.ckc.wo.content.Hint;
+import edu.umass.ckc.wo.content.Problem;
+import edu.umass.ckc.wo.content.ProblemAnswer;
+import edu.umass.ckc.wo.content.Video;
+import edu.umass.ckc.wo.db.DbHint;
+import edu.umass.ckc.wo.db.DbProblem;
+import edu.umass.ckc.wo.db.DbUtil;
 import edu.umass.ckc.wo.db.DbVideo;
-import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.probSel.StandardExampleSelector;
 import edu.umass.ckc.wo.tutor.vid.StandardVideoSelector;
 import edu.umass.ckc.wo.tutormeta.ExampleSelector;
 import edu.umass.ckc.wo.tutormeta.VideoSelector;
-import edu.umass.ckc.wo.db.DbHint;
-import edu.umass.ckc.wo.db.DbUtil;
-import edu.umass.ckc.wo.db.DbProblem;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.*;
-
-
 import edu.umass.ckc.wo.util.Pair;
-import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,6 +76,7 @@ public class ProblemMgr {
             fillTopicStandardMap(conn);
             // once problems are built, we pass over them and set their examples using the StandardExampleSelector
             setProblemExamples(conn);
+            updateProblemStats(conn,getProblemStatsProblemStats(conn));
         }
     }
 
@@ -89,6 +104,90 @@ public class ProblemMgr {
 //            sess.close();
 //        }
 //    }
+    
+    private static Map<Integer,List<Double>> getProblemStatsProblemStats(Connection conn) throws SQLException {
+    	  PreparedStatement ps = null;
+          ResultSet rs = null;
+          Map<Integer,List<Double>> probStatsEntries = new HashMap<>();
+          try {
+              String q = "select stats.probId,stats.meanHints, stats.meanAttempts,stats.meanTime,ov.avghints ,ov.avgincorrect ,ov.avgsecsprob, prob.gradeFromStandard from probstats stats join overallprobdifficulty ov on stats.probId = ov.problemId join problem prob on prob.id = ov.problemId where stats.n >=10  order by probId"; 
+              ps = conn.prepareStatement(q);
+              rs = ps.executeQuery();
+              while (rs.next()) {
+                  List<Double> probStats = new ArrayList<>();
+                  probStats.add(rs.getDouble("meanHints"));
+                  probStats.add(rs.getDouble("meanAttempts"));
+                  probStats.add(rs.getDouble("meanTime"));
+                  
+                  probStats.add(rs.getDouble("avghints"));
+                  probStats.add(rs.getDouble("avgincorrect"));
+                  probStats.add(rs.getDouble("avgsecsprob"));
+                  probStats.add(rs.getDouble("gradeFromStandard"));
+                  probStatsEntries.put(rs.getInt("probId"), probStats);
+              }
+          } finally {
+              if (rs != null)
+                  rs.close();
+              if (ps != null)
+                  ps.close();
+
+          }
+          return probStatsEntries;
+    }
+    
+    
+	private static Map<Integer, List<Double>> updateProblemStats(Connection conn,
+			Map<Integer, List<Double>> probStatsEntries) throws SQLException {
+		List<Double> totalAvgHints = new ArrayList<>();
+		List<Double> totalAvgIncorrect = new ArrayList<>();
+		List<Double> totalAvgSecsProblem = new ArrayList<>();
+
+		probStatsEntries.forEach((probId, statEntries) -> {
+			totalAvgHints.add(statEntries.get(3));
+			totalAvgIncorrect.add(statEntries.get(4));
+			totalAvgSecsProblem.add(statEntries.get(5));
+		});
+
+		double percentleHints = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgHints.stream().toArray(Double[]::new)));
+		double percentileAvgIncorrect = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgIncorrect.stream().toArray(Double[]::new)));
+		double percentileAvgSecsProblem = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgSecsProblem.stream().toArray(Double[]::new)));
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String q = "UPDATE overallprobdifficulty SET diff_hints = ?, diff_time = ?,diff_incorr = ?,diff_level=?  WHERE problemId = ?";
+		try {
+			ps = conn.prepareStatement(q);
+			for (Map.Entry<Integer, List<Double>> statEntries : probStatsEntries.entrySet()) {
+
+				double diff_hints = statEntries.getValue().get(0) / percentleHints;
+				double diff_incorr = statEntries.getValue().get(1) / percentileAvgIncorrect;
+				double diff_time = statEntries.getValue().get(2) / percentileAvgSecsProblem;
+				double diff_level_compute = (diff_hints + diff_incorr + diff_time) / 3;
+				diff_level_compute = (diff_level_compute < 1 ? diff_level_compute : 0.99)/10;
+				double diff_level = statEntries.getValue().get(6) / 10 + diff_level_compute;
+				
+				diff_hints = diff_hints < 1 ? diff_hints : 0.99;
+				diff_incorr = diff_incorr < 1 ? diff_incorr : 0.99;
+				diff_time = diff_time < 1 ? diff_time : 0.99;
+				
+				ps.setDouble(1, diff_hints);
+				ps.setDouble(2, diff_time);
+				ps.setDouble(3, diff_incorr);
+				ps.setDouble(4, diff_level);
+				ps.setInt(5, statEntries.getKey());
+
+				ps.executeUpdate();
+			}
+
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (ps != null)
+				ps.close();
+
+		}
+		return probStatsEntries;
+	}
+  
 
     private static void loadTopics(Connection conn) throws SQLException {
 //        List<TopicEntity> topicEntities = loadTopics2();
@@ -279,6 +378,23 @@ public class ProblemMgr {
         p.setVideo(vidURL);
         logger.debug("Loaded ready Problem id="+p.getId() + " name=" + p.getName() + " form=" + (p.isQuickAuth() ? "quickAuth" : type) );
         return p;
+    }
+    
+    
+    private static void updateProblemStats(Connection conn) throws Exception {
+        PreparedStatement ps = buildProblemQuery(conn, null); //query all problems
+        ResultSet rs = ps.executeQuery();
+        try {
+            while (rs.next()) {
+                Problem p = buildProblem(conn, rs);
+                problemIds.add(p.getId());
+            }
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+        }
     }
 
     private static void loadAllProblems(Connection conn) throws Exception {
