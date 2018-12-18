@@ -1,6 +1,5 @@
 <%@ include file="partials/loginK12-header.jsp" %>
 <%@ include file="partials/loginK12-nav.jsp" %>
-
 <div class="fullscreen">
     <div class="bootstrap vertical-center">
         <div class="container">

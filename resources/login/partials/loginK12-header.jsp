@@ -16,6 +16,7 @@
     <%--<link href="${pageContext.request.contextPath}/login/css/switcher-button.css" rel="stylesheet" type="text/css" />--%>
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/jquery-2.2.2.min.js" />"></script>
     <script type="text/javascript" src="<c:url value="/login/js/p7EHCscripts.js" />"></script>
+    <script src="js/bootstrap/js/language_es.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             var $userSwitcher = $('#usertypeswitcher');
@@ -33,6 +34,7 @@
                     $loginSubmitBtn.attr('value', 'Login');
                 }
             });
+            langPrefrenceForLoginPage();
         });
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';

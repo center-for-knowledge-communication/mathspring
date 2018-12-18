@@ -26,3 +26,24 @@ function langPrefrenceForWelcomePage() {
 		$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
 	}
 }
+
+function langPrefrenceForLoginPage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		$(".fullscreen").find(".col-sm-6:eq(0)").children("p").text("¿Ya tenés un nombre de usuario?");
+		$(".fullscreen").find(".col-sm-6:eq(0)").children("form").find(".switch-label").text("¿Sos maestro?");
+		$(".fullscreen").find(".col-sm-6:eq(0)").children("form").find("button").text("Loguearse");
+		$(".fullscreen").find(".col-sm-6:eq(1)").children("p").text("¿Querés crear un nombre de usuario?");
+		$(".fullscreen").find(".col-sm-6:eq(1)").find("form:eq(0)").find("button").text("Crear un usuario de Maestro");
+		$(".fullscreen").find(".col-sm-6:eq(1)").find("form:eq(1)").find("button").text("Crear un usuario de Alumno");
+		$(".fullscreen").find(".col-sm-6:eq(1)").find("form:eq(2)").find("button").text("Probar el programa como Visitante");
+		$(".information-box").html("<p class='text-center'>Para tener una mejor experiencia, por favor fijarse que el sonido funciona, y  habilitar los pop-ups.</p>");
+		$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
+	}
+}
