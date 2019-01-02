@@ -46,4 +46,43 @@ function langPrefrenceForLoginPage(){
 		$(".information-box").html("<p class='text-center'>Para tener una mejor experiencia, por favor fijarse que el sonido funciona, y  habilitar los pop-ups.</p>");
 		$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
 	}
-}
+}	
+	
+	function langPrefrenceForNewUserPage(isNewStudentPage){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			if(isNewStudentPage){
+			$(".form-title").text("Registro para alumnos");
+			$(".student-registration-form").find(".col-sm-4:eq(0)").text("Nombre:");
+			$(".student-registration-form").find(".col-sm-4:eq(1)").text("Apellido:");
+			$(".student-registration-form").find(".col-sm-4:eq(2)").text("Edad:");
+			$(".student-registration-form").find(".col-sm-4:eq(3)").text("Sexo:");
+			$( "#gender option[value='male']").text("Masculino");
+			$( "#gender option[value='female']").text("Femenino");
+			$(".student-registration-form").find(".col-sm-4:eq(4)").text("Correo electrónico");
+			$(".student-registration-form").find(".col-sm-4:eq(5)").text("Nombre de usuario:");
+			$(".student-registration-form").find(".col-sm-4:eq(6)").text("Contraseña:");
+			$(".form-check-label:eq(0)").text("Alumno regular");
+			$(".form-check-label:eq(1)").text("Prueba del sistema (versión de alumno)");
+			$(".form-check-label:eq(2)").text("Prueba del sistema (versión de desarrollador)");
+			$(".student-button").text("Enviar");
+		}else{
+			$(".form-title").text("Registro para Maéstras");
+			$(".form-horizontal").find(".col-sm-4:eq(0)").text("Nombre:");
+			$(".form-horizontal").find(".col-sm-4:eq(1)").text("Apellido:");
+			$(".form-horizontal").find(".col-sm-4:eq(2)").text("Correo electrónico:");
+			$(".form-horizontal").find(".col-sm-4:eq(3)").text("Nombre de usuario:");
+			$(".form-horizontal").find(".col-sm-4:eq(4)").text("Contraseña:");
+			$(".form-horizontal").find(".col-sm-4:eq(5)").text("Reescribe contraseña:");
+			$(".teacher-button").text("Enviar");
+		}
+			$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
+		}
+		
+	}

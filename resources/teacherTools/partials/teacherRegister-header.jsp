@@ -12,6 +12,13 @@
     <%--<link href="css/bootstrap.min.css" rel="stylesheet">--%>
     <%--<link href="css/common_new.css" rel="stylesheet">--%>
     <link href="sass_compiled/teacher_register.css" rel="stylesheet">
+      <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+     <script src="js/bootstrap/js/language_es.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+    	langPrefrenceForNewUserPage(false);
+    });
+    </script>
 </head>
 
 <body>
