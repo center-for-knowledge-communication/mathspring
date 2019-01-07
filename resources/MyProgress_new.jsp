@@ -17,6 +17,7 @@
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
+     <script src="js/bootstrap/js/language_es.js"></script>
     <script>
         $.extend({
             getUrlVars: function () {
@@ -453,7 +454,7 @@
                     $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
                 }
             });
-
+            langPrefrenceForProgressPage();
         });
     </script>
 </head>
@@ -481,7 +482,7 @@
                     </c:otherwise>
                 </c:choose>
             </li>
-            <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b">Log Out &nbsp; <span class="fa fa-sign-out"></span></a>
+            <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b">Log Out &nbsp;<span class="fa fa-sign-out"></a></span>
         </nav>
     </div><!-- wrapper -->
 </header>

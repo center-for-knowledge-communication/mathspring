@@ -53,6 +53,7 @@
     <script type="text/javascript" src="js/tutorintervention.js"></script>
     <script type="text/javascript" src="js/intervhandlers_new.js"></script>
     <script type="text/javascript" src="js/swfobject.js"></script>
+    <script src="js/bootstrap/js/language_es.js"></script>
     <script type="text/javascript">
         var globals = {
             lastProbType: '${lastProbType}',
@@ -158,6 +159,7 @@
             } else {
                 $('.huytran-practice__character-window').width(250);
             }
+            langPrefrenceForPracticePage();
         });
     </script>
 

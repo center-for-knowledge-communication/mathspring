@@ -192,11 +192,23 @@ function displayHintCount () {
 
 function showProblemInfo (pid, name, topic, standards) {
     $("#pid").text(pid + ":" + name);  // shows the problem ID + resource
-
-    $("#problemTopicAndStandards").html(
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			 $("#problemTopicAndStandards").html(
+            "<p style='float: left'>Tema actual: " + topic + "</p>" +
+            "<p style='float: right'>Area curricular: " + standards + "</p>");
+		}else{
+			$("#problemTopicAndStandards").html(
             "<p style='float: left'>Current Topic: " + topic + "</p>" +
             "<p style='float: right'>Standards: " + standards + "</p>"
-    );
+			);
+	}
     displayHintCount();
 }
 
@@ -1230,6 +1242,12 @@ function clickHandling () {
             if (id_exists)  {
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
+			var languagePreference = window.navigator.language;
+			if (languagePreference.includes("es")) {
+				$("#exampleContainer").attr('title', 'Ve y Eschcha a Este Ejemplo. Usa “Paso Siguiente” Para Continuar.');
+				$("#pulsate_play_button").text('Paso Siguiente');
+				$("#example_button_done").text('Terminé de ver');
+			}
 
         },
         close: function () { exampleDialogCloseHandler(); } ,
@@ -1261,7 +1279,8 @@ function clickHandling () {
                     e.preventDefault();
                 })
             },
-            {
+            {	
+            	id: 'example_button_done',
                 text: "Done",
                 click: function() {
                     $( this ).dialog( "close" );

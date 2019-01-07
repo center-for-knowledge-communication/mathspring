@@ -84,20 +84,20 @@
                     <div class="form-group row">
                         <div class="col-md-offset-4 col-md-8">
                             <div class="form-check">
+                             <input class="form-check-input" type="radio" name="userType" id="exampleRadios1" value="student" checked>
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" name="userType" id="exampleRadios1" value="student" checked>
                                     &nbsp;Regular Student
                                 </label>
                             </div>
                             <div class="form-check">
+                             <input class="form-check-input" type="radio" name="userType" id="exampleRadios2" value="testStudent">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" name="userType" id="exampleRadios2" value="testStudent">
                                     &nbsp;System testing (student view)
                                 </label>
                             </div>
                             <div class="form-check">
+                             <input class="form-check-input" type="radio" name="userType" id="exampleRadios3" value="testDeveloper">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="radio" name="userType" id="exampleRadios3" value="testDeveloper">
                                     &nbsp;System testing (developer view)
                                 </label>
                             </div>

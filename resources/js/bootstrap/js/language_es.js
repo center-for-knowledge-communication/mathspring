@@ -86,3 +86,74 @@ function langPrefrenceForLoginPage(){
 		}
 		
 	}
+	
+	function langPrefrenceForDashBoardPage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			
+			$("ul").find(".nav__item:eq(0)").children("a").text("Mi Jardín");
+			$("ul").find(".nav__item:eq(1)").children("a").text("Mi Progreso");
+			$("ul").find(".nav__item:eq(2)").children("a").text("Area de Práctica");
+			$("ul").find(".nav__item:eq(3)").children("a").text("Cerrar sesión");
+			$(".topic-list").find(".welcome").children("h1").text("Bienvenidos a MathSpring");
+			$(".topic-list").find(".welcome").children("p").text("¡Ve a Mi Progreso para ver todas las lecciones, o al Area de Práctica para comenzar!")
+		}
+		
+	}
+	
+	function langPrefrenceForPracticePage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(0)").text("Ayuda");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(1)").text("Repetir Ayuda");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(2)").text("Leer en Voz Alta");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(3)").text("Ejemplo");
+			
+			$(".huytran-practice__menu").find(".huytran-sitenav__buttontitle").text("Próximo Problema");
+			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(0)").text("Mi Jardín");
+			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(1)").text("Mi Progreso");
+			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(2)").text("Area de Práctica");
+			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(3)").text("Cerrar sesión");
+		
+		}
+	}
+	
+	function langPrefrenceForProgressPage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			
+			$("nav").find(".nav-item:eq(0)").children("a").text("Mi Jardín");
+			$("nav").find(".nav-item:eq(1)").children("a").text("Mi Progreso");
+			$("nav").find(".nav-item:eq(2)").children("a").text("Area de Práctica");
+			$("nav").find(".nav-item:eq(3)").children("a").text("Cerrar sesión");
+		
+			$(".progress-table").find(".progress-table-header").find("th:eq(0)").text("Lección");
+			$(".progress-table").find(".progress-table-header").find("th:eq(1)").text("Comentarios**");
+			$(".progress-table").find(".progress-table-header").find("th:eq(2)").text("Rendimiento");
+			$(".progress-table").find(".progress-table-header").find("th:eq(3)").text("Esfuerzo");
+			$(".progress-table").find(".progress-table-header").find("th:eq(4)").text("Acción");
+			
+			$(".progress-table").find(".col-md-2").children("p").text("Nivel de Conocimiento Alcanzado");
+			$(".progress-table").find(".col-md-2").find(".mathspring-important-btn").text("Más detalles");
+			$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
+		
+		}
+	}

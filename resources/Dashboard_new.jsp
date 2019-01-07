@@ -16,6 +16,7 @@
     <script src="js/jchart_new.js"></script>
     <script src="js/huy-slider.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
+    <script src="js/bootstrap/js/language_es.js"></script>
     <script>
     
     function loadFlashContent () {
@@ -108,6 +109,7 @@
             $('#volume_control').on('click', toggleVolumeControl);
             $(document).mouseup(closeVolumeControl);
             $('.play-button span').on('click', playBackground);
+            langPrefrenceForDashBoardPage();
         });
 
     </script>
@@ -147,7 +149,7 @@
         <li class="nav__item">
             <a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
                 Log Out &nbsp;
-                <span class="fa fa-sign-out"></span>
+            <span class="fa fa-sign-out"></span>
             </a>
         </li>
         <li class="nav__item" id="volume_control">
