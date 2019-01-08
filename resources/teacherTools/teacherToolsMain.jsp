@@ -47,6 +47,7 @@
             src="<c:url value="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js" />"></script>
+      <script type="text/javascript" src="<c:url value="/js/bootstrap/js/language_es.js" />"></script>        
     <script type="text/javascript">
         var servletContextPath = "${pageContext.request.contextPath}";
         $(document).ready(function () {
@@ -54,6 +55,7 @@
             $("#report-wrapper").show();
             $("#form-wrapper").hide();
             handleclickHandlers();
+            langPrefrenceForTTMainPage();
         });
       
         function handleclickHandlers() {
@@ -163,11 +165,11 @@
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                        <a id= "profile_selector" href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
                     </li>
                     <li class="divider"></li>
                     <li>
-                        <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
+                        <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                                 class="fa fa-fw fa-power-off"></i>Log Out</a>
                     </li>
                 </ul>
@@ -184,7 +186,7 @@
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> Create a New Class</a>
             </li>
             <li>
-                <a href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i>Create Surveys and Math Problems</a>
+                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i>Create Surveys and Math Problems</a>
             </li>
         </ul>
         <!-- /#sidebar-end -->
@@ -272,7 +274,7 @@
                             </div>
                              <div class="panel-body">
                                <div class="form-group">
-                                    <label for="classGrade">Class Grade</label>
+                                    <label for="classLanguage">Class Language</label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-education"></i></span>

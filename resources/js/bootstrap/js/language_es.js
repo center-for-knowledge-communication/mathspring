@@ -157,3 +157,45 @@ function langPrefrenceForLoginPage(){
 		
 		}
 	}
+	
+	function langPrefrenceForTTMainPage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			
+			$("#PageRefresh").html('<i class="fa fa-fw fa-home"></i> Inicio</a>');
+			$("#createClass_handler").html('<i class="fa fa-fw fa-pencil"></i> Crear una lección nueva');
+			$("#survey_problems_site").html('<i class="fa fa-fw fa-pencil"></i> Crear encuestas, pruebas o problemas de matemáticas');
+			$("#report-wrapper").find(".page-header").children("small").text("Clases existentes");
+			$("#report-wrapper").find(".panel-footer").find(".pull-left").text("Ver detalles");
+			$("#profile_selector").html('<i class="fa fa-fw fa-user"></i> Perfil');
+			$("#logout_selector").html('<i class="fa fa-fw fa-power-off"></i>Cerrar Sesión');
+			
+			
+			$("#form-wrapper").find(".page-header").children("small").text("Organización de clase");
+			$("#create_class_out").find(".panel-heading").text("Paso uno : Configuración de la clase");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(0)").children("label").text("Idioma de la clase");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(1)").children("label").text("Nombre de la clase");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(2)").children("label").text("Localidad y Pais");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(3)").children("label").text("Escuela");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(4)").children("label").text("Año");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(5)").children("label").text("Sección");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(6)").children("label").text("Grado de la clase");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(7)").children("label").text("Mínima Complejidad de problemas");
+			$("#create_class_out").find(".panel-body").find(".form-group:eq(8)").children("label").text("Máxima Complejidad de problemas");
+			
+			$("#add_students_out_panel_default").find(".panel-heading").text("Paso dos : Listado de alumnos (Opcional)");
+			$("#add_students_out_panel_default").find(".panel-body:eq(0)").children("label").text("Los siguientes campos son opcionales. Si quieres crear nombres de usuarios para los alumnos ahora mismo, asegurate de dar un prefijo único para los nombres de usuario, una contraseña y el número de usuarios que quieres crear.");
+			$("#add_students_out_panel_default").find(".panel-body:eq(1)").find(".form-group:eq(0)").children("label").text("Prefijo de nombre de usuario");
+			$("#add_students_out_panel_default").find(".panel-body:eq(1)").find(".form-group:eq(1)").children("label").text("Contraseña");
+			$("#add_students_out_panel_default").find(".panel-body:eq(1)").find(".form-group:eq(2)").children("label").text("# de identificaciónes para crear");
+			
+			
+		}
+		}
+	
