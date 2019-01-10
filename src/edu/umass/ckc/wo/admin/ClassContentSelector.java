@@ -233,7 +233,8 @@ public class ClassContentSelector {
             if (hasStandardWithinBounds(p.getStandards().iterator(),grade,lowDiff,highDiff))
                 continue;
             else
-                deactivatedIds.add(p.getId());
+            	if(!deactivatedIds.contains(p.getId()))
+            		deactivatedIds.add(p.getId());
         }
         probMgr.setClassTopicOmittedProblems(conn, classId, t.getId(), deactivatedIds);
         return Math.abs(probs.size() - deactivatedIds.size());
