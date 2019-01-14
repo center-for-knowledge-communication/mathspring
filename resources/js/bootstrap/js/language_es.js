@@ -199,3 +199,80 @@ function langPrefrenceForLoginPage(){
 		}
 		}
 	
+	
+	function langPrefrenceForDetailsPage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			
+			//Manage Problemsets
+			$("#problem_set_content").find("h3:eq(0)").children("small").text("Grupos de problemas activos");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(0)").text("La siguiente tabla muestra grupos de problemas activos para esta clase. Fijate qué grupos de problemas quieres desactivar y hacer clic en el botón de abajo, que dice 'Desactivar'.");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(1)").text("PD: Los Grupos de problemas que verán los alumnos seguirán el orden indicado debajo. Este orden se puede reorganizar arrastrando las fillas que indican cada ''Grupo de Problemas' hacia arriba o abajo.");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(2)").children("button").text("Desactivar");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(0)").children("span").html("Orden&nbsp;&nbsp;");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(1)").text("Grupo de problemas");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(2)").children("span").html("# de Problemas Activados&nbsp;&nbsp;");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(3)").text("Distribución por Grado");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(4)").text("Desactivar");
+			
+			$("#problem_set_content").find("h3:eq(1)").children("small").text("Grupos de problemas activos");
+			$("#problem_set_content").find(".panel-default:eq(1)").find(".panel-body:eq(0)").text("Las siguientes tablas muestran grupos de problemas inactivos para esta clase.");
+			$("#problem_set_content").find(".panel-default:eq(1)").find(".panel-body:eq(1)").children("button").text("Activar");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(0)").text("Orden");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(1)").text("Grupo de problemas");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(2)").text("Problemas disponibles");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(3)").text("Distribución por grado");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(4)").text("Activar Grupos de Problemas");
+			
+			//Manage Students
+			$("#student_roster_out").find(".page-header").children("small").text("Reconfigurar información de alumno");
+			$("#student_roster_out").find(".panel-default").find(".panel-body:eq(0)").text("La siguiente tabla muestra nombres de usuario para los alumnos de esta clase. Se pueden crear más nombres de usuario haciendo clic en el botón debajo.");
+			
+			$("#student_roster_out").find(".panel-default").find(".panel-body:eq(1)").children("button").text("Crear nombre de usuario para alumno");
+			$("#student_roster_out").find(".panel-default").find(".panel-body:eq(1)").children("a").text("Descargar etiquetas con nombres de usuario, para cada alumno");
+			
+			$("#student_roster").children("thead").find("tr:eq(0)").find("th:eq(0)").text("Identificacíón de alumno");
+			$("#student_roster").children("thead").find("tr:eq(0)").find("th:eq(1)").text("Nombre");
+			$("#student_roster").children("thead").find("tr:eq(0)").find("th:eq(2)").text("Apellido");
+			$("#student_roster").children("thead").find("tr:eq(0)").find("th:eq(3)").text("Nombre de usuario");
+			$("#student_roster").children("thead").find("tr:eq(0)").find("th:eq(4)").text("Datos del alumno");
+			$("#student_roster").children("thead").find("tr:eq(1)").find("th:eq(0)").text("Eliminar registros  de problemas de matematics para este alumno");
+			$("#student_roster").children("thead").find("tr:eq(1)").find("th:eq(1)").text("Eliminar el nombre de usuario y todos sus datos/registros");
+			$("#student_roster").children("thead").find("tr:eq(1)").find("th:eq(2)").text("Cambiar contraseña");
+			
+			
+		//Replicate Classes
+			$("#clone_class_out").find(".page-header").children("small").text("Duplicar esta Clase");
+			$("#clone_class_out").find(".form-group:eq(0)").find("#className").attr("placeholder","Nombre de la clase");
+			$("#clone_class_out").find(".form-group:eq(1)").find("#gradeSection").attr("placeholder","Sección");
+			$("#clone_class_out").find(".form-group:eq(2)").children("button").text("Clonar esta clase");
+			$("#clone_class_out").find("label").find("span:eq(0)").html("Estás por duplicar clase&nbsp;&nbsp;");
+			$("#clone_class_out").find("label").find("span:eq(2)").html("y sección&nbsp;&nbsp;");
+			$("#clone_class_out").find("label").find("span:eq(4)").html("Debes dar un nombre y sección diferente a esta nueva clase");
+			
+			
+			//Survey Settings
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(0)").find(".panel-body:eq(0)").find(".page-header").children("small").text("Encender/Apagar el cuestionario");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(0)").find(".panel-body:eq(1)").find(".form-check-label").text("Cuestionario anterior: Los alumnos verán este cuestionario solo la primera vez que el alumno use MathSpring.");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(0)").find(".panel-body:eq(2)").find(".form-check-label").text("Los alumnos verán este cuestionario cada vez que inician una sesion, hasta que lo completen");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(0)").find(".panel-body:eq(3)").children("button").text("Enviar");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(0)").children("h1").children("small").text("Cuestionarios/Pruebas disponibles");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(1)").find("#activeSurveyList").children("thead").find("tr").find("th:eq(0)").text("Identificación del Cuestionario");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(1)").find("#activeSurveyList").children("thead").find("tr").find("th:eq(1)").text("Lista de cuestionarios/pruebas");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(1)").find("#activeSurveyList").children("thead").find("tr").find("th:eq(2)").text("Primera vez que el alumno inicia una sesión");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(1)").find("#activeSurveyList").children("thead").find("tr").find("th:eq(3)").text("Siguiente vez que el alumno inicia una sesión");
+			
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(2)").children("ul").find("li:eq(0)").text("* Nota: Esto cuestionario se mostrará solamente una vez, la primera vez que el alumno inicia sesión en MathSpring");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(2)").children("ul").find("li:eq(1)").text("** Nota: Si hay un cuestionario elejido para la 'siguiente vez alumno inicia sesión', alumnos lo verán cada vez que incian sesión. Debes encender esto solamente cuando estás seguro que quieres recibir esto nuevo cuestionario/prubea");
+			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(3)").children("button").text("Publicar Configuración del cuestionario");
+			
+		}
+		}
+	
+	

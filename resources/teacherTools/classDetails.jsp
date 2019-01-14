@@ -52,6 +52,7 @@
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/ttReportScripts.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/bootstrap/js/language_es.js" />"></script>    
     <script type="text/javascript">
         var servletContextPath = "${pageContext.request.contextPath}";
         var pgContext = '${pageContext.request.contextPath}';
@@ -100,7 +101,7 @@
                     selector: 'td:first-child'
                 },
             });
-
+			langPrefrenceForDetailsPage();
         });
 
     </script>
@@ -258,9 +259,9 @@
                     <table id="activateProbSetTable" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
                         <thead>
                         <tr>
-                            <th rowspan="2" align="center">Order&nbsp;&nbsp;<a rel="popoverOrder"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2" align="center"><span>Order&nbsp;&nbsp;</span><a rel="popoverOrder"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2">Problem Set</th>
-                            <th rowspan="2"># of Activated Problems&nbsp;&nbsp;<a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><span># of Activated Problems&nbsp;&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2">Problem Id</th>
                             <th style="text-align: center;" colspan="<c:out value="${activeproblemSetHeaders.size()}"/>">Gradewise Distribution</th>
                             <th rowspan="2">Deactivate Problem set</th>
@@ -399,9 +400,9 @@
                     </div>
 
                     <span class="input-group label label-warning">P.S</span>
-                    <label>You are about to clone class <c:out value="${classInfo.name}"/> and section <c:out
-                            value="${classInfo.section}"/>. You must give the new class a different name and
-                        section</label>
+                    <label><span>You are about to clone class</span><span><c:out value="${classInfo.name}"/></span><span>and section</span><span><c:out
+                            value="${classInfo.section}"/>.</span><span>You must give the new class a different name and
+                        section</span></label>
 
 
                 </springForm:form>
