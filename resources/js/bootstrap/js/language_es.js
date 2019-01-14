@@ -199,3 +199,37 @@ function langPrefrenceForLoginPage(){
 		}
 		}
 	
+	
+	function langPrefrenceForDetailsPage(){
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+		if (languageSet == 'es') {
+			
+			$("#problem_set_content").find("h3:eq(0)").children("small").text("Grupos de problemas activos");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(0)").text("La siguiente tabla muestra grupos de problemas activos para esta clase. Fijate qué grupos de problemas quieres desactivar y hacer clic en el botón de abajo, que dice 'Desactivar'.");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(1)").text("PD: Los Grupos de problemas que verán los alumnos seguirán el orden indicado debajo. Este orden se puede reorganizar arrastrando las fillas que indican cada ''Grupo de Problemas' hacia arriba o abajo.");
+			$("#problem_set_content").find(".panel-default:eq(0)").find(".panel-body:eq(2)").children("button").text("Desactivar");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(0)").children("span").html("Orden&nbsp;&nbsp;");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(1)").text("Grupo de problemas");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(2)").children("span").html("# de Problemas Activados&nbsp;&nbsp;");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(3)").text("Distribución por Grado");
+			$("#activateProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(4)").text("Desactivar");
+			
+			$("#problem_set_content").find("h3:eq(1)").children("small").text("Grupos de problemas activos");
+			$("#problem_set_content").find(".panel-default:eq(1)").find(".panel-body:eq(0)").text("Las siguientes tablas muestran grupos de problemas inactivos para esta clase.");
+			$("#problem_set_content").find(".panel-default:eq(1)").find(".panel-body:eq(1)").children("button").text("Activar");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(0)").text("Orden");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(1)").text("Grupo de problemas");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(2)").text("Problemas disponibles");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(3)").text("Distribución por grado");
+			$("#inActiveProbSetTable").children("thead").find("tr:eq(0)").find("th:eq(4)").text("Activar Grupos de Problemas");
+			
+		}
+		}
+	
+	

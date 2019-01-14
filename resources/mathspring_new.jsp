@@ -379,7 +379,7 @@
                                 height="600"
                                 src="${learningCompanionMovie}"
                                 onload="lcLoaded(this)"
-                                scrolling="no">
+                                scrolling="no" allow="autoplay">
                         </iframe>
                     </div>
                 </div>
