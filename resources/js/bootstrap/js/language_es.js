@@ -199,7 +199,6 @@ function langPrefrenceForLoginPage(){
 		}
 		}
 	
-	
 	function langPrefrenceForDetailsPage(){
 		var languagePreference = window.navigator.language;
 		var languageSet = "en";
