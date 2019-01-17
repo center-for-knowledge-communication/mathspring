@@ -629,6 +629,10 @@ public class Problem implements Activity {
     public int getAudioFileId() {
         return audioFileId;
     }
+    
+    public void updateHintListForDemoProblems(Hint answerHint) {
+    	this.allHints.add(answerHint);
+    }
 
     public String getPreviewerURL () {
         if (this.isFlash())

@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.tutor.intervSel2;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.db.DbHint;
 import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.event.tutorhut.InputResponseNextProblemInterventionEvent;
 import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
@@ -110,6 +111,7 @@ public class DemoProblemIS extends NextProblemInterventionSelector {
                 if (problem == null)
                     return null;
                 //  gets the solution to the problem from the hint selector and adds into the problem
+                DbHint.updateHintsForDemoProblems(conn, problem);
                 new TutorModelUtils().setupDemoProblem(problem,smgr,topicModel.getHintSelector());
                 return problem;
             }
@@ -124,6 +126,7 @@ public class DemoProblemIS extends NextProblemInterventionSelector {
 
                 if (problem == null) return null;
                 //  gets the solution to the problem from the hint selector and adds into the problem
+                DbHint.updateHintsForDemoProblems(conn, problem);
                 new TutorModelUtils().setupDemoProblem(problem,smgr,topicModel.getHintSelector());
                 return problem;
             }

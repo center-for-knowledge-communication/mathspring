@@ -135,8 +135,7 @@ public class ProblemMgr {
           return probStatsEntries;
     }
     
-    
-	private static Map<Integer, List<Double>> updateProblemStats(Connection conn,
+   	private static Map<Integer, List<Double>> updateProblemStats(Connection conn,
 			Map<Integer, List<Double>> probStatsEntries) throws SQLException {
 		List<Double> totalAvgHints = new ArrayList<>();
 		List<Double> totalAvgIncorrect = new ArrayList<>();

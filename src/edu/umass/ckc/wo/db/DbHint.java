@@ -1,6 +1,7 @@
 package edu.umass.ckc.wo.db;
 
 import edu.umass.ckc.wo.content.Hint;
+import edu.umass.ckc.wo.content.Problem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -133,5 +134,38 @@ public class DbHint extends BaseMgr {
         }
     }
 
+	public static void updateHintsForDemoProblems(Connection conn, Problem currProbLem) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			String q = "select h.id, h.name, h.givesAnswer, h.statementHTML, h.audioResource, h.hoverText, h.order, h.is_root, h.imageURL, h.placement from Hint h "
+					+ "where givesAnswer = 1 and h.problemid= ? and h.order is not null order by h.order";
+			ps = conn.prepareStatement(q);
+			ps.setInt(1, currProbLem.getId());
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				int id = rs.getInt("h.id");
+				String name = rs.getString("h.name");
+				boolean givesAnswer = rs.getBoolean("h.givesAnswer");
+				String audio = rs.getString("h.audioResource");
+				String hoverText = rs.getString("h.hoverText");
+				String stmtHTML = rs.getString("h.statementHTML");
+				int order = rs.getInt("h.order");
+				boolean isroot = rs.getBoolean("h.is_root");
+				String imageURL = rs.getString("h.imageURL"); // DM 1/23/18 added
+				int placement = rs.getInt("h.placement"); // DM 1/23/18 DB sets default of 2 on column
+				Hint h = new Hint(id, name, currProbLem.getId(), givesAnswer, stmtHTML, audio, hoverText, order,
+						placement, imageURL);
+				h.setIs_root(isroot);
+				currProbLem.updateHintListForDemoProblems(h);
+			}
+
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (ps != null)
+				ps.close();
+		}
+	}
 
 }
