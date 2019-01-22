@@ -706,6 +706,41 @@ function handleclickHandlers() {
 
 }
 
+function changeReportThreeHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Nombre del  alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Numero de problemas intentados','effchart': 'Gráfica de esfuerzo','emochart': 'Gráfica de emociones'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','effchart': 'Effort Chart','emochart': 'Emotion Chart'};
+	 	return header;
+	}
+}
+
+
+function changeReportFourHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'cclusters': 'Grupos en clase','problems': '# de problemas intentados de esto tipo','fattempt':  '% resolvidos en el primero intento','avgratio': 'Proporción promedio de pista solicitada'};
+	 	return header;
+	}else{
+	 	var header = {'cclusters': 'Clusters in Class','problems': '# of problems of this kind encountered','fattempt':  '% solved in the first attempt','avgratio': '% solved in the first attempt'};
+	 	return header;
+	}
+}
+
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
     $('#reorg_prob_sets_handler').css('background-color','#e6296f');
@@ -782,15 +817,15 @@ function registerAllEvents(){
         rowReorder: false
 
     } );
-
+    var cc_headers = changeReportFourHeaderAccordingToLanguage();
     perClusterReportTable = $('#perClusterReport').DataTable({
         data: [],
         destroy: true,
         columns: [
-            { title: "Cluster Name", data : "clusterName" },
-            { title: "# of problems of this kind encountered", data : "noOfProblemsInCluster" },
-            { title: "% solved in the first attempt", data : "noOfProblemsonFirstAttempt" },
-            { title: "Avg ratio of hint requested", data : "totalHintsViewedPerCluster" }
+            { title: cc_headers['cclusters'], data : "clusterName" },
+            { title: cc_headers['problems'], data : "noOfProblemsInCluster" },
+            { title: cc_headers['fattempt'], data : "noOfProblemsonFirstAttempt" },
+            { title: cc_headers['avgratio'], data : "totalHintsViewedPerCluster" }
         ],
         "bPaginate": false,
         "bFilter": false,
@@ -798,17 +833,18 @@ function registerAllEvents(){
         rowReorder: false
 
     } );
-
+    var headers = changeReportThreeHeaderAccordingToLanguage();
+    
     perStudentReport  =  $('#perStudentReport').DataTable({
         data: [],
         destroy: true,
         columns: [
-            { title: "Student ID" },
-            { title: "Student Name" },
-            { title: "Username" },
-            { title: "No of problems attempted" },
-            { title: "Effort Chart" },
-            { title: "Emotion Chart" },
+            { title: headers['sid'] },
+            { title: headers['sname']  },
+            { title: headers['uname']  },
+            { title: headers['problems']  },
+            { title: headers['effchart']  },
+            { title: headers['emochart']  },
         ],
         "bPaginate": false,
         "bFilter": false,
@@ -851,7 +887,7 @@ function registerAllEvents(){
                     var effortChartId = "effortChart"+row[0];
                     var containerChart = "containerChart"+row[0];
                     var legendChart = "legendChart"+row[0];
-                    var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>Effort Chart</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                    var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                     return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                 }
             }, {
@@ -1969,8 +2005,9 @@ var completeDataChart;
             success : function(data) {
                 $('#collapseFourLoader').hide();
                 var jsonData = $.parseJSON(data);
+                var cc_headers = changeReportFourHeaderAccordingToLanguage();
                 var columNvalues = [
-                    { "title": "Cluster's in Class", "name" : "clusterNames" , "targets" : [0],"render": function ( data, type, full, meta ) {
+                    { "title": cc_headers['cclusters'], "name" : "clusterNames" , "targets" : [0],"render": function ( data, type, full, meta ) {
                         var clusterCCName = full['clusterCCName'];
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
@@ -1980,7 +2017,7 @@ var completeDataChart;
                             $(td).addClass('span-warning-layer-one');
                         }
                     }},
-                    { "title": "# of problems of this kind encountered", "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                    { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
@@ -1989,14 +2026,14 @@ var completeDataChart;
                             $(td).addClass('span-warning-layer-one');
                         }
                     }},
-                    { "title": "% solved in the first attempt", "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
+                    { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
                             $(td).addClass('span-danger-layer-one');
                         } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5) {
                             $(td).addClass('span-warning-layer-one');
                         }
                     } },
-                    { "title": "Avg ratio of hint requested", "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
+                    { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
                             $(td).addClass('span-danger-layer-one');
                         } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5) {
@@ -2029,7 +2066,6 @@ var completeDataChart;
                     perClusterReportTable.destroy();
                     $('#perClusterReport').empty();
                 }
-
                 perClusterReportTable = $('#perClusterReport').DataTable({
                     data: dataPerCluster,
                     destroy: true,

@@ -271,6 +271,44 @@ function langPrefrenceForLoginPage(){
 			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(2)").children("ul").find("li:eq(1)").text("** Nota: Si hay un cuestionario elejido para la 'siguiente vez alumno inicia sesión', alumnos lo verán cada vez que incian sesión. Debes encender esto solamente cuando estás seguro que quieres recibir esto nuevo cuestionario/prubea");
 			$("#reset_survey_setting_out").find(".container-fluid").find(".panel-default:eq(1)").find(".panel-body:eq(3)").children("button").text("Publicar Configuración del cuestionario");
 			
+			//Class Reports
+			$("#report_three").text("Resumen de la Clase por Alumno");
+			$("#collapseThree").find(".panel-body:eq(0)").find("label:eq(0)").text("Descargar datos de alumno, muchas filas por alumno");
+			$("#collapseThree").find(".panel-body:eq(0)").find("label:eq(1)").text("Descargar datos de emoción, muchas filas por alumno");
+			
+			
+			$("#report_four").text("Resumen de clase por Unidad Curricular");
+			$("#perClusterLegendTable").children("thead").find("tr").find("th:eq(0)").text("Rango de %");
+			$("#perClusterLegendTable").children("thead").find("tr").find("th:eq(1)").text("Significado");
+			
+			$("#perClusterLegendTable").children("tbody").find("tr:eq(0)").find("td:eq(0)").text("Para más que 5 problemas, solo 20%-40% para  esta norma se resolvieron en el primer intento");
+			$("#perClusterLegendTable").children("tbody").find("tr:eq(0)").find("td:eq(1)").text("Temas que fueron dificiles para tus alumnos");
+			$("#perClusterLegendTable").children("tbody").find("tr:eq(1)").find("td:eq(0)").text("Para más que 5 problemas, menos que 20% de problemas se resolvieron en el primer intento");
+			$("#perClusterLegendTable").children("tbody").find("tr:eq(1)").find("td:eq(1)").text("Grupos que alumnos hallaron muy difíciles");
+			
+			
+			$("#report_one").text("Resumen de clase por alumno, por cada grupo de problemas");
+			$("#collapseOne").find(".panel-body:eq(0)").find("label").text("Esta tabla muestra el desempeño de los alumnos de esta clase, en cada grupo de problemas");
+			$("#perTopicReportLegendTable").children("thead").find("tr").find("th:eq(0)").text("Rango de Estimación del Nivel Alcanzado por el Alumno");
+			$("#perTopicReportLegendTable").children("thead").find("tr").find("th:eq(1)").text("Nota y clave de color para 2 o más problemas");
+			$("#perTopicReportLegendTable").children("thead").find("tr").find("th:eq(2)").text("Nota y clave de color para 10 o más problemas");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(0)").find("td:eq(0)").text("0.75 o más");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(0)").find("td:eq(1)").text("Nota:  E (Excelente)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(0)").find("td:eq(2)").text("Nota:  E (Excelente)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(1)").find("td:eq(0)").text("Entre 0.5 y 0.75");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(1)").find("td:eq(1)").text("Nota: B (Bueno o Muy Bueno)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(1)").find("td:eq(2)").text("Nota: B (Bueno o Muy Bueno)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(2)").find("td:eq(0)").text("Entre 0.25 y 0.5");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(2)").find("td:eq(1)").text("Nota: S (Satisfactorio, pero Necesita Mejorar)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(2)").find("td:eq(2)").text("Nota: S (Satisfactorio, pero Necesita Mejorar)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(3)").find("td:eq(0)").text("0.25 o menos");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(3)").find("td:eq(1)").text("Nota: NS (No Satisfactorio)");
+			$("#perTopicReportLegendTable").children("tbody").find("tr:eq(3)").find("td:eq(2)").text("Nota: NS (No Satisfactorio)");
+			
+			$("#collapseOne").find(".panel-body:eq(2)").find("li:eq(0)").text("Cada celda muestra [# problemas resueltos en el primer intento / total de problemas resueltos] junto con el nivel más alto de Maestría alcanzado para eso grupo de problemas");
+			$("#collapseOne").find(".panel-body:eq(2)").find("li:eq(1)").text("Sólo cuando el alumno ha intentado 2 o más problemas, la ceda está codificada con color");
+			$("#collapseOne").find(".panel-body:eq(2)").find("li:eq(2)").text("Haz clic en la celda para ver la trayectoria de Nivel Alcanzado por el alumno, para cada grupo de problemas");
+			
 		}
 		}
 	
