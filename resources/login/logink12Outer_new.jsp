@@ -42,7 +42,7 @@
 <div class="additional-form">
     <div class="additional-form__wrapper">
         <h1 class="additional-form__header">Thank you for using MathSpring</h1>
-        <p class="additional-form__paragraph">Please answer some questions so the software can be more personable in helping you.</p>
+        <p class="additional-form__paragraph">Please answer some questions / follow instructions given below so the software can be more personable in helping you.</p>
         <hr>
         <jsp:include page="${innerjsp}" />
     </div>

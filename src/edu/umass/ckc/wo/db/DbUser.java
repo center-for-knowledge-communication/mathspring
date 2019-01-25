@@ -697,16 +697,23 @@ public class DbUser {
 
     private static int deletePracticeHutEvents(Connection conn, int studId) throws SQLException {
         PreparedStatement stmt = null;
+        PreparedStatement stmt2 = null;
         try {
             // gets all activities that have to do with the practicehut (about the only one that doesn't is 'navigate'
             String actions = getHutActivityNames(RequestActions.TUTOR_HUT_ACTIVITIES);
             String q = "delete from eventlog where studid=? and action in " + actions;
+            String q2 = "delete from studentproblemhistory where studid=?";
             stmt = conn.prepareStatement(q);
+            stmt2 = conn.prepareStatement(q2);
             stmt.setInt(1, studId);
+            stmt2.setInt(1, studId);
+            stmt2.executeUpdate();
             return stmt.executeUpdate();
         } finally {
             if (stmt != null)
                 stmt.close();
+            if (stmt2 != null)
+                stmt2.close();
         }
     }
 
