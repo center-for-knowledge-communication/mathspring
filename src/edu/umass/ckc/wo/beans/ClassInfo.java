@@ -29,6 +29,7 @@ public class ClassInfo {
     private boolean showPostSurvey;
     private boolean showPreSurvey;
     private String classLanguageCode;
+    private boolean isDefaultClass;
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
@@ -245,5 +246,14 @@ public class ClassInfo {
 	public void setClassLanguageCode(String classLanguageCode) {
 		this.classLanguageCode = classLanguageCode;
 	}
+
+	public boolean isDefaultClass() {
+		return isDefaultClass;
+	}
+
+	public void setDefaultClass(boolean isDefaultClass) {
+		this.isDefaultClass = isDefaultClass;
+	}
+	
     
 }

@@ -200,7 +200,7 @@
                         <h1 class="page-header">
                             <c:choose>
                                 <c:when test="${noClass == false}">
-                                    <small>Existing Classes</small>
+                                    <small>Existing Classes (New)</small>
                                 </c:when>
                                 <c:otherwise>
                                     <small>You do not have any pre-existing class.</small>
@@ -213,8 +213,7 @@
                 <!-- /.row -->
                 <c:if test="${noClass == false}">
                 <c:set var="colorpicker" value="${['panel-green','panel-red','panel-primary','panel-yellow']}"/>
-                <c:set var="thumbNailPicker"
-                       value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
+                <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
                 <c:forEach var="c" items="${classbean.classes}" varStatus="loop">
                 <c:set var="randomColorIndex" value="${random.nextInt(fn:length(colorpicker))}"/>
                 <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
@@ -257,6 +256,57 @@
             </c:forEach>
             </c:if>
         </div>
+         <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                           <small>Existing Classes (Archived)</small>
+                        </h1>
+                    </div>
+         </div>
+          <c:if test="${noClass == false}">
+                <c:set var="colorpicker" value="${['panel-green','panel-red','panel-primary','panel-yellow']}"/>
+                <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
+                <c:forEach var="c" items="${classbeanArchived.classes}" varStatus="loop">
+                <c:set var="randomColorIndex" value="${random.nextInt(fn:length(colorpicker))}"/>
+                <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
+                <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
+                <c:set var="terminator" value="${loop.index + 3}"/>
+                <div class="row">
+                    </c:if>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel ${colorpicker[randomColorIndex]}">
+                            <div class="panel-heading">
+
+                                <div class="row">
+
+                                    <div class="col-xs-3">
+                                        <i class="fa ${thumbNailPicker[randomChartIndex]}
+										fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div class="huge">${c.name}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <c:if test="${loop.index == terminator}">
+                    <!-- t div-->
+                </div>
+                </c:if>
+                <c:if test="${loop.last == 'true'}">
+                <!-- s div-->
+            </div>
+            </c:if>
+            </c:forEach>
+            </c:if>
         <div id="form-wrapper" style="display: none;">
             <div class="col-lg-12">
                 <h1 class="page-header">

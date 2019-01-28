@@ -33,7 +33,8 @@
         var startElapsedTime=0;
         var useHybridTutor=${useHybridTutor};
         var selectedCard = null;
-
+        var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
+        
         var globals = {
             mouseSaveInterval: ${mouseSaveInterval},
             mouseHistory: [],
@@ -156,7 +157,7 @@
                     if (!isFormality) {
                         $("#js-problem-view").text(effortFeedback);
                         $("#js-problem-view").append("<img id='problemImage' />");
-                        document.getElementById("problemImage").src ="data:image/jpg;base64,"+problemList[index-1][7];
+                        document.getElementById("problemImage").src = problem_imageURL+[index-1][0]+".jpg";
                         console.log("CCSS: " + problemList[index-1][6]);
                     } else {
                         $("#js-problem-view").text(currentProblem);

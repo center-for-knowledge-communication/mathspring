@@ -103,6 +103,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         try {
             DbClass.setSimpleConfig(connection.getConnection(), classId, createForm.getSimpleLC(), createForm.getSimpleCollab(), createForm.getProbRate(), createForm.getLowEndDiff(), createForm.getHighEndDiff());
             ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
+            info.setDefaultClass(true);
             new ClassContentSelector(connection.getConnection()).selectContent(info);
             return info;
         } catch (SQLException e) {

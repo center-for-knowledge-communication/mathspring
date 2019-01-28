@@ -48,17 +48,17 @@ public class ClassContentSelector {
         // set the class pedagogies based on collab and learning companions selections in the event
         setClassPedagogies(ci.getClassid(), ci.getSimpleLC(), ci.getSimpleCollab());
         // set the problem selectors difficulty rate based on the event
-        setProblemDiffRate(ci.getClassid(), ci.getSimpleDiffRate());
+        setProblemDiffRate(ci.getClassid(), ci.getSimpleDiffRate(),ci.isDefaultClass());
     }
 
-    private void setProblemDiffRate(int classid, String simpleDiffRate) throws SQLException {
+    private void setProblemDiffRate(int classid, String simpleDiffRate, boolean isDeafultClass) throws SQLException {
         // if simpleDiffRate is normal, set rate to 2 (which moves 1/2 the distance in the direction of right/wrong),
         //  mastery threshold to 0.85, and content failure to 4.
         // if simpleDiffRate is aggressive set rate to 1.5, mastery thresh to 0.85, and content failure to 3
         // if simpleDiffRate is gentle set rate to 3, mastery thresh to 0.9, content failure to 5
         double r = 2.0;
-        double m = 0.85;
-        int cf = 4;
+        double m = 0.95;
+        int cf = 5;
         if (simpleDiffRate.equals("gentle"))  {
             r = 3.0;
             m = 0.9;
@@ -68,7 +68,7 @@ public class ClassContentSelector {
             r = 1.5;
             cf = 3;
         }
-        DbClass.setClassConfigDiffRate(conn, classid, r, m, cf);
+        DbClass.setClassConfigDiffRate(conn, classid, r, m, cf, isDeafultClass);
     }
 
     private Pedagogy getPedagogyByName (String name) {

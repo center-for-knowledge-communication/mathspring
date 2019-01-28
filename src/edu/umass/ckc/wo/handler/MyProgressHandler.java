@@ -81,7 +81,6 @@ public class MyProgressHandler {
 
            String  backToVillageURL= Settings.flashClientPath + smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
 
-
             String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
             request.setAttribute("clientPath", flashClientPath);
             request.setAttribute("learningCompanion", learningCompanion);
@@ -105,7 +104,7 @@ public class MyProgressHandler {
 
             request.setAttribute("td", td);
             request.setAttribute("problemDetailsList", problemDetailsList);
-
+            request.setAttribute("webContentpath", Settings.webContentPath);
             request.setAttribute("useHybridTutor", Settings.useHybridTutor);
             request.setAttribute("studentFirstName", smgr.getStudentModel().getStudentFirstName());
             request.setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());

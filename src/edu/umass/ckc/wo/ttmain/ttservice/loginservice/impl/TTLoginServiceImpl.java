@@ -1,5 +1,18 @@
 package edu.umass.ckc.wo.ttmain.ttservice.loginservice.impl;
 
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.ModelMap;
+
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
 import edu.umass.ckc.wo.cache.ProblemMgr;
@@ -11,20 +24,8 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
-import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
-import edu.umass.ckc.wo.ttmain.ttservice.classservice.impl.TTCreateClassAssistServiceImpl;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 import edu.umass.ckc.wo.tutor.Settings;
-import edu.umass.ckc.wo.tutor.probSel.BaseExampleSelector;
-import edu.umass.ckc.wo.tutor.vid.BaseVideoSelector;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Neeraj on 3/25/2017.
@@ -63,9 +64,13 @@ public class TTLoginServiceImpl implements TTLoginService {
                 Settings.pedagogyGroups = DbPedagogy.buildAllPedagogies(connection.getConnection(), null);
             }
             ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), teacherId);
-            List<ClassInfo> classInfoList = Arrays.asList(classes);
-            Collections.reverse(classInfoList);
-            Classes classbean = new Classes(classInfoList.toArray(new ClassInfo[classInfoList.size()]));
+            List<ClassInfo> classInfoList = new  ArrayList<>(Arrays.asList(classes));
+            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> (c.getSchoolYear() == Year.now().getValue())));
+            List<ClassInfo> classInfoListLatest = groups.get(true);
+            List<ClassInfo> classInfoListArchived = groups.get(false);
+            Collections.reverse(classInfoListLatest);
+            Classes classbean = new Classes(classInfoListLatest.toArray(new ClassInfo[classInfoListLatest.size()]));
+            Classes classbeanArchived = new Classes(classInfoListArchived.toArray(new ClassInfo[classInfoListArchived.size()]));
             String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
             model.addAttribute("teacherName", teacherName);
             model.addAttribute("teacherId", Integer.toString(teacherId));
@@ -77,6 +82,7 @@ public class TTLoginServiceImpl implements TTLoginService {
                 List<User> students = DbClass.getClassStudents(connection.getConnection(), classId);
                 model.addAttribute("students", students);
                 model.addAttribute("classbean", classbean);
+                model.addAttribute("classbeanArchived", classbeanArchived);
                 model.addAttribute("classInfo", classInfo);
                 model.addAttribute("noClass", false);
                 return "teacherTools/teacherToolsMain";
