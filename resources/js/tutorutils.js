@@ -108,6 +108,8 @@ function getGritServletURL (action) {
 function servletGetWait (action, args, callbackFn) {
     var extraArgs = "";
     for (var p in args) {
+    	if(p == 'userInput')
+			args[p] = encodeURIComponent(args[p]);
         value = args[p];
         extraArgs += "&" + p + "=" + value;
     }

@@ -100,7 +100,7 @@ public class ProblemAnswer {
 
     public boolean grade (String studentInput) {
         if (val != null)
-            return val.equalsIgnoreCase(studentInput.replaceAll("\\s+",""));
+            return val.equalsIgnoreCase(studentInput.trim());
         else return false;
     }
 }
