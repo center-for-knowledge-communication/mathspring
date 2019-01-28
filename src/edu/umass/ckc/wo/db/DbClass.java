@@ -1337,15 +1337,28 @@ public class DbClass {
     }
 
 
-    public static void setClassConfigDiffRate(Connection conn, int classId, double diffRate, double masteryThresh, int contentFailureThresh) throws SQLException {
+    public static void setClassConfigDiffRate(Connection conn, int classId, double diffRate, double masteryThresh, int contentFailureThresh, boolean defaultClass) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=? where classid=?";
+        	if(defaultClass) {
+            String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=?, maxNumberProbsToShowPerTopic=?, minNumberProbsToShowPerTopic=?, maxTimeInTopic=?, minTimeInTopic=? where classid=?";
             stmt = conn.prepareStatement(q);
             stmt.setDouble(1, diffRate);
             stmt.setDouble(2, masteryThresh);
             stmt.setInt(3, contentFailureThresh);
-            stmt.setInt(4, classId);
+            stmt.setInt(4, 40);
+            stmt.setInt(5, 2);
+            stmt.setInt(6, 1800000);
+            stmt.setInt(7, 0);
+            stmt.setInt(8, classId);
+        	}else {
+        		String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=? where classid=?";	
+        		stmt = conn.prepareStatement(q);
+                stmt.setDouble(1, diffRate);
+                stmt.setDouble(2, masteryThresh);
+                stmt.setInt(3, contentFailureThresh);
+                stmt.setInt(4, classId);
+        	}
             stmt.executeUpdate();
         } finally {
             if (stmt != null)
