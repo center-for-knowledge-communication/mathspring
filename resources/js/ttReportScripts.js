@@ -2309,7 +2309,7 @@ var completeDataChart;
                                 var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                                 var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                                 var imageURL = problem_imageURL+full['problemId']+'.jpg';
-                                return '<a style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
+                                return '<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+problemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
                             }
                         },
                         {
