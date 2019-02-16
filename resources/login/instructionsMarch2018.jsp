@@ -21,13 +21,25 @@ function requestFlashPermission() {
 }
 
  $(document).ready(function () {
-var isNewEdge = (navigator.userAgent.match(/Edge\/(\d+)/) || [])[1] > 14;
-var isNewSafari = (navigator.userAgent.match(/OS X (\d+)/) || [])[1] > 9;
-var isNewChrome = (navigator.userAgent.match(/Chrom(e|ium)\/(\d+)/) || [])[2] > 56
+	var isNewEdge = (navigator.userAgent.match(/Edge\/(\d+)/) || [])[1] > 14;
+	var isNewSafari = (navigator.userAgent.match(/OS X (\d+)/) || [])[1] > 9;
+	var isNewChrome = (navigator.userAgent.match(/Chrom(e|ium)\/(\d+)/) || [])[2] > 56
     && !/Mobile/i.test(navigator.userAgent);
-var canRequestPermission = isNewEdge || isNewSafari || isNewChrome;
+	var canRequestPermission = isNewEdge || isNewSafari || isNewChrome;
     $(window).one('click', requestFlashPermission);    
- 
+    var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		$("additional-form__header").text("Gracias por usar MathSpring");
+		$("additional-form__paragraph").text("Responda algunas preguntas / siga las instrucciones que se dan a continuación para que el software pueda ayudarlo mejor.");
+		$("form").find("p").text("MathSpring requiere flashplayer para trabajar. Por favor, haga clic en el botón Enviar(Submit) a continuación para habilitar esto en su navegador.");
+		
+	}
  });
 
 </script>

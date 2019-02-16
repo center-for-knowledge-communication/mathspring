@@ -116,16 +116,24 @@ function langPrefrenceForLoginPage(){
 			languageSet = "es"
 		}
 		if (languageSet == 'es') {
-			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(0)").text("Ayuda");
-			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(1)").text("Repetir Ayuda");
-			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(2)").text("Leer en Voz Alta");
-			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(3)").text("Ejemplo");
+			$('.huytran-sitenav__main .huytran-sitenav__button').each(function(i){
+					$( this ).css("margin", "0px");			
+			});
+			$(".huytran-sitenav__main").children().find(".huytran-sitenav__button").first().css('margin', '');
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(0)").text("Próximo Problema");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(1)").text("Ayuda");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(2)").text("Repetir Ayuda");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(3)").text("Leer en voz alta");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(4)").text("Un Ejemplo");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(5)").text("Un Video");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(6)").text("Fórmulas");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(7)").text("Reportar Error");
+			$(".huytran-sitenav__main").find(".huytran-sitenav__buttontitle:eq(8)").text("Diccionario");
 			
-			$(".huytran-practice__menu").find(".huytran-sitenav__buttontitle").text("Próximo Problema");
 			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(0)").text("Mi Jardín");
 			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(1)").text("Mi Progreso");
 			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(2)").text("Area de Práctica");
-			$(".huytran-practice__nav").find(".huytran-practice__navitem:eq(3)").text("Cerrar sesión");
+			$(".huytran-practice__navitem--last").html("Cerrar sesión &nbsp;<span class='fa fa-sign-out'></span>");
 		
 		}
 	}

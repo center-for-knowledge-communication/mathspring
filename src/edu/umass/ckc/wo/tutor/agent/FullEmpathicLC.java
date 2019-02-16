@@ -70,7 +70,7 @@ public abstract class FullEmpathicLC extends EmotionalLC {
             // only make the character react 25% of the time.
             if (java.lang.Math.random() < 0.25) {
 
-                if (sm.getLastReportedEmotion().equals(AffectStudentModel.FRUSTRATED)) {
+                if (sm.getLastReportedEmotion().equals(AffectStudentModel.FRUSTRATED) || sm.getLastReportedEmotion().equals(AffectStudentModel.FRUSTACION) ) {
                     if (isHigh(sm.getLastReportedEmotionValue())) {    //Highly frustrated
                         if (java.lang.Math.random() < 0.5) {
                             clips.add(frustratedCombo1);
@@ -90,7 +90,7 @@ public abstract class FullEmpathicLC extends EmotionalLC {
                         clips.add(emotions[INTERESTED]);
                 }
 
-                if (sm.getLastReportedEmotion().equals(AffectStudentModel.CONFIDENT)) {
+                if (sm.getLastReportedEmotion().equals(AffectStudentModel.CONFIDENT)|| sm.getLastReportedEmotion().equals(AffectStudentModel.CONFIANZA)) {
                     if (isHigh(sm.getLastReportedEmotionValue()))
                         clips.add(emotions[CONFIDENT]);
 
