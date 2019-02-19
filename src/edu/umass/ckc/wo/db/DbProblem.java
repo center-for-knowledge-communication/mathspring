@@ -489,6 +489,33 @@ public class DbProblem extends BaseMgr {
 			closeQuery(ps);
 		}
 	}
+	
+	
+	/**
+	 * Remove all the <classId,topicId,problemId> rows for a given class, topic
+	 * 
+	 * @param conn
+	 * @param classId
+	 * @param probs
+	 * @throws SQLException
+	 */
+	public String getClassLanguage(Connection conn, List<Problem> probs, int classId)
+			throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			String class_Language_Query = "select class_language from class c where c.id=?";
+			ps = conn.prepareStatement(class_Language_Query);
+			ps.setInt(1, classId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				final String class_language = rs.getString("class_language");
+				return class_language;
+			}
+		} finally {
+			closeQuery(ps);
+		}
+		return null;
+	}
 
     /**
      * Refresh the the activated problems list for a class and topic.   Remove the old and then reinsert.

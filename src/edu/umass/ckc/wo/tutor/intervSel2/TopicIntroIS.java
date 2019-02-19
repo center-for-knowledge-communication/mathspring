@@ -110,7 +110,7 @@ public class TopicIntroIS extends NextProblemInterventionSelector {
             if (!smgr.getStudentState().isTopicIntroSeen(curTopic) )  {
                 smgr.getStudentState().addTopicIntrosSeen(curTopic);
             }
-            TopicIntro intro = DbTopics.getTopicIntro(smgr.getConnection(), curTopic);
+            TopicIntro intro = DbTopics.getTopicIntro(smgr.getConnection(), curTopic, classId);
             this.pedMoveListener.lessonIntroGiven(intro); // inform pedagogical move listeners that an intervention is given
             return intro;
 
@@ -118,7 +118,7 @@ public class TopicIntroIS extends NextProblemInterventionSelector {
         else if (this.freq == TopicModelParameters.frequency.oncePerSession &&
                 !smgr.getStudentState().isTopicIntroSeen(curTopic)) {
             smgr.getStudentState().addTopicIntrosSeen(curTopic);
-            TopicIntro intro = DbTopics.getTopicIntro(smgr.getConnection(), curTopic);
+            TopicIntro intro = DbTopics.getTopicIntro(smgr.getConnection(), curTopic, classId);
             this.pedMoveListener.lessonIntroGiven(intro); // inform pedagogical move listeners that an intervention is given
             return intro;
         }

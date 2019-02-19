@@ -157,7 +157,7 @@
                     if (!isFormality) {
                         $("#js-problem-view").text(effortFeedback);
                         $("#js-problem-view").append("<img id='problemImage' />");
-                        document.getElementById("problemImage").src = problem_imageURL+[index-1][0]+".jpg";
+                        document.getElementById("problemImage").src = problem_imageURL+currentProblemId+".jpg";
                         console.log("CCSS: " + problemList[index-1][6]);
                     } else {
                         $("#js-problem-view").text(currentProblem);

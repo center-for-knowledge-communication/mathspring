@@ -347,11 +347,12 @@ c
 					<a class="huytran-practice__navitem" id="home">My Garden</a> <a
 						class="huytran-practice__navitem" id="myProg">My Progress</a> <a
 						class="huytran-practice__navitem" href="#">Practice Area</a>
-				</div>
 				<a class="huytran-practice__navitem huytran-practice__navitem--last"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
-					Log Out &nbsp; <span class="fa fa-sign-out"></span>
+					Log Out &nbsp; 
+					<span class="fa fa-sign-out"></span>
 				</a>
+				</div>				
 			</div>
 
 			<div class="huytran-practice__container">

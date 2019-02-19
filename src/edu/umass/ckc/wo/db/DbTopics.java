@@ -456,7 +456,7 @@ public class DbTopics {
      * @return
      * @throws java.sql.SQLException
      */
-    public static TopicIntro getTopicIntro(Connection conn, int topicID) throws SQLException {
+    public static TopicIntro getTopicIntros(Connection conn, int topicID) throws SQLException {
         String q = "select intro,type,description from problemGroup where id = ?";
         PreparedStatement ps = conn.prepareStatement(q);
         ps.setInt(1,topicID);
@@ -470,6 +470,31 @@ public class DbTopics {
         return null;
     }
 
+    
+    /**
+     * Returns A topic introduction if there is one.
+     *
+     * @return
+     * @throws java.sql.SQLException
+     */
+    public static TopicIntro getTopicIntro(Connection conn, int topicID, int classID) throws SQLException {
+    	
+        String q = "select json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= ?)))) as description,\r\n" + 
+        		"json_unquote(json_extract(pgl.pg_intro_html, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= ?)))) as intro\r\n" + 
+        		"from problemgroup_description_multi_language pgl where pgl.pg_pg_grp_id =?;";
+        PreparedStatement ps = conn.prepareStatement(q);
+        ps.setInt(1,classID);
+        ps.setInt(2,classID);
+        ps.setInt(3,topicID);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            String intro = rs.getString("intro");
+            String descr = rs.getString("description");
+            return new TopicIntro(intro,"html", descr, topicID);
+        }
+        return null;
+    }
+    
     public static int getTopicDemoProblem(Connection conn, int topicID) throws SQLException {
         String q = "select demoProblem from problemGroup where id = ?";
         PreparedStatement ps = conn.prepareStatement(q);

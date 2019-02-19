@@ -227,10 +227,10 @@ public class ClassContentSelector {
     List<Problem> probs = ProblemMgr.getTopicProblems(t.getId()); 
         List<Integer> deactivatedIds = new ArrayList<Integer>();
         DbProblem probMgr = new DbProblem();
-        probMgr.filterproblemsBasedOnLanguagePreference(conn,probs,classId);
+        String class_language = probMgr.getClassLanguage(conn,probs,classId);
         for (Problem p: probs) {
             // If the problem has one or more standard within the bounds of the desired range, keep it.
-            if (hasStandardWithinBounds(p.getStandards().iterator(),grade,lowDiff,highDiff))
+            if (hasStandardWithinBounds(p.getStandards().iterator(),grade,lowDiff,highDiff) && p.getProblemLanguage().equalsIgnoreCase(class_language))
                 continue;
             else
             	if(!deactivatedIds.contains(p.getId()))
