@@ -53,6 +53,7 @@
         $(document).ready(function () {
             $('#wrapper').toggleClass('toggled');
             $("#report-wrapper").show();
+            $("#report-wrapper2").show();
             $("#form-wrapper").hide();
             handleclickHandlers();
             langPrefrenceForTTMainPage();
@@ -137,6 +138,7 @@
 
             $("#createClass_handler").click(function () {
                 $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
                 $("#form-wrapper").show();
             });
 
@@ -256,6 +258,7 @@
             </c:forEach>
             </c:if>
         </div>
+        <div id="report-wrapper2" class="row">
          <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
@@ -307,6 +310,7 @@
             </c:if>
             </c:forEach>
             </c:if>
+            </div>
         <div id="form-wrapper" style="display: none;">
             <div class="col-lg-12">
                 <h1 class="page-header">

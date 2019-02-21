@@ -570,6 +570,7 @@ function handleclickHandlers() {
 
         $("#content-conatiner").children().hide();
         $("#report-wrapper").show();
+        $("#report-wrapper2").show();
     });
 
     $("#copyClass_handler").click(function () {

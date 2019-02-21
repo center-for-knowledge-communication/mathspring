@@ -177,9 +177,10 @@ function langPrefrenceForLoginPage(){
 		if (languageSet == 'es') {
 			
 			$("#PageRefresh").html('<i class="fa fa-fw fa-home"></i> Inicio</a>');
-			$("#createClass_handler").html('<i class="fa fa-fw fa-pencil"></i> Crear una lección nueva');
+			$("#createClass_handler").html('<i class="fa fa-fw fa-pencil"></i> Crear una clase nueva');
 			$("#survey_problems_site").html('<i class="fa fa-fw fa-pencil"></i> Crear encuestas, pruebas o problemas de matemáticas');
 			$("#report-wrapper").find(".page-header").children("small").text("Clases existentes");
+			$("#report-wrapper2").find(".page-header").children("small").text("Clases existentes (Archivado)");
 			$("#report-wrapper").find(".panel-footer").find(".pull-left").text("Ver detalles");
 			$("#profile_selector").html('<i class="fa fa-fw fa-user"></i> Perfil');
 			$("#logout_selector").html('<i class="fa fa-fw fa-power-off"></i>Cerrar Sesión');
@@ -216,6 +217,18 @@ function langPrefrenceForLoginPage(){
 			languageSet = "es"
 		}
 		if (languageSet == 'es') {
+			
+			//Top Menu
+			$("#topbar-wrapper").find(".dropdown-menu").find("li:eq(0)").children("a").html('<i class="fa fa-fw fa-user"></i> Perfil');
+			$("#topbar-wrapper").find(".dropdown-menu").find("li:eq(2)").children("a").html('<i class="fa fa-fw fa-power-off"></i>Cerrar Sesión');
+			
+			//Side Menu
+			$("#sidebar-wrapper").find("li:eq(0)").children("a").html('<i class="fa fa-fw fa-home"></i> Inicio');
+			$("#sidebar-wrapper").find("li:eq(1)").children("a").html('<i class="fa fa-bar-chart"></i> Libreta de la Clase');
+			$("#sidebar-wrapper").find("li:eq(2)").children("a").html('<i class="fa fa-book"></i> Grupos de Problemas');
+			$("#sidebar-wrapper").find("li:eq(3)").children("a").html('<i class="fa fa-fw fa-id-badge"></i> Usuarios de Alumno');
+			$("#sidebar-wrapper").find("li:eq(4)").children("a").html('<i class="fa fa-files-o"></i> Copiar una Clase');
+			$("#sidebar-wrapper").find("li:eq(5)").children("a").html('<i class="fa fa-fw fa-cog"></i>Activar Encuestas');
 			
 			//Manage Problemsets
 			$("#problem_set_content").find("h3:eq(0)").children("small").text("Grupos de problemas activos");
