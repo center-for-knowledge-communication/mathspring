@@ -71,6 +71,12 @@ public class TeacherToolsViewClassDetailsController {
         List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
         return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag);
     }
+    
+    @RequestMapping(value = "/tt/continousContentApply", method = RequestMethod.POST)
+    public @ResponseBody String continousContentApply(ModelMap map, @RequestParam(value = "classesToApply[]") List<String> classIdList, @RequestParam(value = "classid") String classid,@RequestParam(value = "teacherId") String teacherId) throws TTCustomException {
+        List<Integer> intClassIDList = classIdList.stream().map(Integer::parseInt).collect(Collectors.toList());
+        return ccService.continousContentApply(intClassIDList,Integer.valueOf(classid),Integer.valueOf(teacherId));
+    }
 
     @RequestMapping(value = "/tt/getProblemForProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String viewProblemsForProblemSet(ModelMap map, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {

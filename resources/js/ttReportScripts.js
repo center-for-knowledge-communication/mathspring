@@ -31,6 +31,7 @@ var surveyReportTable;
 var studentData;
 var surveyStudentTable;
 var surveyQuestionTable;
+var apply_content_table;
 
 //Summary report variable
 var summaryReport;
@@ -663,6 +664,14 @@ function handleclickHandlers() {
             $('#acivateProblemSets').prop('disabled', true);
         }
     });
+    
+    $("#content_apply_handler").click(function () {
+        $('#content_apply_handler').css('background-color', '');
+        $('#content_apply_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        $("#content_apply_handle").show();
+    });
 
     $('a[rel=initialPopover]').popover({
         html: true,
@@ -796,6 +805,40 @@ function registerAllEvents(){
         "bSort" : false,
 
     } );
+    
+    var classListSize = $('#classListSize').val();
+    if(classListSize != 0){
+    	apply_content_table = $('#apply_content_table').DataTable({
+        "bPaginate": false,
+        "bFilter": false,
+        "bLengthChange": false,
+        rowReorder: true,
+        "columnDefs": [
+            {
+                "targets": [ 0 ],
+                "width": "40%",
+                orderable: false
+            },
+            {
+                "targets": [ 1 ],
+                "width": "40%",
+                "orderable": false,
+            },
+            {
+                "targets": [ -1 ],
+                "orderable": false,
+                "width": "20%",
+                'className': 'dt-body-center',
+                'render': function (data, type, full, meta){
+                    return '<input type="checkbox">';
+                }
+            }
+        ]
+
+    });
+	
+ }
+    
 
     perProblemReportTable = $('#perProblemReport').DataTable({
         data: [],
@@ -1257,6 +1300,43 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
         });
 
     });
+    
+    
+    $("#apply_content").click(function () {
+    	$("#loading_spinner").show();
+        var rows = $("#apply_content_table").dataTable().fnGetNodes();
+        var rowsArray = [];
+        var activateData = [];
+        var i = 0;
+        $("input:checked", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+        for(var j=0; j < rowsArray.length; j++)
+            activateData[j]  = $("#apply_content_table").DataTable().row( rowsArray [j] ).data()[0];
+
+        $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/continousContentApply",
+            data : {
+                classesToApply: activateData,
+                classid: classID,
+                teacherId: teacherID
+            },
+            success : function(response) {
+            	$("#loading_spinner").hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "Current class content is applied to all the selected classes" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });
+
 
     $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
         var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;

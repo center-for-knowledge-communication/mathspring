@@ -85,6 +85,7 @@ public class TTLoginServiceImpl implements TTLoginService {
                 model.addAttribute("classbeanArchived", classbeanArchived);
                 model.addAttribute("classInfo", classInfo);
                 model.addAttribute("noClass", false);
+                model.addAttribute("classList", classes);
                 return "teacherTools/teacherToolsMain";
             } else {
                 model.addAttribute("noClass", true);

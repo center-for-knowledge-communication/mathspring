@@ -31,4 +31,6 @@ public interface TTCreateClassAssistService {
     public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder,String activateFlag) throws TTCustomException;
 
     public boolean restSurveySettings(Integer classId, CreateClassForm createForm) throws TTCustomException;
+    
+    public String continousContentApply(List<Integer> classIDtoApply,Integer srcClass, Integer teacherId) throws TTCustomException;
 }

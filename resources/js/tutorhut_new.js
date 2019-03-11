@@ -691,6 +691,8 @@ function checkError (responseText) {
 
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     debugAlert("Server returns " + responseText);
+    $("#next_prob_spinner").show();
+	$("#nextProb").addClass("disable_a_href");
     checkError(responseText);
     // empty out the flashContainer div of any swfobjects and clear the iframe of any problems
     $(FLASH_CONTAINER_OUTERID).html('<div id="' +FLASH_CONTAINER_INNER+ '"></div>');
@@ -859,6 +861,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     		document.getElementById(PROBLEM_WINDOW).contentWindow.postMessage(globals,"*"); //send the message and target URI
     	},6000);
     }
+    
+	 $("#next_prob_spinner").hide();
+	 $("#nextProb").removeClass("disable_a_href");
 }
 
 function newBrowserWindow (url,w, h) {
@@ -1128,9 +1133,11 @@ function clickHandling () {
     });
 
     $("#nextProb").click(function () {
+    	$("#next_prob_spinner").show();
         if (!isWaiting()) {
             nextProb(globals)
         }
+        $("#next_prob_spinner").hide();
     });
     $("#read").click(function () {
         callReadProb()

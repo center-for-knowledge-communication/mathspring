@@ -9,7 +9,10 @@ import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLessonOnPlanBean;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassOmmittedProblemsBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
+import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
@@ -25,6 +28,7 @@ import org.springframework.ui.ModelMap;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         ClassInfo classInfo = DbClass.getClass(connection.getConnection(),Integer.valueOf(classId));
         List<User> students = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId));
         String[] prepostIds = DbPrePost.getActivatedSurveyIdsForClass(connection.getConnection(), Integer.valueOf(classId));
+        ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), Integer.valueOf(teacherId));
         Map<Integer,String> activeSurveys = DbPrePost.getActiveSurveyList(connection.getConnection());
         map.addAttribute("students",students );
         map.addAttribute("teacherName", teacherName);
@@ -58,6 +63,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         map.addAttribute("activeSurveys",activeSurveys );
         map.addAttribute("prepostIds",prepostIds[0]+"~~"+prepostIds[1] );
         map.addAttribute("webContentpath", Settings.webContentPath);
+        map.addAttribute("classList", classes);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -256,4 +262,63 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         }
 
     }
+
+	@Override
+	public String continousContentApply(List<Integer> classIDtoApply, Integer srcClass, Integer teacherId)
+			throws TTCustomException {
+		if (!classIDtoApply.isEmpty()) {
+			SqlParameterSource namedParameters = new MapSqlParameterSource("classId", srcClass);
+			List<ClassLessonOnPlanBean> lpbList = new ArrayList<>();
+			List<ClassLessonOnPlanBean> classLessonPlanList = namedParameterJdbcTemplate
+					.query(TTUtil.GET_CLASS_LESSON_PLAN, namedParameters, (ResultSet mappedrow) -> {
+						while (mappedrow.next()) {
+							int seqPos = mappedrow.getInt("seqPos");
+							int probGroupId = mappedrow.getInt("probGroupId");
+							int isDefault = mappedrow.getInt("isDefault");
+							ClassLessonOnPlanBean lpb = new ClassLessonOnPlanBean(seqPos, probGroupId, isDefault);
+							lpbList.add(lpb);
+						}
+						return lpbList;
+					});
+
+			List<ClassOmmittedProblemsBean> copList = new ArrayList<>();
+			List<ClassOmmittedProblemsBean> classOmittedList = namedParameterJdbcTemplate
+					.query(TTUtil.GET_CLASS_OMITTED_LIST, namedParameters, (ResultSet mappedrow) -> {
+						while (mappedrow.next()) {
+							int probId = mappedrow.getInt("probId");
+							int topicId = mappedrow.getInt("topicId");
+							ClassOmmittedProblemsBean cop = new ClassOmmittedProblemsBean(probId, topicId);
+							copList.add(cop);
+						}
+						return copList;
+					});
+
+			classIDtoApply.forEach(classid -> {
+				try {
+					DbTopics.clearClassLessonPlan(connection.getConnection(), classid);
+					new DbProblem().clearClassOmittedProblems(connection.getConnection(), classid);
+					for (ClassLessonOnPlanBean clb : classLessonPlanList) {
+						Map<String, Integer> insertParams = new HashMap<String, Integer>();
+						insertParams.put("classId", classid);
+						insertParams.put("seqPos", clb.getSeqPos());
+						insertParams.put("probGroupId", clb.getProbGroupId());
+						insertParams.put("isDefault", clb.getIsDefault());
+						namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
+					}
+					for (ClassOmmittedProblemsBean cop : classOmittedList) {
+						Map<String, Integer> insertParams = new HashMap<String, Integer>();
+						insertParams.put("classId", classid);
+						insertParams.put("probId", cop.getProbId());
+						insertParams.put("topicId", cop.getTopicId());
+						namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASSOMITTED_PROBLEMS, insertParams);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error(e.getMessage());
+				}
+			});
+
+		}
+		return "success";
+	}
 }

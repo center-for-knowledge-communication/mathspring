@@ -186,12 +186,7 @@
 
 <style type="text/css">
 /*Overwrite bootstrap rule for developer mode*/
-<%--<
-c:if test ="${showProblemSelector
-	
-}
 
-">--%>
 fieldset.scheduler-border {
 	border: 1px groove #ddd !important;
 	padding: 0 1.4em 1.4em 1.4em !important;
@@ -228,11 +223,16 @@ label {
 .glyphicon {
 	font-family: 'Glyphicons Halflings' !important;
 }
-<%--</
-c
-:if
->
---%>
+
+.huytran-sitenav__button {
+	margin: 0px; !important;
+}
+
+.disable_a_href{
+    pointer-events: none;
+	color: #e1e1e1;
+}
+
 </style>
 </head>
 <body>
@@ -280,6 +280,7 @@ c
 					id="nextProb"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-plus" aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle">Next Problem</span>
+				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 				</a> <a href="#" class="huytran-sitenav__button" id="hint"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o"
 						aria-hidden="true"></i>

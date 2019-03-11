@@ -225,6 +225,8 @@
             </li>
 
             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i>Survey Settings</a></li>
+            
+             <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i>Apply Class Content</a></li>
 
         </ul>
         <!-- /#sidebar-end -->
@@ -237,7 +239,19 @@
 
         <div id="content-conatiner" class="container-fluid">
 
-            <div id="problem_set_content" style="width: 100%;">
+				<div id="loading_spinner" style="display: none">
+					<i class="fa fa-refresh fa-spin"
+						style="font-size: 36px; color: red"></i> <i
+						class="fa fa-refresh fa-spin" style="font-size: 36px; color: blue"></i>
+					<i class="fa fa-refresh fa-spin"
+						style="font-size: 36px; color: green"></i> <i
+						class="fa fa-refresh fa-spin"
+						style="font-size: 36px; color: orange"></i> <i
+						class="fa fa-refresh fa-spin"
+						style="font-size: 36px; color: black"></i>
+				</div>
+
+				<div id="problem_set_content" style="width: 100%;">
 			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
 			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
@@ -884,6 +898,42 @@
                     </table>
                 </div>
             </div>
+             <div id="content_apply_handle" style="display:none;width: 100%;">
+             <div>
+                    <h3 class="page-header">
+                        <small>Apply this content to all of your classes</small>
+                    </h3>
+					<input type="hidden" id="classListSize" name="classListSize" value=" ${fn:length(classList)}">
+                    <div class="panel panel-default"  style="width: 60%;">
+                        <div class="panel-body">The Following Table shows list of active classes. Please select the all classes you want to apply content to.
+                        </div>
+                        <div class="panel-body">
+                            <button id="apply_content" class="btn btn-primary btn-lg" aria-disabled="true">Apply Content</button>
+                        </div>
+                    </div>
+                    <table id="apply_content_table" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                        <th>Class ID</th>
+                        <th>Class Name</th>
+                        <th>Apply Content</th>
+                         </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach var="classList" varStatus="i" items="${classList}">
+                        <c:if test="${classInfo.classid != classList.classid}">
+                            <tr>
+                             <td>${classList.classid}</td>
+                              <td>${classList.name}</td>
+                               <td></td>
+                            </tr>
+                          </c:if>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+             </div>
+            
         </div>
 </div>
 </div>
