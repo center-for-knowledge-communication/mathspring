@@ -172,12 +172,19 @@ public class DbTopics {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
-            String q = "select probGroupId, topic.description, seqPos,topic.summary from classlessonplan, problemgroup topic where " +
-                    (isDefault ? "isDefault=1" : "classid=?") + " and topic.id=probGroupId and seqPos > 0 and topic.active=1 " +
-                    "and topic.id in (select distinct pgroupid from probprobgroup) order by seqPos";
+            String q = "select probGroupId, \r\n" + 
+            		"json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description, seqPos,\r\n" + 
+            		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as summary \r\n" + 
+            		"from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where "
+            		+(isDefault ? "isDefault=1" : "classid=? ")+ 
+            		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
+            		"and topic.id=probGroupId and seqPos > 0 and topic.active=1 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
+            		"order by seqPos;";
             stmt = conn.prepareStatement(q);
+            stmt.setInt(1,classId);
+            stmt.setInt(2,classId);
             if (!isDefault)
-                stmt.setInt(1,classId);
+                stmt.setInt(3,classId);
             rs = stmt.executeQuery();
             List<Topic> topics = new ArrayList<Topic>();
             while (rs.next()) {

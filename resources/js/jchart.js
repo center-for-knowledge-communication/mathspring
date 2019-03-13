@@ -151,14 +151,19 @@ var Chart = {
 
 
 
-    renderCharts	: function(problemList, c, containerId) {
-
-        var tableClassName="";
-        var topicState="";
-        var hints="";
-        var attempts="";
-        var effortFeedback="";
-
+renderCharts : function(problemList, c, containerId) {
+		var tableClassName = "";
+		var topicState = "";
+		var hints = "";
+		var attempts = "";
+		var effortFeedback = "";
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
 
         for (var i=0; i<c; i++){
 
@@ -190,69 +195,62 @@ var Chart = {
 
 
             switch(topicState){
+            case "empty":
+                table.className ="emptyCard";
+                cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "No has visto este problema todavía" : "You have not tried this problem yet.";
+                break;
 
-                case "empty":
-                    table.className ="emptyCard";
-                    cell.innerHTML="_";
-                    effortFeedback="You have not tried this problem yet.";
-                    break;
+            case "SOF":
+                table.className ="correctCard";
+                cell.innerHTML="★";
+                effortFeedback = languageSet == "es" ? "Resolviste este problema correctamente en el primer intento." : "You got this problem correct on first attempt.";
+                break;
 
-                case "SOF":
-                    table.className ="correctCard";
-                    cell.innerHTML="★";
-                    effortFeedback="You got this problem correct on first attempt.";
-                    break;
+            case "NOTR":
+                table.className ="warningCard";
+                cell.innerHTML="ǃ";
+                effortFeedback = languageSet == "es" ? "Quizás necesitas trabajar en este problema con más cuidado" : "Maybe you need to work on this problem more carefully.";
+                break;
 
-                case "NOTR":
-                    table.className ="warningCard";
-                    cell.innerHTML="ǃ";
-                    effortFeedback="Maybe you need to work on this problem more carefully.";
-                    break;
+            case "BOTTOMOUT":
+                table.className ="correctWithHintsCard";
+                cell.innerHTML="H";
+                effortFeedback = languageSet == "es" ? "Hints helped you solve this problem. Do you want to try without hints?" : "Hints helped you solve this problem. Do you want to try without hints?";
+                break;
 
-                case "BOTTOMOUT":
-                    table.className ="correctWithHintsCard";
-                    cell.innerHTML="H";
-                    effortFeedback="Hints helped you solve this problem. Do you want to try without hints?";
-                    break;
+            case "GIVEUP":
+                table.className ="giveupCard";
+                effortFeedback = languageSet == "es" ? "Abandonaste este problema" : "You gave up this problem.";
+                cell.innerHTML="_";
+                break;
 
-                case "GIVEUP":
-                    table.className ="giveupCard";
-                    effortFeedback="You gave up this problem.";
-                    cell.innerHTML="_";
-                    break;
-                case "SKIP":
-                    table.className ="giveupCard";
-                    effortFeedback="You gave up this problem.";
-                    cell.i;
-                    break;
+            case "SHINT":
+                table.className ="correctWithHintsCard";
+                cell.innerHTML="H";
+                if (hints==1)   {
+                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ hints+ languageSet == "es" ? "ayudita" : "hint.";
+                }else
+                { effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ hints+ languageSet == "es" ? "ayuditas" : "hints.";  }
 
-                case "SHINT":
-                    table.className ="correctWithHintsCard";
-                    cell.innerHTML="H";
-                    if (hints==1)   {
-                    effortFeedback="You solved this problem with "+ hints+" hint.";
-                    }else
-                    {effortFeedback="You solved this problem with "+ hints+" hints.";  }
+                break;
 
-                    break;
+            case "ATT":
+                table.className ="correctOnAttemptsCard";
+                cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ languageSet == "es" ? "intento" : "attempts.";
+                break;
 
-                case "ATT":
-                    table.className ="correctOnAttemptsCard";
-                    cell.innerHTML="_";
+            case "GUESS":
+                table.className ="correctOnAttemptsCard";
+                cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ languageSet == "es" ? "intento" : "attempts.";
+                break;
 
-                    effortFeedback="You solved this problem in "+ attempts+" attempts.";
-                    break;
-
-                case "GUESS":
-                    table.className ="correctOnAttemptsCard";
-                    cell.innerHTML="_";
-                    effortFeedback="You solved this problem with "+ attempts+" attempts.";
-                    break;
-
-                default:
-                    table.className ="emptyCard";
-                    cell.innerHTML="_";
-                    break;
+            default:
+                table.className ="emptyCard";
+                cell.innerHTML="_";
+                break;
 
 
             }

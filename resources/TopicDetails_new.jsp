@@ -16,7 +16,7 @@
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
-
+	<script src="js/bootstrap/js/language_es.js"></script>
     <script language="javascript" type="text/javascript">
         var problemList=new Array();
         var currentProblem="";
@@ -190,6 +190,8 @@
                     $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
                 }
             });
+            
+            langPrefrenceForTopicDetailsPage();
         });
     </script>
 </head>
@@ -243,7 +245,7 @@
                             <div id="masteryChartDiv"></div>
                             <div>
                                 <p class="problem-done-num">${problemsDone}/${totalProblems}</p>
-                                <p>Problems Done</p>
+                                <p class="problem_done_label">Problems Done</p>
                             </div>
                         </div>
                         <div class="row" id="problemCards" rel="performanceDetails">

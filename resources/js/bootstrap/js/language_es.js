@@ -27,6 +27,16 @@ function langPrefrenceForWelcomePage() {
 	}
 }
 
+function langPrefrenceForTopicDetailsPage(){
+	$(".nav").find("ul").find(".nav__item:eq(0)").children("a").text("Mi Jardín");
+	$(".nav").find("ul").find(".nav__item:eq(1)").children("a").text("Mi Progreso");
+	$(".nav").find("ul").find(".nav__item:eq(2)").children("a").text("Area de Práctica");
+	$(".nav").find("ul").find(".nav__item:eq(3)").children("a").text("Cerrar sesión");
+	$(".bootstrap").find(".topic-statistics").children("h2").text("Nivel de Conocimiento Alcanzado");
+	$(".bootstrap").find(".topic-statistics").find(".problem_done_label").text("Problemas Contestados");
+	$(".bootstrap").find(".detail-problem-view").find(".row").children("button").text("Hacer click para intentar este problema");
+}
+
 function langPrefrenceForLoginPage(){
 	var languagePreference = window.navigator.language;
 	var languageSet = "en";
@@ -103,6 +113,9 @@ function langPrefrenceForLoginPage(){
 			$("ul").find(".nav__item:eq(3)").children("a").text("Cerrar sesión");
 			$(".topic-list").find(".welcome").children("h1").text("Bienvenidos a MathSpring");
 			$(".topic-list").find(".welcome").children("p").text("¡Ve a Mi Progreso para ver todas las lecciones, o al Area de Práctica para comenzar!")
+			$(".topic-list__flipper").find(".topic-list__button--green").text("Continuar");
+			$(".topic-list__flipper").find(".topic-list__button--yellow").text("Repasar");
+			$(".topic-list__flipper").find(".topic-list__button--brown").text("Desafío");
 		}
 		
 	}
@@ -158,7 +171,7 @@ function langPrefrenceForLoginPage(){
 			$(".progress-table").find(".progress-table-header").find("th:eq(2)").text("Rendimiento");
 			$(".progress-table").find(".progress-table-header").find("th:eq(3)").text("Esfuerzo");
 			$(".progress-table").find(".progress-table-header").find("th:eq(4)").text("Acción");
-			
+		
 			$(".progress-table").find(".col-md-2").children("p").text("Nivel de Conocimiento Alcanzado");
 			$(".progress-table").find(".col-md-2").find(".mathspring-important-btn").text("Más detalles");
 			$("footer").text("© 2016 Universidad de Massachusetts Amherst y Worcester Polytechnic Institute ~ Todos los Derechos Reservados.");
