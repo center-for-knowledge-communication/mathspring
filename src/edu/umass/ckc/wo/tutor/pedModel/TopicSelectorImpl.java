@@ -4,6 +4,7 @@ import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.db.DbProblem;
 import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.smgr.SessionManager;
@@ -22,6 +23,7 @@ import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -313,11 +315,13 @@ public class TopicSelectorImpl implements TopicSelector {
      */
     public List<Integer> getClassTopicProblems(int topicId, int classId, boolean includeTestProblems) throws Exception {
         // studentID and classID were set in setServletInfo method.
-        List<Integer> topicProbs = ProblemMgr.getTopicProblemIds(topicId);  // operates on a clone so destruction is ok
+        // operates on a clone so destruction is ok
         // TODO:  Issue:  If all the problems in a topic are marked as TESTABLE and there are no ready problems, the
         // list of problems becomes empty if the includeTestProblems flag is false.   Then we have a bug because
         // we can't find a problem in an empty list.
-
+        List<Problem> topicProblems = ProblemMgr.getTopicProblems(topicId);
+        new DbProblem().filterproblemsBasedOnLanguagePreference(conn, topicProblems, classId);
+        List<Integer> topicProbs = topicProblems.stream().map(p -> p.getId()).collect(Collectors.toList());
         if (!includeTestProblems)  {
             removeTestProblems(topicProbs);
             if (topicProbs.size() == 0)
