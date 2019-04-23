@@ -116,7 +116,7 @@ body {
 .answer-row{
     margin: 0 0 10px 20px;
     line-height: 27px;
-    height: 27px;
+    /* height: 27px; */
 }
 .button{
     display: inline-block;
@@ -153,7 +153,7 @@ body {
 }
 .answer_text{
     display: inline-block;
-    height: 27px;
+    /* height: 27px; */
     position: relative;
     vertical-align: top;
 }
