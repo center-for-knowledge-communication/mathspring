@@ -85,3 +85,52 @@ Source					Deploy Path
 /resources				/
 /web					/
 Maven Dependencies		WEB-INF/lib
+
+
+
+
+Tomcat Installation:
+Download from http://tomcat.apache.org/
+Install Tomcat in a place which doesn't require admin access (eg. not under Program Files).
+Usually Tomcat is installed as a Service on Windows which is started automatically, need to change this behaviour to work with IntelliJ
+Open the "Monitor Tomcat" application that is installed by the Tomcat installer. Go to the "General" tab, "Stop" the service and change the "Startup type" to "Manual".
+
+Setting Environment Variables:
+Set CATALINA_HOME (required).
+Variable Name: CATALINA_HOME
+Variable Value: F:\Apache Software Foundation\Tomcat 9.0 (change to the directory where you installed Tomcat)
+Set JRE_HOME or JAVA_HOME (required).
+JAVA_HOME or JRE HOME are the locations of the Java JDK and JRE respectively.
+Using JAVA_HOME provides access to certain additional startup options that
+are not allowed when JRE_HOME is used.
+If both JRE_HOME and JAVA_HOME are specified, JRE_HOME is used.
+The recommended place to specify these variables is a "setenv" script as we will see next.
+There is no harm in setting it in the system's environment variables too.
+Variable Name: JAVA_HOME
+Variable Value: C:\Program Files\Java\jdk1.8.0_202 (change to whatever version of Java you have installed on your machine)
+
+Using the "setenv" script:
+Navigate to the bin folder of the Tomcat installation.
+Create a .bat file called setenv.bat with the following contents:
+set "JRE_HOME=%ProgramFiles%\Java\jre1.8.0_202" (change to your JRE version)
+exit /b 0
+
+Configuring Tomcat for IntelliJ Community Edition:
+Open IntelliJ -> File -> Settings -> Tools -> External Tools -> + (Add).
+Add a new tool with the name "Tomcat".
+In the Tool Settings, select the catalina.bat file, usually located in the bin folder of the Tomcat installation.
+Set the argument as "jpda run".
+The working directory should be set automatically, if not, set it to the bin folder of the Tomcat installation.
+
+Start Tomcat from IntelliJ:
+Tools -> External Tools -> Tomcat, this will start the Tomcat server.
+
+Build using Maven and deploy to Tomcat:
+Run -> Edit Configurations -> + (Add) -> Maven.
+Name: Deploy_to_Tomcat
+Working Directory: path/to/MathSpring (the project folder)
+Command Line: war:war org.codehaus.mojo:wagon-maven-plugin:upload-single -Dwagon.fromFile=path\to\MathSpring\release\ms.war -Dwagon.url=file://path\to\webapps\folder\under\tomcat\
+Remember to replace any spaces by %20 in the path in the Command Line above as it's a URL. For eg. \Apache Software Foundation\Tomcat 9.0\webapps\ should be replace by \Apache%20Software%20Foundation\Tomcat%209.0\webapps\
+Save the configuration and run it.
+This should create a war file under "release" called "ms.war".
+What this command line does is that it builds the project, using Maven, and then gets the file from the specified path and copies it to the webapps folder in Tomcat. Tomcat then knows it has a new version of the file and redeploys it.
