@@ -132,9 +132,19 @@ Maven Dependencies		WEB-INF/lib
     ```
     war:war org.codehaus.mojo:wagon-maven-plugin:upload-single -Dwagon.fromFile=path\to\MathSpring\release\ms.war -Dwagon.url=file://path\to\webapps\folder\under\tomcat\
     ```
-- Remember to replace any spaces by %20 in the path in the Command Line above as it's a URL. For eg. \Apache Software Foundation\Tomcat 9.0\webapps\ should be replace by \Apache%20Software%20Foundation\Tomcat%209.0\webapps\
+- Remember to replace any spaces by %20 in the path in the Command Line above as it's a URL. For eg.
+   ```
+   \Apache Software Foundation\Tomcat 9.0\webapps\
+   ```
+   should be replace by
+   ```
+   \Apache%20Software%20Foundation\Tomcat%209.0\webapps\
+   ```
 - This command line builds the project, using Maven, and then gets the file from the specified path and copies it to the webapps folder in Tomcat. Tomcat then knows it has a new version of the file and redeploys it.
-- Add a Maven Goal in the "Before Launch" tool with the command: "-e clean package -P local".
+- Add a Maven Goal in the "Before Launch" tool with the command:
+   ```
+   -e clean package -P local
+   ```
 - This command will build the war with the src folder included (the previous command doesn't take the src folder into account). Uses the local user profile instead of the production profile.
 - Save the configuration and run it.
 - This should create a war file under "release" called "ms.war".
