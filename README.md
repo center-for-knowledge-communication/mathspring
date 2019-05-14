@@ -136,7 +136,7 @@ Maven Dependencies		WEB-INF/lib
    ```
    \Apache Software Foundation\Tomcat 9.0\webapps\
    ```
-   should be replace by
+   should be replaced by
    ```
    \Apache%20Software%20Foundation\Tomcat%209.0\webapps\
    ```
