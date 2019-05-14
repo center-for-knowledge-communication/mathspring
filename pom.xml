@@ -52,7 +52,8 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.30</version>
+			<!--<version>5.1.30</version>-->
+			<version>5.1.47</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
@@ -162,6 +163,17 @@
 			<version>3.6.1</version>
 		</dependency>
 	</dependencies>
+	<properties>
+		<webXmlPath>${pom.basedir}/webProduction</webXmlPath>
+	</properties>
+	<profiles>
+		<profile>
+			<id>local</id>
+			<properties>
+				<webXmlPath>${pom.basedir}/web</webXmlPath>
+			</properties>
+		</profile>
+	</profiles>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<directory>${project.basedir}/release</directory>
@@ -193,7 +205,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
-					<webXml>${pom.basedir}/webProduction/WEB-INF/web.xml</webXml>
+					<!--<webXml>${pom.basedir}/webProduction/WEB-INF/web.xml</webXml>-->
+					<webXml>${webXmlPath}/WEB-INF/web.xml</webXml>
 					<webResources>
 						<resource>
 							<directory>resources</directory>
@@ -206,7 +219,8 @@
 							</includes>
 						</resource>
 						<resource>
-							<directory>${pom.basedir}/webProduction/WEB-INF/classes</directory>
+							<!--<directory>${pom.basedir}/webProduction/WEB-INF/classes</directory>-->
+							<directory>${webXmlPath}/WEB-INF/classes</directory>
 							<targetPath>WEB-INF/classes</targetPath>
 							<includes>
 								<include>log4j.properties</include>

@@ -88,6 +88,7 @@ Maven Dependencies		WEB-INF/lib
 
 
 
+Instructions for Windows - Working with IntelliJ
 
 Tomcat Installation:
 Download from http://tomcat.apache.org/
@@ -124,6 +125,7 @@ The working directory should be set automatically, if not, set it to the bin fol
 
 Start Tomcat from IntelliJ:
 Tools -> External Tools -> Tomcat, this will start the Tomcat server.
+This will keep the Tomcat server running in a terminal.
 
 Build using Maven and deploy to Tomcat:
 Run -> Edit Configurations -> + (Add) -> Maven.
@@ -131,6 +133,22 @@ Name: Deploy_to_Tomcat
 Working Directory: path/to/MathSpring (the project folder)
 Command Line: war:war org.codehaus.mojo:wagon-maven-plugin:upload-single -Dwagon.fromFile=path\to\MathSpring\release\ms.war -Dwagon.url=file://path\to\webapps\folder\under\tomcat\
 Remember to replace any spaces by %20 in the path in the Command Line above as it's a URL. For eg. \Apache Software Foundation\Tomcat 9.0\webapps\ should be replace by \Apache%20Software%20Foundation\Tomcat%209.0\webapps\
+This command line builds the project, using Maven, and then gets the file from the specified path and copies it to the webapps folder in Tomcat. Tomcat then knows it has a new version of the file and redeploys it.
+Add a Maven Goal in the "Before Launch" tool with the command: "-e clean package -P local".
+This command will build the war with the src folder included (the previous command doesn't take the src folder into account). Uses the local user profile instead of the production profile.
 Save the configuration and run it.
 This should create a war file under "release" called "ms.war".
-What this command line does is that it builds the project, using Maven, and then gets the file from the specified path and copies it to the webapps folder in Tomcat. Tomcat then knows it has a new version of the file and redeploys it.
+
+Remote debugging with Tomcat:
+Add a new configuration: Run -> Edit Configurations -> + (Add) -> Remote.
+Name: Debug_Tomcat
+Debugger Mode: Attach to remote JVM
+Transport: Socket
+Host: localhost
+Port: 8000 (can be changed in server.xml under Tomcat)
+The final command line argument (auto-generated) should look like this: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000".
+Save the configuration and run it (will run in debug mode).
+Now, you should be able to debug with breakpoints.
+
+Access the application:
+http://localhost:8080/ms/welcome.html
