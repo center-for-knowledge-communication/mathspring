@@ -90,7 +90,7 @@ catch (Exception e) {
     <c:choose>
         <c:when test="${numSolvableProbsInTest > 0}">
             <%= rb.getString("thanks_for_taking_survey")%><br>
-            <%= rb.getString("Your score is")%> ${numProbsCorrect}/${numSolvableProbsInTest} <br>
+            <%= rb.getString("your_score_is")%> ${numProbsCorrect}/${numSolvableProbsInTest} <br>
             <%= rb.getString("please_click_continue")%>
         </c:when>
         <c:otherwise>

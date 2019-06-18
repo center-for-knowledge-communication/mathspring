@@ -33,6 +33,6 @@ catch (Exception e) {
 
         <p><%= rb.getString("first_name")%>: <input type="text" name="fname" /></p>
         <p><%= rb.getString("last_initial")%>: <input type="text" name="lini" /></p>
-        <input class="btn mathspring-btn" type="<%= rb.getString("submit")%>" value="Submit" />
+        <input class="btn mathspring-btn" type="submit" value="<%= rb.getString("submit")%>" />
     </form>
 </div>
