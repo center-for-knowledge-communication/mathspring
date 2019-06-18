@@ -9,6 +9,22 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="edu.umass.ckc.wo.content.PrePostProblemDefn" %>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <style>
     .ui-progressbar {
         position: relative;
@@ -73,19 +89,19 @@
     <p>&nbsp;</p>
     <c:choose>
         <c:when test="${numSolvableProbsInTest > 0}">
-            Thanks for taking the survey!<br>
-            Your score is ${numProbsCorrect}/${numSolvableProbsInTest} <br>
-            Please click continue to move on.
+            <%= rb.getString("thanks_for_taking_survey")%><br>
+            <%= rb.getString("Your score is")%> ${numProbsCorrect}/${numSolvableProbsInTest} <br>
+            <%= rb.getString("please_click_continue")%>
         </c:when>
         <c:otherwise>
-            Thanks for taking the survey!<br>
-            Please click continue to move on.
+            <%= rb.getString("thanks_for_taking_survey")%><br>
+            <%= rb.getString("please_click_continue")%>
         </c:otherwise>
     </c:choose>
     <br>
 
     <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input  type="submit"  value="Continue" /> &nbsp;&nbsp;
+    <input  type="submit"  value="<%= rb.getString("continue")%>" /> &nbsp;&nbsp;
     <br><br>
 </form>
 <br>

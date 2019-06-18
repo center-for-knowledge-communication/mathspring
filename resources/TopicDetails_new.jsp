@@ -1,10 +1,26 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MathSpring | Topic Details</title>
+    <title>MathSpring | <%= rb.getString("topic_details") %></title>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
@@ -16,7 +32,8 @@
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
-	<script src="js/bootstrap/js/language_es.js"></script>
+<!-- <script src="js/bootstrap/js/language_es.js"></script> -->
+
     <script language="javascript" type="text/javascript">
         var problemList=new Array();
         var currentProblem="";
@@ -206,19 +223,19 @@
 
     <ul class="nav__list">
         <li class="nav__item">
-            <a class="js-go-to-my-garden">My Garden</a>
+            <a class="js-go-to-my-garden"><%= rb.getString("my_garden") %></a>
         </li>
         <li class="nav__item">
             <a
                     onclick="window.location='TutorBrain?action=navigation&from=sat_Hut&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"
             >
-                My Progress
+                <%= rb.getString("my_progress") %>
             </a>
         </li>
         <li class="nav__item">
             <c:choose>
                 <c:when test="${newSession}">
-                    <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'">Practice Area</a>
+                    <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area") %></a>
                 </c:when>
                 <c:otherwise>
                     <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'">Practice Area</a>
@@ -227,7 +244,7 @@
         </li>
         <li class="nav__item">
             <a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
-                Log Out &nbsp;
+                <%= rb.getString("log_out") %> &nbsp;
                 <span class="fa fa-sign-out"></span>
             </a>
         </li>
@@ -241,11 +258,11 @@
                 <div class="row topic-overview">
                     <div class="col-md-4">
                         <div class="row topic-statistics">
-                            <h2>Mastery Level</h2>
+                            <h2><%= rb.getString("mastery_level") %></h2>
                             <div id="masteryChartDiv"></div>
                             <div>
                                 <p class="problem-done-num">${problemsDone}/${totalProblems}</p>
-                                <p class="problem_done_label">Problems Done</p>
+                                <p class="problem_done_label"><%= rb.getString("topic_details_problems_done") %></p>
                             </div>
                         </div>
                         <div class="row" id="problemCards" rel="performanceDetails">
@@ -257,7 +274,7 @@
                         <div class="row">
                             <button type="button"
                                     class="btn btn-lg try-problem-button"
-                                    id="problemDetailsButtons">Click to try this problem</button>
+                                    id="problemDetailsButtons"><%= rb.getString("topic_details_click") %></button>
                         </div>
                     </div>
                 </div>

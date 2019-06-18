@@ -1,5 +1,61 @@
 <%@ include file="partials/loginK12-header.jsp" %>
 <%@ include file="partials/loginK12-nav.jsp" %>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
+// styles contain hard-coded content - conditionally include style based on langauge
+if (lang == "Spanish" ) {
+%>
+<style>
+.onoffswitch-inner:before {
+  content: "si"; 
+  padding-left: 10px;
+  color: #000;
+}
+.onoffswitch-inner:after {
+  content:"no"; 
+  background-color: white;
+  color: #000;
+  text-align: right;
+  position: relative;
+  left: 22px;
+}
+</style>
+<%
+}
+else {
+%>
+<style>
+.onoffswitch-inner:before {
+  content: "yes"; 
+  padding-left: 10px;
+  color: #000;
+}
+.onoffswitch-inner:after {
+  content:"no"; 
+  background-color: white;
+  color: #000;
+  text-align: right;
+  position: relative;
+  left: 22px;
+}
+</style>
+<% 
+}
+%>
 <div class="fullscreen">
     <div class="bootstrap vertical-center">
         <div class="container">
@@ -10,7 +66,7 @@
                 <div class="col-md-8 col-md-offset-2 main-box">
                     <div class="row">
                         <div class="col-sm-6">
-                            <p>Have a username already?</p>
+                            <p><%= rb.getString("have_username_already") %></p>
                             <form
                                     class="user-login-form"
                                     method="post"
@@ -25,7 +81,7 @@
                                             name="uname"
                                             value="${userName}"
                                             class="form-control nav-login user-login-form-username"
-                                            placeholder="Username"
+                                            placeholder="<%= rb.getString("username") %>"
                                             autofocus
                                     />
                                 </div>
@@ -35,13 +91,13 @@
                                             name="password"
                                             value="${password}"
                                             class="form-control nav-login"
-                                            placeholder="Password"
+                                            placeholder="<%= rb.getString("password") %>"
                                     />
                                 </div>
 
                                 <div class="form-group switch-group">
                                     <div class="switch-group-1">
-                                        <div class="switch-label">Are you a teacher?</div>
+                                        <div class="switch-label"><%= rb.getString("are_you_teacher") %></div>
                                         <div class="onoffswitch">
                                             <input
                                                     type="checkbox"
@@ -56,14 +112,14 @@
                                     </div>
                                     <button
                                             type="submit"
-                                            class="btn btn-success sign-in-btn js-login-btn">Login
+                                            class="btn btn-success sign-in-btn js-login-btn"><%= rb.getString("login") %>
                                     </button>
                                 </div>
                             </form>
                         </div>
 
                         <div class="col-sm-6">
-                            <p>Do you need a username?</p>
+                            <p><%= rb.getString("do_you_need_username") %></p>
                             <form
                                     method="post"
                                     action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherLogin&var=b">
@@ -71,7 +127,7 @@
                                         class="btn btn-primary btn-lg btn-block signup-btn--teacher"
                                         type="submit"
                                         name="register" value="Register"
-                                >Sign up for Teacher
+                                ><%= rb.getString("signup_teacher") %>
                                 </button>
                             </form>
 
@@ -80,7 +136,7 @@
                                         class="btn btn-primary btn-lg btn-block signup-btn--student"
                                         type="button"
                                         onClick="javascript:signup();"
-                                >Sign up for Student
+                                ><%= rb.getString("signup_student") %>
                                 </button>
                             </form>
 
@@ -90,20 +146,24 @@
                                 <input type="hidden" name="var" value="b"/>
                                 <button
                                         class="btn btn-primary btn-lg btn-block signup-btn--guest"
-                                        type="submit">Try out as Guest
+                                        type="submit"><%= rb.getString("signup_guest") %>
                                 </button>
                             </form>
                         </div>
                     </div>
                     <hr>
                     <div class="row information-box">
-                        <p class="text-center">To have the best experience, enable pop-ups and turn on either speakers
-                            or a headset!</p>
+                        <p class="text-center"><%= rb.getString("use_audio_device") %></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<footer>
+    &copy; <%= rb.getString("copyright") %>
+</footer>
 
+</body>
+</html>
 <%@ include file="partials/loginK12-footer.jsp" %>

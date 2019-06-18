@@ -7,9 +7,24 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <div class="p7ccm04-1col-column1-cnt p7ccm04-content">
-    <p>If you are working in a classroom or a lab the MathSpring Mathematics Tutor can better
-        help you if you let us know who is sitting next to you.</p>
+    <p><%= rb.getString("identify_neighbors_instructions")%></p>
 
     <p>&nbsp;</p>
 
@@ -23,10 +38,10 @@
         <input type="hidden" name="interventionClass" value="${interventionClass}"/>
 
         <c:out value="${message}"/>
-        <p>Who is on your left?
+        <p><%= rb.getString("who_is_on_left")%>
             <select name="left">
 
-                <option value="-1">No One</option>
+                <option value="-1">N<%= rb.getString("no_one")%></option>
                 <c:forEach var="u" items="${students}">
                     <%--<c:out value="${u.id}"/>--%>
                      <%--<br>--%>
@@ -34,9 +49,9 @@
                 </c:forEach>
             </select>
             <img src="login/images/Devices-computer-icon.png" width="60" height="32"
-                 alt="computer"/>Who is on your right?
+                 alt="computer"/><%= rb.getString("who_is_on_right")%>
             <select name="right">
-                <option value="-1">No One</option>
+                <option value="-1"><%= rb.getString("no_one")%></option>
                 <c:forEach var="u" items="${students}">
                     <option value="${u.id}">${u.uname} : ${u.fname} ${u.lname}</option>
                 </c:forEach>
@@ -46,7 +61,7 @@
 
         <label>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="submit" name="button" id="button" value="Submit"/>
+            <input type="submit" name="button" id="button" value="<%= rb.getString("submit")%>"/>
         </label>
         </form>
         <p>&nbsp;              </p>

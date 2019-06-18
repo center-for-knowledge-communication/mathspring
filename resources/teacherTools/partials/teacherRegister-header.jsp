@@ -1,4 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+	//logger.error(e.getMessage());
+}
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,11 +29,7 @@
     <%--<link href="css/common_new.css" rel="stylesheet">--%>
     <link href="sass_compiled/teacher_register.css" rel="stylesheet">
       <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
-     <script src="js/bootstrap/js/language_es.js"></script>
     <script type="text/javascript">
-    $(document).ready(function () {
-    	langPrefrenceForNewUserPage(false);
-    });
     </script>
 </head>
 
