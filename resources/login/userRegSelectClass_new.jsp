@@ -1,10 +1,26 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>MathSpring | Student Registration</title>
+    <title>MathSpring | <%= rb.getString("student_registration")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -28,11 +44,11 @@
             <table class="table table-striped table-bordered school-table">
                 <thead class="thead-inverse">
                 <tr>
-                    <th>Teacher</th>
-                    <th>School</th>
-                    <th>Class</th>
-                    <th>Town</th>
-                    <th>Choose</th>
+                    <th><%= rb.getString("teacher")%></th>
+                    <th><%= rb.getString("school")%></th>
+                    <th><%= rb.getString("class")%></th>
+                    <th><%= rb.getString("town")%></th>
+                    <th><%= rb.getString("choose")%></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -54,7 +70,7 @@
         </div>
     </div>
     <footer class="bottom-sticky-footer">
-        &copy; 2016 University of Massachusetts Amherst and Worcester Polytechnic Institute ~ All Rights Reserved.
+        &copy; <%= rb.getString("copyright")%>
     </footer>
 </body>
 </html>

@@ -788,8 +788,19 @@ giveFeedback	: function(remarksDiv, topic_state,topicState_pepperPlant,topicMast
 
 
     problemsDone: function(problemsDone_div,problemsDone,totalProblems) {
+    	
+		var languagePreference = window.navigator.language;
+		var languageSet = "en";
+		if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
 
-        document.getElementById(problemsDone_div).innerHTML="Problems Done : " + problemsDone + "/"+totalProblems ;
+
+    	var probsdone = languageSet == "es" ? "Problemas hechos" : "Problems Done";
+
+        document.getElementById(problemsDone_div).innerHTML= probsdone + " : " + problemsDone + "/"+totalProblems ;
     }
 
 }
