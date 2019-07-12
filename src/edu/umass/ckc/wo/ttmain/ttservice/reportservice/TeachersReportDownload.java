@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ResourceBundle;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,24 +33,40 @@ import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 
 public class TeachersReportDownload extends AbstractXlsView {
 
-    @Override
+
+	protected ResourceBundle rb = null;
+	
+	@Override
     protected void buildExcelDocument(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
 
         String reportType = (String) map.get("reportType");
-        if (reportType.equals("perStudentReportDownload"))
-            buildPerStudentTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
-        else if (reportType.equals("perProblmSetReportDownload"))
-            buildPerProblemSetTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
-        else if (reportType.equals("perProblemReportDownload"))
-            buildPerProblemReport(map, workbook, httpServletRequest, httpServletResponse);
-        else if (reportType.equals("perClusterReport"))
-            buildPerClusterReport(map, workbook, httpServletRequest, httpServletResponse);
-        else if(reportType.equals("studentInfoDownload"))
-            buildStudentTagsForDownload(map, workbook, httpServletRequest, httpServletResponse);
-        else if(reportType.equals("perStudentEmotion"))
-            buildEmotionReportForDownload(map, workbook, httpServletRequest, httpServletResponse);
-        else if(reportType.equals("perSummSurveyReport"))
-        	buildSummSurveyReport(map, workbook, httpServletRequest, httpServletResponse);
+        System.out.println("buildExcelDocument");
+        try {
+
+        	// Multi=lingual enhancement
+        	rb = ResourceBundle.getBundle("MathSpring",httpServletRequest.getLocale());
+
+            System.out.println("buildExcelDocument");
+
+        	if (reportType.equals("perStudentReportDownload"))
+        		buildPerStudentTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else if (reportType.equals("perProblmSetReportDownload"))
+        		buildPerProblemSetTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else if (reportType.equals("perProblemReportDownload"))
+        		buildPerProblemReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else if (reportType.equals("perClusterReport"))
+        		buildPerClusterReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else if(reportType.equals("studentInfoDownload"))
+        		buildStudentTagsForDownload(map, workbook, httpServletRequest, httpServletResponse);
+        	else if(reportType.equals("perStudentEmotion"))
+        		buildEmotionReportForDownload(map, workbook, httpServletRequest, httpServletResponse);
+        	else if(reportType.equals("perSummSurveyReport"))
+        		buildSummSurveyReport(map, workbook, httpServletRequest, httpServletResponse);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        	
+        }
     }
 
     private void buildEmotionReportForDownload(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -62,31 +80,31 @@ public class TeachersReportDownload extends AbstractXlsView {
             Sheet sheet = workbook.createSheet(classId);
             Row header = sheet.createRow(3);
             Cell studentIdHeader = header.createCell(3);
-            studentIdHeader.setCellValue("Student ID");
+            studentIdHeader.setCellValue(rb.getString("student_id"));
             Cell userNameHeader = header.createCell(4);
-            userNameHeader.setCellValue("UserName");
+            userNameHeader.setCellValue(rb.getString("username"));
             Cell problemIDHeader = header.createCell(5);
-            problemIDHeader.setCellValue("After  Problem");
+            problemIDHeader.setCellValue(rb.getString("after_problem"));
             Cell topicIdHeader = header.createCell(6);
-            topicIdHeader.setCellValue("Topic ID");
+            topicIdHeader.setCellValue(rb.getString("topic_id"));
             Cell topicDescriptionHeader = header.createCell(7);
-            topicDescriptionHeader.setCellValue("Topic Description");
+            topicDescriptionHeader.setCellValue(rb.getString("topic_description"));
             Cell timeHeader = header.createCell(8);
-            timeHeader.setCellValue("Timestamp");
+            timeHeader.setCellValue(rb.getString("timestamp"));
             Cell problemNameHeader = header.createCell(9);
-            problemNameHeader.setCellValue("Problem Name");
+            problemNameHeader.setCellValue(rb.getString("problem_name"));
             Cell problemNickName = header.createCell(10);
-            problemNickName.setCellValue("Problem Nick Name");
+            problemNickName.setCellValue(rb.getString("problem_nick_name"));
             Cell standardIDHeader = header.createCell(11);
-            standardIDHeader.setCellValue("Standard ID");
+            standardIDHeader.setCellValue(rb.getString("standard_id"));
             Cell diffLevel = header.createCell(12);
-            diffLevel.setCellValue("Difficulty Level");
+            diffLevel.setCellValue(rb.getString("difficulty_level"));
             Cell emotionNameHeader = header.createCell(13);
-            emotionNameHeader.setCellValue("Emotion Recorded");
+            emotionNameHeader.setCellValue(rb.getString("emotion_recorded"));
             Cell emotionValuesHeader = header.createCell(14);
-            emotionValuesHeader.setCellValue("Emotion Level");
+            emotionValuesHeader.setCellValue(rb.getString("emotion_level"));
             Cell emotionCOmmentsHeader = header.createCell(15);
-            emotionCOmmentsHeader.setCellValue("Emotion Comments");
+            emotionCOmmentsHeader.setCellValue(rb.getString("emotion_comments"));
             emotionReportForDownload.forEach((student, emotionValues) -> {
                 emotionValues.forEach(emotionArray ->{
                     Row dataRow = sheet.createRow(atomicIntegerForHeaderForData.getAndIncrement());
@@ -170,7 +188,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row fname = sheet.createRow(atomicIntegerForNewRow.get()+1);
                     Cell fnameLabel = fname.createCell(0);
-                    fnameLabel.setCellValue("First Name:");
+                    fnameLabel.setCellValue(rb.getString("first_name") + ":");
                     fnameLabel.setCellStyle(headerStyles);
                     Cell fnameValue = fname.createCell(1);
                     fnameValue.setCellValue(studentInfoForm.getStudentFname());
@@ -178,7 +196,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row lname = sheet.createRow(atomicIntegerForNewRow.get()+2);
                     Cell lnameLabel = lname.createCell(0);
-                    lnameLabel.setCellValue("Last Name:");
+                    lnameLabel.setCellValue(rb.getString("last_name") + ":");
                     lnameLabel.setCellStyle(headerStyles);
                     Cell lnameValue = lname.createCell(1);
                     lnameValue.setCellValue(studentInfoForm.getStudentLname());
@@ -187,7 +205,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row uname = sheet.createRow(atomicIntegerForNewRow.get()+3 );
                     Cell unameLabel = uname.createCell(0);
-                    unameLabel.setCellValue("User Name:");
+                    unameLabel.setCellValue(rb.getString("username") + ":");
                     unameLabel.setCellStyle(headerStyles);
                     Cell unameValue = uname.createCell(1);
                     unameValue.setCellValue(studentInfoForm.getStudentUsername());
@@ -195,7 +213,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row passwordRow = sheet.createRow(atomicIntegerForNewRow.get()+4 );
                     Cell passwordRowLabel = passwordRow.createCell(0);
-                    passwordRowLabel.setCellValue("Password:");
+                    passwordRowLabel.setCellValue(rb.getString("password") + ":");
                     passwordRowLabel.setCellStyle(headerStyles);
                     Cell passwordValue = passwordRow.createCell(1);
                     passwordValue.setCellValue(studentInfoForm.getClassPassword());
@@ -221,7 +239,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row fname = sheet.getRow(atomicIntegerForNewRow.get()+1);
                     Cell fnameLabel = fname.createCell(3);
-                    fnameLabel.setCellValue("First Name:");
+                    fnameLabel.setCellValue(rb.getString("first_name") + ":");
                     fnameLabel.setCellStyle(headerStyles);
                     Cell fnameValue = fname.createCell(4);
                     fnameValue.setCellValue(studentInfoForm.getStudentFname());
@@ -229,7 +247,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row lname = sheet.getRow(atomicIntegerForNewRow.get()+2);
                     Cell lnameLabel = lname.createCell(3);
-                    lnameLabel.setCellValue("Last Name:");
+                    lnameLabel.setCellValue(rb.getString("last_name") + ":");
                     lnameLabel.setCellStyle(headerStyles);
                     Cell lnameValue = lname.createCell(4);
                     lnameValue.setCellValue(studentInfoForm.getStudentLname());
@@ -238,7 +256,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row uname = sheet.getRow(atomicIntegerForNewRow.get()+3 );
                     Cell unameLabel = uname.createCell(3);
-                    unameLabel.setCellValue("User Name:");
+                    unameLabel.setCellValue(rb.getString("username") + ":");
                     unameLabel.setCellStyle(headerStyles);
                     Cell unameValue = uname.createCell(4);
                     unameValue.setCellValue(studentInfoForm.getStudentUsername());
@@ -246,7 +264,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
                     Row passwordRow = sheet.getRow(atomicIntegerForNewRow.get()+4 );
                     Cell passwordRowLabel = passwordRow.createCell(3);
-                    passwordRowLabel.setCellValue("Password:");
+                    passwordRowLabel.setCellValue(rb.getString("password") + ":");
                     passwordRowLabel.setCellStyle(headerStyles);
                     Cell passwordValue = passwordRow.createCell(4);
                     passwordValue.setCellValue(studentInfoForm.getClassPassword());
@@ -288,25 +306,25 @@ public class TeachersReportDownload extends AbstractXlsView {
             Sheet sheet = workbook.createSheet(classId);
             Row header = sheet.createRow(3);
             Cell clusterIdHeader = header.createCell(2);
-            clusterIdHeader.setCellValue("Cluster ID");
+            clusterIdHeader.setCellValue(rb.getString("cluster_id") + ":");
 
 
             Cell categoryCodeAndDisplayCodeHeader = header.createCell(3);
-            categoryCodeAndDisplayCodeHeader.setCellValue("Cluster's in Class");
+            categoryCodeAndDisplayCodeHeader.setCellValue(rb.getString("clusters_in_class") + ":");
 
             Cell ClusterDescriptionHeader = header.createCell(4);
-            ClusterDescriptionHeader.setCellValue("Cluster Description");
+            ClusterDescriptionHeader.setCellValue(rb.getString("cluster_description") + ":");
 
 
             Cell noOfProblemsInClusterHeader = header.createCell(5);
-            noOfProblemsInClusterHeader.setCellValue("# of problems in cluster");
+            noOfProblemsInClusterHeader.setCellValue(rb.getString("nbr_problems_in_cluster") + ":");
 
             Cell noOfProblemsonFirstAttemptHeader = header.createCell(6);
-            noOfProblemsonFirstAttemptHeader.setCellValue("% solved in the first attempt");
+            noOfProblemsonFirstAttemptHeader.setCellValue(rb.getString("pct_solved_first_attempt") + ":");
 
 
             Cell totalHintsViewedPerClusterHeader = header.createCell(7);
-            totalHintsViewedPerClusterHeader.setCellValue("Avg ratio of hint requested");
+            totalHintsViewedPerClusterHeader.setCellValue(rb.getString("avg_ratio_hints_requested") + ":");
 
 
             AtomicInteger atomicIntegerForHeaderForData = new AtomicInteger(4);
@@ -360,43 +378,43 @@ public class TeachersReportDownload extends AbstractXlsView {
             Row header = sheet.createRow(3);
 
             Cell problemID = header.createCell(2);
-            problemID.setCellValue("Problem ID");
+            problemID.setCellValue(rb.getString("problem_id"));
 
 
             Cell problemName = header.createCell(3);
-            problemName.setCellValue("Problem Name");
+            problemName.setCellValue(rb.getString("problem_name"));
 
 
             Cell problemStandard = header.createCell(4);
-            problemStandard.setCellValue("Problem Standard");
+            problemStandard.setCellValue(rb.getString("problem_standard"));
 
 
             Cell noStudentsSeenProblem = header.createCell(5);
-            noStudentsSeenProblem.setCellValue("# of Students seen the problem");
+            noStudentsSeenProblem.setCellValue(rb.getString("nbr_students_seen_problem"));
 
 
             Cell getPercStudentsSolvedEventually = header.createCell(6);
-            getPercStudentsSolvedEventually.setCellValue("% of Students solved the problem");
+            getPercStudentsSolvedEventually.setCellValue(rb.getString("pct_students_solved_problem"));
 
 
             Cell getGetPercStudentsSolvedFirstTry = header.createCell(7);
-            getGetPercStudentsSolvedFirstTry.setCellValue("% of Students solved the problem on the first attempt");
+            getGetPercStudentsSolvedFirstTry.setCellValue(rb.getString("pct_students_solved_first_attempt"));
 
 
             Cell percStudentsRepeated = header.createCell(8);
-            percStudentsRepeated.setCellValue("% of Students repeated the problem");
+            percStudentsRepeated.setCellValue(rb.getString("pct_students_reeated_problem"));
 
 
             Cell percStudentsSkipped = header.createCell(9);
-            percStudentsSkipped.setCellValue("% of Students skipped the problem");
+            percStudentsSkipped.setCellValue(rb.getString("pct_students_skipped_problem"));
 
 
             Cell percStudentsGaveUp = header.createCell(10);
-            percStudentsGaveUp.setCellValue("% of Students gave up");
+            percStudentsGaveUp.setCellValue(rb.getString("pct_students_gave_up"));
 
 
             Cell mostIncorrectResponse = header.createCell(11);
-            mostIncorrectResponse.setCellValue("Most Frequent Incorrect Response");
+            mostIncorrectResponse.setCellValue(rb.getString("most_frequent_incorrect_reponse"));
 
 
             AtomicInteger atomicIntegerForHeaderForData = new AtomicInteger(4);
@@ -475,13 +493,13 @@ public class TeachersReportDownload extends AbstractXlsView {
             Cell studentNameID = header.createCell(2);
             Cell studentNameCell = header.createCell(3);
             Cell studentUsernameCell = header.createCell(4);
-            studentNameID.setCellValue("Student ID");
+            studentNameID.setCellValue(rb.getString("student_id"));
 
 
-            studentNameCell.setCellValue("Student Name");
+            studentNameCell.setCellValue(rb.getString("student_name"));
 
 
-            studentUsernameCell.setCellValue("Username");
+            studentUsernameCell.setCellValue(rb.getString("username"));
 
 
             AtomicInteger atomicIntegerForHeader = new AtomicInteger(5);
@@ -571,26 +589,26 @@ public class TeachersReportDownload extends AbstractXlsView {
             Cell childCellHeaderTopicID = header.createCell(20);
             Cell childCellHeaderTopicDescription = header.createCell(21);
 
-            studentNameID.setCellValue("Student ID");
-            studentNameCell.setCellValue("Student Name");
-            studentUsernameCell.setCellValue("Username");
-            childCellHeaderProblemId.setCellValue("Problem Id");
-            childCellHeaderProblemNickName.setCellValue("Problem Nickname");
-            childCellHeaderProblemFinishedOn.setCellValue("Problem finished on");
-            childCellHeaderProblemDescription.setCellValue("Problem Description");
-            childCellHeaderProblemURL.setCellValue("Problem URL");
-            childCellHeaderSolvedCorrectly.setCellValue("Solved Correctly");
-            childCellHeadermistakesMade.setCellValue("# of mistakes made");
-            childCellHedarHintsSeen.setCellValue("# of hints seen");
-            childCellHeaderAttemptsMade.setCellValue("# of attempts made");
-            childCellExampleSeen.setCellValue("Effort");
-            childCellVideosSeen.setCellValue("# of video seen");
-            childCellHeaderEffort.setCellValue("# of example seen");
-            childCellHeaderStandard.setCellValue("Standard");
-            childCellHeaderDifficulty.setCellValue("Difficulty");
-            childCellHeaderMastery.setCellValue("Mastery");
-            childCellHeaderTopicID.setCellValue("Problem Set ID");
-            childCellHeaderTopicDescription.setCellValue("Problem Set");
+            studentNameID.setCellValue(rb.getString("student_id"));
+            studentNameCell.setCellValue(rb.getString("student_name"));
+            studentUsernameCell.setCellValue(rb.getString("username"));
+            childCellHeaderProblemId.setCellValue(rb.getString("problem_id"));
+            childCellHeaderProblemNickName.setCellValue(rb.getString("problem_nick_name"));
+            childCellHeaderProblemFinishedOn.setCellValue(rb.getString("problem_finishd_on"));
+            childCellHeaderProblemDescription.setCellValue(rb.getString("problem_descrition"));
+            childCellHeaderProblemURL.setCellValue(rb.getString("problem_url"));
+            childCellHeaderSolvedCorrectly.setCellValue(rb.getString("solved_correctly"));
+            childCellHeadermistakesMade.setCellValue(rb.getString("nbr_mistakes_made"));
+            childCellHedarHintsSeen.setCellValue(rb.getString("nbr_hints_seen"));
+            childCellHeaderAttemptsMade.setCellValue(rb.getString("nbr_attempts_made"));
+            childCellExampleSeen.setCellValue(rb.getString("effort"));
+            childCellVideosSeen.setCellValue(rb.getString("nbr_videos_seen"));
+            childCellHeaderEffort.setCellValue(rb.getString("nbr_examples_seen"));
+            childCellHeaderStandard.setCellValue(rb.getString("standard"));
+            childCellHeaderDifficulty.setCellValue(rb.getString("difficulty"));
+            childCellHeaderMastery.setCellValue(rb.getString("mastery"));
+            childCellHeaderTopicID.setCellValue(rb.getString("problem_set_id"));
+            childCellHeaderTopicDescription.setCellValue(rb.getString("problem_set"));
 
             AtomicInteger atomicInteger = new AtomicInteger(4);
             detailDataMap.forEach((key, dataObject) -> {
@@ -673,23 +691,23 @@ public class TeachersReportDownload extends AbstractXlsView {
             Row header = sheet.createRow(3);
 
             Cell surveyName = header.createCell(2);
-            surveyName.setCellValue("Survey Name");
+            surveyName.setCellValue(rb.getString("survey_name"));
 
 
             Cell studentName = header.createCell(3);
-            studentName.setCellValue("Student Name");
+            studentName.setCellValue(rb.getString("student_name"));
 
 
             Cell userName = header.createCell(4);
-            userName.setCellValue("Username");
+            userName.setCellValue(rb.getString("username"));
 
 
             Cell question = header.createCell(5);
-            question.setCellValue("Question");
+            question.setCellValue(rb.getString("question"));
 
 
             Cell studentAnswer = header.createCell(6);
-            studentAnswer.setCellValue("Student's Answer");
+            studentAnswer.setCellValue(rb.getString("student_answer"));
 
             
             AtomicInteger atomicIntegerForHeaderForData = new AtomicInteger(4);

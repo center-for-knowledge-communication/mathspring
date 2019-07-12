@@ -1,11 +1,25 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>MathSpring Login</title>
+    <title>MathSpring | <%= rb.getString("login")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -42,16 +56,6 @@
 
 <% 
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
-
-ResourceBundle rb = null;
-try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
-}
-catch (Exception e) {
-//	logger.error(e.getMessage());
-}
 
 // styles contain hard-coded content - conditionally include style based on langauge
 if (lang == "Spanish" ) {

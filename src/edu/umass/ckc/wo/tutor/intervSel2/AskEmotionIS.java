@@ -140,13 +140,13 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
             Emotion emotionToQuery;
             if (inputType.equals("slider"))  {
                 emotionToQuery= getEmotionToQueryRandom();
-                intervention = new AskEmotionSliderIntervention(emotionToQuery,this.numVals,this.askWhy, askAboutSkipping, this.questionHeader, this.question, skippedProblem);
+                intervention = new AskEmotionSliderIntervention(emotionToQuery,this.numVals,this.askWhy, askAboutSkipping, this.questionHeader, this.question, skippedProblem, smgr.getLocale());
             }
             else if (inputType.equals("freeAnswer"))
-                intervention = new AskEmotionFreeAnswerIntervention(askAboutSkipping, skippedProblem);
+                intervention = new AskEmotionFreeAnswerIntervention(askAboutSkipping, skippedProblem, smgr.getLocale());
             else   {
                 emotionToQuery= getEmotionToQueryRandom();
-                intervention = new AskEmotionRadioIntervention(emotionToQuery, this.askWhy, askAboutSkipping, skippedProblem);
+                intervention = new AskEmotionRadioIntervention(emotionToQuery, this.askWhy, askAboutSkipping, skippedProblem, smgr.getLocale());
             }
 
             state.setTimeOfLastIntervention(now);

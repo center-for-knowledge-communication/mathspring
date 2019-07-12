@@ -12784,7 +12784,7 @@ body {
   color: #003364;
 }
 .existing__message-box {
-  width: 700px;
+  width: 800px;
   position: absolute;
   left: 0;
   right: 0;
@@ -12807,7 +12807,7 @@ body {
   flex-direction: row;
   padding: 10px;
   height: 80px;
-  width: 500px;
+  width: 600px;
   margin: 0 auto;
 }
 .existing__return-button, .existing__login-button {
