@@ -866,7 +866,9 @@ giveFeedback    : function(remarksDiv, topic_state,topicState_pepperPlant,topicM
 
     problemsDone: function(problemsDone_div,problemsDone,totalProblems,problemsSolved) {
 
-        document.getElementById(problemsDone_div).innerHTML="Problems Done : " + problemsDone + "/"+totalProblems ;
+    	var probsdone = languageSet == "es" ? "Problemas hechos" : "Problems Done";
+
+        document.getElementById(problemsDone_div).innerHTML= probsdone + " : " + problemsDone + "/"+totalProblems ;
     }
 
 }

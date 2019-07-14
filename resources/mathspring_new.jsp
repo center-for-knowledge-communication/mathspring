@@ -1,5 +1,21 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -73,7 +89,6 @@
 <script type="text/javascript" src="js/tutorintervention.js"></script>
 <script type="text/javascript" src="js/intervhandlers_new.js"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
-<script src="js/bootstrap/js/language_es.js"></script>
 <script type="text/javascript">
         var globals = {
             lastProbType: '${lastProbType}',
@@ -179,7 +194,6 @@
             } else {
                 $('.huytran-practice__character-window').width(250);
             }
-            langPrefrenceForPracticePage();
         });
     </script>
 
@@ -241,12 +255,12 @@ label {
 	<audio id='questionaudio' name='questionaudio'>
 		<source id='questionogg' src='' type='audio/ogg'>
 		<source id='questionmp3' src='' type='audio/mpeg'>
-		Your browser does not support the audio element.
+		<%= rb.getString("browser_does_not_support_the_audio_element") %>
 	</audio>
 
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="600" height="600"
-		title="Watch/listen to this example. Use 'Play Next Step' to move along">
+		title="<%= rb.getString("watch_and_listen_instructions")%>">
 		<%-- This iframe gets replaced by swfobject.embed.   It replaces it with the Flash object/embed tags for showing a problem OR an the html
      of an HTML5 problem (perhaps in an iframe if we must)--%>
 		<iframe id="exampleFrame" name="iframe2" width="600" height="600"
@@ -261,7 +275,7 @@ label {
 		<div id="interventionDialogContent"></div>
 	</div>
 
-	<div id="selectProblemDialog" title="Select Problem">
+	<div id="selectProblemDialog" title="<%= rb.getString("select_problem")%>">
 		<iframe id="selectProblemDialogIframe" width="500" height="500"></iframe>
 	</div>
 
@@ -279,58 +293,58 @@ label {
 					class="huytran-sitenav__button huytran-sitenav__button--first"
 					id="nextProb"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-plus" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Next Problem</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 				</a> <a href="#" class="huytran-sitenav__button" id="hint"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o"
 						aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><span
-						id="hint_label">Hints</span></span>
+						id="hint_label"><%= rb.getString("hint") %></span></span>
 				</a> <a href="#" class="huytran-sitenav__button" id="replay"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-repeat"
 						aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Replay Hints</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("replay_hints") %></span>
 				</a> <a href="#" class="huytran-sitenav__button" id="read"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-bullhorn"
 						aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Read Question</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("read_question") %></span>
 				</a> <a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="example"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-question" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Show Example</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("show_example") %></span>
 				</a> <a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="video"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-video-camera" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Show Video</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("show_video") %></span>
 				</a> <a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="formulas"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-magic" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Formula</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("formula") %></span>
 				</a> <a class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					data-toggle="modal" data-target="#reportModal"> <span
 					class="huytran-sitenav__icon"> <i
 						class="fa fa-exclamation aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Report Error</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("report_error") %></span>
 				</a> <a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="glossary"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-sticky-note-o" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle">Glossary</span>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("glossary") %></span>
 				</a>
 				<c:if test="${showProblemSelector}">
 					<a id="selectProb" href="#" class="huytran-sitenav__button"> <span
 						class="huytran-sitenav__icon"> <i class="fa fa-check"
 							aria-hidden="true"></i>
-					</span> <span class="huytran-sitenav__buttontitle">Select Prob</span>
+					</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("select_prob") %></span>
 					</a>
 
 					<a id="getEventLogs" href="#" class="huytran-sitenav__button">
 						<span class="huytran-sitenav__icon"> <i class="fa fa-eye"
 							aria-hidden="true"></i>
-					</span> <span class="huytran-sitenav__buttontitle">View Log</span>
+					</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("view_log") %></span>
 					</a>
 				</c:if>
 				<a href="#" class="huytran-sitenav__button" id="video"> <span
@@ -345,12 +359,12 @@ label {
 		<div class="huytran-practice">
 			<div class="huytran-practice__menu">
 				<div class="huytran-practice__nav">
-					<a class="huytran-practice__navitem" id="home">My Garden</a> <a
-						class="huytran-practice__navitem" id="myProg">My Progress</a> <a
-						class="huytran-practice__navitem" href="#">Practice Area</a>
+					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> <a
+						class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> <a
+						class="huytran-practice__navitem" href="#"><%= rb.getString("practice_area") %></a>
 				<a class="huytran-practice__navitem huytran-practice__navitem--last"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
-					Log Out &nbsp; 
+					<%= rb.getString("log_out") %> &nbsp; 
 					<span class="fa fa-sign-out"></span>
 				</a>
 				</div>				
@@ -371,7 +385,7 @@ label {
 						<p id="pid">${probId}</p>
 						<div class="dev-view">
 							<p id="effort">${effort}</p>
-							<p class="dev-view-label" id="answer">Answer:
+							<p class="dev-view-label" id="answer"><%= rb.getString("answer")%>:
 								${globals.answer}</p>
 						</div>
 					</div>
@@ -405,7 +419,7 @@ label {
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Report Error</h5>
+					<h5 class="modal-title" id="exampleModalLabel"><%= rb.getString("report_error")%></h5>
 					<button type="button" class="close" data-dismiss="modal"
 						aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -414,16 +428,15 @@ label {
 				<div class="modal-body">
 					<form id="report-form" data-target="#reportModal" method="POST">
 						<div class="form-group">
-							<label for="message-text" class="form-control-label">Message:</label>
+							<label for="message-text" class="form-control-label"><%= rb.getString("message")%>:</label>
 							<textarea class="form-control" id="message-text" name="message"></textarea>
 						</div>
 						<div class="form-check">
 							<label class="form-check-label"> <input id="is-broken"
-								type="checkbox" class="form-check-input"> Is the current
-								problem broken?
+								type="checkbox" class="form-check-input"> <%= rb.getString("is_current_problem_broken")%>
 							</label>
 						</div>
-						<button type="submit" class="btn btn-success">Submit</button>
+						<button type="submit" class="btn btn-success"><%= rb.getString("submit")%></button>
 					</form>
 				</div>
 				<div class="modal-footer">

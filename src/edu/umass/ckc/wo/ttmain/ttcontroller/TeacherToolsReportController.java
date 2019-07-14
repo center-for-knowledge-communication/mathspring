@@ -32,8 +32,8 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/getTeacherReports", method = RequestMethod.POST)
     public @ResponseBody
-    String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType) throws TTCustomException {
-        return reportService.generateTeacherReport(teacherId, classId, reportType);
+    String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType, @RequestParam("lang") String lang) throws TTCustomException {
+        return reportService.generateTeacherReport(teacherId, classId, reportType, lang);
     }
 
     @RequestMapping(value = "/tt/getCompleteMasteryProjectionForStudent", method = RequestMethod.POST)

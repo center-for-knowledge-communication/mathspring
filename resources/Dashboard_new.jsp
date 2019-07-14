@@ -1,17 +1,31 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MathSpring | My Garden</title>
+    <title>MathSpring | <%= rb.getString("my_garden")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="manifest.json">
 
     <link href="sass_compiled/dashboard.css" rel="stylesheet" type="text/css" />
-
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart_new.js"></script>
     <script src="js/huy-slider.js"></script>
@@ -127,19 +141,19 @@
 
     <ul class="nav__list">
         <li class="nav__item">
-            <a href="#">My Garden</a>
+            <a href="#"><%= rb.getString("my_garden")%></a>
         </li>
         <li class="nav__item">
             <a
                     onclick="window.location='TutorBrain?action=navigation&from=sat_Hut&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"
             >
-                My Progress
+                <%= rb.getString("my_progress")%>
             </a>
         </li>
         <li class="nav__item">
             <c:choose>
             <c:when test="${newSession}">
-            <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'">Practice Area</a>
+            <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area")%></a>
             </c:when>
             <c:otherwise>
         <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'">Practice Area</a>
@@ -148,7 +162,7 @@
         </li>
         <li class="nav__item">
             <a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
-                Log Out &nbsp;
+                <%= rb.getString("log_out")%> &nbsp;
             <span class="fa fa-sign-out"></span>
             </a>
         </li>
@@ -173,11 +187,8 @@
 <div class="topic-list">
     <c:if test="${newUser == true}">
         <div class="welcome">
-            <h1>Welcome to MathSpring</h1>
-            <p>Go to
-                <a onclick="window.location='TutorBrain?action=navigation&from=sat_Hut&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'">My Progress</a>
-                to see all topics in your class or
-                <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'">Practice Area</a> to get started!
+            <h1><%= rb.getString("welcome_to_mathspring")%></h1>
+            <p><%= rb.getString("go_to_instructions")%>
             </p>
         </div>
     </c:if>
@@ -245,35 +256,35 @@
                     <div class="topic-list__flipper">
                         <div class="topic-list__front topic-list__front--${colorClass}">
                             <p class="topic-list__title">${topicName}</p>
-                            <p class="topic-list__info">${numProblemsDone} / ${numTotalProblems} problems done</p>
-                            <p class="topic-list__info">In Progress</p>
+                            <p class="topic-list__info">${numProblemsDone} / ${numTotalProblems} <%= rb.getString("problems_done")%></p>
+                            <p class="topic-list__info"><%= rb.getString("in_progress")%></p>
                             <div class="pot" id="${plantDiv}">
                             </div>
                         </div>
                         <div class="topic-list__back">
                             <p class="topic-list__title">${topicName}</p>
-                            <p class="topic-list__info">${numProblemsDone} / ${numTotalProblems} problems done</p>
-                            <p class="topic-list__info">In Progress</p>
+                            <p class="topic-list__info">${numProblemsDone} / ${numTotalProblems} <%= rb.getString("problems_done")%></p>
+                            <p class="topic-list__info"><%= rb.getString("in_progress")%></p>
                             <div class="topic-list__buttons">
                                 <div
                                         class="topic-list__button topic-list__button--green"
                                         onclick="window.location='${continueTopicLink}'"
                                 >
-                                    CONTINUE
+                                    <%= rb.getString("dashboard_continue")%>
                                 </div>
 
                                 <div
                                         class="topic-list__button topic-list__button--yellow"
                                         onclick="window.location='${reviewTopicLink}'"
                                 >
-                                    REVIEW
+                                    <%= rb.getString("dashboard_review")%>
                                 </div>
 
                                 <div
                                         class="topic-list__button topic-list__button--brown"
                                         onclick="window.location='${challengeTopicLink}'"
                                 >
-                                    CHALLENGE
+                                    <%= rb.getString("dashboard_challenge")%>
                                 </div>
                             </div>
                         </div>

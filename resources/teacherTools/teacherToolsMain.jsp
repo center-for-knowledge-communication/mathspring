@@ -2,6 +2,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="springForm" uri="http://www.springframework.org/tags/form" %>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());	
+}
+%>
 
 <!DOCTYPE HTML>
 <html>
@@ -56,7 +71,6 @@
             $("#report-wrapper2").show();
             $("#form-wrapper").hide();
             handleclickHandlers();
-            langPrefrenceForTTMainPage();
         });
       
         function handleclickHandlers() {
@@ -157,7 +171,7 @@
         <ul class="nav sidebar-nav">
             <li class="sidebar-brand">
                 <a href="#">
-                    <i class="fa fa-tachometer" aria-hidden="true"></i> Teacher Tools
+                    <i class="fa fa-tachometer" aria-hidden="true"></i> <%= rb.getString("teacher_tools") %>
                 </a>
             </li>
         </ul>
@@ -167,12 +181,12 @@
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a id= "profile_selector" href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                        <a id= "profile_selector" href="#"><i class="fa fa-fw fa-user"></i> <%= rb.getString("profile") %></a>
                     </li>
                     <li class="divider"></li>
                     <li>
                         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
-                                class="fa fa-fw fa-power-off"></i>Log Out</a>
+                                class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
                     </li>
                 </ul>
             </li>
@@ -182,13 +196,13 @@
         <ul class="nav sidebar-nav">
             <li>
                 <a id="PageRefresh" href="#"><i
-                        class="fa fa-fw fa-home"></i> Home</a>
+                        class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
             <li>
-                <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> Create a New Class</a>
+                <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
             </li>
             <li>
-                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i>Create Surveys and Math Problems</a>
+                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i><%= rb.getString("create_surveys_and_math_problems") %></a>
             </li>
         </ul>
         <!-- /#sidebar-end -->
@@ -202,10 +216,10 @@
                         <h1 class="page-header">
                             <c:choose>
                                 <c:when test="${noClass == false}">
-                                    <small>Existing Classes (New)</small>
+                                    <small><%= rb.getString("existing_classes") %></small>
                                 </c:when>
                                 <c:otherwise>
-                                    <small>You do not have any pre-existing class.</small>
+                                    <small><%= rb.getString("no_pre-existing_classes") %></small>
                                 </c:otherwise>
                             </c:choose>
 
@@ -240,7 +254,7 @@
                             </div>
                             <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left"><%= rb.getString("view_details") %></span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -262,7 +276,7 @@
          <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                           <small>Existing Classes (Archived)</small>
+                           <small><%= rb.getString("existing_classes_archived") %></small>
                         </h1>
                     </div>
          </div>
@@ -293,7 +307,7 @@
                             </div>
                             <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left"><%= rb.getString("view_details") %></span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -314,7 +328,7 @@
         <div id="form-wrapper" style="display: none;">
             <div class="col-lg-12">
                 <h1 class="page-header">
-                    <small>Class Setup</small>
+                    <small><%= rb.getString("class_setup") %></small>
                 </h1>
             </div>
             <springForm:form id="create_class_form" method="post"
@@ -324,24 +338,24 @@
                     <div id="create_class_out" class="col-md-6 col-sm-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Part one : Class Configuration
+                                <%= rb.getString("part_one_class_configuration") %>
                             </div>
                              <div class="panel-body">
                                <div class="form-group">
-                                    <label for="classLanguage">Class Language</label>
+                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-education"></i></span>
                                         <springForm:select path="classLanguage" class="form-control" id="classLanguage"
                                                            name="classLanguage">
-                                            <springForm:option value="">Select language preference for your class</springForm:option>
-                                            <springForm:option value="en:English">English</springForm:option>
-                                            <springForm:option value="es:Spanish">Spanish</springForm:option>
+                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
+                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="className">Class Name</label>
+                                    <label for="className"><%= rb.getString("class_name") %></label>
                                     <div class="input-group">
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-blackboard"></i></span>
@@ -350,7 +364,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="town">Town</label>
+                                    <label for="town"><%= rb.getString("town") %></label>
                                     <div class="input-group">
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-tree-deciduous"></i></span>
@@ -360,7 +374,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="schoolName">School</label>
+                                    <label for="schoolName"><%= rb.getString("school") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-university"></i></span>
                                         <springForm:input path="schoolName" id="schoolName" name="schoolName"
@@ -368,7 +382,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="schoolYear">Year</label>
+                                    <label for="schoolYear"><%= rb.getString("year") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-hourglass"></i></span>
@@ -377,7 +391,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="gradeSection">Section</label>
+                                    <label for="gradeSection"><%= rb.getString("section") %></label>
                                     <div class="input-group">
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-menu-hamburger"></i></span>
@@ -386,52 +400,52 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="classGrade">Class Grade</label>
+                                    <label for="classGrade"><%= rb.getString("class_grade") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-education"></i></span>
                                         <springForm:select path="classGrade" class="form-control" id="classGrade"
                                                            name="classGrade">
-                                            <springForm:option value="">Select Grade</springForm:option>
-                                            <springForm:option value="5">Grade 5</springForm:option>
-                                            <springForm:option value="6">Grade 6</springForm:option>
-                                            <springForm:option value="7">Grade 7</springForm:option>
-                                            <springForm:option value="8">Grade 8</springForm:option>
-                                            <springForm:option value="9">Grade 9</springForm:option>
-                                            <springForm:option value="10">Grade 10</springForm:option>
-                                            <springForm:option value="adult">Adult</springForm:option>
+                                            <springForm:option value=""><%= rb.getString("select_grade") %></springForm:option>
+                                            <springForm:option value="5"><%= rb.getString("grade") %> 5</springForm:option>
+                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
+                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
+                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
+                                            <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
+                                            <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+                                            <springForm:option value="adult"><%= rb.getString("adult") %>Adult</springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="lowEndDiff">Problem Complexity : Lower</label>
+                                    <label for="lowEndDiff"><%= rb.getString("problem_complexity_lower") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-education"></i></span>
                                         <springForm:select path="lowEndDiff" class="form-control" id="lowEndDiff"
                                                            name="lowEndDiff">
-                                            <springForm:option value="">Select Complexity</springForm:option>
-                                            <springForm:option value="below3">Three Grades Below</springForm:option>
-                                            <springForm:option value="below2">Two Grades Below</springForm:option>
-                                            <springForm:option value="below1">One Grade Below</springForm:option>
-                                            <springForm:option value="below0">No Grade Below</springForm:option>
+                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+                                            <springForm:option value="below3"><%= rb.getString("three_grades_below") %></springForm:option>
+                                            <springForm:option value="below2"><%= rb.getString("two_grades_below") %></springForm:option>
+                                            <springForm:option value="below1"><%= rb.getString("one_grades_below") %></springForm:option>
+                                            <springForm:option value="below0"><%= rb.getString("no_grades_below") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="highEndDiff">Problem Complexity : Higher</label>
+                                    <label for="highEndDiff"><%= rb.getString("problem_complexity_higher") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-education"></i></span>
                                         <springForm:select path="highEndDiff" class="form-control" id="highEndDiff"
                                                            name="highEndDiff">
-                                            <springForm:option value="">Select Complexity</springForm:option>
-                                            <springForm:option value="above3">Three Grades Above</springForm:option>
-                                            <springForm:option value="above2">Two Grades Above</springForm:option>
-                                            <springForm:option value="above1">One Grade Above</springForm:option>
-                                            <springForm:option value="above0">No Grade Above</springForm:option>
+                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+                                            <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
+                                            <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
+                                            <springForm:option value="above1"><%= rb.getString("one_grades_above") %></springForm:option>
+                                            <springForm:option value="above0"><%= rb.getString("one_grades_above") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -441,18 +455,17 @@
                     <div id="add_students_out" class="col-md-6 col-sm-6">
                         <div id="add_students_out_panel_default" class="panel panel-default">
                             <div class="panel-heading">
-                                Part two : Student Roster (Optional)
+                               <%= rb.getString("part_two_student_roster") %>
                             </div>
 
                             <div class="panel-body">
                                 <span class="input-group label label-warning">P.S</span>
-                                <label>The following fields are optional. However if you do wish to create students, make sure to give a unique prefix,
-                                    password and number of Id's you wish to create for this class</label>
+                                <label><%= rb.getString("student_name_instructions") %></label>
                             </div>
 
                             <div class="panel-body">
                                 <div class="form-group">
-                                    <label for="userPrefix">Username Prefix</label>
+                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
                                         <springForm:input path="userPrefix" id="userPrefix" name="userPrefix"
@@ -460,7 +473,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="passwordToken">Password</label>
+                                    <label for="passwordToken"><%= rb.getString("student_password") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-eye"></i></span>
                                         <springForm:input path="passwordToken" id="passwordToken" name="passwordToken"
@@ -468,7 +481,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="noOfStudentAccountsForClass"># of ID's to be created</label>
+                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-location-arrow"></i></span>
                                         <springForm:input path="noOfStudentAccountsForClass"
@@ -483,7 +496,7 @@
                     </div>
                 </div>
                 <div style="text-align:center;">
-                    <button role="button" type="submit" class="btn btn-primary">Create Class</button>
+                    <button role="button" type="submit" class="btn btn-primary"><%= rb.getString("create_class") %></button>
                 </div>
             </springForm:form>
         </div>

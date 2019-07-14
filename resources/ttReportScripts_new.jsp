@@ -1,18 +1,67 @@
+<%@ page import="java.util.ResourceBundle"%>
+<script type="text/javascript">
 /**
  * Created by nsmenon on 6/1/2017.
- * 
- * Obsoleted by Frank Sylvia 6/11/2019
- * 
- * !!!!!!!!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!!!!!
- * 
- * THIS JAVASCRIPT FILE IS NO LONGER IN USE.  
- * 
- * IT HAS BEEN REPLACED BY ttReportScripts_new.JSP A JSP VERSION WITH THE SAME BASIC LOGIC BUT MULTI-LINGUAL CAPABLE.
- * 
- * !!!!!!!!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!!!!!
  */
-
-//Report1 Varriables
+ 
+/** cut and paste snippets
+ 
+ 
+                     "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
+                    
+                    
+                "language": {
+                	"sEmptyTable":     "No data available in table",
+                	"sInfo":           "Showing _START_ to _END_ of _TOTAL_ entries",
+                	"sInfoEmpty":      "Showing 0 to 0 of 0 entries",
+                	"sInfoFiltered":   "(filtered from _MAX_ total entries)",
+                	"sInfoPostFix":    "",
+                	"sInfoThousands":  ",",
+                	"sLengthMenu":     "Show _MENU_ entries",
+                	"sLoadingRecords": "Loading...",
+                	"sProcessing":     "Processing...",
+                	"sSearch":         "Search:",
+                    "sUrl":            "",
+                	"sZeroRecords":    "No matching records found",
+                	"oPaginate": {
+                		"sFirst":    "First",
+                		"sLast":     "Last",
+                		"sNext":     "Next",
+                		"sPrevious": "Previous"
+                	},
+                	"oAria": {
+                		"sSortAscending":  ": activate to sort column ascending",
+                		"sSortDescending": ": activate to sort column descending"
+                	}
+                }
+*/
+ 
+ 
+ 
+ //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
 var perProblemSetLevelTwo;
@@ -44,19 +93,59 @@ var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
 
+var languagePreference = window.navigator.language;
+var languageSet = "en";
+if (languagePreference.includes("en")) {
+	languageSet = "en"
+} else if (languagePreference.includes("es")) {
+	languageSet = "es"
+}
+
+<% 
+/**
+try {
+	
+	Locale loc = new Locale(languagePreference.substring(0,2),languagePreference.substring(2,4));
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+	// Log error	
+}
+*/
+%>
+
 //Summary report variable
 var summaryReport;
 
-var effortLabelMap = {"SKIP" : "The student SKIPPED the problem (didn't do anything on the problem)",
-                       "NOTR" : "NOT even READING the problem --The student answered too fast, in less than 4 seconds",
-                        "GIVEUP" : "The student started working on the problem, but then GAVE UP and moved on without solving it correctly.",
-                        "SOF" :  "The student SOLVED the problem correctly on the FIRST attempt, without any help.",
-                        "ATT" : "The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help request.",
-                        "GUESS" : "The student apparently GUESSED, clicked through 3-5 answers until getting the right one, and did not ask for hints/videos etc.",
-                        "SHINT" : "Student SOLVED problem correctly after seeing HINTS.",
-                        "SHELP" : "Got the problem correct but saw atleast one video.",
-                        "NO DATA" : "No data could be gathered."
-                        }
+var effortLabelMap;
+
+if (languageSet == 'es') {
+
+	effortLabelMap = {
+			"SKIP" : "El estudiante saltó el problema (no hizo nada al respecto)",
+            "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos",
+            "GIVEUP" : "El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.",
+            "SOF" :  "El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.",
+            "ATT" : "El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.",
+            "GUESS" : "El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.",
+            "SHINT" : "El estudiante resolvió el problema correctamente después de ver PISTAS.",
+            "SHELP" : "Consiguió el problema correcto, pero vio al menos un video.",
+            "NO DATA" : "No se pudieron recopilar datos."
+    }
+}
+else {
+	effortLabelMap = {
+		  "SKIP" : "The student SKIPPED the problem (didn't do anything on the problem)",
+          "NOTR" : "NOT even READING the problem --The student answered too fast, in less than 4 seconds",
+          "GIVEUP" : "The student started working on the problem, but then GAVE UP and moved on without solving it correctly.",
+          "SOF" :  "The student SOLVED the problem correctly on the FIRST attempt, without any help.",
+          "ATT" : "The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help request.",
+          "GUESS" : "The student apparently GUESSED, clicked through 3-5 answers until getting the right one, and did not ask for hints/videos etc.",
+          "SHINT" : "Student SOLVED problem correctly after seeing HINTS.",
+          "SHELP" : "Got the problem correct but saw atleast one video.",
+          "NO DATA" : "No data could be gathered."
+    }
+}
 var effortChartOnPopup;
 function loadEffortMap (rows,flag) {
     if (flag) {
@@ -67,46 +156,92 @@ function loadEffortMap (rows,flag) {
             var containerChartSelector = "#containerChart" + rows;
             var legendChart = "#legendChart" + rows;
             var effortValues = effortMap[rows];
-            var effortData = {
-                labels: ["Type of behaviour in problem"],
+            var effortData;
+            
+            if (languageSet == 'es') {
+              effortData = {
+                labels: ["Tipo de comportamiento en problema"],
                 datasets: [{
                     backgroundColor: "#8dd3c7",
-                    label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
+                    label: 'OMITIR: El estudiante saltó el problema (no hizo nada al respecto)',
                     data: [effortValues[0]]
                 }, {
                     backgroundColor: "#ffffb3",
-                    label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
+                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
                     data: [effortValues[1]]
                 }, {
                     backgroundColor: "#bebada",
-                    label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
+                    label: 'ABANDONO: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                     data: [effortValues[2]]
                 }, {
                     backgroundColor: "#fb8072",
-                    label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
+                    label: 'CORRECTO: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                     data: [effortValues[3]]
                 }, {
                     backgroundColor: "#b3de69",
-                    label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
+                    label: 'AUTOCORRIGIO: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                     data: [effortValues[4]]
                 }, {
                     backgroundColor: "#fccde5",
-                    label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
+                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                     data: [effortValues[5]]
                 }, {
                     backgroundColor: "#80b1d3",
-                    label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
+                    label: 'CONAYUDA: El estudiante resolvió el problema correctamente después de ver PISTAS.',
                     data: [effortValues[6]]
                 }, {
                     backgroundColor: "#fdb462",
-                    label: 'SHELP: Got the problem correct but saw atleast one video.',
+                    label: 'SCONAYUDAHELP: Consiguió el problema correcto, pero vio al menos un video.',
                     data: [effortValues[7]]
                 }, {
-                    label: 'NO DATA: No data could be gathered.',
+                    label: 'NOHAYDATOS: No se pudieron recopilar datos.',
                     backgroundColor: "#d9d9d9",
                     data: [effortValues[8]],
                 },]
-            };
+              };
+            }
+            else {
+                effortData = {
+                        labels: ["Type of behaviour in problem"],
+                        datasets: [{
+                            backgroundColor: "#8dd3c7",
+                            label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
+                            data: [effortValues[0]]
+                        }, {
+                            backgroundColor: "#ffffb3",
+                            label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
+                            data: [effortValues[1]]
+                        }, {
+                            backgroundColor: "#bebada",
+                            label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
+                            data: [effortValues[2]]
+                        }, {
+                            backgroundColor: "#fb8072",
+                            label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
+                            data: [effortValues[3]]
+                        }, {
+                            backgroundColor: "#b3de69",
+                            label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
+                            data: [effortValues[4]]
+                        }, {
+                            backgroundColor: "#fccde5",
+                            label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
+                            data: [effortValues[5]]
+                        }, {
+                            backgroundColor: "#80b1d3",
+                            label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
+                            data: [effortValues[6]]
+                        }, {
+                            backgroundColor: "#fdb462",
+                            label: 'SHELP: Got the problem correct but saw atleast one video.',
+                            data: [effortValues[7]]
+                        }, {
+                            label: 'NO DATA: No data could be gathered.',
+                            backgroundColor: "#d9d9d9",
+                            data: [effortValues[8]],
+                        },]
+                      };            	
+            }
             var emotionChart = new Chart($(effortChartIdSelector), {
             type: 'horizontalBar',
             data: effortData,
@@ -162,52 +297,97 @@ function loadEffortMap (rows,flag) {
         var effortValues = completeValues['studentEffortsPerProblem'];
         var imageURL = problem_imageURL+rows+'.jpg';
         var legendChart = "#lengendTable";
-        $('#problemSnapshot').append('<span><strong>Problem ID :'+rows+'</strong></span>');
+        $('#problemSnapshot').append('<span><strong><%= rb.getString("problem_id")%> :'+rows+'</strong></span>');
         $('#problemSnapshot').append('<img src="'+imageURL +'"/>');
         if(effortChartOnPopup) {
             effortChartOnPopup.destroy();
             $(legendChart).empty();
         }
-        var effortData = {
+
+        if (languageSet == 'es') {
+			effortData = {
             labels: ["Type of behaviour in problem"],
             datasets: [{
                 backgroundColor: "#8dd3c7",
-                label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
+                label: 'SKIP: El estudiante saltó el problema (no hizo nada al respecto)',
                 data: [effortValues[0]]
             }, {
                 backgroundColor: "#ffffb3",
-                label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
+                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
                 data: [effortValues[1]]
             }, {
                 backgroundColor: "#bebada",
-                label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
+                label: 'GIVEUP: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                 data: [effortValues[2]]
             }, {
                 backgroundColor: "#fb8072",
-                label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
+                label: 'SOF: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                 data: [effortValues[3]]
             }, {
                 backgroundColor: "#b3de69",
-                label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
+                label: 'ATT: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                 data: [effortValues[4]]
             }, {
                 backgroundColor: "#fccde5",
-                label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
+                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                 data: [effortValues[5]]
             }, {
                 backgroundColor: "#80b1d3",
-                label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
+                label: 'SHINT: El estudiante resolvió el problema correctamente después de ver PISTAS.',
                 data: [effortValues[6]]
             }, {
                 backgroundColor: "#fdb462",
-                label: 'SHELP: Got the problem correct but saw atleast one video.',
+                label: 'SHELP: Consiguió el problema correcto, pero vio al menos un video.',
                 data: [effortValues[7]]
             }, {
-                label: 'NO DATA: No data could be gathered.',
+                label: 'NO DATA: NO DATA: No se pudieron recopilar datos.',
                 backgroundColor: "#d9d9d9",
                 data: [effortValues[8]],
             },]
         };
+        }
+        else {
+			effortData = {
+		            labels: ["Type of behaviour in problem"],
+		            datasets: [{
+		                backgroundColor: "#8dd3c7",
+		                label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
+		                data: [effortValues[0]]
+		            }, {
+		                backgroundColor: "#ffffb3",
+		                label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
+		                data: [effortValues[1]]
+		            }, {
+		                backgroundColor: "#bebada",
+		                label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
+		                data: [effortValues[2]]
+		            }, {
+		                backgroundColor: "#fb8072",
+		                label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
+		                data: [effortValues[3]]
+		            }, {
+		                backgroundColor: "#b3de69",
+		                label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
+		                data: [effortValues[4]]
+		            }, {
+		                backgroundColor: "#fccde5",
+		                label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
+		                data: [effortValues[5]]
+		            }, {
+		                backgroundColor: "#80b1d3",
+		                label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
+		                data: [effortValues[6]]
+		            }, {
+		                backgroundColor: "#fdb462",
+		                label: 'SHELP: Got the problem correct but saw atleast one video.',
+		                data: [effortValues[7]]
+		            }, {
+		                label: 'NO DATA: No data could be gathered.',
+		                backgroundColor: "#d9d9d9",
+		                data: [effortValues[8]],
+		            },]
+		        };        	
+        }
             effortChartOnPopup = new Chart($("#studentEffortRecordedProblemCanvas"), {
             type: 'horizontalBar',
             data: effortData,
@@ -270,7 +450,7 @@ function loadEmotionMap (rows) {
                 percentValues[2] = Math.round(percentValues[2] / percentValues[5] * 100);
                 percentValues[3] = Math.round(percentValues[3] / percentValues[5] * 100);
                 percentValues[4] = Math.round(percentValues[4] / percentValues[5] * 100);
-                var barLabels = ['Not at All', 'A Little', 'Somewhat', 'Quite a Bit', 'Extremely'];
+                var barLabels = ['<%= rb.getString("not_at_all")%>', '<%= rb.getString("a_little")%>', '<%= rb.getString("somewhat")%>', '<%= rb.getString("quite_a_bit")%>', '<%= rb.getString("extremely")%>'];
                 var colorCodes;
                 if (keyValue == 'Frustration') {
                     colorCodes = ['#FFB2B2', '#FF7F7F', '#FF4C4C', '#FF1919', '#CC0000'];
@@ -359,7 +539,7 @@ function resetStudentData( title,studentId) {
                 $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                 $('#errorMsgModelPopup').modal('show');
             }else{
-                $("#successMsgModelPopup").find("[class*='modal-body']").html("Student Info updated. Please refresh page to reflect changes");
+                $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_info_updated")%>");
                 $('#successMsgModelPopup').modal('show');
             }
         }
@@ -383,7 +563,7 @@ function resetPassWordForThisStudent(id,uname){
                  $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                  $('#errorMsgModelPopup').modal('show');
              }else{
-                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "The Password for the student is reset. The new password is"+response+"");
+                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%>"+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
          }
@@ -428,7 +608,7 @@ function updateStudentInfo(formName){
 
     });
 }
-
+/** Moved back to classDetail.jsp
 function editStudentInformation(id,fname,lname,uname,context){
     var tr = context.closest('tr')
     var row = $('#student_roster').DataTable().row( tr );
@@ -478,7 +658,7 @@ function editStudentInformation(id,fname,lname,uname,context){
     }
 
 }
-
+*/
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -489,13 +669,39 @@ function problemDetails(data, response) {
     });
 
     var selector = "#"+JSONData["problemLevelId"]+"_handler";
+if (languageSet == 'es') {
     $(document.body).on('click', selector ,function(){
         var rows = $("#"+JSONData["problemLevelId"]).dataTable(
             { "bPaginate": false,
                 "bFilter": false,
                 "bLengthChange": false,
                 rowReorder: false,
-                "bSort": false
+                "bSort": false,
+                "language": {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+                
             }).fnGetNodes();
 
         var rowsArray = [];
@@ -521,20 +727,68 @@ function problemDetails(data, response) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "Content changes saved successfully." );
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
                     $('#successMsgModelPopupForProblemSets').modal('show');
                 }
             }
         });
 
     });
+}
+else {
+    $(document.body).on('click', selector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
 
+                
+            }).fnGetNodes();
+
+        var rowsArray = [];
+        var problemIds = [""];
+        var i = 0;
+        $("input:checkbox:not(:checked)", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+        for(var j=0; j < rowsArray.length; j++)
+            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
+
+        $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+}
+	var save_changes = "<%= rb.getString("save_changes")%>";
+	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
+	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
+	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
+	
     var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
-        " <div class='panel panel-default'> <div class='panel-body'><strong>Problem Set: " + JSONData["topicName"] + "</strong></div> " +
-        " <div class='panel-body'><strong>Standards Covered in this Problem Set: " + html + "</strong></div>" +
+        " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+        " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
         " <div class='panel-body'><strong>Summary : " + JSONData["topicSummary"] + "</strong></div>"+
-        "<div class='panel-body'>Students will see the following selected problems for this problem set,within the grade range that you selected. Feel free to Check/Uncheck  problems you wish to add/remove and remember to Click on the 'SAVE' button below </div>"+
-        "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>Save Changes</button></div></div>";
+        "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
+        "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
 
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
@@ -542,7 +796,7 @@ function problemDetails(data, response) {
 }
 
 function problemLevelDetails(JSONData,problems){
-    var tableHeader = '<table id='+JSONData["problemLevelId"]+' class="table table-striped table-bordered hover" cellspacing="0" width="100%"><thead><tr><th>Activated</th><th>ID</th><th>Name</th><th>Nickname</th><th>Difficulty</th><th>CC Standard</th><th>Type</th></tr></thead><tbody>';
+    var tableHeader = '<table id='+JSONData["problemLevelId"]+' class="table table-striped table-bordered hover" cellspacing="0" width="100%"><thead><tr><th><%= rb.getString("activated")%></th><th><%= rb.getString("id")%></th><th><%= rb.getString("name")%></th><th><%= rb.getString("nickname")%></th><th><%= rb.getString("difficulty")%></th><th><%= rb.getString("cc_standard")%></th><th>Type</th></tr></thead><tbody>';
     var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
     $.each(problems, function (i, obj) {
         var html = "";
@@ -660,7 +914,7 @@ function handleclickHandlers() {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "The Selected Surveys are activated for this class" );
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("selected_surveys_active_for_class")%>" );
                     $('#successMsgModelPopupForProblemSets').modal('show');
                 }
             }
@@ -688,13 +942,10 @@ function handleclickHandlers() {
         html: true,
         trigger: 'hover',
         container: 'body',
-        title: 'What is Mastery ?',
+        title: '<%= rb.getString("what_is_mastery")%>',
         placement: 'right',
         content: function () {
-            return "<ul><li>Student 'Mastery' is MathSpring's estimation of how much the student has demonstrated to know the topic, ranging from zero (0) to one (1)</li>" +
-                "<li>Example: IF a student solves 4 problems correctly in a row without mistakes and no help requests, they get a mastery of 0.85 and mastered the topic.</li>" +
-                "(Note: also, these 4 problems would be increasingly harder, because as students continue to solve these problems correctly, problems get harder).  " +
-                "Mastery would increase slower if the student asks for hints. Mastery would decrease if students make mistakes";
+            return "<ul><li><%= rb.getString("what_is_mastery_popover1")%></li><li><%= rb.getString("what_is_mastery_popover2")%></li></ul><%= rb.getString("what_is_mastery_popover3")%>";
         }
     });
 
@@ -704,7 +955,7 @@ function handleclickHandlers() {
         container: 'body',
         placement: 'top',
         content: function () {
-            return 'Order in which the ProblemSet will be shown to the student.';
+            return '<%= rb.getString("order_problemset_will_be_shown")%>';
         }
     });
     $('a[rel="popoveractivatedProblems"]').popover({
@@ -713,7 +964,7 @@ function handleclickHandlers() {
         container: 'body',
         placement: 'top',
         content: function () {
-            return 'Number of Activated Problems. Click on the "V" arrow to see all problems and activate more.';
+            return '<%= rb.getString("nbr_activated_problems_click_to_see")%>';
         }
     });
 
@@ -727,39 +978,9 @@ function handleclickHandlers() {
 
 }
 
-function changeReportThreeHeaderAccordingToLanguage(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-		languageSet = "en"
-	} else if (languagePreference.includes("es")) {
-		languageSet = "es"
-	}
-	if (languageSet == 'es') {
-		var header = {'sid':  'Nombre del  alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Numero de problemas intentados','effchart': 'GrÃ¡fica de esfuerzo','emochart': 'GrÃ¡fica de emociones'};
-		return header;
-	}else{
-	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','effchart': 'Effort Chart','emochart': 'Emotion Chart'};
-	 	return header;
-	}
-}
-
-
 function changeReportFourHeaderAccordingToLanguage(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-		languageSet = "en"
-	} else if (languagePreference.includes("es")) {
-		languageSet = "es"
-	}
-	if (languageSet == 'es') {
-		var header = {'cclusters': 'Grupos en clase','problems': '# de problemas intentados de esto tipo','fattempt':  '% resolvidos en el primero intento','avgratio': 'ProporciÃ³n promedio de pista solicitada'};
-	 	return header;
-	}else{
-	 	var header = {'cclusters': 'Clusters in Class','problems': '# of problems of this kind encountered','fattempt':  '% solved in the first attempt','avgratio': '% solved in the first attempt'};
-	 	return header;
-	}
+	var header = {'cclusters': '<%= rb.getString("clusters_in_class")%>','problems': '<%= rb.getString("nbr_problems_this_kind")%>','fattempt':  '% resolvidos en el primero intento','avgratio': '<%= rb.getString("pct_solved_first_attempt")%>','avgratio': '<%= rb.getString("pct_solved_first_attempt")%>'};
+ 	return header;
 }
 
 function registerAllEvents(){
@@ -791,23 +1012,66 @@ function registerAllEvents(){
 
 
     $('#masteryTrajecotoryLegend').DataTable({
-        "columnDefs" : [{"title" : "Problem ID", "targets": [0]},{"title" : "Problem Name", "targets": [1]},{"title" : "Student Effort", "targets": [2]}],
+        "columnDefs" : [{"title" : "<%= rb.getString("problem_id")%>", "targets": [0]},{"title" : "<%= rb.getString("problem_name")%>", "targets": [1]},{"title" : "<%= rb.getString("student_effort")%>", "targets": [2]}],
         destroy: true,
         "bFilter": false,
         "bLengthChange": false,
         "ordering": false
     });
 
-
+if (languageSet == 'es') {
     perProblemSetReport = $('#perTopicStudentReport').DataTable({
         data: [],
         destroy: true,
         columns: [
-            { title: "Student ID" },
-            { title: "Student Name" },
-            { title: "Username" },
-            { title: "No of problems attempted" },
-            { title: "Effort Chart" },
+            { title: "<%= rb.getString("student_id")%>" },
+            { title: "<%= rb.getString("student_name")%>" },
+            { title: "<%= rb.getString("username")%>" },
+            { title: "<%= rb.getString("nbr_problems_attempted")%>" },
+            { title: "<%= rb.getString("effchart")%>" },
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bLengthChange": false,
+        rowReorder: false,
+        "bSort" : false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+
+    } );
+}
+else {
+    perProblemSetReport = $('#perTopicStudentReport').DataTable({
+        data: [],
+        destroy: true,
+        columns: [
+            { title: "<%= rb.getString("student_id")%>" },
+            { title: "<%= rb.getString("student_name")%>" },
+            { title: "<%= rb.getString("username")%>" },
+            { title: "<%= rb.getString("nbr_problems_attempted")%>" },
+            { title: "<%= rb.getString("effchart")%>" },
         ],
         "bPaginate": false,
         "bFilter": false,
@@ -816,9 +1080,11 @@ function registerAllEvents(){
         "bSort" : false,
 
     } );
-    
+	
+}
     var classListSize = $('#classListSize').val();
     if(classListSize != 0){
+
     	apply_content_table = $('#apply_content_table').DataTable({
         "bPaginate": false,
         "bFilter": false,
@@ -850,29 +1116,80 @@ function registerAllEvents(){
 	
  }
     
-
+    if (languageSet == 'es') {
     perProblemReportTable = $('#perProblemReport').DataTable({
         data: [],
         destroy: true,
         columns: [
-            { title: "Problem ID", data : "problemId" },
-            { title: "Problem Name", data : "problemName" },
-            { title: "# of Students seen the problem", data : "noStudentsSeenProblem" },
-            { title: "# of Students solved the problem", data : "getPercStudentsSolvedEventually" },
-            { title: "# of Students solved the problem on the first attempt", data : "getGetPercStudentsSolvedFirstTry" },
-            { title: "# of Students solved the problem on the second attempt", data : "getGetPercStudentsSolvedSecondTry" },
-            { title: "# of Students repeated the problem", data : "percStudentsRepeated" },
-            { title: "# of Students skipped the problem", data : "percStudentsSkipped" },
-            { title: "# of Students gave up", data : "percStudentsGaveUp" },
-            { title: "Most Frequent Incorrect Response", data : "mostIncorrectResponse" }
+            { title: "<%= rb.getString("problem_id")%>", data : "problemId" },
+            { title: "<%= rb.getString("problem_name")%>", data : "problemName" },
+            { title: "<%= rb.getString("nbr_students_seen_problem")%>", data : "noStudentsSeenProblem" },
+            { title: "<%= rb.getString("nbr_students_solved_problem")%>", data : "getPercStudentsSolvedEventually" },
+            { title: "<%= rb.getString("nbr_students_solved_problem_first")%>", data : "getGetPercStudentsSolvedFirstTry" },
+            { title: "<%= rb.getString("nbr_students_solved_problem_second")%>", data : "getGetPercStudentsSolvedSecondTry" },
+            { title: "<%= rb.getString("nbr_students_repeated_problem")%>", data : "percStudentsRepeated" },
+            { title: "<%= rb.getString("nbr_students_skipped_problem")%>", data : "percStudentsSkipped" },
+            { title: "<%= rb.getString("nbr_students_gave_up")%>", data : "percStudentsGaveUp" },
+            { title: "<%= rb.getString("most_frequent_incorrect_response")%>", data : "mostIncorrectResponse" }
         ],
         "bPaginate": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: false
 
     } );
+    }
+    else { 
+        perProblemReportTable = $('#perProblemReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: "<%= rb.getString("problem_id")%>", data : "problemId" },
+                { title: "<%= rb.getString("problem_name")%>", data : "problemName" },
+                { title: "<%= rb.getString("nbr_students_seen_problem")%>", data : "noStudentsSeenProblem" },
+                { title: "<%= rb.getString("nbr_students_solved_problem")%>", data : "getPercStudentsSolvedEventually" },
+                { title: "<%= rb.getString("nbr_students_solved_problem_first")%>", data : "getGetPercStudentsSolvedFirstTry" },
+                { title: "<%= rb.getString("nbr_students_solved_problem_second")%>", data : "getGetPercStudentsSolvedSecondTry" },
+                { title: "<%= rb.getString("nbr_students_repeated_problem")%>", data : "percStudentsRepeated" },
+                { title: "<%= rb.getString("nbr_students_skipped_problem")%>", data : "percStudentsSkipped" },
+                { title: "<%= rb.getString("nbr_students_gave_up")%>", data : "percStudentsGaveUp" },
+                { title: "<%= rb.getString("most_frequent_incorrect_response")%>", data : "mostIncorrectResponse" }
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false
+
+        } );
+    	
+    }
     var cc_headers = changeReportFourHeaderAccordingToLanguage();
+
+    if (languageSet == 'es') {
     perClusterReportTable = $('#perClusterReport').DataTable({
         data: [],
         destroy: true,
@@ -883,12 +1200,60 @@ function registerAllEvents(){
             { title: cc_headers['avgratio'], data : "totalHintsViewedPerCluster" }
         ],
         "bPaginate": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: false
 
     } );
-    var headers = changeReportThreeHeaderAccordingToLanguage();
+    }
+    else { 
+        perClusterReportTable = $('#perClusterReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: cc_headers['cclusters'], data : "clusterName" },
+                { title: cc_headers['problems'], data : "noOfProblemsInCluster" },
+                { title: cc_headers['fattempt'], data : "noOfProblemsonFirstAttempt" },
+                { title: cc_headers['avgratio'], data : "totalHintsViewedPerCluster" }
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false
+
+        } );
+    	
+    }
+    
+    
+	var headers = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("nbr_problems_attempted")%>','effchart': '<%= rb.getString("effchart")%>','emochart': '<%= rb.getString("emochart")%>'};
+
+    
+    if (languageSet == 'es') {
     
     perStudentReport  =  $('#perStudentReport').DataTable({
         data: [],
@@ -904,7 +1269,32 @@ function registerAllEvents(){
         "bPaginate": false,
         "bFilter": false,
         "bLengthChange": false,
-        rowReorder: false,
+        rowReorder: false,                
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+
         "scrollX": true,
         "bSort" : false,
         "columnDefs": [
@@ -955,7 +1345,7 @@ function registerAllEvents(){
                     var emotionContainerChart = "emotionContainerChart"+row[0];
                     var containerConvas = "<div id="+emotionContainerChart+" style='width:100%;display:none'>";
                     if(jQuery.isEmptyObject(studentEmotions)) {
-                        var noEmotionReported = "<span><label>The Student does not have any emotions Reported </label></span>";
+                        var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
                         var containerChartSelector = "#emotionContainerChart" +row[0];
                          containerConvas += noEmotionReported;
                     }else {
@@ -966,7 +1356,7 @@ function registerAllEvents(){
                             var eachEmotionComment = studentComments[key];
                             var commentsTable = "";
                             if (!jQuery.isEmptyObject(eachEmotionComment)) {
-                                commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr>Comments</tr></thead><tbody>"
+                                commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr><%= rb.getString("comments")%></tr></thead><tbody>"
                                 var emotionComments = "";
                                 eachEmotionComment.forEach(function (comments) {
                                     if (comments != "")
@@ -975,15 +1365,31 @@ function registerAllEvents(){
                                 emotionComments += "</tbody></table>"
                                 commentsTable += emotionComments;
                             }
-                            var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + key + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
+
+                            var emo = "undefined";
+                                          
+                            if (key == "Frustration") {
+                            	emo = "Frustración";
+                            }
+                            if (key == "Confidence") {
+                            	emo = "Confianza";
+                            }
+                            if (key == "Excitement") {
+                            	emo = "Estusiasmo";
+                            }
+                            if (key == "Interest") {
+                            	emo = "Inters";
+                            }
+                            
+                            var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + emo + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
 
                             if (i == 0 || i == 1)
                                 divBlockOne += canvasTags;
                             if (i == 2 || i == 3)
                                 divBlockTwo += canvasTags;
                             if (i == 3) {
-                                divBlockOne += "</div>"
-                                divBlockTwo += "</div>"
+                                divBlockOne += "</div>";
+                                divBlockTwo += "</div>";
                             }
                             i++;
                         });
@@ -992,12 +1398,150 @@ function registerAllEvents(){
                     return "<i id='emotioniconID"+row[0]+"' style='cursor:pointer;' class='fa fa-heart' aria-hidden='true' onclick='loadEmotionMap("+row[0]+");'></i>"+containerConvas;
                 }
             },
-        ]
-    } );
-var activeProblemSetsize = $('#activeproblemSetSize').val();
+                
+    	]
+    }    
+    );
+    }
+    else {
+        perStudentReport  =  $('#perStudentReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers['sid'] },
+                { title: headers['sname']  },
+                { title: headers['uname']  },
+                { title: headers['problems']  },
+                { title: headers['effchart']  },
+                { title: headers['emochart']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "5%",
+                    "targets": [ 0 ],
+                    "visible": false
+
+                },{
+                    "width": "5%",
+                    "targets": [ 1 ],
+                    "visible": true
+
+                },{
+                    "width": "5%",
+                    "targets": [ 2 ],
+                    "visible": true
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 3 ],
+                    "visible": true,
+                    'className': 'dt-body-center',
+                    'render': function ( data, type, row ) {
+                        return '<label>'+data+'&nbsp&nbsp</lable><a  class="viewEachStudentDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
+                    }
+
+                },
+                {
+                    "targets": [ 4 ],
+                    "width": "10%",
+                    'className': 'dt-body-center',
+                    'render': function ( data, type, row ) {
+                        var effortChartId = "effortChart"+row[0];
+                        var containerChart = "containerChart"+row[0];
+                        var legendChart = "legendChart"+row[0];
+                        var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                        return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
+                    }
+                }, {
+                    "targets": [ 5 ],
+                    "width": "70%",
+                    'className': 'dt-body-center',
+                    'render': function ( data, type, row ) {
+                        var studentEmotions = emotionMap[row[0]];
+                        var studentComments = commentsMap[row[0]];
+                        var emotionContainerChart = "emotionContainerChart"+row[0];
+                        var containerConvas = "<div id="+emotionContainerChart+" style='width:100%;display:none'>";
+                        if(jQuery.isEmptyObject(studentEmotions)) {
+                            var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
+                            var containerChartSelector = "#emotionContainerChart" +row[0];
+                             containerConvas += noEmotionReported;
+                        }else {
+                            var i = 0;
+                            var divBlockOne = "<div id='bloc1' style='margin: 1%; float: left;'>";
+                            var divBlockTwo = "<div id='bloc2' style='margin: 1%; float: left;'>";
+                            Object.keys(studentEmotions).forEach(function (key) {
+                                var eachEmotionComment = studentComments[key];
+                                var commentsTable = "";
+                                if (!jQuery.isEmptyObject(eachEmotionComment)) {
+                                    commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr><%= rb.getString("comments")%></tr></thead><tbody>"
+                                    var emotionComments = "";
+                                    eachEmotionComment.forEach(function (comments) {
+                                        if (comments != "")
+                                            emotionComments += "<tr><td>" + comments + "</td></tr>";
+                                    });
+                                    emotionComments += "</tbody></table>"
+                                    commentsTable += emotionComments;
+                                }
+                                var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + key + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
+
+                                if (i == 0 || i == 1)
+                                    divBlockOne += canvasTags;
+                                if (i == 2 || i == 3)
+                                    divBlockTwo += canvasTags;
+                                if (i == 3) {
+                                    divBlockOne += "</div>";
+                                    divBlockTwo += "</div>";
+                                }
+                                i++;
+                            });
+                            containerConvas = containerConvas + divBlockOne + divBlockTwo + "</div>"
+                        }
+                        return "<i id='emotioniconID"+row[0]+"' style='cursor:pointer;' class='fa fa-heart' aria-hidden='true' onclick='loadEmotionMap("+row[0]+");'></i>"+containerConvas;
+                    }
+                },
+                    
+        	]
+        }    
+        );    	
+    }
+    
+	var activeProblemSetsize = $('#activeproblemSetSize').val();
     if(activeProblemSetsize != 0){
-    activetable = $('#activateProbSetTable').DataTable({
+    	
+        if (languageSet == 'es') {
+    	activetable = $('#activateProbSetTable').DataTable({
         "bPaginate": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: true,
@@ -1037,6 +1581,50 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
         ]
 
     });
+    }
+    else {
+    	activetable = $('#activateProbSetTable').DataTable({
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: true,
+            "columnDefs": [
+                {
+                    "targets": [ 0 ],
+                    "width": "10%",
+                    'className': 'reorder',
+                    orderable: false
+                },
+                {
+                    "targets": [ 1 ],
+                    "width": "30%",
+                    "orderable": false,
+                },
+                {
+                    "targets": [ 2 ],
+                    orderable: false,
+                    "width": "10%",
+                },
+                {
+                    "width": "30%",
+                    "targets": [ 3 ],
+                    "visible": false,
+                    "orderable": false,
+
+                },
+                {
+                    "targets": [ -1 ],
+                    "orderable": false,
+                    "width": "20%",
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta){
+                        return '<input type="checkbox">';
+                    }
+                },
+            ]
+
+        });        	
+    }
 	
 	 $(".active").click(function () {
         $(this).children(':first').toggleClass('rotate-icon');
@@ -1201,15 +1789,48 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
     }
 
     var studentRosterSize = $('#studentRosterSize').val();
-
     if(studentRosterSize != 0) {
+        if (languageSet == 'es') {
+            studentRosterTable = $('#student_roster').DataTable({
+                "bPaginate": false,
+                "bFilter": false,
+                "bLengthChange": false,
+                "bSort": false,
+                "language": {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        } 
+        else {
         studentRosterTable = $('#student_roster').DataTable({
             "bPaginate": false,
             "bFilter": false,
             "bLengthChange": false,
-            "bSort": false
-        });
+            "bSort": false            
 
+        });
+        }
     }
 
     $("#deacivateProblemSets").click(function () {
@@ -1219,7 +1840,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
         var i = 0;
 
         if (rows.length == 1) {
-            $("#errorMsgModelPopup").find("[class*='modal-body']").html("Every class must have atleast one active problem set");
+            $("#errorMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("every_class_must_have_active_problem")%>");
             $('#errorMsgModelPopup').modal('show');
         }
         $("input:checkbox:not(:checked)",rows).each(function(){
@@ -1242,7 +1863,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "Selected problemsets are deactivated" );
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("selected_problemsets_are_deactivated")%>" );
                     $('#successMsgModelPopupForProblemSets').modal('show');
                 }
             }
@@ -1269,7 +1890,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopup").find("[class*='modal-body']").html( "User creation was successful. Please refresh you page to view your change " );
+                    $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("user_creation_successful")%> " );
                     $('#successMsgModelPopup').modal('show');
                 }
 
@@ -1304,7 +1925,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "Selected problemsets are activated" );
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("selected_problemsets_are_activated")%>" );
                     $('#successMsgModelPopupForProblemSets').modal('show');
                 }
             }
@@ -1340,7 +1961,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "Current class content is applied to all the selected classes" );
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("current_class_content_applied")%>" );
                     $('#successMsgModelPopupForProblemSets').modal('show');
                 }
             }
@@ -1421,11 +2042,11 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
 
 
                 var columDvalues = [{data : "problemId"},{data : "problemName"},{data : "studentEffort"}]
-                var columNvalues = [{"title" : "Problem ID", "targets": [0]},{"title" : "Problem Name", "targets": [1], "render": function ( data, type, row ) {
+                var columNvalues = [{"title" : "<%= rb.getString("problem_id")%>", "targets": [0]},{"title" : "<%= rb.getString("problem_name")%>", "targets": [1], "render": function ( data, type, row ) {
                     var imageURL = problem_imageURL+row['problemId']+'.jpg';
                     return  "<a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + data + "</a>";
                 }
-                },{"title" : "Student Effort", "targets": [2], "render": function ( data, type, row ) {
+                },{"title" : "<%= rb.getString("student_effort")%>", "targets": [2], "render": function ( data, type, row ) {
                     return  "<a style='cursor:pointer' rel='popoverLabel' data-content='"+effortLabelMap[data]+"'>" + data + "</a>";
                 }
                 }];
@@ -1463,7 +2084,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     data: {
                         labels: chartLabel,
                         datasets: [{
-                            label: 'Mastery Recorded',
+                            label: '<%= rb.getString("mastery_recorded")%>',
                             data: chartData,
                             backgroundColor: bgcolor
                         }]
@@ -1472,7 +2093,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                             xAxes: [{
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Problems Seen in Order'
+                                    labelString: '<%= rb.getString("problems_seen_in_order")%>'
                                 }
                             }],
                             yAxes: [{
@@ -1510,7 +2131,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
         if (row.child.isShown()) {
             row.child.hide();
         } else {
-          var tabPanel =  '<ul class="nav nav-tabs"> <li class="active"><a  href="#1" data-toggle="tab">Problems solved today</a></li> <li><a href="#2" data-toggle="tab">Problems solved most recently</a> </li> <li><a href="#3" data-toggle="tab">All solved problems</a> </li> </ul>';
+        	var tabPanel =  '<ul class="nav nav-tabs"> <li class="active"><a  href="#1" data-toggle="tab"><%= rb.getString("problems_solved_today")%></a></li> <li><a href="#2" data-toggle="tab"><%= rb.getString("problems_solved_most_recently")%></a> </li> <li><a href="#3" data-toggle="tab"><%= rb.getString("all_solved_problems")%></a> </li> </ul>';	
             var studentDataList = eachStudentData[rowID];
             var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
             var outputStudentDataTodayList =[];
@@ -1538,9 +2159,9 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                         }
                     });
                   if(jQuery.isEmptyObject(outputStudentDataTodayList)) {
-                      secondHeader = '<div id=' + "panel1" + rowID + ' class="panel-body animated zoomOut">No Problems Done Today</div>'
+                      secondHeader = '<div id=' + "panel1" + rowID + ' class="panel-body animated zoomOut"> <%= rb.getString("no_problems_done_today")%></div>'
                   } else {
-                      secondHeader = '<div id='+"panel1"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th>Problem</th><th>Problem Nickname</th><th>Problem finished on</th><th>Problem Description</th><th>Solved Correctly</th><th># of mistakes made</th><th># of hints seen</th><th># of attempts made</th><th># of videos Seen</th><th># of examples seen</th><th>Effort</th></tr></thead><tbody>';
+                      secondHeader = '<div id='+"panel1"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
                     $.each(outputStudentDataTodayList, function (i, obj) {
                         var correctHtml = "";
                         var imageURL = problem_imageURL+obj[11]+'.jpg';
@@ -1572,9 +2193,9 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                         }
                     });
                     if(jQuery.isEmptyObject(outputStudentDataYesterdayList)) {
-                        thirdHeader = '<div id=' + "panel2" + rowID + ' class="panel-body animated zoomOut">No Problems Done Yesterday</div>'
+                        thirdHeader = '<div id=' + "panel2" + rowID + ' class="panel-body animated zoomOut"><%= rb.getString("no_problems_done_yesterday")%></div>'
                     } else {
-                        thirdHeader = '<div id='+"panel2"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th>Problem</th><th>Problem Nickname</th><th>Problem finished on</th><th>Problem Description</th><th>Solved Correctly</th><th># of mistakes made</th><th># of hints seen</th><th># of attempts made</th><th># of videos Seen</th><th># of examples seen</th><th>Effort</th></tr></thead><tbody>';
+                        thirdHeader = '<div id='+"panel2"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
                         $.each(outputStudentDataYesterdayList, function (i, obj) {
                             var correctHtml = "";
                             var imageURL = problem_imageURL+obj[11]+'.jpg';
@@ -1592,7 +2213,7 @@ var activeProblemSetsize = $('#activeproblemSetSize').val();
                     }
                 }else{
                     //show all other problems
-                    firstHeader = '<div id='+"panel"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th>Problem</th><th>Problem Nickname</th><th>Problem finished on</th><th>Problem Description</th><th>Solved Correctly</th><th># of mistakes made</th><th># of hints seen</th><th># of attempts made</th><th># of videos Seen</th><th># of examples seen</th><th>Effort</th></tr></thead><tbody>';
+                    firstHeader = '<div id='+"panel"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
                     $.each(outputStudentDataList, function (i, obj) {
                         var correctHtml = "";
                         var imageURL = problem_imageURL+obj[11]+'.jpg';
@@ -1666,7 +2287,7 @@ var completeDataChart;
                     data: {
                         labels: problemsetName,
                         datasets: [{
-                            label: 'Average Mastery Recorded',
+                            label: '<%= rb.getString("average_mastery_recorded")%>',
                             data: masteryData,
                             backgroundColor: '#33b5e5'
                         }]
@@ -1720,7 +2341,7 @@ var completeDataChart;
                     data: {
                         labels: problemsetName,
                         datasets: [{
-                            label: 'Max Mastery Recorded',
+                            label: '<%= rb.getString("max_mastery_recorded")%>',
                             data: masteryData,
                             backgroundColor: '#33b5e5'
                         }]
@@ -1775,7 +2396,7 @@ var completeDataChart;
                     data: {
                         labels: problemsetName,
                         datasets: [{
-                            label: 'Last Recorded Mastery',
+                            label: '<%= rb.getString("last_recorded_mastery")%>',
                             data: masteryData,
                             backgroundColor: '#33b5e5'
                         }]
@@ -1810,7 +2431,8 @@ var completeDataChart;
             data : {
                 classId: classID,
                 teacherId: teacherID,
-                reportType: 'perStudentPerProblemSetReport'
+                reportType: 'perStudentPerProblemSetReport',
+                lang: languagePreference
             },
             success : function(data) {
                 $('#collapseOne').find('.loader').hide();
@@ -1861,13 +2483,13 @@ var completeDataChart;
                         return temp;
                     }
                 );
-                columNvalues.unshift({"title" : "Student Name","name":"studentName" , "targets": [0]},
-                    {"title" : "Username","name":"userName", "targets": [1],   "createdCell": function (td, cellData, rowData, row, col) {
+                columNvalues.unshift({"title" : "<%= rb.getString("student_name")%>","name":"studentName" , "targets": [0]},
+                    {"title" : "<%= rb.getString("username")%>","name":"userName", "targets": [1],   "createdCell": function (td, cellData, rowData, row, col) {
                         $(td).html(cellData+"&nbsp;&nbsp;" +
-                            "<a tabindex='0' rel='completeMasteryChartPopover' data-toggle='popover' data-trigger='focus' title='Get Complete Mastery Chart' style='cursor: pointer;' aria-hidden='true'><i class='fa fa-bar-chart' aria-hidden='true'/></a>");
+                            "<a tabindex='0' rel='completeMasteryChartPopover' data-toggle='popover' data-trigger='focus' title='<%= rb.getString("get_complete_mastery_chart")%>' style='cursor: pointer;' aria-hidden='true'><i class='fa fa-bar-chart' aria-hidden='true'/></a>");
                         }
                     },
-                    {"title" : "StudentID","name":"studentId", "targets": [2], visible : false});
+                    {"title" : "<%= rb.getString("student_id")%>","name":"studentId", "targets": [2], visible : false});
                 var columDvalues = $.map(perProblemSetColumnNamesMap, function(v) {
                         v = v.replace(/\s/g, '');
                         return  { width: "20%", data : v };
@@ -1891,6 +2513,58 @@ var completeDataChart;
                     $('#perTopicStudentReport').empty();
                 }
 
+                
+                if (languageSet == "es") {
+                perProblemSetReport = $('#perTopicStudentReport').DataTable({
+                    data: perProblemSetLevelOneFullTemp,
+                    destroy: true,
+                    "columns": columDvalues,
+                    "columnDefs": columNvalues,
+                    "bPaginate": true,
+                    "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
+                    "scrollX": true,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": false,
+                    "drawCallback": function () {
+                        $('a[rel=completeMasteryChartPopover]').popover({
+                            html: true,
+                            trigger: 'focus',
+                            placement: 'right',
+                            content: function () {
+                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> Get Complete "Mastery" by average </a></li>' +
+                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> Get "Mastery" reported by highest recorded value for problemset</a></li>' +
+                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> Get Complete "Mastery" by latest recorded value for each problemset</a></li></ul>';
+                            }
+                        })
+                    }
+                });
+                }
+                else {
                 perProblemSetReport = $('#perTopicStudentReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
@@ -1915,7 +2589,10 @@ var completeDataChart;
                         })
                     }
                 });
-
+                }
+                
+                
+                
             }
         });
 
@@ -1930,7 +2607,8 @@ var completeDataChart;
             data : {
                 classId: classID,
                 teacherId: teacherID,
-                reportType: 'perProblemReport'
+                reportType: 'perProblemReport',
+                lang: languagePreference
             },
             success : function(data) {
                 $('#collapseTwo').find('.loader').hide();
@@ -1956,19 +2634,19 @@ var completeDataChart;
                         perProblemSetLevelOneFullTemp.push(perProblemSetLevelOneTemp);
                         });
                 var columNvalues = [
-                    { "title": "Problem ID", "name" : "problemId" , "targets" : [0]},
-                    { "title": "Problem Name", "name" : "problemName" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("problem_id")%>", "name" : "problemId" , "targets" : [0]},
+                    { "title": "<%= rb.getString("problem_name")%>", "name" : "problemName" , "targets" : [1],"render": function ( data, type, full, meta ) {
                             var problemId = full['problemId'];
                             var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                              var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                             return '<a  onclick="window.open('+window+');" style="cursor:pointer" rel="popoverPerProblem" data-img="' + problemImageMap[problemId] + '">' + data + '</a>';
                     }},
-                    { "title": "CC Standard", "name" : "problemStandardAndDescription" , "targets" : [2],"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("cc_standard")%>", "name" : "problemStandardAndDescription" , "targets" : [2],"render": function ( data, type, full, meta ) {
                         var standardSplitter = data.split(":");
                         return "<a style='cursor:pointer' rel='popoverstandard' title='"+standardSplitter[1]+"'  data-content='" + standardSplitter[2]+ "'>" + standardSplitter[0] + "</a>";
                     }},
-                    { "title": "# of Students seen the problem", "name" : "noStudentsSeenProblem","targets" : [3] },
-                    { "title": "% of Students solved the problem on the first attempt", "name" : "getGetPercStudentsSolvedFirstTry","targets" : [4] ,"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("nbr_students_seen_problem")%>", "name" : "noStudentsSeenProblem","targets" : [3] },
+                    { "title": "<%= rb.getString("pct_students_solved_problem_first")%>", "name" : "getGetPercStudentsSolvedFirstTry","targets" : [4] ,"render": function ( data, type, full, meta ) {
                         return data+" %";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                             if(cellData >= 80){
@@ -1977,17 +2655,17 @@ var completeDataChart;
                                 $(td).addClass('span-danger-layer-one');
                             }
                     } },
-                    { "title": "# of Students solved the problem on the second attempt", "name" : "getGetPercStudentsSolvedSecondTry","targets" : [5], visible : false },
-                    { "title": "% of Students repeated the problem", "name" : "percStudentsRepeated","targets" : [6],"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("nbr_students_solved_problem_second")%>", "name" : "getGetPercStudentsSolvedSecondTry","targets" : [5], visible : false },
+                    { "title": "<%= rb.getString("pct_students_repeated_problem")%>", "name" : "percStudentsRepeated","targets" : [6],"render": function ( data, type, full, meta ) {
                         return data+" %";
                     }},
-                    { "title": "% of Students skipped the problem", "name" : "percStudentsSkipped","targets" : [7] ,"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("pct_students_skipped_problem")%>", "name" : "percStudentsSkipped","targets" : [7] ,"render": function ( data, type, full, meta ) {
                         return data+" %";
                     }},
-                    { "title": "% of Students gave up", "name" : "percStudentsGaveUp","targets" : [8],"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("pct_students_gave_up")%>", "name" : "percStudentsGaveUp","targets" : [8],"render": function ( data, type, full, meta ) {
                         return data+" %";
                     }},
-                    { "title": "Most Frequent Incorrect Response", "name" : "mostIncorrectResponse","targets" : [9] }
+                    { "title": "<%= rb.getString("most_frequent_incorrect_response")%>", "name" : "mostIncorrectResponse","targets" : [9] }
                 ];
                 var columDvalues = [
                     { width: "10%", data : "problemId"},
@@ -2044,9 +2722,9 @@ var completeDataChart;
 
                     },
                     headerCallback: function headerCallback(thead, data, start, end, display) {
-                       $(thead).find('th').eq(5).html('% of Students repeated the problem &nbsp;&nbsp;<a rel="popoverHeader"  data-content="Students who received the problem again, because the last time they did NOT solve it."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                       $(thead).find('th').eq(6).html('% of Students skipped the problem &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who received the problem and immediately clicked the '+"New Problem"+' button"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                       $(thead).find('th').eq(7).html('% of Students gave up &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who started working on the problem, but decided to move on to another one (quit)."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                       $(thead).find('th').eq(5).html('<%= rb.getString("pct_students_repeated_problem")%> &nbsp;&nbsp;<a rel="popoverHeader"  data-content="<%= rb.getString("students_who_repeat")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                       $(thead).find('th').eq(6).html('<%= rb.getString("pct_students_skipped_problem")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_who_skip")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                       $(thead).find('th').eq(7).html('<%= rb.getString("pct_students_gave_up")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_who_gave_up")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
 
                     }
                 });
@@ -2065,7 +2743,8 @@ var completeDataChart;
             data : {
                 classId: classID,
                 teacherId: teacherID,
-                reportType: 'perStudentReport'
+                reportType: 'perStudentReport',
+                lang: languagePreference
             },
             success : function(data) {
                 var jsonData = $.parseJSON(data);
@@ -2092,7 +2771,8 @@ var completeDataChart;
             data : {
                 classId: classID,
                 teacherId: teacherID,
-                reportType: 'commonCoreClusterReport'
+                reportType: 'commonCoreClusterReport',
+                lang: languagePreference
             },
             success : function(data) {
                 $('#collapseFourLoader').hide();
@@ -2105,7 +2785,7 @@ var completeDataChart;
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
                             $(td).addClass('span-danger-layer-one');
-                        } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5 ) {
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
                         }
                     }},
@@ -2114,26 +2794,26 @@ var completeDataChart;
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
                             $(td).addClass('span-danger-layer-one');
-                        } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5 ) {
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
                             $(td).addClass('span-danger-layer-one');
-                        } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5) {
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
                             $(td).addClass('span-danger-layer-one');
-                        } else if (rowData['noOfProblemsonFirstAttempt'] > 20 && rowData['noOfProblemsonFirstAttempt'] <  40 && rowData['noOfProblemsInCluster'] >= 5) {
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
                         }
                     }},
-                    { "title": "ClusterID", "name" : "clusterId","targets" : [4], visible : false},
-                    { "title": "Cluster Description", "name" : "clusterCCName","targets" : [5], visible : false}
+                    { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
+                    { "title": "<%= rb.getString("cluster_description")%>", "name" : "clusterCCName","targets" : [5], visible : false}
                 ];
                 var columDvalues = [
                     { width: "30%", data : "categoryCodeAndDisplayCode"},
@@ -2158,13 +2838,39 @@ var completeDataChart;
                     perClusterReportTable.destroy();
                     $('#perClusterReport').empty();
                 }
+                if (languageSet == 'es') {
+
                 perClusterReportTable = $('#perClusterReport').DataTable({
                     data: dataPerCluster,
                     destroy: true,
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bFilter": false,
-                    "bPaginate": false,
+                    "bPaginate": false,                
+                    "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
                     "bLengthChange": false,
                     rowReorder: false,
                     "bSort": true,
@@ -2177,6 +2883,28 @@ var completeDataChart;
                         });
                     }
                 });
+                }
+                else {
+                    perClusterReportTable = $('#perClusterReport').DataTable({
+                        data: dataPerCluster,
+                        destroy: true,
+                        "columns": columDvalues,
+                        "columnDefs": columNvalues,
+                        "bFilter": false,
+                        "bPaginate": false,                
+                        "bLengthChange": false,
+                        rowReorder: false,
+                        "bSort": true,
+                        "drawCallback": function () {
+                            $('a[rel=popoverCluster]').popover({
+                                html: false,
+                                trigger: 'hover',
+                                placement: 'right',
+                                container: 'body',
+                            });
+                        }
+                    });                	
+                }
             }
         });
 
@@ -2193,7 +2921,8 @@ var completeDataChart;
             	
                 classId: classID,
                 teacherId: teacherID,
-                reportType: 'summarySurveyReport'
+                reportType: 'summarySurveyReport',
+                lang: languagePreference
             },
             success : function(data) {
             	$('#collapseFive').find('.loader').hide();
@@ -2205,7 +2934,7 @@ var completeDataChart;
                 
                 var columNvalues = [
                     
-                    { "title": "Survey Name", "name" : "SurveyName" , "targets" : [0],"render": function ( data, type, full, meta ) {
+                    { "title": "<%= rb.getString("survey_name")%>", "name" : "SurveyName" , "targets" : [0],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getStudentDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     }},
                     
@@ -2218,7 +2947,7 @@ var completeDataChart;
                     surveyList.push([key]);
                     
                 });
-                
+                if (languageSet == 'es') {
                 surveyReportTable = $('#surveyReport').DataTable({
                     data: surveyList,
                     destroy: true,
@@ -2226,11 +2955,51 @@ var completeDataChart;
                     "columnDefs": columNvalues,
                     "bFilter": false,
                     "bPaginate": false,
+                    "language": {
+                        "sProcessing":     "Procesando...",
+                        "sLengthMenu":     "Mostrar _MENU_ registros",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix":    "",
+                        "sSearch":         "Buscar:",
+                        "sUrl":            "",
+                        "sInfoThousands":  ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
                     "bLengthChange": false,
                     rowReorder: false,
                     "bSort": true,
                     
                 });
+                }
+                else {
+                    surveyReportTable = $('#surveyReport').DataTable({
+                        data: surveyList,
+                        destroy: true,
+                        "columns": [ { title: "Survey Name" , width: "30%"}],
+                        "columnDefs": columNvalues,
+                        "bFilter": false,
+                        "bPaginate": false,
+                        "bLengthChange": false,
+                        rowReorder: false,
+                        "bSort": true,
+                        
+                    });
+                	
+                }
                 
             },
             error : function(e) {
@@ -2263,31 +3032,71 @@ var completeDataChart;
             });
             
             var columNvalues = [
-            	{ "title": "Question", "name" : "Question" , "targets" : [0],"render": function ( data, type, full, meta ) {
+            	{ "title": "<%= rb.getString("question")%>", "name" : "Question" , "targets" : [0],"render": function ( data, type, full, meta ) {
                     return '<label style="width: 90%;">'+data+'</label>';
                 }},
-                { "title": "Answer", "name" : "Answer" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                { "title": "<%= rb.getString("answer")%>", "name" : "Answer" , "targets" : [1],"render": function ( data, type, full, meta ) {
                     return '<label style="width: 90%;">'+data+'</label>';
                 }}
                 
                 
             ];
-            
+
             var $perSurveyQuestiontable = $($('#question_table_Survey').html());
             $perSurveyQuestiontable.css('width', '100%');
+            if (languageSet == 'es') {
             surveyQuestionTable = $perSurveyQuestiontable.DataTable({
                 data: questionList,
                 destroy: true,
-                "columns": [ { title: "Question" , width: "20%"}, { title: "Answer" , width: "20%"}],
+                "columns": [ { title: "<%= rb.getString("question")%>" , width: "20%"}, { title: "<%= rb.getString("answer")%>" , width: "20%"}],
                 "columnDefs": columNvalues,
                 "bFilter": false,
                 "bPaginate": false,
+                "language": {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                },
                 "bLengthChange": false,
                 rowReorder: false,
                 "bSort": true,
                 
             });
-            
+            }
+            else { 
+                surveyQuestionTable = $perSurveyQuestiontable.DataTable({
+                    data: questionList,
+                    destroy: true,
+                    "columns": [ { title: "<%= rb.getString("question")%>" , width: "20%"}, { title: "<%= rb.getString("answer")%>" , width: "20%"}],
+                    "columnDefs": columNvalues,
+                    "bFilter": false,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": true,
+                    
+                });
+            	
+            }
             
             surveyStudentTable.row(tr).child(surveyQuestionTable.table().container()).show();
         }
@@ -2313,13 +3122,13 @@ var completeDataChart;
             });
             
             var columNvalues = [
-            	{ "title": "Student Name", "name" : "Student Name" , "targets" : [0],"render": function ( data, type, full, meta ) {
+            	{ "title": "<%= rb.getString("student_name")%>", "name" : "Student Name" , "targets" : [0],"render": function ( data, type, full, meta ) {
                     return '<label style="width: 90%;">'+data+'</label>';
                 }},
-                { "title": "Username", "name" : "Username" , "targets" : [1],"render": function ( data, type, full, meta ) {
+                { "title": "<%= rb.getString("username")%>", "name" : "Username" , "targets" : [1],"render": function ( data, type, full, meta ) {
                     return '<label style="width: 50%;">'+data+'</label><a  class="getQuestionDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                 }},
-                { "title": "Student Id", "name" : "StudentId" , "targets" : [2],"render": function ( data, type, full, meta ) {
+                { "title": "<%= rb.getString("student_id")%>", "name" : "StudentId" , "targets" : [2],"render": function ( data, type, full, meta ) {
                     return '<label style="width: 50%;">'+data+'</label>';
                 }}
                 
@@ -2330,7 +3139,7 @@ var completeDataChart;
             surveyStudentTable = $perSurveyStudenttable.DataTable({
                 data: studentList,
                 destroy: true,
-                "columns": [ { title: "Student Name" , width: "20%"}, { title: "Username" , width: "20%"}, { title: "StudentId" , width: "20%"}],
+                "columns": [ { title: "<%= rb.getString("student_name")%>" , width: "20%"}, { title: "<%= rb.getString("username")%>" , width: "20%"}, { title: "<%= rb.getString("student_id")%>" , width: "20%"}],
                 "columnDefs": columNvalues,
                 "bFilter": false,
                 "bPaginate": false,
@@ -2391,9 +3200,9 @@ var completeDataChart;
                         perProblemSetLevelOneFullTemp.push(perProblemSetLevelOneTemp);
                     });
                     var columNvalues = [
-                        {"title": "Problem ID", "name": "problemId", "targets": [0]},
+                        {"title": "<%= rb.getString("problem_id")%>", "name": "problemId", "targets": [0]},
                         {
-                            "title": "Problem Name",
+                            "title": "<%= rb.getString("problem_name")%>",
                             "name": "problemName",
                             "targets": [1],
                             "render": function (data, type, full, meta) {
@@ -2405,7 +3214,7 @@ var completeDataChart;
                             }
                         },
                         {
-                            "title": "CC Standard",
+                            "title": "<%= rb.getString("cc_standard")%>",
                             "name": "problemStandardAndDescription",
                             "targets": [2],
                             "render": function (data, type, full, meta) {
@@ -2413,9 +3222,9 @@ var completeDataChart;
                                 return "<a style='cursor:pointer' rel='popoverstandard' title='"+standardSplitter[1]+"'  data-content='" + standardSplitter[2]+ "'>" + standardSplitter[0] + "</a>";
                             }
                         },
-                        {"title": "# of Students seen the problem", "name": "noStudentsSeenProblem", "targets": [3]},
+                        {"title": "<%= rb.getString("nbr_students_seen_problem")%>", "name": "noStudentsSeenProblem", "targets": [3]},
                         {
-                            "title": "% of Students solved the problem on the first attempt",
+                            "title": "<%= rb.getString("pct_students_solved_problem_first")%>",
                             "name": "getGetPercStudentsSolvedFirstTry",
                             "targets": [4],
                             "createdCell": function (td, cellData, rowData, row, col) {
@@ -2431,13 +3240,13 @@ var completeDataChart;
                         }
                         },
                         {
-                            "title": "# of Students solved the problem on the second attempt",
+                            "title": "<%= rb.getString("nbr_students_solved_problem_second")%>",
                             "name": "getGetPercStudentsSolvedSecondTry",
                             "targets": [5],
                             visible: false
                         },
                         {
-                            "title": "% of Students repeated the problem",
+                            "title": "<%= rb.getString("pct_students_repeated_problem")%>",
                             "name": "percStudentsRepeated",
                             "targets": [6],
                             "render": function ( data, type, full, meta ) {
@@ -2445,7 +3254,7 @@ var completeDataChart;
                         }
                         },
                         {
-                            "title": "% of Students skipped the problem",
+                            "title": "<%= rb.getString("pct_students_skipped_problem")%>",
                             "name": "percStudentsSkipped",
                             "targets": [7],
                             "render": function ( data, type, full, meta ) {
@@ -2453,16 +3262,16 @@ var completeDataChart;
                         }
                         },
                         {
-                            "title": "% of Students gave up",
+                            "title": "<%= rb.getString("pct_students_gave_up")%>",
                             "name": "percStudentsGaveUp",
                             "targets": [8],
                             "render": function ( data, type, full, meta ) {
                             return data+" %";
                         }
                         },
-                        {"title": "Most Frequent Incorrect Response", "name": "mostIncorrectResponse", "targets": [9]},
+                        {"title": "<%= rb.getString("most_frequent_incorrect_response")%>", "name": "mostIncorrectResponse", "targets": [9]},
                         {
-                            "title": "Similar problems",
+                            "title": "<%= rb.getString("similar_problems")%>",
                             "name": "similarproblems",
                             "targets": [10],"render": function ( data, type, full, meta ) {
                                 var gradeIdCode = full['problemStandardAndDescription'].split(":")[0];
@@ -2473,7 +3282,7 @@ var completeDataChart;
 
                             }
                         },{
-                            "title": "Collective effort on Problem",
+                            "title": "<%= rb.getString("collective_effort_on_problem")%>",
                             "name": "collectiveEffortOnProblem",
                             "targets": [ 11 ],
                             "width": "10%",
@@ -2505,6 +3314,7 @@ var completeDataChart;
 
 
                     var $perClusterChildtable = $($('#child_table_perCluster').html());
+                                       
                     $perClusterChildtable.css('width', '100%');
                         var perClusterChildtable = $perClusterChildtable.DataTable({
                         data: perProblemSetLevelOneFullTemp,
@@ -2543,10 +3353,10 @@ var completeDataChart;
 
                         },
                         headerCallback: function headerCallback(thead, data, start, end, display) {
-                            $(thead).find('th').eq(5).html('% of Students repeated the problem &nbsp;&nbsp;<a rel="popoverHeader"  data-content="Students who received the problem again, because the last time they did NOT solve it."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(6).html('% of Students skipped the problem &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who received the problem and immediately clicked the '+"New Problem"+' button"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(7).html('% of Students gave up &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who started working on the problem, but decided to move on to another one (quit)."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(9).html('See Similar Problems &nbsp;&nbsp;<a rel="popoverHeader" data-content="Click here to see similar problems like the one seen in each row"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(5).html('<%= rb.getString("pct_students_repeated_problem")%> &nbsp;&nbsp;<a rel="popoverHeader"  data-content="Students who received the problem again, because the last time they did NOT solve it."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(6).html('<%= rb.getString("pct_students_skipped_problem")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who received the problem and immediately clicked the '+"New Problem"+' button"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(7).html('<%= rb.getString("pct_students_gave_up")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who started working on the problem, but decided to move on to another one (quit)."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(9).html('<%= rb.getString("see_similar_problems")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("click_to_see_similar_problems")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
 
                         }
                     });
@@ -2560,3 +3370,4 @@ var completeDataChart;
     });
 
 }
+</script>

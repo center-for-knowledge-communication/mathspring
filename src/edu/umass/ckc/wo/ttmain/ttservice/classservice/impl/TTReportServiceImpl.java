@@ -39,7 +39,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import java.util.ResourceBundle;
+import java.util.Locale;
 /**
  * Created by nsmenon on 5/19/2017.
  */
@@ -52,12 +53,19 @@ public class TTReportServiceImpl implements TTReportService {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private static Logger logger = Logger.getLogger(TTReportServiceImpl.class);
+	private ResourceBundle rb = null;
 
 
     @Override
-    public String generateTeacherReport(String teacherId, String classId, String reportType) throws TTCustomException {
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException {
+
         try {
-            switch (reportType) {
+        	
+    		// Multi=lingual enhancement
+    		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+
+        	switch (reportType) {
                 case "perStudentReport":
                     List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
@@ -66,7 +74,7 @@ public class TTReportServiceImpl implements TTReportService {
                     Map<String, List<Document>> genemotioMap   = generateEmotionMapValues(studentIdMap);
                     Map<String,Map<String,int[]>> fullstudentEmotionsMap = new HashMap<>();
                     Map<String,Map<String,List<String>>> fullstudentEmotionsComments = new HashMap<>();
-                    String[] barLabels = {"Not at All", "A Little", "Somewhat", "Quite a Bit", "Extremely"};
+                    String[] barLabels = {rb.getString("not_at_all"), rb.getString("a_little"), rb.getString("somewhat"), rb.getString("quite_a_bit"), rb.getString("extremely")};
                     genemotioMap.forEach((studentId, xmlDocumentList) -> {
                         Map<String,List<String>> eachEmotionMap = new HashMap<>();
                         int[] frustrationValues = new int[6];
@@ -77,7 +85,7 @@ public class TTReportServiceImpl implements TTReportService {
                         List<String> excitementComments = null;
                         int[] interestValues = new int[6];
                         List<String> interestComments = null;
-
+                        
                         Integer frustrationCount=0,confidenceCount=0,excitementCount=0,interestCount = 0;
                         Map<String,int[]> emotionsValuesMap = new HashMap<>();
                         for (Document doc : xmlDocumentList) {
@@ -157,6 +165,7 @@ public class TTReportServiceImpl implements TTReportService {
                         fullstudentEmotionsComments.put(studentId,eachEmotionMap);
                         fullstudentEmotionsMap.put(studentId,emotionsValuesMap);
                     });
+                	
                     ObjectMapper objMapper = new ObjectMapper();
                     Map<String, Object> dataMap = new HashMap<>();
                     dataMap.put("levelOneData", levelOneData);
@@ -191,6 +200,10 @@ public class TTReportServiceImpl implements TTReportService {
         } catch (IOException e) {
            logger.error(e.getMessage());
            throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
+        }
+        catch (MissingResourceException e) {
+        	logger.error(e.getMessage());
+        	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
         }
         return null;
     }
@@ -1065,6 +1078,22 @@ public class TTReportServiceImpl implements TTReportService {
                     }
                 }
                 String[] effortvalues = new String[9];
+                
+                // Frank S. - Temporary fix for divide by zero exception
+                if (perProblemReportBeanObj.nStudsSeen == 0) {
+                	perProblemReportBeanObj.nStudsSeen = 1;
+                	logger.debug("When nStudsSeen = 0");
+                	logger.debug("SKIPO=" + String.valueOf(SKIPO));
+                	logger.debug("NOTRO=" + String.valueOf(NOTRO));
+                	logger.debug("GIVEUPO=" + String.valueOf(GIVEUPO));
+                	logger.debug("SOFO=" + String.valueOf(SOFO));
+                	logger.debug("ATTO=" + String.valueOf(ATTO));
+                	logger.debug("GUESSO=" + String.valueOf(GUESSO));
+                	logger.debug("SHINTO=" + String.valueOf(SHINTO));
+                	logger.debug("SHELPO=" + String.valueOf(SHELPO));
+                	logger.debug("(NODATAO=" + String.valueOf(NODATAO));
+                }
+            
                 effortvalues[0] = Double.toString((double) ((SKIPO * 100) / perProblemReportBeanObj.nStudsSeen));
                 effortvalues[1] = Double.toString((double) ((NOTRO * 100) / perProblemReportBeanObj.nStudsSeen));
                 effortvalues[2] = Double.toString((double) ((GIVEUPO * 100) / perProblemReportBeanObj.nStudsSeen));
