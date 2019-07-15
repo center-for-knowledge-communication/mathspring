@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -395,7 +396,7 @@ public class LCAccessors {
             Settings.loginMap = DbPedagogy.buildAllLoginSequences(conn);
             Settings.pedagogyGroups = DbPedagogy.buildAllPedagogies(conn,null);
             SessionManager smgr = new SessionManager(conn);
-            smgr.attemptSessionCreation("dm","dm",System.currentTimeMillis(),true);
+            smgr.attemptSessionCreation("dm","dm",System.currentTimeMillis(),true,new Locale("en","US"));
 
             System.out.println("Testing LCAccessors with user dm/dm studId="+ smgr.getStudentId());
             LCAccessors fns = new LCAccessors(smgr,null);

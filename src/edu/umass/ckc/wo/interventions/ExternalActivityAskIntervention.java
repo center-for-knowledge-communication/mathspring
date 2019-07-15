@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: marshall
@@ -8,15 +11,32 @@ package edu.umass.ckc.wo.interventions;
  * To change this template use File | Settings | File Templates.
  */
 public class ExternalActivityAskIntervention extends InformationIntervention implements NextProblemIntervention {
-    public String getType () {
+
+    private Locale locale;
+
+    public ExternalActivityAskIntervention(Locale loc) {
+        this.locale = loc;
+    }
+
+	public String getType () {
         return "ExternalActivityAskIntervention";
     }
 
 
     public String getDialogHTML () {
-        String str = "<div><p>Let's try a different kind of activity!<br>";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		str = "<div><p>" + rb.getString("lets_try_different_activity") + "<br></p></div>";
 
-        str+="</div>";
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 

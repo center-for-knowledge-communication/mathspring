@@ -38,7 +38,7 @@ catch (Exception e) {
         <input type="radio" name="confidence" value="4"><%= rb.getString("quite_a_bit")%>
     </label>
     <label class="radio-inline">
-        <input type="radio" name="confidence" value="5">C
+        <input type="radio" name="confidence" value="5"><%= rb.getString("extremely")%>
     </label>
     <br>
 
@@ -57,7 +57,7 @@ catch (Exception e) {
         <input type="radio" name="interest" value="4"><%= rb.getString("quite_a_bit")%>
     </label>
     <label class="radio-inline">
-        <input type="radio" name="interest" value="5"><%= rb.getString("<%= rb.getString("extremely")%>")%>
+        <input type="radio" name="interest" value="5"><%= rb.getString("extremely")%>
     </label>
     </br>
     <br>

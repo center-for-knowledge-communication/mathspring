@@ -1,6 +1,9 @@
 package edu.umass.ckc.wo.interventions;
 
 import net.sf.json.JSONObject;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,6 +18,12 @@ public class RapidAttemptIntervention extends InputResponseIntervention implemen
     public static final String AFFECT = "affect";
     public static final String FRUSTRATED = "frustrated";
     public static final String BORED = "bored";
+
+    private Locale locale;
+
+    public RapidAttemptIntervention(Locale loc) {
+        this.locale = loc;
+    }
 
 
     @Override
@@ -33,10 +42,22 @@ public class RapidAttemptIntervention extends InputResponseIntervention implemen
     }
 
     public String getDialogHTML() {
-        String str = "<div>  " +getFormOpen()+ " <p>You seem to be guessing!   Can you tell me if you are:<br><br>";
-        str+= "<input type=\"radio\" name=\""+AFFECT+"\" value=\"" +FRUSTRATED+ "\">frustrated<br>";
-        str+= "<input type=\"radio\" name=\""+AFFECT+"\" value=\"" +BORED+ "\">bored<br>";
-        str+="</p></form></div>";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		str = "<div>  " +getFormOpen()+ " <p>" + rb.getString("you_seem_to_be_guessing") + "<br><br>";
+        		str+= "<input type=\"radio\" name=\""+AFFECT+"\" value=\"" +FRUSTRATED+ "\">" + rb.getString("frustrated") + "<br>";
+        		str+= "<input type=\"radio\" name=\""+AFFECT+"\" value=\"" +BORED+ "\">" + rb.getString("bored") + "<br>";
+        		str+="</p></form></div>";
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
+
         return str;
     }
 }

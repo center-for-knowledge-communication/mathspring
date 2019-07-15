@@ -8,6 +8,7 @@ import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.Settings;
 
 import java.sql.Connection;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -195,7 +196,7 @@ public class LCExpr extends LCRuleComponent {
             Settings.pedagogyGroups = DbPedagogy.buildAllPedagogies(conn,null);
             SessionManager smgr = new SessionManager(conn);
             StudentDataCache cache = new StudentDataCache();
-            smgr.attemptSessionCreation("dm","dm",System.currentTimeMillis(),true);
+            smgr.attemptSessionCreation("dm","dm",System.currentTimeMillis(),true,new Locale("en","US"));
 
             System.out.println("Testing LCExpr with user dm/dm studId="+ smgr.getStudentId());
 

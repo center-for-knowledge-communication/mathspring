@@ -33,30 +33,7 @@
                     },
                     
                     
-                "language": {
-                	"sEmptyTable":     "No data available in table",
-                	"sInfo":           "Showing _START_ to _END_ of _TOTAL_ entries",
-                	"sInfoEmpty":      "Showing 0 to 0 of 0 entries",
-                	"sInfoFiltered":   "(filtered from _MAX_ total entries)",
-                	"sInfoPostFix":    "",
-                	"sInfoThousands":  ",",
-                	"sLengthMenu":     "Show _MENU_ entries",
-                	"sLoadingRecords": "Loading...",
-                	"sProcessing":     "Processing...",
-                	"sSearch":         "Search:",
-                    "sUrl":            "",
-                	"sZeroRecords":    "No matching records found",
-                	"oPaginate": {
-                		"sFirst":    "First",
-                		"sLast":     "Last",
-                		"sNext":     "Next",
-                		"sPrevious": "Previous"
-                	},
-                	"oAria": {
-                		"sSortAscending":  ": activate to sort column ascending",
-                		"sSortDescending": ": activate to sort column descending"
-                	}
-                }
+                    
 */
  
  
@@ -191,7 +168,7 @@ function loadEffortMap (rows,flag) {
                     data: [effortValues[6]]
                 }, {
                     backgroundColor: "#fdb462",
-                    label: 'SCONAYUDAHELP: Consiguió el problema correcto, pero vio al menos un video.',
+                    label: 'SCONAYUDA: Consiguió el problema correcto, pero vio al menos un video.',
                     data: [effortValues[7]]
                 }, {
                     label: 'NOHAYDATOS: No se pudieron recopilar datos.',
@@ -306,7 +283,7 @@ function loadEffortMap (rows,flag) {
 
         if (languageSet == 'es') {
 			effortData = {
-            labels: ["Type of behaviour in problem"],
+            labels: ["Tipo de comportamiento en problema"],
             datasets: [{
                 backgroundColor: "#8dd3c7",
                 label: 'SKIP: El estudiante saltó el problema (no hizo nada al respecto)',
@@ -532,7 +509,8 @@ function resetStudentData( title,studentId) {
         url :pgContext+"/tt/tt/resetStudentdata",
         data : {
             studentId: studentId,
-            action: title
+            action: title,
+            lang: languagePreference
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -594,7 +572,8 @@ function updateStudentInfo(formName){
         url :pgContext+"/tt/tt/editStudentInfo",
         data : {
             studentId: formName,
-            formData: values
+            formData: values,
+            lang: languagePreference
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -778,17 +757,17 @@ else {
 
     });	
 }
-	var save_changes = "<%= rb.getString("save_changes")%>";
-	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
-	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
-	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
-	
-    var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
-        " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-        " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-        " <div class='panel-body'><strong>Summary : " + JSONData["topicSummary"] + "</strong></div>"+
-        "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
-        "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
+var save_changes = "<%= rb.getString("save_changes")%>";
+var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
+var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
+var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
+
+var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
+    " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+    " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
+    " <div class='panel-body'><strong>Summary : " + JSONData["topicSummary"] + "</strong></div>"+
+    "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
+    "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
 
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
@@ -978,9 +957,42 @@ function handleclickHandlers() {
 
 }
 
+
+
+function changeReportThreeHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','effchart': 'Gráfico de esfuerzo','emochart': 'Gráfico de emociones'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','effchart': 'Effort Chart','emochart': 'Emotion Chart'};
+	 	return header;
+	}
+}
+
+
+
 function changeReportFourHeaderAccordingToLanguage(){
-	var header = {'cclusters': '<%= rb.getString("clusters_in_class")%>','problems': '<%= rb.getString("nbr_problems_this_kind")%>','fattempt':  '% resolvidos en el primero intento','avgratio': '<%= rb.getString("pct_solved_first_attempt")%>','avgratio': '<%= rb.getString("pct_solved_first_attempt")%>'};
- 	return header;
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'cclusters': 'Unidades Curriculares','problems': '# de problemas recibidos sobre este tema','fattempt':  '% resueltos en el primer intento','avgratio': '# de ayudas/pistas vistas'};
+	 	return header;
+	}else{
+	 	var header = {'cclusters': 'Clusters in Class','problems': '# of problems of this kind encountered','fattempt':  '% solved in the first attempt','avgratio': 'Total hints viewed'};
+	 	return header;
+	}
 }
 
 function registerAllEvents(){
@@ -1250,7 +1262,7 @@ else {
     }
     
     
-	var headers = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("nbr_problems_attempted")%>','effchart': '<%= rb.getString("effchart")%>','emochart': '<%= rb.getString("emochart")%>'};
+    var headers = changeReportThreeHeaderAccordingToLanguage();
 
     
     if (languageSet == 'es') {
@@ -1795,7 +1807,7 @@ else {
                 "bPaginate": false,
                 "bFilter": false,
                 "bLengthChange": false,
-                "bSort": false,
+                "bSort": false,            
                 "language": {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -1820,6 +1832,7 @@ else {
                         "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                     }
                 }
+
             });
         } 
         else {
@@ -1883,7 +1896,8 @@ else {
             type: "POST",
             url: pgContext + "/tt/tt/createMoreStudentIds",
             data: {
-                formData: values
+                formData: values,
+                lang: languagePreference
             },
             success: function (data) {
                 if (data.includes("***")) {
@@ -2486,7 +2500,7 @@ var completeDataChart;
                 columNvalues.unshift({"title" : "<%= rb.getString("student_name")%>","name":"studentName" , "targets": [0]},
                     {"title" : "<%= rb.getString("username")%>","name":"userName", "targets": [1],   "createdCell": function (td, cellData, rowData, row, col) {
                         $(td).html(cellData+"&nbsp;&nbsp;" +
-                            "<a tabindex='0' rel='completeMasteryChartPopover' data-toggle='popover' data-trigger='focus' title='<%= rb.getString("get_complete_mastery_chart")%>' style='cursor: pointer;' aria-hidden='true'><i class='fa fa-bar-chart' aria-hidden='true'/></a>");
+                                "<a tabindex='0' rel='completeMasteryChartPopover' data-toggle='popover' data-trigger='focus' title='<%= rb.getString("get_complete_mastery_chart")%>' style='cursor: pointer;' aria-hidden='true'><i class='fa fa-bar-chart' aria-hidden='true'/></a>");
                         }
                     },
                     {"title" : "<%= rb.getString("student_id")%>","name":"studentId", "targets": [2], visible : false});
@@ -2512,7 +2526,6 @@ var completeDataChart;
                     perProblemSetReport.destroy();
                     $('#perTopicStudentReport').empty();
                 }
-
                 
                 if (languageSet == "es") {
                 perProblemSetReport = $('#perTopicStudentReport').DataTable({
@@ -2522,28 +2535,28 @@ var completeDataChart;
                     "columnDefs": columNvalues,
                     "bPaginate": true,
                     "language": {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix":    "",
-                        "sSearch":         "Buscar:",
-                        "sUrl":            "",
-                        "sInfoThousands":  ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
                     },
                     "scrollX": true,
                     "bFilter": false,
@@ -2556,9 +2569,9 @@ var completeDataChart;
                             trigger: 'focus',
                             placement: 'right',
                             content: function () {
-                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> Get Complete "Mastery" by average </a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> Get "Mastery" reported by highest recorded value for problemset</a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> Get Complete "Mastery" by latest recorded value for each problemset</a></li></ul>';
+                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
+                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
+                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> <%= rb.getString("get_mastery_by_last_reported")%></a></li></ul>';
                             }
                         })
                     }
@@ -2582,10 +2595,10 @@ var completeDataChart;
                             trigger: 'focus',
                             placement: 'right',
                             content: function () {
-                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> Get Complete "Mastery" by average </a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> Get "Mastery" reported by highest recorded value for problemset</a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> Get Complete "Mastery" by latest recorded value for each problemset</a></li></ul>';
-                            }
+                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
+                                '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
+                                '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> <%= rb.getString("get_mastery_by_last_reported")%></a></li></ul>';
+                        }
                         })
                     }
                 });
@@ -2951,7 +2964,7 @@ var completeDataChart;
                 surveyReportTable = $('#surveyReport').DataTable({
                     data: surveyList,
                     destroy: true,
-                    "columns": [ { title: "Survey Name" , width: "30%"}],
+                    "columns": [ { title: "<%= rb.getString("survey_name")%>" , width: "30%"}],
                     "columnDefs": columNvalues,
                     "bFilter": false,
                     "bPaginate": false,
@@ -2989,7 +3002,7 @@ var completeDataChart;
                     surveyReportTable = $('#surveyReport').DataTable({
                         data: surveyList,
                         destroy: true,
-                        "columns": [ { title: "Survey Name" , width: "30%"}],
+                        "columns": [ { title: "<%= rb.getString("survey_name")%>" , width: "30%"}],
                         "columnDefs": columNvalues,
                         "bFilter": false,
                         "bPaginate": false,
@@ -3353,9 +3366,9 @@ var completeDataChart;
 
                         },
                         headerCallback: function headerCallback(thead, data, start, end, display) {
-                            $(thead).find('th').eq(5).html('<%= rb.getString("pct_students_repeated_problem")%> &nbsp;&nbsp;<a rel="popoverHeader"  data-content="Students who received the problem again, because the last time they did NOT solve it."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(6).html('<%= rb.getString("pct_students_skipped_problem")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who received the problem and immediately clicked the '+"New Problem"+' button"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(7).html('<%= rb.getString("pct_students_gave_up")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="Students who started working on the problem, but decided to move on to another one (quit)."><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(5).html('<%= rb.getString("pct_students_repeated_problem")%> &nbsp;&nbsp;<a rel="popoverHeader"  data-content="<%= rb.getString("students_repeated_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(6).html('<%= rb.getString("pct_students_skipped_problem")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_skipped_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(7).html('<%= rb.getString("pct_students_gave_up")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_gave_up_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
                             $(thead).find('th').eq(9).html('<%= rb.getString("see_similar_problems")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("click_to_see_similar_problems")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
 
                         }

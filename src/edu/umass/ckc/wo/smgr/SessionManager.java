@@ -16,6 +16,7 @@ import edu.umass.ckc.wo.mrcommon.Names;
 import edu.umass.ckc.wo.state.ExtendedStudentState;
 import edu.umass.ckc.wo.state.StudentState;
 import edu.umass.ckc.wo.strat.ClassStrategyComponent;
+import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.strat.StrategyMgr;
 import edu.umass.ckc.wo.strat.TutorStrategy;
 import edu.umass.ckc.wo.tutor.Pedagogy;
@@ -33,6 +34,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class SessionManager {
@@ -71,6 +74,7 @@ public class SessionManager {
     private long timeInSession;
     private String hostPath; // The piece of the request URL that gives http://chinacat.../
     private String contextPath; // The full URL up to /TutorBrain (e.g.  http://localhost:8082/wo4
+    private Locale locale = new Locale("en","US");
     private boolean assistmentsUser = false;
     private long elapsedTime = 0;
     private boolean testUser;
@@ -110,6 +114,14 @@ public class SessionManager {
         this(connection, sessionId);
         this.hostPath = hostPath;
         this.contextPath = contextPath;
+    }
+
+    public SessionManager(Connection connection,
+            int sessionId, String hostPath, String contextPath, Locale loc) throws Exception {
+    	this(connection, sessionId);
+    	this.hostPath = hostPath;
+    	this.contextPath = contextPath;
+    	this.locale = loc;
     }
 
     public static void main(String[] args) {
@@ -200,13 +212,13 @@ public class SessionManager {
         return this;
     }
 
-    public LoginResult login(String uname, String password, long sessBeginTime, boolean logoutExistingSession) throws Exception {
-        return attemptSessionCreation(uname, password, sessBeginTime, logoutExistingSession);
+    public LoginResult login(String uname, String password, long sessBeginTime, boolean logoutExistingSession, Locale loc) throws Exception {
+        return attemptSessionCreation(uname, password, sessBeginTime, logoutExistingSession, loc);
     }
 
     /**
      * Constructor only used when the user is logging in from Assistments
-     */
+    */
     public SessionManager assistmentsLoginSession(int studId) throws Exception {
         int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), true);
         timeInSession = 0;
@@ -216,6 +228,7 @@ public class SessionManager {
         studState.getSessionState().initializeState();
         return this;
     }
+
 
     /**
      * Constructor only used when the user is logging in as guest.
@@ -238,6 +251,14 @@ public class SessionManager {
     // returns something like http://localhost:8082/wo4
     public String getContextPath() {
         return this.contextPath;
+    }
+
+    public void setLocale(Locale loc) {
+    	this.locale = loc;
+    }
+
+    public Locale getLocale() {
+        return this.locale;
     }
 
     public void createSessionForStudent(int studId) {
@@ -307,6 +328,16 @@ public class SessionManager {
         int[] ids = DbSession.setSessionInfo(connection, sessionId);
         this.studId = ids[0];
         this.classId = ids[1];
+   
+        ClassInfo cl = DbClass.getClass(connection, this.classId);
+        
+        String language = "en";
+        language = cl.getClassLanguageCode();
+        if (language.startsWith("es")) {
+        	language = "es";
+            this.locale = new Locale(language,"Ar");
+        }
+        System.out.println("Locale from Class " + this.locale.toString());
         this.user = DbUser.getStudent(connection, this.studId);
         this.setClient(DbSession.getClientType(connection, sessionId));
         woProps = new WoProps(connection);
@@ -477,14 +508,24 @@ public class SessionManager {
      * @return
      * @throws Exception
      */
-    public LoginResult attemptSessionCreation(String uname, String password, long sessBeginTime, boolean logoutExistingSession) throws Exception {
+    // Frank TBD translate
+    public LoginResult attemptSessionCreation(String uname, String password, long sessBeginTime, boolean logoutExistingSession, Locale loc) throws Exception {
+    	ResourceBundle rb = null;
+        try {
+        	
+    		// Multi=lingual enhancement
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+        }
+        catch (MissingResourceException e ) {
+            return new LoginResult(-1, e.getMessage(), LoginResult.ERROR);        	
+    	}
         if (uname.trim().length() == 0 || password.trim().length() == 0)
-            return new LoginResult(-1, "Invalid user name/password combination", LoginResult.ERROR);
+            return new LoginResult(-1, rb.getString("invalid_username_password_combination"), LoginResult.ERROR);
         else {
             studId = DbUser.getStudent(this.getConnection(), uname, password);
 
             if (studId == -1) {
-                return new LoginResult(-1, "Invalid user name/password combination", LoginResult.ERROR);
+                return new LoginResult(-1, rb.getString("invalid_username_password_combination"), LoginResult.ERROR);
             } else {
                 this.user = DbUser.getStudent(this.getConnection(), studId);
                 int classId = DbUser.getStudentClass(this.getConnection(), studId);
@@ -493,14 +534,14 @@ public class SessionManager {
                 // the same user/passwd and need to get this old bogus user out of the way.
                 if (classId == -1) {
                     DbUser.deleteStudent(connection, studId);
-                    return new LoginResult(-1, "This user is invalid because it is not in a class.   You need to re-register and select a class", LoginResult.ERROR);
+                    return new LoginResult(-1, rb.getString("user_invalid_not_in_class"), LoginResult.ERROR);
                 }
                 //Remove collaboration requests and pairings for students who have just logged in, as any such data is erroneous.
                 CollaborationManager.clearOldData(studId);
                 int oldSessId = DbSession.findActiveSession(getConnection(), studId);
                 Pedagogy ped;
                 if (oldSessId != -1) {
-                    String msg = String.format("The user name <b>%s</b> whose name is <b>%s %s</b> is already logged into the system.  If you are not this person, please check with your teacher or double check that you are using the correct user name", user.getUname(), user.getFname(), user.getLname());
+                    String msg = String.format("%s <b>%s</b> %s <b>%s %s</b> %s", rb.getString("the_user_name"),user.getUname(), rb.getString("whose_name_is"), user.getFname(), user.getLname(),rb.getString("is_already_logged_in_instructions"));
                     if (!logoutExistingSession)
                         return new LoginResult(-1, msg, LoginResult.ALREADY_LOGGED_IN);
                     else {
@@ -536,6 +577,7 @@ public class SessionManager {
 
             }
         }
+        
     }
 
     /**

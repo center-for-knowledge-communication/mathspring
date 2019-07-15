@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Melissa
@@ -14,8 +17,12 @@ public class CollaborationOptionIntervention extends InputResponseIntervention i
     public static final String NO_ALONE = "No_alone";
     public static final String NO_DECLINE = "No_decline";
 
-    public  CollaborationOptionIntervention () {
+    private Locale locale;
+
+    public  CollaborationOptionIntervention (Locale loc) {
         super();
+        this.locale = loc;
+
     }
     public String getType () {
         return "CollaborationOptionIntervention";
@@ -23,12 +30,24 @@ public class CollaborationOptionIntervention extends InputResponseIntervention i
 
 
     public String getDialogHTML () {
-        String str = "<div><p> Would you like to work with a person near you for the next problem?  <br/<br/>" + getFormOpen();
-        str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+YES+"\" checked=\"checked\">Yes; there is someone next to me.</input><br>";
-        str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO_ALONE+"\">No; there is no one next to me.</input><br>";
-        str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO_DECLINE+"\">No; I don't want to.</input><br>";
-        str += "<input type=\"hidden\" name=\"destination\" value=\"edu.umass.ckc.wo.tutor.intervSel2.CollaborationOriginatorIS\">";
-        str+="</form></div>";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+
+        		str = "<div><p>" + rb.getString("would_you_like_to_work_with_person_near_you") + "  <br/<br/>" + getFormOpen();
+        		str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+YES+"\" checked=\"checked\">" + rb.getString("yes_someone_next_to_me") + "</input><br>";
+        		str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO_ALONE+"\">" + rb.getString("no_no_one_next_to_me") + "</input><br>";
+        		str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO_DECLINE+"\">" + rb.getString("no_do_not_want_to") + "</input><br>";
+        		str += "<input type=\"hidden\" name=\"destination\" value=\"edu.umass.ckc.wo.tutor.intervSel2.CollaborationOriginatorIS\">";
+        		str+="</form></div>";
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 

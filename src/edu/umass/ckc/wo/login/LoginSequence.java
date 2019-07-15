@@ -21,6 +21,7 @@ import javax.servlet.RequestDispatcher;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,6 +54,12 @@ public class LoginSequence {
         ServletParams params = servletInfo.getParams();
         this.sessId = sessId;
         this.smgr = new SessionManager(servletInfo.getConn(),sessId,servletInfo.getHostPath(),servletInfo.getContextPath()).buildExistingSession();
+
+        // Frank s. - added locale to sessionManager object to support multi-lingual capability
+        Locale loc = (Locale) servletInfo.getRequest().getLocales().nextElement();
+        this.smgr.setLocale(loc);
+        System.out.println("Locale = " + this.smgr.getLocale());
+        
         pedagogicalModel = smgr.getPedagogicalModel();
         Pedagogy ped = pedagogicalModel.getPedagogy();
         buildInterventions(ped);

@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: marshall
@@ -22,10 +25,13 @@ public class AskEmotionFreeAnswerIntervention extends InputResponseIntervention 
     private boolean askAboutSkipping;
     private boolean skippedProblem;
 
-    public AskEmotionFreeAnswerIntervention(boolean askAboutSkipping, boolean skippedProblem) {
+    private Locale locale;
+
+    public AskEmotionFreeAnswerIntervention(boolean askAboutSkipping, boolean skippedProblem, Locale loc) {
         this.askAboutSkipping = askAboutSkipping;
         this.skippedProblem = skippedProblem;
-    }
+        this.locale = loc;
+  }
 
     @Override
     public String logEventName() {
@@ -55,30 +61,40 @@ public class AskEmotionFreeAnswerIntervention extends InputResponseIntervention 
     }
 
     public String getDialogHTML() {
-        String str = "<div>  " +
-                                 getFormOpen() + " <p>We will ask these questions a <b>few</b> times, so its <b>OK</b> to change your mind.  " +
-                "Please be as <b>honest</b> as possible in answering these questions. <br><br>";
-        str += "1.  How would you describe your emotions right now" +
-                " (as compared to the last time you were asked)?";
-        str += "<textarea name=\"" + FEELING + "\" rows=\"3\" cols=\"40\"/>" ;
-        str += "<br><br>2. Why do you feel that way?";
-        str += "<textarea name=\"" + REASON + "\" rows=\"3\" cols=\"40\"/>" ;
-        str += "<br><br>3. What do you wish you could do to improve this class right now?";
-        str += "<textarea name=\"" + GOAL + "\" rows=\"3\" cols=\"40\"/>" ;
+    	ResourceBundle rb = null;
+
+    	String str = "";
+
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		str = "<div>  " + getFormOpen() + " <p>" + rb.getString("ask_emotion_radio_header") + "<br><br>";
+        		str += rb.getString("ask_emotion_free_question1");
+        		str += " <textarea name=\"" + FEELING + "\" rows=\"3\" cols=\"40\"/>" ;
+        		str += "<br><br>" + rb.getString("ask_emotion_free_question2");
+        		str += " <textarea name=\"" + REASON + "\" rows=\"3\" cols=\"40\"/>" ;
+        		str += "<br><br>" + rb.getString("ask_emotion_free_question3");
+        		str += " <textarea name=\"" + GOAL + "\" rows=\"3\" cols=\"40\"/>" ;
 //        str += "<br><br>3. What do you want to happen?";
 //        str += "<textarea name=\"" + RESULT + "\" rows=\"3\" cols=\"40\"/>" ;
-        str+= "</p>";
-        if (askAboutSkipping && skippedProblem) {
-            str += "<br>";
-            str += "Have you skipped a problem recently (clicked on 'new problem' without answering)?";
-            str += "<input type='radio' name='skipFrequency' value='never'> Never<br>";
-            str += "<input type='radio' name='skipFrequency' value='fewTimes'> A few times<br>";
-            str += "<input type='radio' name='skipFrequency' value='aLot'> A lot<br>";
-            str += "If you skipped can you please say why?<br>";
-            str += "<textarea name=\"" + SKIP_REASON + "\" rows=\"3\" cols=\"40\"/>";
-        }
-        str+="</form></div>";
+        		str+= "</p>";
+        		if (askAboutSkipping && skippedProblem) {
+        			str += "<br>";
+        			str += rb.getString("have_you_skipped") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='never'>" + rb.getString("never") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='fewTimes'>" + rb.getString("a_few_times") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='aLot'>" + rb.getString("a_lot") + "<br>";
+        			str += "<br>" + rb.getString("if_you_skipped_why") +  "<br>";
+        			str += "<textarea name=\"" + SKIP_REASON + "\" rows=\"2\" cols=\"50\"/>";
+        		}
+       
+        	str+="</form></div>";
 
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 

@@ -13,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Copyright (c) University of Massachusetts
@@ -24,25 +26,37 @@ public class TeacherRegistrationHandler {
 
 
     public void handleEvent(Connection conn, AdminTeacherRegistrationEvent event, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        // if passwords aren't same, gripe
+
+    	Locale loc = req.getLocale();
+
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+    	    			
+    			
+    	// if passwords aren't same, gripe
         if (event.getFname() == null || event.getLname() == null || event.getPw1() == null || event.getPw2() == null || event.getEmail() == null ||
                 event.getFname().equals("") || event.getLname().equals("") || event.getPw1().equals("") || event.getPw2().equals("") || event.getEmail().equals(""))
         {
-            req.setAttribute("message","You must supply values for required fields");
+            req.setAttribute("message",rb.getString("you_must_supply_values_for_required_fields"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher(Settings.useNewGUI()
                     ? "/teacherTools/teacherRegister_new.jsp"
-                    : "/teacherTools/teacherRegister.jsp").forward(req ,resp);
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }
         else if (!event.getPw1().equals(event.getPw2()))
         {
-            req.setAttribute("message","Passwords must match");
+            req.setAttribute("message",rb.getString("passwords_must_match"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher("b".equals(req.getParameter("var"))
                     ? "/teacherTools/teacherRegister_new.jsp"
-                    : "/teacherTools/teacherRegister.jsp").forward(req ,resp);
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }
         // show userName created and give a button to proceed to class creation
         else {

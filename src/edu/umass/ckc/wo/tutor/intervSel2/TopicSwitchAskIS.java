@@ -35,6 +35,7 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
 
     private static Logger logger = Logger.getLogger(TopicSwitchAskIS.class);
 
+    
     public TopicSwitchAskIS(SessionManager smgr) {
         super(smgr);
     }
@@ -98,6 +99,7 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
         if (smgr.getStudentState().getCurTopic() < 1) {
             return null;
         }
+
         // TODO As long as its END_OF_TOPIC this will be true and will return intervention
         // It has to shut off after playing at the end of a topic and then become possible
         // again in the next topic.
@@ -108,7 +110,7 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
         TopicModel tm = (TopicModel) pedagogicalModel.getLessonModel();
         EndOfTopicInfo reasons = tm.getEndOfTopicInfo();
         if (reasons != null && reasons.isTopicDone()) {
-            String expl = reasons.getExplanation();
+            String expl = reasons.getExplanation(smgr.getLocale());
             int seen = studentState.getTopicNumPracticeProbsSeen();
             int solved = studentState.getTopicProblemsSolved();
             // If configured to ask about staying in the topic and not a content failure, then pop up dialog asking if stay or switch topics.
@@ -118,9 +120,9 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
 
             }
             else if (this.ask && !reasons.isContentFailure())
-                intervention = new TopicSwitchAskIntervention(expl,smgr.getSessionNum());
+                intervention = new TopicSwitchAskIntervention(expl,smgr.getSessionNum(),smgr.getLocale());
                 // just inform that we are moving to next topic
-            else intervention = new TopicSwitchIntervention(expl,seen,solved);
+            else intervention = new TopicSwitchIntervention(expl,seen,solved,smgr.getLocale());
         }
         return intervention;
     }
@@ -130,7 +132,7 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
         List<String> reviewTopics = studentState.getReviewTopics();
         List<String> topicNames = new ArrayList<String>(reviewTopics.size());
         List<InterleavedTopic.TopicPerformance> topicPerformanceList = interleavedTopic.getStudentPerformance();
-        NextProblemIntervention intervention = new InterleavedTopicSwitchIntervention(topicPerformanceList);
+        NextProblemIntervention intervention = new InterleavedTopicSwitchIntervention(topicPerformanceList,smgr.getLocale());
         return intervention;
     }
 

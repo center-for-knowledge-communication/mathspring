@@ -4,6 +4,8 @@ import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.tutor.pedModel.InterleavedTopic;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,11 +17,13 @@ import java.util.List;
 public class InterleavedTopicSwitchIntervention extends InputResponseIntervention implements NextProblemIntervention {
     protected List<InterleavedTopic.TopicPerformance> topicPerformanceList;
 
+    private Locale locale;
 
 
-    public InterleavedTopicSwitchIntervention(List<InterleavedTopic.TopicPerformance> topicPerformanceList) {
+    public InterleavedTopicSwitchIntervention(List<InterleavedTopic.TopicPerformance> topicPerformanceList, Locale loc) {
         this.topicPerformanceList = topicPerformanceList;
-
+        this.locale = loc;
+        
     }
 
 
@@ -30,13 +34,28 @@ public class InterleavedTopicSwitchIntervention extends InputResponseInterventio
 
 
     public String getDialogHTML () {
-        String str = "<div><p>You just completed a review of some recent topics.  Here is how you did:<br>";
-        str += "<table><tr><th>Topic</th><th>Problems Solved</th><th>Problems Given</th></tr>";
-        for (InterleavedTopic.TopicPerformance perf: topicPerformanceList) {
-            str += "<tr><td>" + perf.getTopicName() + "</td><td>" + perf.getNumCorrect() + "</td><td>" + perf.getNumShown() + "</td></tr>";
+    	
+    	System.out.println("InterleavedTopicSwitch locale = " + this.locale.toString());
+    	
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+       		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+
+       		str = "<div><p>" + rb.getString("just_completed_review_of_topics") + "  " + rb.getString("here_is_how_you_did") + ":<br>";
+       		str += "<table><tr><th>" + rb.getString("topic") + "</th><th>" + rb.getString("problems_solved") + "</th><th>" + rb.getString("problems_given") + "/th></tr>";
+       		for (InterleavedTopic.TopicPerformance perf: topicPerformanceList) {
+       			str += "<tr><td>" + perf.getTopicName() + "</td><td>" + perf.getNumCorrect() + "</td><td>" + perf.getNumShown() + "</td></tr>";
+       		}
+       		str += "</table>";
+       		str+="</p>" + rb.getString("use_progress_page_to_return_to_topic") + "</div>";
         }
-        str += "</table>";
-        str+="</p>You might want to use the Progress Page to return to a topic you didn't do well in.</div>";
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 
