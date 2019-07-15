@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Melissa
@@ -13,17 +16,37 @@ public class CollaborationTimedoutIntervention extends InputResponseIntervention
     public static final String YES = "Yes_wait";
     public static final String NO = "No";
 
+    private Locale locale;
+
+    public  CollaborationTimedoutIntervention (Locale loc) {
+        super();
+        this.locale = loc;
+
+    }
+
     public String getType () {
         return "CollaborationTimedoutIntervention";
     }
 
 
     public String getDialogHTML () {
-        String str = "<div><p> No partner has been found for you yet. <br>" +
-                      "Would you like to continue waiting for a partner?  <br/<br/>" + getFormOpen();
-        str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO+"\" checked=\"checked\">No</input><br>";
-        str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+YES+"\">Yes</input><br>";
-        str+="</form></div>";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+
+        		str = "<div><p>" + rb.getString("no_partner_yet") + " <br>" +
+        				rb.getString("wait_for_partner") + "<br/<br/>" + getFormOpen();
+        		str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+NO+"\" checked=\"checked\">" + rb.getString("no") + "</input><br>";
+        		str += "<input name=\""+OPTION+"\" type=\"radio\" value=\""+YES+"\">" + rb.getString("yes") + "</input><br>";
+        		str+="</form></div>";
+        }
+        catch (java.util.MissingResourceException e){
+        	System.out.println(e.getMessage());
+        	str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 

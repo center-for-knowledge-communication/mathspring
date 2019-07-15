@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,7 +60,7 @@ public class CollaborationOriginatorIS extends NextProblemInterventionSelector {
         else{
             // This intervention has inputs so that the student may accept or decline.
             DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), 0, null, "CollaborationOfferedBySystem_Originator");
-            return new CollaborationOptionIntervention();
+            return new CollaborationOptionIntervention(smgr.getLocale());
         }
     }
 
@@ -77,7 +78,7 @@ public class CollaborationOriginatorIS extends NextProblemInterventionSelector {
                 DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), 0, option, "CollaborationAccepted_Originator");
                 CollaborationManager.addRequest(smgr.getConnection(), smgr.getStudentId());
                 // DM had modify to return an InterventionResponse rather than intervention
-                return new InterventionResponse(new CollaborationOriginatorIntervention());
+                return new InterventionResponse(new CollaborationOriginatorIntervention(smgr.getLocale()));
             }
         }
         //CollaborationTimedoutIntervention: Yes, I want to keep waiting for a partner
@@ -89,7 +90,7 @@ public class CollaborationOriginatorIS extends NextProblemInterventionSelector {
             else {
                 DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), 0, option, "CollaborationContinuedWaiting_Originator");
                 // DM had modify to return an InterventionResponse rather than intervention
-                return new InterventionResponse(new CollaborationOriginatorIntervention());
+                return new InterventionResponse(new CollaborationOriginatorIntervention(smgr.getLocale()));
             }
         }
         //Either CollaborationTimedoutIntervention or CollaborationOptionIntervention, they wanted to exit out
@@ -125,7 +126,7 @@ public class CollaborationOriginatorIS extends NextProblemInterventionSelector {
         if(partner == null){
             if(e.getTimeWaiting() >= state.getMaxPartnerWaitPeriod()){
                 DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), 0, null, "CollaborationAskContinueWaiting_Originator");
-                return new CollaborationTimedoutIntervention();
+                return new CollaborationTimedoutIntervention(smgr.getLocale());
             }
             else{
                 return new SameIntervention();
@@ -135,7 +136,7 @@ public class CollaborationOriginatorIS extends NextProblemInterventionSelector {
             User u = DbUser.getStudent(smgr.getConnection(),partner);
             String name = (u.getFname() != null && !u.getFname().equals("")) ? u.getFname() : u.getUname();
             DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), partner, null, "CollaborationConfirmationToBeginAlert_Originator");
-            Intervention interv = new CollaborationConfirmationIntervention(name);
+            Intervention interv = new CollaborationConfirmationIntervention(name, smgr.getLocale());
             return interv;
         }
 

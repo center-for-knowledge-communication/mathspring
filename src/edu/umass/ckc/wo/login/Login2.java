@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,8 +36,10 @@ public class Login2 implements LoginServletAction {
         String uName = params.getString(LoginParams.USER_NAME,"");
         String pw = params.getString(LoginParams.PASSWORD,"");
         boolean logoutExistingSession = params.getBoolean(LoginParams.LOGOUT_EXISTING_SESSION,false);
+        Locale loc = (Locale) req.getLocales().nextElement();
+
         SessionManager smgr = new SessionManager(conn);
-        LoginResult lr = smgr.login(uName,pw,System.currentTimeMillis(), logoutExistingSession);
+        LoginResult lr = smgr.login(uName,pw,System.currentTimeMillis(), logoutExistingSession, loc);
         // login succeeds.  Now we move into selecting login interventions
         if (!lr.isFailed())  {
             lr.setForwardedToJSP(false);

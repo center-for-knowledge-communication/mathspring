@@ -131,7 +131,8 @@ m.build = function(activity, previewMode) {
     }
 
     //For demo and example modes all answers should stay hidden
-    if (mode !== "demo" && mode !== "example") {
+    // if (mode !== "demo" && mode !== "example") {
+    	console.log("Show answers")
         if (questType.match(/^multi(Choice|Select)$/)) {
             var multi_answers = document.getElementById("MultipleChoiceAnswers");
             var multiSelect = questType === "multiSelect";
@@ -171,7 +172,7 @@ m.build = function(activity, previewMode) {
         if(questType.match(/^(multiSelect|shortAnswer)$/)) {
             document.getElementById("SubmitAnswerBox").style.display = "block";
         }
-    }
+    //}
 
     if(previewMode) {
         problemContainer.style.float = "left";

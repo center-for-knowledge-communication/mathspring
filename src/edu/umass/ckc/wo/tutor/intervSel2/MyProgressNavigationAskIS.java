@@ -181,7 +181,7 @@ public class MyProgressNavigationAskIS extends NextProblemInterventionSelector {
                     if (emVal != 0 && b.within(emVal)) {
                         state.setTimeOfLastInterventionForEmotions(now);
                         if (this.isAskDialog)
-                            intervention = new MyProgressNavigationAskIntervention();
+                            intervention = new MyProgressNavigationAskIntervention(smgr.getLocale());
                         else intervention =new MyProgressNavigationIntervention(true, MyProgressNavigationIntervention.BEFORE,
                                 "<p>Let's see how much progress we are making!<br>", false, null, null);
                         break;

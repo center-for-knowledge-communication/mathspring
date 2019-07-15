@@ -1,5 +1,7 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 /**
  * Created with IntelliJ IDEA.
  * User: marshall
@@ -8,13 +10,33 @@ package edu.umass.ckc.wo.interventions;
  * To change this template use File | Settings | File Templates.
  */
 public class MyProgressNavigationAskIntervention extends InformationIntervention implements NextProblemIntervention {
-    public String getType () {
+
+   private Locale locale;
+
+    public MyProgressNavigationAskIntervention(Locale loc) {
+        this.locale = loc;
+    }
+	    
+	public String getType () {
         return "MyProgressNavigationAsk";
     }
 
 
     public String getDialogHTML () {
-        String str = "<div><p>Let's see how much progress we are making!<br>";
+
+   	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		str = "<div><p>" + rb.getString("lets_see_progress_we_are_making") + "<br></p></div>";
+
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
 
         str+="</div>";
         return str;

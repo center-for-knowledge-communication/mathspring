@@ -80,7 +80,7 @@ public class AskGoalsIS extends NextProblemInterventionSelector  {
         // By request of ivon we only ask if the previous problem was practice
         boolean condition = e.isEnteringPracticeArea();
         if (condition) {
-            intervention = new AskGoalsIntervention(inputType);
+            intervention = new AskGoalsIntervention(inputType,smgr.getLocale());
             long now = System.currentTimeMillis();
             state.setTimeOfLastIntervention(now);
             state.setNumProblemsSinceLastIntervention(0);

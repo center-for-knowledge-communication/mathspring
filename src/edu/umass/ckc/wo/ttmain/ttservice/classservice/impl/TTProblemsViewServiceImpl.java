@@ -3,6 +3,8 @@ package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,8 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private static Logger logger =   Logger.getLogger(TTProblemsViewServiceImpl.class);
+
+	private ResourceBundle rb = null;
 
     @Override
     public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId) throws TTCustomException {
@@ -89,38 +93,44 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     }
 
     @Override
-    public String resetStudentData(String studentId, String action) throws TTCustomException {
-        String message = "";
+    public String resetStudentData(String studentId, String action, String lang) throws TTCustomException {
+    	
+    	lang = "en-US";
+    	System.out.println("resetStudentData - lang=" + lang);
+		// Multi=lingual enhancement
+		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+		rb = ResourceBundle.getBundle("MathSpring",loc);        
+		String message = "";
         try {
             switch (action) {
                 case "4":
                     DbUser.deleteStudentData(connection.getConnection(), Integer.valueOf(studentId.trim()));
-                    message = "Student data successfully cleared.";
+                    message = rb.getString("student_data_successfully_cleared");
                     break;
 
                 case "5":
                     DbUser.deleteStudentPracticeHutData(connection.getConnection(), Integer.valueOf(studentId.trim()));
-                    message = "Student successfully deleted.";
+                    message = rb.getString("student_successfully_deleted");
                     break;
 
                 case "6":
                     DbUser.resetStudentPracticeHut(connection.getConnection(), Integer.valueOf(studentId.trim()));
-                    message = "Student data reset";
+                    message = rb.getString("student_data_reset");
                     break;
 
                 case "7":
                     DbUser.deleteStudentPrePostEventData(connection.getConnection(), Integer.valueOf(studentId.trim()), true, false);
-                    message = "Cleard Pretest data";
+                    message = rb.getString("cleared_pretest_data");
                     break;
 
                 case "8":
                     DbUser.deleteStudentPrePostEventData(connection.getConnection(), Integer.valueOf(studentId.trim()), false, true);
-                    message = "Cleard Posttest data";
+                    message = rb.getString("cleared_posttest_data");
                     break;
 
                 case "9":
                     DbUser.deleteStudent(connection.getConnection(), Integer.valueOf(studentId.trim()));
-                    message = "Student info removed from class";
+                    message = rb.getString("student_info_removed_from_class");
                     break;
 
 
@@ -130,6 +140,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
             logger.error(e.getMessage());
             throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA);
         }
+    	System.out.println("resetStudentData - message=" + message);
         return message;
     }
 
@@ -145,18 +156,32 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     }
 
     @Override
-    public String editStudentInfo(EditStudentInfoForm editStudentInfoForm) throws TTCustomException {
+    public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
+    	
+    	lang = "en-US";   	
+    	System.out.println("editStudentInfo - lang=" + lang);
+    	// Multi=lingual enhancement
+		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+		rb = ResourceBundle.getBundle("MathSpring",loc);        
+
         Map<String,Object> updateParams = new HashMap<String,Object>();
         updateParams.put("fname", editStudentInfoForm.getStudentFname());
         updateParams.put("lname", editStudentInfoForm.getStudentLname());
         updateParams.put("uname", editStudentInfoForm.getStudentUsername());
         updateParams.put("studentId", editStudentInfoForm.getStudentId());
         this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_STUDENT_INFO,updateParams);
-        return "Changes saved successfully";
+        return rb.getString("changes_saved_successfully");
     }
 
     @Override
-    public String createAdditionalIdForClass(String[] formValues) throws TTCustomException {
+    public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
+    	
+    	lang = "en-US";
+       	System.out.println("createAdditionalIdForClass - lang=" + lang);
+		// Multi=lingual enhancement
+		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+		rb = ResourceBundle.getBundle("MathSpring",loc);        
+
         try {
             ClassInfo info = DbClass.getClass(connection.getConnection(),Integer.valueOf(formValues[4]));
             DbClass.createStudentRoster(connection.getConnection(),info,formValues[0].trim(),formValues[1].trim(),Integer.valueOf(formValues[2]));
@@ -165,7 +190,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
             logger.error(e.getMessage());
             throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
         }
-        return "success";
+        return rb.getString("changes_saved_successfully");
     }
 
     @Override

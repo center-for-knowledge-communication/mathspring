@@ -45,7 +45,7 @@ public class CollaborationPartnerIS extends NextProblemInterventionSelector {
         // them to help the person who is next to them (partnerName).
         //  This intervention plays in the client along with a loop that runs and sends an event every second.
         //   This event is handled below in  processContinueNextProblemInterventionEvent
-        CollaborationPartnerIntervention interv = new CollaborationPartnerIntervention();
+        CollaborationPartnerIntervention interv = new CollaborationPartnerIntervention(smgr.getLocale());
         interv.setPartner(partnerName);
         return interv;
     }
@@ -56,7 +56,7 @@ public class CollaborationPartnerIS extends NextProblemInterventionSelector {
         partnerName = CollaborationManager.getPartnerName(smgr.getConnection(), id); // get the partner's name
         // update DB with collab event indicating the two students are starting to collaborate
         DbCollaborationLogging.saveEvent(conn, smgr.getStudentId(), id, null, "CollaborationInstructions_Partner");
-        CollaborationPartnerIntervention interv = new CollaborationPartnerIntervention();
+        CollaborationPartnerIntervention interv = new CollaborationPartnerIntervention(smgr.getLocale());
         interv.setPartner(partnerName);
         return interv;
     }

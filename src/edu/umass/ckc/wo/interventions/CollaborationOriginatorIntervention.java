@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Melissa
@@ -8,16 +11,32 @@ package edu.umass.ckc.wo.interventions;
  * To change this template use File | Settings | File Templates.
  */
 public class CollaborationOriginatorIntervention extends TimeoutIntervention implements NextProblemIntervention{
+    private Locale locale;
 
+    public  CollaborationOriginatorIntervention (Locale loc) {
+        super();
+        this.locale = loc;
+
+    }
     public String getType () {
         this.setWaitTime(1000);
         return "CollaborationOriginatorIntervention";
     }
 
     public String getDialogHTML () {
-        String str = "<div><p>Please wait while we find a partner for you... <br/>" +
-                "You will discuss the problem <b>together</b>. <br/>" +
-                "<b>YOUR</b> job is to use the <b>mouse</b> and <b>keyboard</b>.<br/>";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+
+        		str = "<div><p>" + rb.getString("please_wait_for_a_partner") + "<br/></p>";
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
 
         str+="</div>";
         return str;

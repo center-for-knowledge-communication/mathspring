@@ -46,9 +46,13 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map,@RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId ) throws TTCustomException {
+    	System.out.println("/tt/viewClassDetails 1");
         ccService.setTeacherInfo(map,teacherId,classId);
+    	System.out.println("/tt/viewClassDetails 2");
         ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+    	System.out.println("/tt/viewClassDetails 3");
         map.addAttribute("createClassForm", new CreateClassForm());
+    	System.out.println("/tt/viewClassDetails 4");
         return "teacherTools/classDetails";
     }
 
@@ -84,10 +88,13 @@ public class TeacherToolsViewClassDetailsController {
             ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid));
             ObjectMapper objectMapp = new ObjectMapper();
             objectMapp.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
+        	System.out.println("getProblemForProblemSets = success");
             return objectMapp.writeValueAsString(pView);
         }catch (IOException e){
+        	System.out.println("getProblemForProblemSets" + e.getMessage());
             e.printStackTrace();
         }
+    	System.out.println("getProblemForProblemSets = Failed");
         return "failed";
     }
 
@@ -112,8 +119,9 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/resetStudentdata", method = RequestMethod.POST)
     public @ResponseBody
-    String resetStudentdata(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "action") String action) throws TTCustomException {
-        return pvService.resetStudentData(studentId,action);
+    String resetStudentdata(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("resetStudentdata");
+    	return pvService.resetStudentData(studentId,action,lang);
     }
 
 
@@ -126,15 +134,17 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/editStudentInfo", method = RequestMethod.POST)
     public @ResponseBody
-    String editStudentInfo(@RequestParam(value = "studentId") String studentId,@RequestParam(value = "formData[]") String[] formData) throws TTCustomException {
-        return pvService.editStudentInfo(new EditStudentInfoForm(Integer.valueOf(studentId.trim()),formData[1].trim(),formData[2].trim(),formData[0].trim()));
+    String editStudentInfo(@RequestParam(value = "studentId") String studentId,@RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("editStudentInfo");
+        return pvService.editStudentInfo(new EditStudentInfoForm(Integer.valueOf(studentId.trim()),formData[1].trim(),formData[2].trim(),formData[0].trim()),lang);
     }
 
 
     @RequestMapping(value = "/tt/createMoreStudentIds", method = RequestMethod.POST)
     public @ResponseBody
-    String createMoreStudentIds(ModelMap map,@RequestParam(value = "formData[]") String[] formData) throws TTCustomException {
-        String message =  pvService.createAdditionalIdForClass(formData);
+    String createMoreStudentIds(ModelMap map,@RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("createMoreStudentIds");
+    	String message =  pvService.createAdditionalIdForClass(formData,lang);
         loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()));
         return message;
     }
