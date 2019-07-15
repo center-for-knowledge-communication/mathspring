@@ -165,18 +165,20 @@
 	</dependencies>
 	<properties>
 		<webXmlPath>${pom.basedir}/webProduction</webXmlPath>
+		<warDirectory>release</warDirectory>
 	</properties>
 	<profiles>
 		<profile>
 			<id>local</id>
 			<properties>
 				<webXmlPath>${pom.basedir}/web</webXmlPath>
+				<warDirectory>development</warDirectory>
 			</properties>
 		</profile>
 	</profiles>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<directory>${project.basedir}/release</directory>
+		<directory>${project.basedir}/${warDirectory}</directory>
 		<finalName>ms</finalName>
 		<plugins>
 			<plugin>
