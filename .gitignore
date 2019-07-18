@@ -1,4 +1,5 @@
 .idea
-release
+release*
 *.iml
 woServer
+resources/sass_compiled

@@ -20,7 +20,28 @@
             validationQuery="SELECT 1"
             driverClassName="com.mysql.jdbc.Driver"
             url="jdbc:mysql://localhost:3303/wayangoutpostdb?autoReconnect=true" />
+
+  <Resource name="jdbc/wodbrose"
+            type="javax.sql.DataSource"
+            auth="Container"
+            description="Mysql database for wayang"
+            maxActive="100"
+            maxIdle="30"
+            maxWait="10000"
+            username="MathspringServer"
+            password="m4thspr1ng!"
+            removeAbandoned="true"
+            removeAbandonedTimeout="60"
+            logAbandoned="true"
+            testWhileIdle="true"
+            testOnBorrow="true"
+            testOnReturn="true"
+            timeBetweenEvictionRunMillis="600000"
+            numTestsPerEvictionRun="10"
+            validationQuery="SELECT 1"
+            driverClassName="com.mysql.jdbc.Driver"
+            url="jdbc:mysql://rose.cs.umass.edu/wayangoutpostdb?autoReconnect=true" />
             
-<ResourceLink name="jdbc/wodbrose" global="jdbc/aws" type="javax.sql.DataSource"/>
+<ResourceLink name="jdbc/wodbaws" global="jdbc/aws" type="javax.sql.DataSource"/>
 
 </Context>

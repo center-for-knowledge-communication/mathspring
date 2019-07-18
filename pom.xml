@@ -165,18 +165,27 @@
 	</dependencies>
 	<properties>
 		<webXmlPath>${pom.basedir}/webProduction</webXmlPath>
+		<warDirectory>release</warDirectory>
 	</properties>
 	<profiles>
 		<profile>
 			<id>local</id>
 			<properties>
 				<webXmlPath>${pom.basedir}/web</webXmlPath>
+				<warDirectory>release_local</warDirectory>
+			</properties>
+		</profile>
+		<profile>
+			<id>rose</id>
+			<properties>
+				<webXmlPath>${pom.basedir}/webRose</webXmlPath>
+				<warDirectory>release_rose</warDirectory>
 			</properties>
 		</profile>
 	</profiles>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<directory>${project.basedir}/release</directory>
+		<directory>${project.basedir}/${warDirectory}</directory>
 		<finalName>ms</finalName>
 		<plugins>
 			<plugin>
