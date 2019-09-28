@@ -8,6 +8,22 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <%@ page import="edu.umass.ckc.wo.content.PrePostProblemDefn" %>
 <style>
     .ui-progressbar {
@@ -72,19 +88,22 @@
                 return;
         if (isMultiChoice) {
             setIDontKnowControls(true, 'inline');
-            alert("You are taking a while to answer this question.  I've added another choice to the list.   If you aren't sure, you can select 'I dont know' and submit to move on.");
+            var msg1 = "<%= rb.getString("taking_a_while_added_choice")%>";
+            alert(msg1);
         }
         else {
             // expose a button that allows the user to select 'I don't know'
             setIDontKnowControls(false, 'inline');
-            alert("You are taking a while to answer this question.  I've added a new button.  If you aren't sure, click the 'I dont know' button to move on.");
+            var msg2 = "<%= rb.getString("taking_a_while_added_button")%>";
+            alert(msg2);
         }
     }
 
     // when the user clicks the I don't know button, it autofills the input box and submits the form.
     function submitIDontKnow () {
         // put text in the input box so that it will be valid on submission
-        document.getElementById("f").value = "I don't know.";
+        var msg3 = "<%= rb.getString("i_dont_know")%>" + ".";
+        document.getElementById("f").value = msg3;
         // now submit the form
         document.getElementById("pretestQuestion").submit();
     }
@@ -103,7 +122,8 @@
             v = a || b || c || d || e || idontknow;
 
             if (!v) {
-                alert("Please select one of the answers!");
+            	var msg4 = "<%= rb.getString("please_select_one_answer")%>";
+            	alert(msg4);
             }
         }
         else {
@@ -111,7 +131,8 @@
             var input = document.getElementById("f").value.trim();
             if(input == "")
             {
-                alert('Please answer the question!');
+            	var msg5 = "<%= rb.getString("please_answer_question")%>";
+            	alert(msg5);
                 document.getElementById("f").focus();
                 v = false
             }
@@ -233,8 +254,8 @@
                 <br>
             </c:if>
             <br/>
-            <input id="IDontKnowRadioButton" type="radio" name="answer" value="I dont know">
-                <span id="IDontKnowText">I don't know</span>
+            <input id="IDontKnowRadioButton" type="radio" name="answer" value="<%= rb.getString("i_dont_know")%>">
+                <span id="IDontKnowText"><%= rb.getString("i_dont_know")%></span>
             </input>
 
             <br>
@@ -252,10 +273,10 @@
     </c:choose>
 
 
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  type="submit"  value="Submit" /> &nbsp;&nbsp;
-    <input id="IDontKnowButton" onClick="submitIDontKnow()" type="submit" value="I don't know" style="display:none"/>
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  type="submit"  value="<%= rb.getString("submit")%>" /> &nbsp;&nbsp;
+    <input id="IDontKnowButton" onClick="submitIDontKnow()" type="submit" value="<%= rb.getString("i_dont_know")%>" style="display:none"/>
     <br><br>
-    <div id="progressbar"> <div class="progress-label">${numProbsCompleted+1} of ${numProbsInTest} questions</div></div>
+    <div id="progressbar"> <div class="progress-label">${numProbsCompleted+1} <%= rb.getString("of")%> ${numProbsInTest} <%= rb.getString("questions")%></div></div>
     </p>
 </form>
 <br>
