@@ -245,7 +245,7 @@ public class Pretest extends LoginInterventionSelector {
             // on dev machine the survey resources are absent because they live under the msadmin tool's files.
             // To get them working on a dev machine, find the /fileUploads/surveys/ folder and copy it under
             // this projects webResources (if they are not there)
-            String surveyURI = Settings.surveyURI + "surveyq_" + p.getId() + "/";
+            String surveyURI = Settings.surveyURI + "/surveyq_" + p.getId() + "/";
             req.setAttribute(SURVEY_URI, surveyURI);
             req.setAttribute(NUM_PROBS_IN_TEST, this.numProbsInTest);
             req.setAttribute(NUM_PROBS_COMPLETED, this.numTestProbsCompleted);
@@ -298,6 +298,8 @@ public class Pretest extends LoginInterventionSelector {
             req.setAttribute(NUM_PROBS_IN_TEST, this.numProbsInTest);
             req.setAttribute(NUM_PROBS_COMPLETED, this.numTestProbsCompleted);
             req.setAttribute(LoginInterventionSelector.INTERVENTION_CLASS,getClass().getName());
+			String surveyURI = Settings.surveyURI + "/surveyq_" + p.getId() + "/";
+            req.setAttribute(SURVEY_URI, surveyURI);
             //  The JSP will conditionally generate the right kind of HTML depending on whether its a multiple-choice or short-answer question.
             return new LoginIntervention(JSP);
         }

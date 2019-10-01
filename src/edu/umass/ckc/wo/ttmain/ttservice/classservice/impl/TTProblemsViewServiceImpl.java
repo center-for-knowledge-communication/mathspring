@@ -95,7 +95,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     @Override
     public String resetStudentData(String studentId, String action, String lang) throws TTCustomException {
     	
-    	lang = "en-US";
     	System.out.println("resetStudentData - lang=" + lang);
 		// Multi=lingual enhancement
 		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
@@ -158,7 +157,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     @Override
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	
-    	lang = "en-US";   	
     	System.out.println("editStudentInfo - lang=" + lang);
     	// Multi=lingual enhancement
 		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
@@ -176,7 +174,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     @Override
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
     	
-    	lang = "en-US";
        	System.out.println("createAdditionalIdForClass - lang=" + lang);
 		// Multi=lingual enhancement
 		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));

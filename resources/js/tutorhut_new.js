@@ -183,10 +183,22 @@ function showHourglassCursor(b) {
 }
 
 function displayHintCount () {
+	
+	var languagePreference = window.navigator.language;
+
+
+	var hintText = "";
+	if (languagePreference === "en-US") {
+		hintText = "Hint";
+	}
+	else {
+		hintText = "Ayuda";
+	}
+
     if (globals.numHints >= 0 && globals.numHintsSeen == 0) {
-        $("#hint_label").html("Hint (" + globals.numHints + ")");
+        $("#hint_label").html(hintText + "(" + globals.numHints + ")");
     } else if (globals.numHintsSeen <= globals.numHints) {
-        $("#hint_label").html("Hint (" + globals.numHintsSeen + "/" + globals.numHints + ")");
+        $("#hint_label").html(hintText + "(" + globals.numHintsSeen + "/" + globals.numHints + ")");
     }
 }
 
@@ -423,10 +435,20 @@ function showDashboard () {
 
 
 function processShowExample (responseText, textStatus, XMLHttpRequest) {
-    checkError(responseText);
+	var languagePreference = window.navigator.language;
+	
+	var amsg = "";
+	if (languagePreference == "en-US") {
+		 amsg = "There is not an example to show for this problem.";
+	}
+	else {
+		 amsg = "No hay un ejemplo para mostrar para este problema.";
+	}
+
+	checkError(responseText);
     var activity = JSON.parse(responseText);
     if (activity.activityType === NO_MORE_PROBLEMS) {
-        alert("There is not an example to show for this problem");
+        alert(amsg);
         return;
     }
 

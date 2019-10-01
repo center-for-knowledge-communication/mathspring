@@ -271,7 +271,9 @@ function stopAudio(){
 }
 
 m.getIdCorrespondingToHint = function(hintLabel){
-    if(hintLabel === "Show Answer") hintLabel = "Hint 10";
+	var languagePreference = window.navigator.language;
+	
+	if(hintLabel === "Show Answer") hintLabel = "Hint 10";
     if(hintLabel.match(/Hint \d+/)) {
         //If it's "Hint ##", remove the whitespace
         return hintLabel.replace(/\s/g, "");
@@ -280,10 +282,24 @@ m.getIdCorrespondingToHint = function(hintLabel){
 }
 
 function getNextHint(hintLabel){
+
+    //alert(hintLabel);
+
+	var languagePreference = window.navigator.language;
+	
+	var hintText = "";
+	if (languagePreference === "en-US") {
+		hintText = "Hint";
+	}
+	else {
+		hintText = "Ayuda";
+	}
+
     var hintId = m.getIdCorrespondingToHint(hintLabel);
+
     if(hintId.match(/Hint\d+/)) {
         var num = parseInt(hintId.substring(4));
-        if(num < 10) return "hint" + (num + 1);
+        if(num < 10) return hintText + (num + 1);
     }
     return "";
 }

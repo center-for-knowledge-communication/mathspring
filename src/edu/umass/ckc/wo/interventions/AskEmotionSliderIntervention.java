@@ -85,22 +85,34 @@ public class AskEmotionSliderIntervention extends InputResponseIntervention impl
         try {           	
         		// Multi=lingual enhancement
         		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		
+        		String strEmotion = emotion.getName();       		
+        		String strEmotionLower = strEmotion.toLowerCase(this.locale);
+        		
+        		String strEmo = ""; 
+        		try {
+        			strEmo = rb.getString(strEmotionLower);
+        		}
+        		catch(Exception e) {
+        			strEmo = emotion.getName();
+        		}
+        		
         		str = "<div>  " +
         				"<link href=\"css/simple-slider.css\" rel=\"stylesheet\" type=\"text/css\" />" +
         				"<script type=\"text/javascript\" src=\"js/simple-slider.js\"></script>"
-        				+ getFormOpen() + " <p>" + rb.getString("ask_emotion_radio_header") + "<br>" + rb.getString("ask_emotion_radio_question") + emotion.getName() + ".";
+        				+ getFormOpen() + " <p>" + rb.getString("ask_emotion_radio_header") + "<br>" + rb.getString("ask_emotion_radio_question") + strEmo + ".";
        			str += "<br><br>";
        			str += "<input name=\"" + EMOTION + "\" type=\"hidden\" value=\"" + emotion.getName() + "\"/>";
        			str += "<br>\n" +
 "        			<table><tr><td width=\"200\"><p>"+this.emotion.getLabels().get(0)+"</p></td><td><input type=\"text\" name=\""+ LEVEL +"\" data-slider=\"true\" data-slider-range=\"1,"+numVals+"\" data-slider-step=\"1\" data-slider-snap=\"true\"></td><td><p>"+this.emotion.getLabels().get(this.emotion.getLabels().size()-1)+"</p></td></tr></table>\n" +
 "        			</br>";
        			if (askWhy) {
-       				str += "Why is that?<br>";
+       				str += rb.getString("why_is_that") + "<br>";
        				str += "<textarea name=\"" + REASON + "\" rows=\"4\" cols=\"40\"/>";
        			}
         		if (askAboutSkipping && skippedProblem) {
         			str += "<br>";
-        			str += "Have you skipped a problem recently (clicked on 'new problem' without answering)?<br>";
+        			str += rb.getString("have_you_skipped") + "<br>";
         			str += "<input type='radio' name='skipFrequency' value='never'>" + rb.getString("never") + "<br>";
         			str += "<input type='radio' name='skipFrequency' value='fewTimes'>" + rb.getString("a_few_times") + "<br>";
         			str += "<input type='radio' name='skipFrequency' value='aLot'>" + rb.getString("a_lot") + "<br>";
