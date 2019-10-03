@@ -1,4 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <jsp:useBean id="problem" scope="request" class="edu.umass.ckc.wo.content.Problem"/>
 <!DOCTYPE html>
 <html>
@@ -49,7 +65,7 @@
             <div id="MultipleChoiceAnswers" style="display: none">
             </div>
             <div id="SubmitAnswerBox" style="display:none">
-                <button id="submit_answer" type="button">Submit Answer!</button>
+                <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
             </div>

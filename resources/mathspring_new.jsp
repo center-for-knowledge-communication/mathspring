@@ -33,7 +33,20 @@ catch (Exception e) {
 	href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css"
 	rel="stylesheet">
 
+<%
+if (loc.getDisplayLanguage() == "Spanish") {
+%>
+<link href="sass_compiled/tutores.css" rel="stylesheet">
+<%
+}
+else 
+{
+%>
 <link href="sass_compiled/tutor.css" rel="stylesheet">
+<%
+}
+%>
+
 <link rel="stylesheet"
 	href="<c:url value="/js/bootstrap/css/bootstrap.css" />" />
 

@@ -402,7 +402,7 @@ public class TeachersReportDownload extends AbstractXlsView {
 
 
             Cell percStudentsRepeated = header.createCell(8);
-            percStudentsRepeated.setCellValue(rb.getString("pct_students_reeated_problem"));
+            percStudentsRepeated.setCellValue(rb.getString("pct_students_repeated_problem"));
 
 
             Cell percStudentsSkipped = header.createCell(9);
@@ -595,7 +595,7 @@ public class TeachersReportDownload extends AbstractXlsView {
             childCellHeaderProblemId.setCellValue(rb.getString("problem_id"));
             childCellHeaderProblemNickName.setCellValue(rb.getString("problem_nick_name"));
             childCellHeaderProblemFinishedOn.setCellValue(rb.getString("problem_finishd_on"));
-            childCellHeaderProblemDescription.setCellValue(rb.getString("problem_descrition"));
+            childCellHeaderProblemDescription.setCellValue(rb.getString("problem_description"));
             childCellHeaderProblemURL.setCellValue(rb.getString("problem_url"));
             childCellHeaderSolvedCorrectly.setCellValue(rb.getString("solved_correctly"));
             childCellHeadermistakesMade.setCellValue(rb.getString("nbr_mistakes_made"));

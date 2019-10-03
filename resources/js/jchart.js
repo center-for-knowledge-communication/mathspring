@@ -639,134 +639,144 @@ renderCharts : function(problemList, c, containerId) {
 
 giveFeedback	: function(remarksDiv, topic_state,topicState_pepperPlant,topicMastery, neglectful_count,studentState_disengaged) {
 
-        var feedbackText="";
+
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	
+	var feedbackText="";
 
         //empty state
 
 
-        if (topic_state=="topicEmpty") feedbackText+="Untried topic- Would you like to try this topic now?";
+    	//feedbackText += languageSet == "es" ? "" : "";
+
+	
+        if (topic_state=="topicEmpty") feedbackText += languageSet == "es" ? "Tema no intentado: ¿te gustaría probar este tema ahora mismo?" : "Untried topic- Would you like to try this topic now?";
 
         // correct for the first time
 
-        if (topic_state=="correctForTheFirstTime") feedbackText+="Got last problem right on first attempt. Congratulations!! Do you want to try more problems like this?";
-        if (topic_state=="correctForTheFirstTime_goodHelpUsage") feedbackText+="Got last problem right on first attempt! You had also made good use of tutor help in previous problem. You are using this tutor correctly as you are asking for help when you need it and solving on your own when you can.";
+        if (topic_state=="correctForTheFirstTime") feedbackText += languageSet == "es" ? "Contestaste el último problema en el primer intento. ¡¡Felicitaciones!! ¿Querés probar más problemas como este?" : "Got last problem right on first attempt. Congratulations!! Do you want to try more problems like this?";
+        if (topic_state=="correctForTheFirstTime_goodHelpUsage") feedbackText += languageSet == "es" ? "¡Contestaste el último problema en el primer intento! También has usado de la ayuda muy bien en el problema anterior. Estás utilizando este programa correctamente ya que pedís ayuda cuando la necesitás y resolvés por su cuenta cuando podés." : "Got last problem right on first attempt! You had also made good use of tutor help in previous problem. You are using this tutor correctly as you are asking for help when you need it and solving on your own when you can.";
 
 
         // baby topic just started
 
-        else if (topicState_pepperPlant=="babyTopicJustStarted_babyPepper" )  feedbackText+="You have received this baby pepper plant as you have started working on this new topic. Don't forget to use hints, videos and examples when needed. "
-
+        else if (topicState_pepperPlant=="babyTopicJustStarted_babyPepper" )  feedbackText += languageSet == "es" ? "Recibiste esta plantita de pimiento cuando comenzaste a trabajar en este tema nuevo. No olvides utilizar la AYUDA, los videos y los ejemplos cuando sea necesario." : "You have received this baby pepper plant as you have started working on this new topic. Don't forget to use hints, videos and examples when needed.";
         // baby topic
 
         else if (topicState_pepperPlant=="babyTopic_babyPepper" ) {
 
-            if (topic_state=="SHINT") feedbackText+="Great effort! Keep using the hints, videos and examples!";
-            else if (topic_state=="NOTR")    feedbackText+="Don’t like reading? Have the computer read aloud - click the read aloud button.";
-            else if (topic_state=="SOF") feedbackText+="Got last problem right on first attempt! Congratulations!!";
-            else feedbackText+="As you put more effort on solving the problems, the baby pepper plant grows to give pepper fruits.";
+            if (topic_state=="SHINT") feedbackText += languageSet == "es" ? "¡Excelente esfuerzo! ¡Seguí usando la ayuda, los videos y los ejemplos!" : "Great effort! Keep using the hints, videos and examples!";
+            else if (topic_state=="NOTR")    feedbackText += languageSet == "es" ? "¿No te gusta leer? Hacé que la computadora lea en voz alta: hacé clic en el botón de LEER EN VOZ ALTA." : "Don’t like reading? Have the computer read aloud - click the read aloud button.";
+            else if (topic_state=="SOF") feedbackText += languageSet == "es" ? "¡Tengo el último problema justo en el primer intento! ¡¡Felicitaciones!!" : "Got last problem right on first attempt! Congratulations!!";
+            else feedbackText += languageSet == "es" ? "A medida que te esfuerces más para resolver los problemas, la planta de pimiento crece para dar frutos." : "As you put more effort on solving the problems, the baby pepper plant grows to give pepper fruits.";
         }
 
 
         // toddler topics
 
-        else if (topicState_pepperPlant=="toddlerTopic_toddlerPepper" ) feedbackText+="Your pepper plant grows as you put effort working on these math problems.";
-        else if (topicState_pepperPlant=="toddlerTopic_toddlerPepper_wilt" ) feedbackText+="If you do not put effort on solving the problems, but rather keep guessing and giving up and not reading carefully, the plant wilts.";
-
-
+        else if (topicState_pepperPlant=="toddlerTopic_toddlerPepper" ) feedbackText += languageSet == "es" ? "Tu planta de pimiento crece a medida que te esfuerces trabajando en estos problemas matemáticos." : "Your pepper plant grows as you put effort working on these math problems.";
+        else if (topicState_pepperPlant=="toddlerTopic_toddlerPepper_wilt" ) feedbackText += languageSet == "es" ? "Si no te esforzás en resolver los problemas, sino que adivinás y te das por vencido y no lees con cuidado, la planta se marchita." : "If you do not put effort on solving the problems, but rather keep guessing and giving up and not reading carefully, the plant wilts.";
 
         // just mastered states
 
-        else if (topicState_pepperPlant=="justMastered_rainbowPepper") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You also made an exceptional use of tutor help features. You are therefore getting a special Rainbow Pepper. Double Congratulations!! ";
+        else if (topicState_pepperPlant=="justMastered_rainbowPepper") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la barra de tu conocimiento supera el 88%. También hizo un uso excepcional de las funciones de ayuda del tutor. Por lo tanto, obtienes un especial Rainbow Pepper. Doble felicitaciones !!" : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You also made an exceptional use of tutor help features. You are therefore getting a special Rainbow Pepper. Double Congratulations!!";
 
-        else if (topicState_pepperPlant=="justMastered_masteryPepper_bonusPeppers") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You also made a good use of tutor help features. You have received bonus peppers. ";
+        else if (topicState_pepperPlant=="justMastered_masteryPepper_bonusPeppers") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la estimación de tu conocimiento supera el 88%. También hizo un uso excepcional de las funciones de ayuda del tutor. Por lo tanto, obtienes un especial Rainbow Pepper. Doble felicitaciones !!" : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You also made a good use of tutor help features. You have received bonus peppers. ";
 
-        else if (topicState_pepperPlant=="justMastered_monsterPepper") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You have demonstrated exceptional performance. You are therefore getting a special Monster Pepper. Double Congratulations!! ";
+        else if (topicState_pepperPlant=="justMastered_monsterPepper") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la estimación de tu conocimiento supera el 88%. Has demostrado un rendimiento excepcional. Por lo tanto, obtienes una planta de Pimientos Gigantes especial. Doble felicitaciones !!" : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You have demonstrated exceptional performance. You are therefore getting a special Monster Pepper. Double Congratulations!! ";
 
-        else if (topicState_pepperPlant=="justMastered_bigPepper") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You have solved a lot of problems. You have thus received a Big Pepper plant. ";
+        else if (topicState_pepperPlant=="justMastered_bigPepper") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la estimación de tu conocimiento supera el 88%. Has resuelto muchos problemas. Por lo tanto, Has recibido una planta de Big Pepper. " : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. You have solved a lot of problems. You have thus received a Big Pepper plant. ";
 
-        else if (topicState_pepperPlant=="justMastered_masteryPepper") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. There are now fruits on your pepper plant.";
+        else if (topicState_pepperPlant=="justMastered_masteryPepper") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la estimación de tu conocimiento supera el 88%. Ahora hay frutas en su planta de pimiento." : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. There are now fruits on your pepper plant.";
 
         //in mastery states
 
-        else if (topicState_pepperPlant=="inMastery_rainbowPepper") feedbackText="Skill mastered! You have demonstrated exceptional help usage in this topic and have this rainbow pepper. Now, do you want to try more challenging problems, or try a new topic? ";
+        else if (topicState_pepperPlant=="inMastery_rainbowPepper") feedbackText = languageSet == "es" ? "Tema dominado! Has demostrado un uso excepcional de la ayuda en este tema y ganaste un pimiento arcoíris. Ahora, ¿quieres probar problemas más desafiantes o probar un nuevo tema?" : "Skill mastered! You have demonstrated exceptional help usage in this topic and have this rainbow pepper. Now, do you want to try more challenging problems, or try a new topic? ";
 
-        else if (topicState_pepperPlant=="inMastery_masteryPepper_bonusPeppers") feedbackText="Skill mastered! You have demonstrated exceptional help usage in this topic and have this rainbow pepper. Now, do you want to try more challenging problems, or try a new topic? ";
+        else if (topicState_pepperPlant=="inMastery_masteryPepper_bonusPeppers") feedbackText = languageSet == "es" ? "Tema dominado! Has demostrado un uso excepcional de la ayuda en este tema y tenés ahora un pimiento arcoíris. Ahora, ¿quieres probar problemas más desafiantes o probar un nuevo tema?" : "Skill mastered! You have demonstrated exceptional help usage in this topic and have this rainbow pepper. Now, do you want to try more challenging problems, or try a new topic? ";
 
-        else if (topicState_pepperPlant=="inMastery_monsterPepper") feedbackText="Skill mastered! You have demonstrated exceptional performance in this topic and have this monster pepper. Now, do you want to try more challenging problems, or try a new topic? ";
+        else if (topicState_pepperPlant=="inMastery_monsterPepper") feedbackText = languageSet == "es" ? "Tema dominado! Has demostrado un rendimiento excepcional en este tema y tenés  este monstruo de pimienta. Ahora, ¿quieres probar problemas más desafiantes o probar un nuevo tema?" : "Skill mastered! You have demonstrated exceptional performance in this topic and have this monster pepper. Now, do you want to try more challenging problems, or try a new topic? ";
 
-        else if (topicState_pepperPlant=="inMastery_bigPepper") feedbackText="Skill mastered! You have solved a lot of problems in this topic. Now, do you want to try more challenging problems, or try a new topic? ";
+        else if (topicState_pepperPlant=="inMastery_bigPepper") feedbackText = languageSet == "es" ? "Tema dominado! Has resuelto muchos problemas en este tema. Ahora, ¿quieres probar problemas más desafiantes o probar un nuevo tema? " : "Skill mastered! You have solved a lot of problems in this topic. Now, do you want to try more challenging problems, or try a new topic? ";
 
-        else if (topicState_pepperPlant=="inMastery_masteryPepper") feedbackText="Congratulations! You’ve mastered this topic and the mastery bar is over 88%. ";
+        else if (topicState_pepperPlant=="inMastery_masteryPepper") feedbackText = languageSet == "es" ? "¡Felicitaciones! Has dominado este tema y la estimación de tu conocimiento supera el 88%." : "Congratulations! You’ve mastered this topic and the mastery bar is over 88%. ";
 
         //remastered states
 
-        else if (topicState_pepperPlant=="reMasteredWithGoodHelpUsage_rainbowPepper") feedbackText="Good job on keeping mastery up! You have a rainbow pepper indicating that you made effective use of tutor help.";
-        else if (topicState_pepperPlant=="reMasteredWithGoodHelpUsage_masteryPepper_bonusPeppers") feedbackText="Good job on keeping mastery up! You have bonus peppers for using tutor help effectively..";
-        else if (topicState_pepperPlant=="reMasteredSolvingLotOfProblems_bigPepper") feedbackText="Good job on keeping mastery up! You have a big pepper indicating that you have solved a lot of problems in this topic.";
-
+        else if (topicState_pepperPlant=="reMasteredWithGoodHelpUsage_rainbowPepper") feedbackText = languageSet == "es" ? "¡Buen trabajo para mantener el dominio! Tenés un pimiento arcoíris que indica que hizo un uso efectivo de la ayuda del tutor." : "Good job on keeping mastery up! You have a rainbow pepper indicating that you made effective use of tutor help.";
+        else if (topicState_pepperPlant=="reMasteredWithGoodHelpUsage_masteryPepper_bonusPeppers") feedbackText = languageSet == "es" ? "¡Buen trabajo para mantener el dominio! Tenés  pimientos extra por usar la ayuda del tutor de una manera muy efectiva" : "Good job on keeping mastery up! You have bonus peppers for using tutor help effectively..";
+        else if (topicState_pepperPlant=="reMasteredSolvingLotOfProblems_bigPepper") feedbackText = languageSet == "es" ? "¡Buen trabajo para mantener el dominio! Tenés un gran pimiento que indica que Has resuelto muchos problemas en este tema." : "Good job on keeping mastery up! You have a big pepper indicating that you have solved a lot of problems in this topic.";
+        
         //close to mastery(mastery>75) states
 
         else if (topicMastery >= 75)
 
         {
-            feedbackText+="You are close to mastering this topic. ";
+            feedbackText += languageSet == "es" ? "Estás cerca de dominar este tema. " : "You are close to mastering this topic. ";
 
-            if (topicState_pepperPlant=="disengagedCloseToMastery_youngPepper_wilt")  feedbackText+="But, you seem to be disengaged lately. Your flowered pepper is wilting."
-            else if (topicState_pepperPlant=="closeToMastery_flowerPepper_bonusFlowers")  feedbackText+="";
-            else if (topicState_pepperPlant=="closeToMasteryGoodHelpUsage_flowerPepper_moreBonusFlowers")  feedbackText+="You seem to have done quite well in this topic, using the tutor help effectively. Keep it up."
+            if (topicState_pepperPlant=="disengagedCloseToMastery_youngPepper_wilt")  feedbackText += languageSet == "es" ? "Pero, parecés estar desconectado últimamente. Tu pimiento florecido se está marchitando." : "But, you seem to be disengaged lately. Your flowered pepper is wilting.";
+            else if (topicState_pepperPlant=="closeToMastery_flowerPepper_bonusFlowers")  feedbackText +="";
+            else if (topicState_pepperPlant=="closeToMasteryGoodHelpUsage_flowerPepper_moreBonusFlowers")  feedbackText += languageSet == "es" ? "Parece que le Has ido bastante bien en este tema, utilizando la ayuda del tutor de manera efectiva. Seguid así." : "You seem to have done quite well in this topic, using the tutor help effectively. Keep it up.";
             else if (topicState_pepperPlant=="closeToMastery_flowerPepper")  feedbackText+="";
 
-            if (topic_state=="inProgress") feedbackText+="You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
-            else if (topic_state=="inProgress_goodHelpUsage") feedbackText+="You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are using this tutor correctly as you are asking for help when you need it and solving on your own when you can.";
-            else if (topic_state=="SHINT") feedbackText+="Great effort! Keep using the hints, videos and examples!";
+            if (topic_state=="inProgress") feedbackText += languageSet == "es" ? "Tienes el último problema correcto en el primer intento. Sigan con el buen trabajo y pronto podrán obtener el dominio." : "You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
+            else if (topic_state=="inProgress_goodHelpUsage") feedbackText += languageSet == "es" ? "Obtuvo el último problema correcto en el primer intento. También hizo un buen uso de la ayuda del tutor en el problema anterior. Está utilizando este tutor correctamente ya que solicita ayuda cuando la necesita y resuelve por su cuenta cuando puede." : "You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are using this tutor correctly as you are asking for help when you need it and solving on your own when you can.";
+            else if (topic_state=="SHINT") feedbackText += languageSet == "es" ? "¡Gran esfuerzo! ¡Sigue usando las pistas, videos y ejemplos!" : "Great effort! Keep using the hints, videos and examples!";
 
 
         }
         //adolescent topic
 
-        else if (topicState_pepperPlant=="adolescentTopicGoodHelpUsage_adolescentPepper_withMoreFlowers") feedbackText+="You seem to have used tutor help features very well in this topic. Your plant has a lot of flowers."
+        else if (topicState_pepperPlant=="adolescentTopicGoodHelpUsage_adolescentPepper_withMoreFlowers") feedbackText += languageSet == "es" ? "Parece que Has utilizado muy bien las funciones de ayuda del tutor en este tema. Tu planta tenés muchas flores." : "You seem to have used tutor help features very well in this topic. Your plant has a lot of flowers.";
         else if ((topicState_pepperPlant=="adolescentTopic_adolescentPepper") || (topicState_pepperPlant=="adolescentTopic_adolescentPepper_withFlowers"))
         {
-            if (topic_state=="inProgress") feedbackText+="You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
-            else if (topic_state=="inProgress_goodHelpUsage") feedbackText+="You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are showing good problem solving, asking for help when you need it and solving on your own when you can.";
-            else if (topic_state=="SHINT") feedbackText+="Great effort! Keep using the hints, videos and examples!";  }
+            if (topic_state=="inProgress") feedbackText += languageSet == "es" ? "Tienes el último problema correcto en el primer intento. Sigan con el buen trabajo y pronto podrán obtener el dominio." : "You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
+            else if (topic_state=="inProgress_goodHelpUsage") feedbackText += languageSet == "es" ? "Obtuvo el último problema correcto en el primer intento. También hizo un buen uso de la ayuda del tutor en el problema anterior. Está mostrando una buena resolución de problemas, solicitando ayuda cuando la necesita y resolviendo por su cuenta cuando puede." : "You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are showing good problem solving, asking for help when you need it and solving on your own when you can.";
+            else if (topic_state=="SHINT") feedbackText += languageSet == "es" ? "¡Gran esfuerzo! ¡Sigue usando las pistas, videos y ejemplos!" : "Great effort! Keep using the hints, videos and examples!";  }
 
-        else if (topicState_pepperPlant=="adolescentTopic_adolescentPepper_wilt") feedbackText+="You seem to have lost interest. Please use hints, videos and examples if you need."
+        else if (topicState_pepperPlant=="adolescentTopic_adolescentPepper_wilt") feedbackText += languageSet == "es" ? "Parece que has perdido interés. Utilice sugerencias, videos y ejemplos si lo necesita." : "You seem to have lost interest. Please use hints, videos and examples if you need.";
 
         //young topic
 
-        else if (topicState_pepperPlant=="youngTopicGoodHelpUsage_youngPepper_withMoreFlowers") feedbackText+="You have progressed well on this topic. You seem to have used tutor help features very well. Your plant has a lot of flowers."
+        else if (topicState_pepperPlant=="youngTopicGoodHelpUsage_youngPepper_withMoreFlowers") feedbackText += languageSet == "es" ? "Has progresado bien en este tema. Parece que has utilizado muy bien las funciones de ayuda del tutor. Tu planta tenés muchas flores." : "You have progressed well on this topic. You seem to have used tutor help features very well. Your plant has a lot of flowers.";
 
         else if ((topicState_pepperPlant=="youngTopic_youngPepper") || (topicState_pepperPlant=="youngTopic_youngPepper_withFlowers"))
         {
-            if (topic_state=="inProgress") feedbackText+="You have progressed well on this topic. You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
-            else if (topic_state=="inProgress_goodHelpUsage") feedbackText+="You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are showing good problem solving, asking for help when you need it and solving on your own when you can.";
-            else if (topic_state=="SHINT") feedbackText+="Great effort! Keep using the hints, videos and examples!";  }
+            if (topic_state=="inProgress") feedbackText += languageSet == "es" ? "Has progresado bien en este tema.Tenés  el último problema correcto en el primer intento. Sigan con el buen trabajo y pronto podrán obtener el dominio." : "You have progressed well on this topic. You got the last problem correct on first attempt. Keep up the good work and you can soon get the mastery.";
+            else if (topic_state=="inProgress_goodHelpUsage") feedbackText += languageSet == "es" ? "Obtuvo el último problema correcto en el primer intento. También hizo un buen uso de la ayuda del tutor en el problema anterior. Está mostrando una buena resolución de problemas, solicitando ayuda cuando la necesita y resolviendo por su cuenta cuando puede." : "You got the last problem correct on first attempt.You had also made good use of tutor help in previous problem. You are showing good problem solving, asking for help when you need it and solving on your own when you can.";
+            else if (topic_state=="SHINT") feedbackText += languageSet == "es" ? "¡Gran esfuerzo! ¡Sigue usando las pistas, videos y ejemplos!" : "Great effort! Keep using the hints, videos and examples!";  }
 
-        else if (topicState_pepperPlant=="youngTopic_adolescentPepper_wilt") feedbackText+="You seem to have lost interest. Please use hints, videos and examples if you need."
+        else if (topicState_pepperPlant=="youngTopic_adolescentPepper_wilt") feedbackText += languageSet == "es" ? "Parece que has perdido interés. Utiliza las sugerencias, videos y ejemplos si lo necesitas." : "You seem to have lost interest. Please use hints, videos and examples if you need.";
 
         //
-        if (topic_state=="ATT_hardProblem") feedbackText+="That last problem was a hard one. Good work!";
+        if (topic_state=="ATT_hardProblem") feedbackText += languageSet == "es" ? "Ese último problema fue difícil. ¡Buen trabajo!" : "That last problem was a hard one. Good work!";
 
-        else if (topic_state=="GIVEUP_hardProblem") feedbackText+="Maybe that one was too confusing. The next problem will be easier. When in doubt try clicking ‘solve it’ - it’s useful!";
+        else if (topic_state=="GIVEUP_hardProblem") feedbackText += languageSet == "es" ? "Tal vez ese era demasiado confuso. El siguiente problema será más fácil. En caso de duda, intentá hacer clic en la Ayuda, ¡es útil!" : "Maybe that one was too confusing. The next problem will be easier. When in doubt try clicking ‘solve it’ - it’s useful!";
 
         //disengaged behavior
 
         if (neglectful_count>=2){
 
 
-        if (topic_state=="NOTR") feedbackText+="Don’t like reading? Have the computer read aloud - click the read aloud button.";
+        if (topic_state=="NOTR") feedbackText += languageSet == "es" ? "¿No te gusta leer? Hacé que la computadora lea en voz alta: haga clic en el botón leer en voz alta." : "Don’t like reading? Have the computer read aloud - click the read aloud button.";
 
-        else if (topic_state=="GUESS_helpAvoidance") feedbackText+="Many find hints, videos, and examples helpful.  Try them! ";
+        else if (topic_state=="GUESS_helpAvoidance") feedbackText += languageSet == "es" ? "Muchos encuentran sugerencias, videos y ejemplos útiles. ¡Pruébalos! " : "Many find hints, videos, and examples helpful.  Try them! ";
 
-        else if (topic_state=="BOTTOMOUT_helpMisuse") feedbackText+="When you’ve had some practice, using fewer hints will help you master these problems.";
+        else if (topic_state=="BOTTOMOUT_helpMisuse") feedbackText += languageSet == "es" ? "Cuando hayas practicado un poco, usar menos pistas te ayudará a resolver estos problemas." : "When you’ve had some practice, using fewer hints will help you master these problems.";
 
-        if (studentState_disengaged==true) feedbackText+="<br/>Are you frustrated?  Raise your hand and someone will help you.";
+        if (studentState_disengaged==true) feedbackText += languageSet == "es" ? "<br/>¿Estás frustrado? Levanta la mano y alguien te ayudará." : "<br/>Are you frustrated?  Raise your hand and someone will help you.";
         }
 
         document.getElementById(remarksDiv).innerHTML=feedbackText;
 
     },
+
 
 
 
