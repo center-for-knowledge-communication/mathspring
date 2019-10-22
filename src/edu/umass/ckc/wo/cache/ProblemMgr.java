@@ -41,6 +41,9 @@ import edu.umass.ckc.wo.util.Pair;
  * User: marshall
  * Date: Sep 24, 2009
  * Time: 2:40:23 PM
+ * 
+ * Frank 10-15-19 Issue #4 new status value in-progress
+ * 
  * To change this template use File | Settings | File Templates.
  */
 public class ProblemMgr {
@@ -268,7 +271,7 @@ public class ProblemMgr {
                 " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,language" +
                 " from Problem p, OverallProbDifficulty o" +
                 " where p.id=o.problemid" + problemFilter +
-                " and (status='Ready' or status='ready' or status='testable')" +
+                " and (status='Ready' or status='ready' or status='testable' or status='in-progress')" +
                 " order by p.id;";
         PreparedStatement ps = conn.prepareStatement(s);
         return ps;
@@ -599,7 +602,7 @@ public class ProblemMgr {
     // Note this correctly takes care of problems that live in more than one topic.
     public static void fillTopicProblemMap(Connection conn) throws Exception {
         String q = "select p.id,t.id from problem p, OverallProbDifficulty d, " +
-                "ProbProbGroup m, problemgroup t where p.id = m.probID and t.id=m.pgroupid and t.active=1 and d.problemId = p.id and (p.status='ready' or p.status='testable')" +
+                "ProbProbGroup m, problemgroup t where p.id = m.probID and t.id=m.pgroupid and t.active=1 and d.problemId = p.id and (p.status='ready' or p.status='testable' or p.status='in-progress')" +
                 " order by t.id, d.diff_level";
         PreparedStatement ps = conn.prepareStatement(q);
         ResultSet rs = ps.executeQuery();
