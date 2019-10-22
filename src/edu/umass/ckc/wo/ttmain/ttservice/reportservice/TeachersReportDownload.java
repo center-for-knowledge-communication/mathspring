@@ -29,6 +29,9 @@ import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 
 /**
  * Created by nsmenon on 6/6/2017.
+ * 
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * 
  */
 
 public class TeachersReportDownload extends AbstractXlsView {
@@ -40,18 +43,19 @@ public class TeachersReportDownload extends AbstractXlsView {
     protected void buildExcelDocument(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
 
         String reportType = (String) map.get("reportType");
-        System.out.println("buildExcelDocument");
         try {
 
         	// Multi=lingual enhancement
         	rb = ResourceBundle.getBundle("MathSpring",httpServletRequest.getLocale());
 
-            System.out.println("buildExcelDocument");
-
+            System.out.println("buildExcelDocument for " + reportType);
+            
         	if (reportType.equals("perStudentReportDownload"))
         		buildPerStudentTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
-        	else if (reportType.equals("perProblmSetReportDownload"))
+        	else if (reportType.equals("perProblemSetReportDownload"))
         		buildPerProblemSetTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else if (reportType.equals("perStudentperProblemReportDownload"))
+        		buildPerStudentPerProblemTeacherReport(map, workbook, httpServletRequest, httpServletResponse);
         	else if (reportType.equals("perProblemReportDownload"))
         		buildPerProblemReport(map, workbook, httpServletRequest, httpServletResponse);
         	else if (reportType.equals("perClusterReport"))
@@ -62,6 +66,9 @@ public class TeachersReportDownload extends AbstractXlsView {
         		buildEmotionReportForDownload(map, workbook, httpServletRequest, httpServletResponse);
         	else if(reportType.equals("perSummSurveyReport"))
         		buildSummSurveyReport(map, workbook, httpServletRequest, httpServletResponse);
+        	else {
+        		System.out.println("No such report: " + reportType);
+        	}
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -546,6 +553,99 @@ public class TeachersReportDownload extends AbstractXlsView {
                 }
             });
 
+            workbook.write(httpServletResponse.getOutputStream());
+            httpServletResponse.getOutputStream().flush();
+            httpServletResponse.getOutputStream().close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    private void buildPerStudentPerProblemTeacherReport(Map<String, Object> map, Workbook workbook, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        try {
+        	System.out.println("buildPerStudentPerProblemTeacherReport");
+            String classId = (String) map.get("classId");
+            String teacherId = (String) map.get("teacherId");
+            CreationHelper helper = workbook.getCreationHelper();
+            httpServletResponse.setContentType("application/vnd.ms-excel");
+            httpServletResponse.setHeader("Content-Disposition", "attachment; filename=\"perStudentPerProblem_report" + classId + ".xls\"");
+            Map<String, Object> dataForStudentPerProblem = (Map<String, Object>) map.get("dataForStudentPerProblem");
+
+            Map<String, List<String>> finalMapLevelOne = (Map<String, List<String>>) dataForStudentPerProblem.get("levelOneData");
+            Map<String, String> columnNamesMap = (Map<String, String>) dataForStudentPerProblem.get("columns");
+
+            Sheet sheet = workbook.createSheet(classId);
+
+            Row header = sheet.createRow(3);
+
+            Cell studentNameID = header.createCell(0);
+            Cell studentNameCell = header.createCell(1);
+            Cell studentUsernameCell = header.createCell(2);
+            studentNameID.setCellValue(rb.getString("student_id"));
+
+
+            studentNameCell.setCellValue(rb.getString("student_name"));
+
+
+            studentUsernameCell.setCellValue("------" + rb.getString("username") + "------");
+
+            AtomicInteger atomicIntegerForHeader = new AtomicInteger(5);
+            AtomicInteger atomicIntegerForHeaderForData = new AtomicInteger(4);
+            columnNamesMap.forEach((problemID, problemName) -> {
+            	problemName = problemName.trim();
+                Cell columnNameHeaderCell = header.createCell(atomicIntegerForHeader.getAndIncrement());
+                columnNameHeaderCell.setCellValue(problemName);
+
+            });
+            finalMapLevelOne.forEach((studentId, problemSetDetails) -> {
+
+            	//System.out.println("finalMapLevelOne");
+                Row dataRow = sheet.createRow(atomicIntegerForHeaderForData.getAndIncrement());
+                Cell columnNameHeaderCellID = dataRow.createCell(0);
+                columnNameHeaderCellID.setCellValue(studentId);
+
+
+                for (String studentDetails : problemSetDetails) {
+                	//System.out.println("studentDetails = " + studentDetails);
+                	String datadetails[] = studentDetails.split("~~~");
+                    if (studentDetails.contains("studentName")) {
+                        Cell columnStudentPersonal = dataRow.createCell(1);
+                        columnStudentPersonal.setCellValue(datadetails[1]);
+                        
+                    } else if (studentDetails.contains("userName")) {
+                        Cell columnStudentPersonal = dataRow.createCell(2);
+                        columnStudentPersonal.setCellValue(datadetails[1]);
+
+                    } else {
+                        if (datadetails.length > 1) {
+                            String problemName = datadetails[0].trim();
+                            String problemValue = datadetails[1];
+                            //System.out.println("problemName=" + problemName);
+                            int cellIndex = 0;
+                            for (Cell cell : header) {
+                            	//System.out.println("cellValue=" + cell.getStringCellValue());
+                                if (cell.getStringCellValue().equals(problemName)) {
+                                    cellIndex = cell.getColumnIndex();
+                                    break;
+                                }
+                            }
+                            if (cellIndex == 0) {
+                            	System.out.println("key-value is " + problemName + "=" + String.valueOf(cellIndex) );
+                            }
+                            Cell columnStudentproblemSetDetails = dataRow.createCell(cellIndex);
+                            if (problemValue.length() > 0) {
+                            	columnStudentproblemSetDetails.setCellValue(problemValue);
+                            }
+                            else {
+                            	columnStudentproblemSetDetails.setCellValue(" ");
+                            }
+                        }
+                    }
+                }
+            });
             workbook.write(httpServletResponse.getOutputStream());
             httpServletResponse.getOutputStream().flush();
             httpServletResponse.getOutputStream().close();
