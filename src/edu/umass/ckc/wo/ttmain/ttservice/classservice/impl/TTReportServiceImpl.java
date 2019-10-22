@@ -43,6 +43,10 @@ import java.util.ResourceBundle;
 import java.util.Locale;
 /**
  * Created by nsmenon on 5/19/2017.
+ * 
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * Frank 	10-22-19	Issue #14 remove debugging
+ * 
  */
 
 @Service
@@ -60,7 +64,6 @@ public class TTReportServiceImpl implements TTReportService {
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException {
 
         try {
-        	
     		// Multi=lingual enhancement
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -191,6 +194,11 @@ public class TTReportServiceImpl implements TTReportService {
                     Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
+                    
+                case "perStudentPerProblemReport":
+                    Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId);
+                    ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
+                    return perStudentPerProblemReportMapper2.writeValueAsString(result2);
                     
                 case "summarySurveyReport":
                 	Map<String, Map<Integer, StudentDetails>> result1 = generateSurveyReport(classId);
@@ -573,6 +581,7 @@ public class TTReportServiceImpl implements TTReportService {
 
     @Override
     public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException {
+    	
         SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
@@ -639,6 +648,96 @@ public class TTReportServiceImpl implements TTReportService {
         return allResult;
     }
 
+    @Override
+    public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId) throws TTCustomException {
+
+        logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+        Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
+        Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
+        Map<String, String> columnNamesMap = new LinkedHashMap<>();
+        Map<String, Object> allResult = new HashMap<>();
+        Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_PER_PROBLEM, namedParameters, (ResultSet mappedrow) -> {
+            while (mappedrow.next()) {
+                String studentId = ((String) mappedrow.getString("studId")).trim();
+                Integer problemId = mappedrow.getInt("problemId");
+                String effort = mappedrow.getString("effort");
+                if ((effort == null) || (effort == "unknown") || (effort == "null")) {
+                	effort = " ";                
+                }
+                else {
+                	effort = effort.trim();
+                }
+                String description = ((String) mappedrow.getString("description")).trim();
+              
+            	logger.debug("[" + studentId + String.valueOf(problemId) + description + effort + "]");
+
+                
+                List<String> studentValuesList = null;
+                List<String> tempProblemDescriptionList = null;
+                /*
+                StudentProblemHistory shHistory = null;
+                try {
+                    shHistory = new StudentProblemHistory(connection.getConnection(), Integer.valueOf(studentId));
+
+                } catch (TTCustomException e) {
+                    logger.error(e.getErrorMessage());
+                }
+                //List<String> noOfProblemsSolved = shHistory.getTopicProblemsSolved(problemSetId);
+                //List<String> noOfProblemsSolvedOnFirstAttempt = shHistory.getTopicProblemsSolvedOnFirstAttempt(problemSetId);
+                */ 
+                if (finalMapLevelOne.containsKey(studentId)) {
+                    studentValuesList = finalMapLevelOne.get(studentId);
+                    tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
+//                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort);
+                    tempProblemDescriptionList.add(description.trim().replace(" ", ""));
+                } else {
+                    studentValuesList = new ArrayList<>();
+                    tempProblemDescriptionList = new ArrayList<>();
+
+                    studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
+                    studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
+//                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort);
+                    tempProblemDescriptionList.add(description.trim().replace(" ", ""));
+                }
+
+                columnNamesMap.put(problemId.toString(), description);
+                finalMapLevelOne.put(studentId, studentValuesList);
+                finalMapLevelOneTemp.put(studentId, tempProblemDescriptionList);
+
+            }
+            return finalMapLevelOne;
+        });
+        finalMapLevelOne.forEach((studentId, studentDetails) -> {
+            Map<String, String> selectParams = new LinkedHashMap<String, String>();
+            selectParams.put("classId", classId);
+            selectParams.put("studId", studentId);
+
+            List<String> tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
+            List<String> columnList = new ArrayList<String>(columnNamesMap.values());
+            List<String> columnListFinal = new ArrayList<String>();
+
+            for (String columnNames : columnList) {
+                columnListFinal.add(columnNames.trim().replaceAll(" ", ""));
+            }
+            if (!tempProblemDescriptionList.isEmpty()) {
+                columnListFinal.removeAll(tempProblemDescriptionList);
+                for (String columnNames : columnListFinal) {
+                    studentDetails.add(columnNames + "~~~" + "");
+
+                }
+            }
+        });
+        allResult.put("levelOneData", finalMapLevelOne);
+        allResult.put("columns", columnNamesMap);
+        logger.debug(columnNamesMap);
+        //logger.info(allResult.toString());
+        return allResult;
+    }
+    
+    
 
     @Override
     public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID) throws TTCustomException {
