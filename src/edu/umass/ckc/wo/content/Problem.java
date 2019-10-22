@@ -15,8 +15,6 @@ import java.util.*;
 /**
  * A ProblemImpl Object represents the information out of the Problem table in the database.
  * This object is used to represent both SAT and Adventure problems.
- * 
- * Frank	10-25-19	Issue #4 new status value in-progress
  */
 
 public class Problem implements Activity {
@@ -27,7 +25,6 @@ public class Problem implements Activity {
     public static final String PRACTICE = "practice";
     public static final String TOPIC_INTRO = "topicIntro";
     public static final String TESTABLE_STATUS = "testable";
-    public static final String INPROGRESS_STATUS = "in-progress";
     public static final String QUICK_AUTH="quickAuth";
     public static final String SAT_PROBLEM="satProblem";
     public static final String ADV_PROBLEM="advProblem";
@@ -537,10 +534,8 @@ public class Problem implements Activity {
 
     public String getHTMLDir () {
         String rsc = getResource();
-        if (rsc == null) {
-        	System.out.println("rsc=null use problem name " + getName());
-        	rsc = getName();
-    	}
+
+
         // If a resource is present but isn't a legit filename, make it be .html by default
         if (rsc.indexOf('.') == -1) {
             rsc +=".html";
@@ -661,7 +656,7 @@ public class Problem implements Activity {
     }
 
     public boolean isTestProblem() {
-        return (status.equals(TESTABLE_STATUS) || status.equals(INPROGRESS_STATUS));
+        return status.equals(TESTABLE_STATUS);
     }
 
     public boolean isShortAnswer () {
