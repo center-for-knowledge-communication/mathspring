@@ -244,14 +244,14 @@
 							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
 							<targetPath>WEB-INF/classes</targetPath>
 							<includes>
-								<include>Mathspring.properties</include>
+								<include>MathSpring.properties</include>
 							</includes>
 						</resource>
 						<resource>
 							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
 							<targetPath>WEB-INF/classes</targetPath>
 							<includes>
-								<include>Mathspring_es.properties</include>
+								<include>MathSpring_es.properties</include>
 							</includes>
 						</resource>
 					</webResources>
