@@ -45,6 +45,7 @@ import java.util.Locale;
  * Created by nsmenon on 5/19/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * Frank 	10-22-19	Issue #14 remove debugging
  * 
  */
 
@@ -63,7 +64,6 @@ public class TTReportServiceImpl implements TTReportService {
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException {
 
         try {
-        	
     		// Multi=lingual enhancement
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -651,7 +651,7 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId) throws TTCustomException {
 
-        logger.info("generateClassReportPerStudentPerProblem for class " + classId);
+        logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
@@ -670,7 +670,8 @@ public class TTReportServiceImpl implements TTReportService {
                 }
                 String description = ((String) mappedrow.getString("description")).trim();
               
-            	logger.info("[" + studentId + String.valueOf(problemId) + description + effort + "]");
+
+            	logger.debug("[" + studentId + String.valueOf(problemId) + description + effort + "]");
 
                 
                 List<String> studentValuesList = null;
@@ -721,7 +722,6 @@ public class TTReportServiceImpl implements TTReportService {
 
             for (String columnNames : columnList) {
                 columnListFinal.add(columnNames.trim().replaceAll(" ", ""));
-                logger.info("columnNames =" + columnNames);
             }
             if (!tempProblemDescriptionList.isEmpty()) {
                 columnListFinal.removeAll(tempProblemDescriptionList);
@@ -733,7 +733,7 @@ public class TTReportServiceImpl implements TTReportService {
         });
         allResult.put("levelOneData", finalMapLevelOne);
         allResult.put("columns", columnNamesMap);
-        logger.info(columnNamesMap);
+
         //logger.info(allResult.toString());
         return allResult;
     }

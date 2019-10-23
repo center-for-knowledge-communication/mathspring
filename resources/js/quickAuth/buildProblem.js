@@ -1,4 +1,5 @@
 //Module pattern for better scoping
+// Frank 10-22-19 issue #14 translation
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -13,7 +14,7 @@ m.build = function(activity, previewMode) {
     var problem = activity.problem;
     theProblem = problem;
     var questType = problem.questType;
-    var mode = problem.mode;
+    var mode = problem.mode; 
     var probContentPath = activity.probContentPath || problem.probContentPath;
     probContentPath = probContentPath.replace(/\/$/g, ""); // removes a trailing slash from the content path
     theProblem.contentPath = probContentPath; // save this so that at play hint time we can get this and build URLs.
@@ -61,6 +62,16 @@ m.build = function(activity, previewMode) {
         document.getElementById("Units").innerHTML = parameterizeText(formatText(window.parent.getUnits(), resource, probContentPath, problemParams, previewMode), problemParams);
     }
 
+	var languagePreference = window.navigator.language;
+	
+	var stepText = "";
+	if (languagePreference == "en") {
+		stepText = "Step";
+	}
+	else {
+		stepText = "Paso";
+	}
+
     var hint_labels = [];
     var hint_thumbs = document.getElementById("HintThumbs");
     if(isNotEmpty(hints)) {
@@ -73,7 +84,7 @@ m.build = function(activity, previewMode) {
             hint_thumb.id = hintId + "Thumb";
             hint_thumb.style.visibility = "hidden";
             var stepNumber = i+1;
-            hint_thumb.innerHTML = "Step"+" "+stepNumber;
+            hint_thumb.innerHTML = stepText + " " + stepNumber;
             hint_thumb.addEventListener("click",
                 //This looks weird but is necessary to save the hintLabel value properly
                 function(hint) {

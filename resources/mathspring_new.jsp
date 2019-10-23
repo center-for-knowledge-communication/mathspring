@@ -4,6 +4,8 @@
 <%@ page import="java.util.ResourceBundle"%>
 <% 
 
+// Frank 10-22-19 Issue # 9 Add Enable Flash message at bottom of screen
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -396,6 +398,9 @@ label {
 					</div>
 					<div class="huytran-practice__info">
 						<p id="pid">${probId}</p>
+						<h2>&nbsp</h2>
+						<h2>&nbsp</h2>
+						<h2>If no problems appear, try 'Enable Flash'</h2>
 						<div class="dev-view">
 							<p id="effort">${effort}</p>
 							<p class="dev-view-label" id="answer"><%= rb.getString("answer")%>:
