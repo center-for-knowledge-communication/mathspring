@@ -670,6 +670,7 @@ public class TTReportServiceImpl implements TTReportService {
                 }
                 String description = ((String) mappedrow.getString("description")).trim();
               
+
             	logger.debug("[" + studentId + String.valueOf(problemId) + description + effort + "]");
 
                 
@@ -732,7 +733,7 @@ public class TTReportServiceImpl implements TTReportService {
         });
         allResult.put("levelOneData", finalMapLevelOne);
         allResult.put("columns", columnNamesMap);
-        logger.debug(columnNamesMap);
+
         //logger.info(allResult.toString());
         return allResult;
     }
