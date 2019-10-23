@@ -3,3 +3,6 @@ release*
 *.iml
 woServer
 resources/sass_compiled
+development
+release_local
+release_rose

@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Melissa
@@ -10,22 +13,37 @@ package edu.umass.ckc.wo.interventions;
 public class CollaborationConfirmationIntervention extends InputResponseIntervention implements NextProblemIntervention{
 
     private final String partnerName;
-    public  CollaborationConfirmationIntervention (String partnerName) {
+    private Locale locale;
+
+    public  CollaborationConfirmationIntervention (String partnerName, Locale loc) {
         super();
         this.partnerName = partnerName;
+        this.locale = loc;
     }
+    
     public String getType () {
         return "CollaborationConfirmationIntervention";
     }
 
 
     public String getDialogHTML () {
-        String str = "<div><p>The next activity is a special one. <br/> " +
-                 "You will be working with <b><font color='red'>" + partnerName + "</font></b> on <b>ONE</b> problem. "+
-                 "<b><font color='red'>" + partnerName + "</font></b> will read the problem aloud, and your job is to use the " +
-                 "<b>mouse</b> and <b>keyboard</b>.  <b>WORK " +
-                 "TOGETHER</b> to solve the problem. <br/>" +
-                 "Click 'Ok' to start solving a problem together";
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		 rb = ResourceBundle.getBundle("MathSpring",this.locale);
+
+                 str = "<div><p>" + rb.getString("next_activity_is_special") + "<br/> " +
+                 rb.getString("you_will_be_working_with") + "<b><font color='red'>" + partnerName + "</font></b>" + rb.getString("on_one_problem") +
+                 "<b><font color='red'>" + partnerName + "</font></b>," + rb.getString("collaborate_instructions_1") + 
+                 rb.getString("collaborate_instructions_2") + "<br/>" +
+                 rb.getString("collaborate_instructions_3");
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
 
         str+="</div>";
         return str;

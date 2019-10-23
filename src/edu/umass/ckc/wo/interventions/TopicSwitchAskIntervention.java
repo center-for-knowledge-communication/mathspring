@@ -5,6 +5,9 @@ import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,10 +24,13 @@ public class TopicSwitchAskIntervention extends InputResponseIntervention implem
     public static final String STAY = "stay";
     private int sessionId;
     protected String reasons;
+    private Locale locale;
 
-    public TopicSwitchAskIntervention(String reasons, int sessionId) {
+
+    public TopicSwitchAskIntervention(String reasons, int sessionId, Locale loc) {
         this.reasons = reasons;
         this.sessionId= sessionId;
+        this.locale = loc;
     }
 
     @Override
@@ -38,22 +44,29 @@ public class TopicSwitchAskIntervention extends InputResponseIntervention implem
     }
 
     public String getDialogHTML() {
-        String str = "<div>  " +getFormOpen()+ " <p>You are about to switch topics because:<br>";
-        str += reasons;
+    	
+    	
+    	System.out.println("TopicSwitch locale = " + this.locale.toString());
+    	
+    	ResourceBundle rb = null;
+    	
+    	String str = "";
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+                str = "<div>  " +getFormOpen()+ " <p>" + rb.getString("you_are_about_to_switch_topics_because")+ ":<br>";
+                str += reasons;
 
-        str += "<br><br>";
-        // increment the elapsedTime and probElapsedTime and then put these and sessionId into hidden inputs to the form
-//        str+="<script type=\"text/javascript\">incrementTimers(globals); document.getElementById('hiddenparams').innerHTML=";
-//        str+="'<input type=\"hidden\" name=\"action\" value=\"InputResponseNextProblemIntervention\">";
-//        str+="<input type=\"hidden\" name=\"sessionId\" value=\""+sessionId+"\">";
-//        str+="<input type=\"hidden\" name=\"elapsedTime\" value=\"'+globals.elapsedTime+'\">";
-//        str+="<input type=\"hidden\" name=\"probElapsedTime\" value=\"'+globals.probElapsedTime+'\">';</script>";
-
-//        str+="<div id=\"hiddenparams\">";
-//        str+="</div>";
-        str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +SWITCH+ "\">Go forward to next topic<br>";
-        str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +STAY+ "\">Stay in the current topic<br>";
-        str+="</p></form></div>";
+                str += "<br><br>";
+                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +SWITCH+ "\">" + rb.getString("go_forward_to_next_target") + "<br>";
+                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +STAY+ "\">" + rb.getString("stay_in_current_topic") + "<br>";
+                str+="</p></form></div>";
+        
+        }
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
+        }
         return str;
     }
 

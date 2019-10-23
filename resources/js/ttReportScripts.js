@@ -1,6 +1,17 @@
 /**
  * Created by nsmenon on 6/1/2017.
+ * 
+ * Obsoleted by Frank Sylvia 6/11/2019
+ * 
+ * !!!!!!!!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!!!!!
+ * 
+ * THIS JAVASCRIPT FILE IS NO LONGER IN USE.  
+ * 
+ * IT HAS BEEN REPLACED BY ttReportScripts_new.JSP A JSP VERSION WITH THE SAME BASIC LOGIC BUT MULTI-LINGUAL CAPABLE.
+ * 
+ * !!!!!!!!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!!!!!
  */
+
 //Report1 Varriables
 var perProblemSetReport;
 var perProblemSetLevelOne;

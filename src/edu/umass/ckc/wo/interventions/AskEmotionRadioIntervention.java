@@ -1,6 +1,8 @@
 package edu.umass.ckc.wo.interventions;
 
 import edu.umass.ckc.wo.tutor.intervSel2.AskEmotionIS;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,20 +17,20 @@ public class AskEmotionRadioIntervention extends InputResponseIntervention imple
     private boolean askWhy=false;
     private boolean askAboutSkipping=false;
     private boolean skippedProblem=false;
-    // the default question this thing asks has an emotion plugged into the string
-    private String question = "Based on the last few problems tell us about your level of %s in solving math problems.";
-    private String questionHeader = "Please tell us how you are feeling.";
 
     public static final String LEVEL = "level" ;
     public static final String EMOTION = "emotion" ;
     public static final String REASON = "reason" ;
     public static final String SKIP_REASON = "skipReason" ;
 
-    public AskEmotionRadioIntervention(AskEmotionIS.Emotion emotionToQuery, boolean askWhy, boolean askAboutSkipping, boolean skippedProblem) {
+    private Locale locale;
+
+    public AskEmotionRadioIntervention(AskEmotionIS.Emotion emotionToQuery, boolean askWhy, boolean askAboutSkipping, boolean skippedProblem, Locale loc) {
         this.emotion = emotionToQuery;
         this.askWhy=askWhy;
         this.askAboutSkipping=askAboutSkipping;
         this.skippedProblem=skippedProblem;
+        this.locale = loc;
     }
 
     @Override
@@ -59,29 +61,52 @@ public class AskEmotionRadioIntervention extends InputResponseIntervention imple
     }
 
     public String getDialogHTML() {
-        String str = "<div>  " +
-                                 getFormOpen() + " <p>" + this.questionHeader + "<br>" +
-                String.format(question,emotion.getName());
+    	
+    	ResourceBundle rb = null;
 
-        str += "<input type=\"hidden\" name=\"" + EMOTION + "\" value=\"" + emotion.getName() + "\"><br>";
-        for (int i =0;i<emotion.getLabels().size();i++)
-            str += "<input name=\"" + LEVEL + "\" type=\"radio\" value=\"" + emotion.getVals().get(i) + "\">" + emotion.getLabels().get(i) + "</input><br>";
-        str += "<br>";
-        if (askWhy) {
-            str += "Why is that?<br>";
-            str += "<textarea name=\"" + REASON + "\" rows=\"2\" cols=\"50\"/>";
+    	String str = "";
+
+        try {           	
+        		// Multi=lingual enhancement
+        		rb = ResourceBundle.getBundle("MathSpring",this.locale);
+        		
+        		String strEmotion = emotion.getName();       		
+        		String strEmotionLower = strEmotion.toLowerCase(this.locale);
+        		
+        		String strEmo = ""; 
+        		try {
+        			strEmo = rb.getString(strEmotionLower);
+        		}
+        		catch(Exception e) {
+        			strEmo = emotion.getName();
+        		}
+        		
+        		str = "<div>  " + getFormOpen() + " <p>" + rb.getString("ask_emotion_radio_header") + "<br>" + rb.getString("ask_emotion_radio_question") + strEmo + ".";
+
+        		str += "<input type=\"hidden\" name=\"" + EMOTION + "\" value=\"" + emotion.getName() + "\"><br>";
+        		for (int i =0;i<emotion.getLabels().size();i++)
+        			str += "<input name=\"" + LEVEL + "\" type=\"radio\" value=\"" + emotion.getVals().get(i) + "\">" + emotion.getLabels().get(i) + "</input><br>";
+        		str += "<br>";
+        		if (askWhy) {
+       				str += rb.getString("why_is_that") + "<br>";
+        			str += "<textarea name=\"" + REASON + "\" rows=\"2\" cols=\"50\"/>";
+        		}
+        		str+= "</p>";
+        		if (askAboutSkipping && skippedProblem) {
+        			str += "<br>";
+        			str += rb.getString("have_you_skipped") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='never'>" + rb.getString("never") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='fewTimes'>" + rb.getString("a_few_times") + "<br>";
+        			str += "<input type='radio' name='skipFrequency' value='aLot'>" + rb.getString("a_lot") + "<br>";
+        			str += "<br>" + rb.getString("if_you_skipped_why") +  "<br>";
+        			str += "<textarea name=\"" + SKIP_REASON + "\" rows=\"2\" cols=\"50\"/>";
+        		}
+        		str+="</form></div>";
         }
-        str+= "</p>";
-        if (askAboutSkipping && skippedProblem) {
-            str += "<br>";
-            str += "Have you skipped a problem recently (clicked on 'new problem' without answering)?<br>";
-            str += "<input type='radio' name='skipFrequency' value='never'> Never<br>";
-            str += "<input type='radio' name='skipFrequency' value='fewTimes'> A few times<br>";
-            str += "<input type='radio' name='skipFrequency' value='aLot'> A lot<br>";
-            str += "<br>If you skipped can you please say why?<br>";
-            str += "<textarea name=\"" + SKIP_REASON + "\" rows=\"2\" cols=\"50\"/>";
+        catch (java.util.MissingResourceException e){
+            System.out.println(e.getMessage());
+            str = "System Error: " + e.getMessage();
         }
-        str+="</form></div>";
 
         return str;
     }

@@ -17,7 +17,7 @@ import java.util.Set;
  */
 
 public interface TTReportService {
-    public String generateTeacherReport(String teacherId, String classId, String reportType) throws TTCustomException;
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException;
 
     public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException;
 

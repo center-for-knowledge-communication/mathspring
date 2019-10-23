@@ -130,7 +130,7 @@ Maven Dependencies		WEB-INF/lib
 - Working Directory: path/to/MathSpring (the project folder)
 - Command Line:
     ```
-    war:war org.codehaus.mojo:wagon-maven-plugin:upload-single -Dwagon.fromFile=path\to\MathSpring\release\ms.war -Dwagon.url=file://path\to\webapps\folder\under\tomcat\
+    org.codehaus.mojo:wagon-maven-plugin:upload-single -Dwagon.fromFile=path\to\MathSpring\release\ms.war -Dwagon.url=file://path\to\webapps\folder\under\tomcat\
     ```
 - Remember to replace any spaces by %20 in the path in the Command Line above as it's a URL. For eg.
    ```

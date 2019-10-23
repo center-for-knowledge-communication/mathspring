@@ -42,7 +42,7 @@ public class GuessingAskAffectIS extends AttemptInterventionSelector {
         long inProbTime = e.getProbElapsedTime();
         System.out.println("Is a Guess: " + numAttempts + " " + inProbTime);
         if (inProbTime <= GUESS_THRESHOLD_TIME && numAttempts >= NUM_ATTEMPTS) {
-            return new RapidAttemptIntervention();
+            return new RapidAttemptIntervention(smgr.getLocale());
 
         }
         return null;

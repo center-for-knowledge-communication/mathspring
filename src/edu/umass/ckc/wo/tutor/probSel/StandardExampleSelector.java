@@ -80,7 +80,9 @@ public class StandardExampleSelector implements ExampleSelector {
         for (CCStandard s : standards) {
             List<Problem> probs = ProblemMgr.getStandardProblems(conn, s.getCode());
             for (Problem p2: probs) {
-                if (p2.getId() != targetProbId && p2.isUsableAsExample())
+                // Frank S. - Added test for same language 
+            	//if (p2.getId() != targetProbId && p2.isUsableAsExample() )                
+                if (p2.getId() != targetProbId && p2.isUsableAsExample() && (p2.getProblemLanguage() == p.getProblemLanguage()) )
                     relatedProbs.add(p2);
             }
         }

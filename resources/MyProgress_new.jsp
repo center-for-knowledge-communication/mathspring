@@ -1,10 +1,26 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MathSpring | My Progress</title>
+    <title>MathSpring | <%= rb.getString("my_progress") %></title>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
@@ -17,7 +33,6 @@
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
-     <script src="js/bootstrap/js/language_es.js"></script>
     <script>
         $.extend({
             getUrlVars: function () {
@@ -48,11 +63,12 @@
         var problemsDoneWithEffort=2;
         var useHybridTutor =${useHybridTutor};
 
+
         var globals = {
-            mouseSaveInterval: ${mouseSaveInterval},
-            mouseHistory: [],
-            sessionId: ${sessionId}
-        }
+                mouseSaveInterval: ${mouseSaveInterval},
+                mouseHistory: [],
+                sessionId: ${sessionId}
+            }
 
         var sysGlobals = {
             gritServletContext: '${gritServletContext}',
@@ -144,6 +160,7 @@
 
                 $("#plantDetails").text("In this topic, you have solved "+problemsDoneWithEffort+" problems without guessing or getting bottom out hint.");
                 $("#plantDetails").append("<br/>This plant will grow bigger as you put more effort on solving the problems.   <br/> <br/> You can leave your comment:");
+
             });
 
             $("#masteryBar_${ts.topicId}").click(function(){
@@ -454,7 +471,6 @@
                     $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
                 }
             });
-            langPrefrenceForProgressPage();
         });
     </script>
 </head>
@@ -470,19 +486,19 @@
         </div><!-- navbar-header -->
 
         <nav id="main_nav" class="nav navbar-nav navbar-right">
-            <li class="nav-item"><a class="js-go-to-my-garden">My Garden</a></li>
-            <li class="nav-item"><a id="myProg">My Progress</a></li>
+            <li class="nav-item"><a class="js-go-to-my-garden"><%= rb.getString("my_garden") %></a></li>
+            <li class="nav-item"><a id="myProg"><%= rb.getString("my_progress") %></a></li>
             <li class="nav-item">
                 <c:choose>
                     <c:when test="${newSession}">
                         <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'">Practice Area</a>
                     </c:when>
                     <c:otherwise>
-                        <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'">Practice Area</a>
+                        <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'"><%= rb.getString("practice_area") %></a>
                     </c:otherwise>
                 </c:choose>
             </li>
-            <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b">Log Out &nbsp;<span class="fa fa-sign-out"></a></span>
+            <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
         </nav>
     </div><!-- wrapper -->
 </header>
@@ -493,11 +509,11 @@
         <table class="table table-bordered progress-table">
             <thead class="thead-inverse progress-table-header">
             <tr>
-                <th>Topic</th>
-                <th>Remark</th>
-                <th>Performance</th>
-                <th>Effort</th>
-                <th>Action</th>
+                <th><%= rb.getString("topic") %></th>
+                <th><%= rb.getString("remark") %></th>
+                <th><%= rb.getString("performance") %></th>
+                <th><%= rb.getString("effort") %></th>
+                <th><%= rb.getString("actions") %></th>
             </tr>
             </thead>
             <tbody>
@@ -520,7 +536,7 @@
                     </a>
                 </td>
                 <td class="performance text-center col-md-2">
-                    <p>Mastery Level</p>
+                    <p><%= rb.getString("mastery_level") %></p>
                     <a href="#" id="masteryBar_${topicId}">
                         <div id=${masteryChartDiv}></div>
                     </a>
@@ -528,7 +544,7 @@
                     <a href="#"
                        id="LearnMore"
                        onclick="window.location='${pageContext.request.contextPath}/TutorBrain?action=TopicDetail&sessionId=${sessionId}&elapsedTime='+updateElapsedTime()+'&mastery=${ts.mastery}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&topicName=${topicName}&problemsDone=${ts.problemsDone}&totalProblems=${ts.totalProblems}&var=b'"
-                       class="littleLink btn mathspring-important-btn">Learn More</a>
+                       class="littleLink btn mathspring-important-btn"><%= rb.getString("learn_more") %></a>
                 </td>
                 <td align="center" valign="bottom" class="plant_wrapper col-md-1">
                     <a href="#" id=${plantLink}><div id=${plantDiv}></div></a>
@@ -539,25 +555,25 @@
                 <c:choose>
                     <c:when test="${ts.problemsDone>0 && ts.hasAvailableContent}">
                         <li class="huy-button huy-button--green" id="continue_${topicId}">
-                            <a href="#">Continue</a>
+                            <a href="#"><%= rb.getString("continue") %></a>
                         </li>
                         <li class="huy-button huy-button--yellow" id="review_${topicId}">
-                            <a href="#">Review</a>
+                            <a href="#"><%= rb.getString("review") %></a>
                         </li>
                         <li class="huy-button huy-button--brown" id="challenge_${topicId}">
-                            <a href="#"><span class="colorPink">Challenge</span></a>
+                            <a href="#"><span class="colorPink"><%= rb.getString("challenge") %></span></a>
                         </li>
                         </ul></td></tr>
                     </c:when>
                     <c:when test="${ts.problemsDone==0}">
                         <li class="huy-button huy-button--green" id="tryThis_${topicId}">
-                            <a href="#">Try this</a>
+                            <a href="#"><%= rb.getString("try_this") %></a>
                         </li>
                     </c:when>
                     <%--The tutor sometimes can't continue a topic if some criteria are satisfied, so we only offer review and challenge--%>
                     <c:otherwise>
                         <li class="huy-button huy-button--yellow" id="review_${topicId}">
-                            <a href="#">Review</a>
+                            <a href="#"><%= rb.getString("review") %></a>
                         </li>
 
                         </ul></td></tr>
@@ -572,15 +588,15 @@
     </div>
 </div>
 
-<footer class="bottom-sticky-footer">&copy; 2016 University of Massachusetts Amherst and Worcester Polytechnic Institute ~ All Rights Reserved.
+<footer class="bottom-sticky-footer">&copy; <%= rb.getString("copyright") %>
 </footer>
 
 <div class="commentLayer" id="commentHolder" >
     <form name="commentForm">
         <textarea class="commentBox" name="commentTextArea" id="commentText"></textarea>
         <br/>
-        <button id="submitCommentButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelCommentButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitCommentButton" type="button" class="thoughtbot"><%= rb.getString("submit") %></button>
+        <button id="cancelCommentButton" type="button" class="clean-gray"><%= rb.getString("cancel") %></button>
     </form>
 </div>
 
@@ -589,80 +605,78 @@
     <form name="plantCommentForm">
         <textarea class="plantCommentBox" name="commentTextArea" id="plantCommentText"></textarea>
         <br/>
-        <button id="submitPlantCommentButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelPlantCommentButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitPlantCommentButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
+        <button id="cancelPlantCommentButton" type="button" class="clean-gray"<%= rb.getString("cancel") %></button>
     </form>
 </div>
 
 <div class="plantCommentLayer" id="masteryBarCommentHolder" >
-    <div id="MasteryBarDetails">Do you think that this mastery calculation is correct?<br/></div>
+    <div id="MasteryBarDetails"><%= rb.getString("is_mastery_calculation_correct?") %><br/></div>
     <form name="masteryBarCommentForm">
-        <input type="radio"  name="userChoice" value="accurate">Yes, it is correct<br>
-        <input type="radio"  name="userChoice" value="ok" >No, it is incorrect.<br>
+        <input type="radio"  name="userChoice" value="accurate"><%= rb.getString("yes_correct") %><br>
+        <input type="radio"  name="userChoice" value="ok" ><%= rb.getString("no_incorrect") %><br>
         <br/>
-        You can also leave your comment:
+        <%= rb.getString("you_can_also_leave_your_comment") %>:
         <textarea class="plantCommentBox" name="commentTextArea"></textarea>
         <br/>
-        <button id="submitMasteryBarCommentButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelMasteryBarCommentButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitMasteryBarCommentButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
+        <button id="cancelMasteryBarCommentButton" type="button" class="clean-gray"><%= rb.getString("cancel") %></button>
     </form>
 </div>
 
 <div class="tableTopDropDown" id="performanceReadMore" >
-    <div id="performanceReadMoreText">We are trying to calculate your mastery level from your performance.  <br/>
-        Do you think that we are doing a good job in calculating your mastery level? <br/><br/></div>
+    <div id="performanceReadMoreText"><%= rb.getString("trying_to_calculate_mastery_level") %>  <br/>
+        <%= rb.getString("are_we_good_calculating_mastery_level?") %> <br/><br/></div>
 
     <form name="performanceFeedbackForm">
-        Please select your response from this list:    <br/><br/>
-        <input type="radio"  name="userChoice" value="accurate">You are doing very good job of Mastery calculation.<br>
-        <input type="radio"  name="userChoice" value="ok" >Mastery calculation is ok<br>
-        <input type="radio"  name="userChoice" value="notAccurate" >You are doing poor job of Mastery calculation.
+        <%= rb.getString("please_select_your_response_from_this_list") %>:    <br/><br/>
+        <input type="radio"  name="userChoice" value="accurate"><%= rb.getString("good_job_of_mastery_calculation") %><br>
+        <input type="radio"  name="userChoice" value="ok" ><%= rb.getString("mastery_calculation_is_ok") %><br>
+        <input type="radio"  name="userChoice" value="notAccurate" ><%= rb.getString("mastery_calculation_is_poor") %>
         <br/><br/>
-        You can also leave your comment:
+        <%= rb.getString("you_can_also_leave_your_comment") %>:
         <textarea class="plantCommentBox" name="commentTextArea" id="performanceCommentText"></textarea>
         <br/>
-        <button id="submitMasteryFeedbackButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelMasteryFeedbackButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitMasteryFeedbackButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
+        <button id="cancelMasteryFeedbackButton" type="button" class="clean-gray"><%= rb.getString("cancel") %></button>
     </form>
 </div>
 
 <div class="tableTopDropDown" id="progressReadMore" >
-    <div id="progressReadMoreText">Your progress in a topic is represented by a plant. As you put more effort on solving problems, the plant will grow and eventually
-        will give fruits once you master the topic. <br/>
-        Do you think that we should keep plants to represent your progress? <br/><br/></div>
+    <div id="progressReadMoreText"><%= rb.getString("plant_growth_description") %> <br/>
+        <%= rb.getString("keep_plant_representation?") %> <br/><br/></div>
     <form name="progressFeedbackForm">
         Please select your response from this list:    <br/> <br/>
-        <input type="radio"  name="userChoice" value="keep">Yes, keep the plants.<br>
-        <input type="radio"  name="userChoice" value="doesnotmatter" >It does not really matter.<br>
-        <input type="radio"  name="userChoice" value="takeAway" >No, take away the plants.
-        <br/><br/>
-        You can also leave your comment:
+        <input type="radio"  name="userChoice" value="keep"><%= rb.getString("yes_keep_plants") %><br>
+        <input type="radio"  name="userChoice" value="doesnotmatter" ><%= rb.getString("it_does_not_matter") %><br>
+        <input type="radio"  name="userChoice" value="takeAway" ><%= rb.getString("no_take_away_plants") %><br/><br/>
+        <%= rb.getString("you_can_also_leave_your_comment") %>:
         <textarea class="plantCommentBox" name="commentTextArea" ></textarea>
         <br/>
-        <button id="submitProgressFeedbackButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelProgressFeedbackButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitProgressFeedbackButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
+        <button id="cancelProgressFeedbackButton" type="button" class="clean-gray"><%= rb.getString("cancel") %></button>
     </form>
 </div>
 
 <div class="tableTopDropDown" id="remarksReadMore" >
-    <div id="remarksReadMoreText">Based on your performance, we are trying to come up with suggestion to help you perform better in each topic.<br/>
-        Do you think that our suggestion is helping you? <br/><br/></div>
+    <div id="remarksReadMoreText"><%= rb.getString("trying_to_help_you_perform_better") %><br/>
+        <%= rb.getString("is_suggestion_helping") %><br/><br/></div>
     <form name="remarksFeedbackForm">
-        Please select your response from this list:    <br/> <br/>
-        <input type="radio"  name="userChoice" value="yes">Yes, they are helpful.<br>
-        <input type="radio"  name="userChoice" value="ok" >The suggestions are ok.<br>
-        <input type="radio"  name="userChoice" value="no" >No, they are not helpful.
+        <%= rb.getString("please_select_your_response_from_this_list") %>:    <br/> <br/>
+        <input type="radio"  name="userChoice" value="yes"><%= rb.getString("yes_helping") %>.<br>
+        <input type="radio"  name="userChoice" value="ok" ><%= rb.getString("ok_helping") %><br>
+        <input type="radio"  name="userChoice" value="no" ><%= rb.getString("not_helping") %>
         <br/><br/>
-        You can also leave your comment:
+        <%= rb.getString("you_can_also_leave_your_comment") %>:
         <textarea class="plantCommentBox" name="commentTextArea" ></textarea>
         <br/>
-        <button id="submitRemarksFeedbackButton" type="button" class="thoughtbot">Submit</button>
-        <button id="cancelRemarksFeedbackButton" type="button" class="clean-gray">Cancel</button>
+        <button id="submitRemarksFeedbackButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
+        <button id="cancelRemarksFeedbackButton" type="button" class="clean-gray">C<%= rb.getString("cancel") %>ancel</button>
     </form>
 </div>
 <div class="thankYou" id="commentAckLayer">
-    Thank you! <br/>
-    We have saved your input.
+    <%= rb.getString("thank_you") %> <br/>
+    <%= rb.getString("we_have_saved_your_input") %>
 </div>
 
 <!-- SCRIPT - LIBRARIES -->

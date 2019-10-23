@@ -1,9 +1,25 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="java.util.ResourceBundle"%>
+<% 
+
+Locale loc = request.getLocale();
+String lang = loc.getDisplayLanguage();
+
+ResourceBundle rb = null;
+try {
+	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>MathSpring Login</title>
+    <title>MathSpring | <%= rb.getString("login")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -12,7 +28,6 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link href="css/common_new.css" rel="stylesheet" type="text/css" />
     <link href="login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/switcher-button.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="login/js/p7EHCscripts.js"></script>
     <script type="text/javascript">
@@ -37,6 +52,117 @@
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
         }
     </script>
+
+
+<% 
+
+
+// styles contain hard-coded content - conditionally include style based on langauge
+if (lang == "Spanish" ) {
+%>
+<style>
+.onoffswitch {
+    margin-top: 2px;
+    position: relative; width: 100px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 1px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Raleway, san-serif;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "Alumno";
+    padding-left: 10px;
+    background-color: #FFFFFF; color: #000;
+}
+.onoffswitch-inner:after {
+    content: "Maestro";
+    padding-right: 10px;
+    background-color: #FFFFFF; color: #000;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 20px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 66px;
+    border: 1px solid #999999; border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
+</style>
+<%
+}
+else {
+%>
+<style>
+.onoffswitch {
+    margin-top: 2px;
+    position: relative; width: 100px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 1px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Raleway, san-serif;
+    box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "Student";
+    padding-left: 10px;
+    background-color: #FFFFFF; color: #000;
+}
+.onoffswitch-inner:after {
+    content: "Teacher";
+    padding-right: 10px;
+    background-color: #FFFFFF; color: #000;
+    text-align: right;
+}
+.onoffswitch-switch {
+    display: block; width: 20px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 66px;
+    border: 1px solid #999999; border-radius: 25px;
+    transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
+</style>
+<% 
+}
+%>
 </head>
 <body>
     <div class="main-content">
@@ -51,9 +177,9 @@
             </div>
         </header>
         <div class="row login-box-wrapper">
-            <div class="col-sm-6 col-sm-offset-3 login-box">
+            <div class="col-sm-8 col-sm-offset-3 login-box">
                 <div class="row sign-in-up-box">
-                    <div class="col-sm-6">
+                    <div class="col-sm-7">
                         <form
                                 method="post"
                                 action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherLogin&var=b">
@@ -61,14 +187,14 @@
                                     class="btn btn-primary btn-lg btn-block signup-btn teacher-sign-up-btn"
                                     type="submit"
                                     name="register" value="Register"
-                            >Sign up for Teacher</button>
+                            ><%= rb.getString("signup_teacher") %></button>
                         </form>
                         <form action="${pageContext.request.contextPath}/WoAdmin">
                             <button
                                     class="btn btn-primary btn-lg btn-block signup-btn student-sign-up-btn"
                                     type="button"
                                     onClick="javascript:signup();"
-                            >Sign up for Student</button>
+                            ><%= rb.getString("signup_student") %></button>
                         </form>
                         <form name="guest" action="${pageContext.request.contextPath}/WoLoginServlet">
                             <input type="hidden" name="action" value="GuestLogin"/>
@@ -76,11 +202,11 @@
                             <input type="hidden" name="var" value="b"/>
                             <button
                                     class="btn btn-primary btn-lg btn-block signup-btn guest-try-out-btn"
-                                    type="submit">Try out as Guest</button>
+                                    type="submit"><%= rb.getString("signup_guest") %></button>
                         </form>
                     </div>
-                    <div class="col-sm-6 login-form">
-                        <p>Have a username and password already? Enter them here!</p>
+                    <div class="col-sm-5 login-form">
+                        <p><%= rb.getString("have_username_already_enter_here") %></p>
                         <form
                                 class="user-login-form"
                                 method="post"
@@ -95,7 +221,7 @@
                                         name="uname"
                                         value="${userName}"
                                         class="form-control nav-login user-login-form-username"
-                                        placeholder="Username"
+                                        placeholder="<%= rb.getString("username") %>"
                                         autofocus
                                 />
                             </div>
@@ -105,7 +231,7 @@
                                         name="password"
                                         value="${password}"
                                         class="form-control nav-login"
-                                        placeholder="Password"
+                                        placeholder="<%= rb.getString("password") %>"
                                 />
                             </div>
                             <div class="row">
@@ -125,20 +251,20 @@
                                 <div class="col-sm-6">
                                     <button
                                             type="submit"
-                                            class="btn btn-default btn-block sign-in-btn js-login-btn">Login</button>
+                                            class="btn btn-default btn-block sign-in-btn js-login-btn"><%= rb.getString("login") %></button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="row information-box">
-                    <p class="text-center">To have the best experience, enable pop-ups and turn on either speakers or a headset!</p>
+                    <p class="text-center"><%= rb.getString("use_audio_device") %></p>
                 </div>
             </div>
         </div>
     </div>
     <footer class="bottom-sticky-footer">
-        &copy; 2016 University of Massachusetts Amherst and Worcester Polytechnic Institute ~ All Rights Reserved.
+        &copy; <%= rb.getString("copyright") %>
     </footer>
 </body>
 </html>
