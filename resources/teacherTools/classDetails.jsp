@@ -1,3 +1,7 @@
+<!-- Frank 	10-15-19	Issue #7 perStudentperProblemReport report -->
+<!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
+<!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -133,7 +137,6 @@ catch (Exception e) {
                     selector: 'td:first-child'
                 },
             });
-/**			langPrefrenceForDetailsPage(); */
         });
 
     </script>
@@ -260,7 +263,6 @@ catch (Exception e) {
             </div>
         </div>
     </script>
-
 </head>
 
 <body>
@@ -285,7 +287,7 @@ catch (Exception e) {
                     <li class="divider"></li>
                     <li>
                         <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
-                                class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %>t</a>
+                                class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
                     </li>
                 </ul>
             </li>
@@ -427,7 +429,7 @@ catch (Exception e) {
                             <th rowspan="2"><%= rb.getString("available_problems") %></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
                             <th style="text-align: center;" colspan="<c:out value="${inActiveproblemSetHeaders.size()}"/>"<%= rb.getString("gradewise_distribution") %></th>
-                            <th rowspan="2"><%= rb.getString("active_problem_sets") %></th>
+                            <th rowspan="2"><%= rb.getString("activate_problem_sets") %></th>
                         </tr>
                         <tr>
                             <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
@@ -515,6 +517,7 @@ catch (Exception e) {
                                 <a id="report_three" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
                                     <%= rb.getString("class_summary_per_student") %>
                                 </a>
+                                <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse">
@@ -554,6 +557,7 @@ catch (Exception e) {
                                 <a id="report_four" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
                                     <%= rb.getString("class_summary_common_core_cluster") %>
                                 </a>
+                                <button id="fourButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
                         <div id="collapseFour" class="panel-collapse collapse">
@@ -650,6 +654,7 @@ catch (Exception e) {
                                 <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
                                     <%= rb.getString("class_summary_per_student_per_problem_set") %>
                                 </a>
+                                <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
 
@@ -699,7 +704,7 @@ catch (Exception e) {
                                 <ul>
                                     <li><%= rb.getString("cell_info1") %> <a title="<%= rb.getString("what_is_mastery")%>" style="cursor:pointer" rel="initialPopover"> <i class="fa fa-question-circle-o" aria-hidden="true"></i></a> value for that problem set.</li>
                                     <li><%= rb.getString("cell_info2") %></li>
-                                    <li><%= rb.getString("cell_info2") %></li>
+                                    <li><%= rb.getString("cell_info3") %></li>
                                 </ul>
                             </div>
 
@@ -710,12 +715,69 @@ catch (Exception e) {
                         </div>
                     </div>
 
+
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
+                                    <%= rb.getString("class_summary_per_student_per_problem") %>
+                                </a>
+                               	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="collapseSix" class="panel-collapse collapse">                
+                            <div class="panel-body">
+                                <label><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></label>
+                                <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
+                                    <i class="fa fa-download fa-2x" aria-hidden="true"></i>
+                                </a>
+                            </div>         
+                            <div class="panel-body">                           
+								  <label><%= rb.getString("standards_e_g") %></label>
+								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn type="submit" value="<%= rb.getString("submit") %>">
+							</div>
+                            <div class="panel-body">
+                                <div class="loader" style="display: none"></div>
+                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("student_effort")%>:</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
+                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
+                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
+                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
+                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
+                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
+                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
+                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
+                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="perStudentPerProblemReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
 					<div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
                                     <%= rb.getString("summary_surveys_test_report") %>
                                 </a>
+                                <button id="fiveButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
 

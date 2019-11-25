@@ -2,47 +2,18 @@
 <script type="text/javascript">
 /**
  * Created by nsmenon on 6/1/2017.
+ * fsylvia 7/1/2019 - Converted to multi-lingual JSP
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * Frank 	10-22-19	Issue #14 fix locale string parameter in some reports
+ * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
  */
- 
-/** cut and paste snippets
- 
- 
-                     "language": {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix":    "",
-                        "sSearch":         "Buscar:",
-                        "sUrl":            "",
-                        "sInfoThousands":  ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
-                    },
-                    
-                    
-                    
-*/
- 
- 
  
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
 var perProblemSetLevelTwo;
 var perProblemSetColumnNamesMap;
+var perStudentPerProblemColumnNamesMap;
 var perProblemSetLevelOneAvg;
 var perProblemSetLevelOneMax;
 var perProblemSetLevelOneLatest;
@@ -72,11 +43,16 @@ var apply_content_table;
 
 var languagePreference = window.navigator.language;
 var languageSet = "en";
+var loc = "en-US";
+
 if (languagePreference.includes("en")) {
 	languageSet = "en"
+	loc = "en-US";
 } else if (languagePreference.includes("es")) {
 	languageSet = "es"
+	loc = "es-Ar";
 }
+
 
 <% 
 /**
@@ -510,7 +486,7 @@ function resetStudentData( title,studentId) {
         data : {
             studentId: studentId,
             action: title,
-            lang: languagePreference
+            lang: loc
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -573,7 +549,7 @@ function updateStudentInfo(formName){
         data : {
             studentId: formName,
             formData: values,
-            lang: languagePreference
+            lang: loc
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -1897,7 +1873,7 @@ else {
             url: pgContext + "/tt/tt/createMoreStudentIds",
             data: {
                 formData: values,
-                lang: languagePreference
+                lang: loc
             },
             success: function (data) {
                 if (data.includes("***")) {
@@ -2446,7 +2422,8 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perStudentPerProblemSetReport',
-                lang: languagePreference
+                lang: loc,
+                filter: ''
             },
             success : function(data) {
                 $('#collapseOne').find('.loader').hide();
@@ -2526,7 +2503,7 @@ var completeDataChart;
                     perProblemSetReport.destroy();
                     $('#perTopicStudentReport').empty();
                 }
-                
+
                 if (languageSet == "es") {
                 perProblemSetReport = $('#perTopicStudentReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
@@ -2612,6 +2589,256 @@ var completeDataChart;
 
     });
 
+    $('#standardsBtn').on('click', function ()  {
+        $('#collapseSix').find('.loader').show();
+        var filter=document.getElementById("standardsFilter").value;
+        
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'perStudentPerProblemReport',
+                lang: loc,
+                filter: filter
+            },
+            success : function(data) {
+                $('#collapseSix').find('.loader').hide();
+                //alert(data);
+                var jsonData = $.parseJSON(data);
+                perProblemSetLevelOne = jsonData.levelOneData;
+                perStudentPerProblemColumnNamesMap = jsonData.columns;
+				
+                
+                var txt="";
+                var abbr="";
+                var indexcolumn = 3;
+                var columNvalues = $.map(perStudentPerProblemColumnNamesMap, function (v) {
+                        var temp = {
+  		
+                            "title": v, "name": v.replace(/\s/g, ''), "targets": indexcolumn,
+                            "createdCell": function (td, cellData, rowData, row, col) {
+                                if (cellData == '') {
+                                    $(td).text("");
+                                    return;
+                                }
+								
+                                if ((cellData == null) || (cellData == "null")) {
+                                	cellData = " ";
+                                    $(td).html("");
+                                }                                
+                                else if (cellData == "SKIP") {                                	
+                                	txt = "<%= rb.getString("skip")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SKIP');
+                                }
+                                else if (cellData == "NOTR") {
+                                	txt = "<%= rb.getString("notr")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-NOTR');
+                                }
+                                else if (cellData == "GIVEUP") {
+                                	txt = "<%= rb.getString("giveup")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-GIVEUP');
+                                }
+                                else if (cellData == "SOF") {
+                                	txt = "<%= rb.getString("sof")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SOF');
+                                }
+                                else if (cellData == "ATT") {
+                                	txt = "<%= rb.getString("att")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-ATT');
+                                }
+                                else if (cellData == "GUESS") {
+                                	txt = "<%= rb.getString("guess")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-GUESS');
+                                }
+                                else if (cellData == "SHINT") {
+                                	txt = "<%= rb.getString("shint")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SHINT');
+                                }
+                                else if (cellData == "SHELP") {
+                                	txt = "<%= rb.getString("shelp")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SHELP');
+                                }
+                                else if (cellData == "NODATA") {
+                                	txt = "<%= rb.getString("no_data")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-NODATA');
+                                }
+                                else {
+                                    $(td).html("");
+                                }
+                            }
+                        };
+                        indexcolumn++;
+                        return temp;
+                    }
+                );
+
+
+
+                columNvalues.unshift({"title" : "<%= rb.getString("student_name")%>","name":"studentName" , "targets": [0]},
+                                     {"title" : "<%= rb.getString("username")%>","name":"userName", "targets": [1]}, 
+                                     {"title" : "<%= rb.getString("student_id")%>","name":"studentId", "targets": [2], visible : false} );
+
+
+<%
+/**
+                indexcolumn = 3;
+                
+				var columDvalues = $.map(perStudentPerProblemColumnNamesMap, function(v) {
+                    var temp = {
+                        "title": "problemId",
+                        "name": "problemId",
+                        "width": "10%", 
+                        "data" : v,
+                        "targets": [indexcolumn],
+                        "render": function (data, type, full, meta) {
+                            var problemId = full['problemId'];
+                            var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                            var window = "'" + problemImageWindow[problemId] + "'" + attri ;
+                            var imageURL = problem_imageURL+full['problemId']+'.jpg';
+                            return '<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+problemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
+                        }
+                    }
+                    indexcolumn++;
+   	                return temp;
+                });
+**/
+%>
+				var columDvalues = $.map(perStudentPerProblemColumnNamesMap, function(v) {
+                    v = v.replace(/\s/g, '');
+                    var imageURL = problem_imageURL+v+'.jpg';
+                    var problemImgHTML = "<a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + v + "</a>";
+                    return  { width: "10%", data : v };
+                }
+            	);
+               
+                columDvalues.unshift({data: "studentName"},{data: "userName"},{data: "studentId"});
+                var perProblemSetLevelOneFullTemp = [];
+                $.map(perProblemSetLevelOne, function (item,k) {
+                        var perProblemSetLevelOneTemp = {};
+                                    item.forEach(function(e){
+                                        var itemArrays = e.split("~~~");
+                                        perProblemSetLevelOneTemp[itemArrays[0]] = itemArrays[1]
+                                        perProblemSetLevelOneTemp['studentId'] = k;
+                                })
+                        perProblemSetLevelOneFullTemp.push(perProblemSetLevelOneTemp);
+                    }
+                );
+
+      
+
+                if (perProblemSetReport) {
+                    perProblemSetReport.destroy();
+                    $('#perStudentPerProblemReport').empty();
+                }
+                if (languageSet == "es") {
+                perProblemSetReport = $('#perStudentPerProblemReport').DataTable({
+                    data: perProblemSetLevelOneFullTemp,
+                    destroy: true,
+                    "columns": columDvalues,
+                    "columnDefs": columNvalues,
+                    "bPaginate": true,
+                    "language": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
+                    },
+                    "scrollX": true,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": false,
+                    "drawCallback": function () {
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+
+                    }
+
+                });
+                }
+                else {
+                perProblemSetReport = $('#perStudentPerProblemReport').DataTable({
+                    data: perProblemSetLevelOneFullTemp,
+                    destroy: true,
+                    "columns": columDvalues,
+                    "columnDefs": columNvalues,
+                    "bPaginate": true,
+                    "scrollX": true,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": false,
+                    "drawCallback": function () {
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+
+                    }
+
+                });
+                }
+                
+                
+                
+            }
+        });
+
+
+    });
+
+
+    
     $('#collapseTwo').on('show.bs.collapse', function ()  {
         $('#collapseTwo').find('.loader').show();
         $.ajax({
@@ -2621,7 +2848,8 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perProblemReport',
-                lang: languagePreference
+                lang: loc,
+                filter: ''
             },
             success : function(data) {
                 $('#collapseTwo').find('.loader').hide();
@@ -2757,7 +2985,8 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perStudentReport',
-                lang: languagePreference
+                lang: loc,
+                filter: ''
             },
             success : function(data) {
                 var jsonData = $.parseJSON(data);
@@ -2785,7 +3014,8 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'commonCoreClusterReport',
-                lang: languagePreference
+                lang: loc,
+                filter: ''
             },
             success : function(data) {
                 $('#collapseFourLoader').hide();
@@ -2935,7 +3165,8 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'summarySurveyReport',
-                lang: languagePreference
+                lang: loc,
+                filter: ''
             },
             success : function(data) {
             	$('#collapseFive').find('.loader').hide();
