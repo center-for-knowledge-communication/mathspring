@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 /**
  * Created by nsmenon on 5/19/2017.
+ * 
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * 
  */
 @Controller
 public class TeacherToolsReportController {
@@ -79,7 +82,18 @@ public class TeacherToolsReportController {
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForProblemSet",dataPerProblemSet );
-        map.addAttribute("reportType", "perProblmSetReportDownload");
+        map.addAttribute("reportType", "perProblemSetReportDownload");
+        return new ModelAndView("teachersReport", map);
+    }
+
+    @RequestMapping(value = "/tt/downLoadPerStudentPerProblemReport", method = RequestMethod.GET)
+    public ModelAndView downLoadPerStudentPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId) throws TTCustomException {
+    	System.out.println("TeacherToolsReportController");
+        Map<String, Object> dataPerStudentPerProblem =  reportService.generateClassReportPerStudentPerProblem(teacherId,classId);
+        map.addAttribute("classId", classId);
+        map.addAttribute("teacherId", teacherId);
+        map.addAttribute("dataForStudentPerProblem",dataPerStudentPerProblem );
+        map.addAttribute("reportType", "perStudentperProblemReportDownload");
         return new ModelAndView("teachersReport", map);
     }
 

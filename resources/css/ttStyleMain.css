@@ -360,6 +360,44 @@ background-color: #FF4766;
 
 }
 
+.span-SKIP {
+  color: #000000;
+  background-color: #8dd3c7;
+}
+.span-NOTR {
+  color: #000000;
+  background-color: #ffffb3;
+}
+.span-GIVEUP {
+  color: #000000;
+  background-color: #bebada;
+}
+.span-SOF {
+  color: #000000;
+  background-color: #fb8072;
+}
+.span-ATT {
+  color: #000000;
+  background-color: #b3de69;
+}
+.span-GUESS {
+  color: #000000;
+  background-color: #fccde5;
+}
+.span-SHINT {
+  color: #000000;
+  background-color: #80b1d3;
+}
+.span-SHELP {
+  color: #000000;
+  background-color: #fdb462";
+}
+.span-NODATA {
+  color: #000000;
+  background-color: #d9d9d9;
+}
+
+
 
 .modal-content {
   max-width: 1500px;

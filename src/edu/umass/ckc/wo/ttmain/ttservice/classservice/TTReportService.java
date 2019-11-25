@@ -14,6 +14,9 @@ import java.util.Set;
 
 /**
  * Created by nsmenon on 5/19/2017.
+ * 
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * 
  */
 
 public interface TTReportService {
@@ -30,6 +33,8 @@ public interface TTReportService {
     public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId);
 
     public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException;
+
+    public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId) throws TTCustomException;
 
     public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID) throws TTCustomException;
 
