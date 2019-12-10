@@ -1,27 +1,47 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jndi.JndiTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.umass.ckc.wo.db.DbUtil;
+import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
+import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
+import edu.umass.ckc.wo.ttmain.ttservice.loginservice.impl.TTLoginServiceImpl;
+import edu.umass.ckc.wo.tutor.Settings;
 
+import javax.servlet.ServletContext;
+import javax.naming.NamingException;
+
+import edu.umass.ckc.wo.log.TeacherLogger;
 /**
  * Created by Neeraj on 3/24/2017.
+ * 
+ * Frank 	12-09-19	Issue #21 add logging of teacher login and logout
  */
 @Controller
 public class TeacherToolsMainLoginController {
+    private static Logger logger = Logger.getLogger(TTLoginServiceImpl.class);
 
     @Autowired
     private TTLoginService loginService;
-
+    
+    DataSource ds;
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.POST)
     public String printWelcome(@RequestParam("userName") String username, @RequestParam("password") String password, ModelMap model, HttpServletRequest request) throws TTCustomException {
         int loginAllowed  = loginService.loginAssist(username,password);
@@ -31,7 +51,35 @@ public class TeacherToolsMainLoginController {
             }else{
             	HttpSession session = request.getSession();
             	session.setMaxInactiveInterval(30*60);
-            	
+
+            	try {
+            		ServletContext ctx  = session.getServletContext();
+            	       try {
+            	            JndiTemplate jndiTemplate = new JndiTemplate();
+            	            String dataSourceLookup = ctx.getInitParameter("wodb.datasource");
+            	            Settings.webContentPath = ctx.getInitParameter("webContentPath");
+            	            ds = (DataSource) jndiTemplate.lookup("java:comp/env/" + dataSourceLookup);
+            	        } catch (Exception e) {
+            	            e.printStackTrace();
+            	            logger.error(e.getMessage());
+            	        }
+            	       
+    
+            		Connection conn = ds.getConnection();
+            		if (conn != null) {
+                		logger.info("conn not null");
+                		session.setAttribute("conn", conn);            		
+                		session.setAttribute("teacherUsername", username);         	
+                		session.setAttribute("teacherId", loginAllowed);
+                		TeacherLogger tlogger = new TeacherLogger(conn);
+                		session.setAttribute("tLogger", tlogger);
+                		tlogger.insertLoginEntry(loginAllowed, "login", "");
+            		}
+            	}
+            	catch(SQLException e) {
+                    logger.error(e.getMessage());
+            	}
+
                 return loginService.populateClassInfoForTeacher(model,loginAllowed);
             }
     }
@@ -44,7 +92,19 @@ public class TeacherToolsMainLoginController {
 
     @RequestMapping(value = "/tt/logout", method = RequestMethod.GET)
     public String logoutSession(HttpSession logoutSession) {
-        logoutSession.invalidate();
+        System.out.println("logging out");
+    	try {
+            Connection conn = (Connection) logoutSession.getAttribute("conn");            		
+            int teacherId = (int) logoutSession.getAttribute("teacherId");
+    		TeacherLogger tlog = new TeacherLogger(conn);
+    		tlog.insertLoginEntry(teacherId, "logout", "");
+    	}
+    	catch (SQLException e ) {
+            logger.error(e.getMessage());
+    	}
+    	finally {
+    		logoutSession.invalidate();
+    	}
         return "login/loginK12";
     }
 }

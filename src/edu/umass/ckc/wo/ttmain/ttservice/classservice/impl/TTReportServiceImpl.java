@@ -39,14 +39,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.ResourceBundle;
-import java.util.Locale;
 /**
  * Created by nsmenon on 5/19/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
  * Frank 	10-22-19	Issue #14 remove debugging
- * 
+  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
+* 
  */
 
 @Service
@@ -61,9 +60,11 @@ public class TTReportServiceImpl implements TTReportService {
 
 
     @Override
-    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException {
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter) throws TTCustomException {
 
         try {
+        	
+        	System.out.println("TTReportServiceImpl  filter = " + filter);
     		// Multi=lingual enhancement
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -196,7 +197,7 @@ public class TTReportServiceImpl implements TTReportService {
                     return perClusterReportMapper.writeValueAsString(result);
                     
                 case "perStudentPerProblemReport":
-                    Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId);
+                    Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter);
                     ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
                     return perStudentPerProblemReportMapper2.writeValueAsString(result2);
                     
@@ -649,10 +650,16 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId) throws TTCustomException {
+    public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException {
 
-        logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
-        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+    	System.out.println("generateClassReportPerStudentPerProblem for class " + classId + "filter= " + filter);
+    	String modFilter = filter + "%";
+    	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("filter", modFilter);
+        params.put("classId", classId);
+        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+        
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
         Map<String, String> columnNamesMap = new LinkedHashMap<>();
@@ -670,7 +677,6 @@ public class TTReportServiceImpl implements TTReportService {
                 }
                 String description = ((String) mappedrow.getString("description")).trim();
               
-
             	logger.debug("[" + studentId + String.valueOf(problemId) + description + effort + "]");
 
                 
@@ -733,7 +739,7 @@ public class TTReportServiceImpl implements TTReportService {
         });
         allResult.put("levelOneData", finalMapLevelOne);
         allResult.put("columns", columnNamesMap);
-
+        logger.debug(columnNamesMap);
         //logger.info(allResult.toString());
         return allResult;
     }
