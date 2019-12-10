@@ -538,7 +538,9 @@ public class Problem implements Activity {
 
     public String getHTMLDir () {
         String rsc = getResource();
+
         
+
         if (rsc == null) {
         	System.out.println("rsc=null use problem name " + getName());
         	rsc = getName();
