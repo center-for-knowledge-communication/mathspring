@@ -1,7 +1,7 @@
 //Module pattern for better scoping
 // Frank 10-22-19 issue #14 translation
 // Frank 11-25-19 issue #15 hide short answer box and buttons
-//
+// try again
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
