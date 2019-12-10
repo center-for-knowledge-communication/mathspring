@@ -18,6 +18,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+// Frank 10-22-19 issue #14 translation
+
 //Module pattern for better scoping
 var problemUtils = (function() {
 
@@ -283,18 +285,23 @@ m.getIdCorrespondingToHint = function(hintLabel){
 
 function getNextHint(hintLabel){
 
-    //alert(hintLabel);
-
 	var languagePreference = window.navigator.language;
-	
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+
 	var hintText = "";
-	if (languagePreference === "en-US") {
+
+	 if (languageSet == "en") {
 		hintText = "Hint";
 	}
 	else {
 		hintText = "Ayuda";
 	}
-
+	
     var hintId = m.getIdCorrespondingToHint(hintLabel);
 
     if(hintId.match(/Hint\d+/)) {

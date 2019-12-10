@@ -733,6 +733,7 @@ catch (Exception e) {
                                 <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
                                     <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                 </a>
+
                             </div>         
                             <div class="panel-body">                           
 								  <label><%= rb.getString("standards_e_g") %></label>
