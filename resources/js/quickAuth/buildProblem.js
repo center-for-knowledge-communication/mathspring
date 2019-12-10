@@ -1,5 +1,6 @@
 //Module pattern for better scoping
 // Frank 10-22-19 issue #14 translation
+// Frank 11-25-19 issue #15 hide short answer box and buttons
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -142,7 +143,8 @@ m.build = function(activity, previewMode) {
     }
 
     //For demo and example modes all answers should stay hidden
-    // if (mode !== "demo" && mode !== "example") {
+    //alert("mode is " + mode + " questType is " + questType);
+//    if (mode !== "demo" && mode !== "example") {
     	console.log("Show answers")
         if (questType.match(/^multi(Choice|Select)$/)) {
             var multi_answers = document.getElementById("MultipleChoiceAnswers");
@@ -164,8 +166,10 @@ m.build = function(activity, previewMode) {
                     }
                 }
             }
-            if(multiSelect) {
-                document.getElementById("submit_answer").addEventListener("click", submitMultiSelectAnswer);
+            if (mode !== "demo" && mode !== "example") {
+            	if(multiSelect) {
+            		document.getElementById("submit_answer").addEventListener("click", submitMultiSelectAnswer);
+            	}
             }
             ///////  -----------  shuffle ANSWER SHUFFLING -------------
             // This moves the answers around with the flaw that it sends the orginal letters
@@ -175,15 +179,19 @@ m.build = function(activity, previewMode) {
             // it also shows the non-shuffled answer letter below the problem which sucks.
             // if(!previewMode) problemUtils.shuffleAnswers(!multiSelect);
         } else {
-            if(questType === "shortAnswer") {
-                document.getElementById("ShortAnswerBox").style.display = "block";
-                document.getElementById("submit_answer").addEventListener("click", submitShortAnswer);
+            if (mode !== "demo" && mode !== "example") {
+            	if(questType === "shortAnswer") {
+            		document.getElementById("ShortAnswerBox").style.display = "block";
+            		document.getElementById("submit_answer").addEventListener("click", submitShortAnswer);
+            	}
             }
         }
-        if(questType.match(/^(multiSelect|shortAnswer)$/)) {
-            document.getElementById("SubmitAnswerBox").style.display = "block";
-        }
-    //}
+        if (mode !== "demo" && mode !== "example") {
+        	if(questType.match(/^(multiSelect|shortAnswer)$/)) {
+        		document.getElementById("SubmitAnswerBox").style.display = "block";
+        	}
+//        }
+    }
 
     if(previewMode) {
         problemContainer.style.float = "left";
