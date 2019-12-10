@@ -538,12 +538,14 @@ public class Problem implements Activity {
 
     public String getHTMLDir () {
         String rsc = getResource();
-/**        
+
+        
+
         if (rsc == null) {
         	System.out.println("rsc=null use problem name " + getName());
         	rsc = getName();
     	}
-*/
+
         // If a resource is present but isn't a legit filename, make it be .html by default
         if (rsc.indexOf('.') == -1) {
             rsc +=".html";

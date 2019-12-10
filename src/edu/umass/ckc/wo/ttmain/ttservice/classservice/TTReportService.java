@@ -16,11 +16,14 @@ import java.util.Set;
  * Created by nsmenon on 5/19/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+
+ * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
+
  * 
  */
 
 public interface TTReportService {
-    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang) throws TTCustomException;
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter) throws TTCustomException;
 
     public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException;
 
@@ -34,7 +37,8 @@ public interface TTReportService {
 
     public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException;
 
-    public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId) throws TTCustomException;
+
+    public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException;
 
     public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID) throws TTCustomException;
 

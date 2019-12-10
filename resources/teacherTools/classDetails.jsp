@@ -1,5 +1,6 @@
 <!-- Frank 	10-15-19	Issue #7 perStudentperProblemReport report -->
 <!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
+<!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -731,7 +732,12 @@ catch (Exception e) {
                                 <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
                                     <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                 </a>
-                            </div>                          
+                            </div>         
+                            <div class="panel-body">                           
+								  <label><%= rb.getString("standards_e_g") %></label>
+								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn type="submit" value="<%= rb.getString("submit") %>">
+							</div>
+
                             <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">

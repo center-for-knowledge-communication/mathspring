@@ -24,7 +24,9 @@ import java.util.stream.Collectors;
  * Created by nsmenon on 5/19/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
- * 
+
+ * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
+
  */
 @Controller
 public class TeacherToolsReportController {
@@ -34,9 +36,9 @@ public class TeacherToolsReportController {
 
 
     @RequestMapping(value = "/tt/getTeacherReports", method = RequestMethod.POST)
-    public @ResponseBody String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType,  @RequestParam("lang") String lang) throws TTCustomException {
-    	System.out.println("TeacherToolsReportController");
-    	return reportService.generateTeacherReport(teacherId, classId, reportType, lang);
+    public @ResponseBody String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType,  @RequestParam("lang") String lang,  @RequestParam("filter") String filter) throws TTCustomException {
+    	System.out.println("TeacherToolsReportController filter = " + filter);
+    	return reportService.generateTeacherReport(teacherId, classId, reportType, lang, filter);
 
     }
 
@@ -87,9 +89,10 @@ public class TeacherToolsReportController {
     }
 
     @RequestMapping(value = "/tt/downLoadPerStudentPerProblemReport", method = RequestMethod.GET)
-    public ModelAndView downLoadPerStudentPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId) throws TTCustomException {
+
+    public ModelAndView downLoadPerStudentPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter) throws TTCustomException {
     	System.out.println("TeacherToolsReportController");
-        Map<String, Object> dataPerStudentPerProblem =  reportService.generateClassReportPerStudentPerProblem(teacherId,classId);
+        Map<String, Object> dataPerStudentPerProblem =  reportService.generateClassReportPerStudentPerProblem(teacherId,classId, filter);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForStudentPerProblem",dataPerStudentPerProblem );
