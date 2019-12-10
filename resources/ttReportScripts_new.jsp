@@ -2,47 +2,17 @@
 <script type="text/javascript">
 /**
  * Created by nsmenon on 6/1/2017.
+ * fsylvia 7/1/2019 - Converted to multi-lingual JSP
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * Frank 	10-22-19	Issue #14 fix locale string parameter in some reports
  */
- 
-/** cut and paste snippets
- 
- 
-                     "language": {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix":    "",
-                        "sSearch":         "Buscar:",
-                        "sUrl":            "",
-                        "sInfoThousands":  ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
-                    },
-                    
-                    
-                    
-*/
- 
- 
  
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
 var perProblemSetLevelTwo;
 var perProblemSetColumnNamesMap;
+var perStudentPerProblemColumnNamesMap;
 var perProblemSetLevelOneAvg;
 var perProblemSetLevelOneMax;
 var perProblemSetLevelOneLatest;
@@ -72,11 +42,16 @@ var apply_content_table;
 
 var languagePreference = window.navigator.language;
 var languageSet = "en";
+var loc = "en-US";
+
 if (languagePreference.includes("en")) {
 	languageSet = "en"
+	loc = "en-US";
 } else if (languagePreference.includes("es")) {
 	languageSet = "es"
+	loc = "es-Ar";
 }
+
 
 <% 
 /**
@@ -99,14 +74,14 @@ var effortLabelMap;
 if (languageSet == 'es') {
 
 	effortLabelMap = {
-			"SKIP" : "El estudiante saltó el problema (no hizo nada al respecto)",
-            "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos",
-            "GIVEUP" : "El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.",
-            "SOF" :  "El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.",
-            "ATT" : "El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.",
-            "GUESS" : "El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.",
-            "SHINT" : "El estudiante resolvió el problema correctamente después de ver PISTAS.",
-            "SHELP" : "Consiguió el problema correcto, pero vio al menos un video.",
+			"SKIP" : "El estudiante saltÃ³ el problema (no hizo nada al respecto)",
+            "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondiÃ³ demasiado rÃ¡pido, en menos de 4 segundos",
+            "GIVEUP" : "El estudiante comenzÃ³ a trabajar en el problema, pero luego AUMENTÃ“ y siguiÃ³ adelante sin resolverlo correctamente.",
+            "SOF" :  "El estudiante resolviÃ³ el problema correctamente en el PRIMER intento, sin ninguna ayuda.",
+            "ATT" : "El estudiante INTENTÃ“ una vez incorrectamente, pero se corrigiÃ³ (contestÃ³ correctamente) en el segundo intento, no se solicitÃ³ ayuda.",
+            "GUESS" : "El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiÃ³ pistas / videos, etc.",
+            "SHINT" : "El estudiante resolviÃ³ el problema correctamente despuÃ©s de ver PISTAS.",
+            "SHELP" : "ConsiguiÃ³ el problema correcto, pero vio al menos un video.",
             "NO DATA" : "No se pudieron recopilar datos."
     }
 }
@@ -140,35 +115,35 @@ function loadEffortMap (rows,flag) {
                 labels: ["Tipo de comportamiento en problema"],
                 datasets: [{
                     backgroundColor: "#8dd3c7",
-                    label: 'OMITIR: El estudiante saltó el problema (no hizo nada al respecto)',
+                    label: 'OMITIR: El estudiante saltÃ³ el problema (no hizo nada al respecto)',
                     data: [effortValues[0]]
                 }, {
                     backgroundColor: "#ffffb3",
-                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
+                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondiÃ³ demasiado rÃ¡pido, en menos de 4 segundos',
                     data: [effortValues[1]]
                 }, {
                     backgroundColor: "#bebada",
-                    label: 'ABANDONO: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
+                    label: 'ABANDONO: El estudiante comenzÃ³ a trabajar en el problema, pero luego AUMENTÃ“ y siguiÃ³ adelante sin resolverlo correctamente.',
                     data: [effortValues[2]]
                 }, {
                     backgroundColor: "#fb8072",
-                    label: 'CORRECTO: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
+                    label: 'CORRECTO: El estudiante resolviÃ³ el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                     data: [effortValues[3]]
                 }, {
                     backgroundColor: "#b3de69",
-                    label: 'AUTOCORRIGIO: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
+                    label: 'AUTOCORRIGIO: El estudiante INTENTÃ“ una vez incorrectamente, pero se corrigiÃ³ (contestÃ³ correctamente) en el segundo intento, no se solicitÃ³ ayuda.',
                     data: [effortValues[4]]
                 }, {
                     backgroundColor: "#fccde5",
-                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
+                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiÃ³ pistas / videos, etc.',
                     data: [effortValues[5]]
                 }, {
                     backgroundColor: "#80b1d3",
-                    label: 'CONAYUDA: El estudiante resolvió el problema correctamente después de ver PISTAS.',
+                    label: 'CONAYUDA: El estudiante resolviÃ³ el problema correctamente despuÃ©s de ver PISTAS.',
                     data: [effortValues[6]]
                 }, {
                     backgroundColor: "#fdb462",
-                    label: 'SCONAYUDA: Consiguió el problema correcto, pero vio al menos un video.',
+                    label: 'SCONAYUDA: ConsiguiÃ³ el problema correcto, pero vio al menos un video.',
                     data: [effortValues[7]]
                 }, {
                     label: 'NOHAYDATOS: No se pudieron recopilar datos.',
@@ -286,35 +261,35 @@ function loadEffortMap (rows,flag) {
             labels: ["Tipo de comportamiento en problema"],
             datasets: [{
                 backgroundColor: "#8dd3c7",
-                label: 'SKIP: El estudiante saltó el problema (no hizo nada al respecto)',
+                label: 'SKIP: El estudiante saltÃ³ el problema (no hizo nada al respecto)',
                 data: [effortValues[0]]
             }, {
                 backgroundColor: "#ffffb3",
-                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
+                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondiÃ³ demasiado rÃ¡pido, en menos de 4 segundos',
                 data: [effortValues[1]]
             }, {
                 backgroundColor: "#bebada",
-                label: 'GIVEUP: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
+                label: 'GIVEUP: El estudiante comenzÃ³ a trabajar en el problema, pero luego AUMENTÃ“ y siguiÃ³ adelante sin resolverlo correctamente.',
                 data: [effortValues[2]]
             }, {
                 backgroundColor: "#fb8072",
-                label: 'SOF: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
+                label: 'SOF: El estudiante resolviÃ³ el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                 data: [effortValues[3]]
             }, {
                 backgroundColor: "#b3de69",
-                label: 'ATT: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
+                label: 'ATT: El estudiante INTENTÃ“ una vez incorrectamente, pero se corrigiÃ³ (contestÃ³ correctamente) en el segundo intento, no se solicitÃ³ ayuda.',
                 data: [effortValues[4]]
             }, {
                 backgroundColor: "#fccde5",
-                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
+                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiÃ³ pistas / videos, etc.',
                 data: [effortValues[5]]
             }, {
                 backgroundColor: "#80b1d3",
-                label: 'SHINT: El estudiante resolvió el problema correctamente después de ver PISTAS.',
+                label: 'SHINT: El estudiante resolviÃ³ el problema correctamente despuÃ©s de ver PISTAS.',
                 data: [effortValues[6]]
             }, {
                 backgroundColor: "#fdb462",
-                label: 'SHELP: Consiguió el problema correcto, pero vio al menos un video.',
+                label: 'SHELP: ConsiguiÃ³ el problema correcto, pero vio al menos un video.',
                 data: [effortValues[7]]
             }, {
                 label: 'NO DATA: NO DATA: No se pudieron recopilar datos.',
@@ -510,7 +485,7 @@ function resetStudentData( title,studentId) {
         data : {
             studentId: studentId,
             action: title,
-            lang: languagePreference
+            lang: loc
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -573,7 +548,7 @@ function updateStudentInfo(formName){
         data : {
             studentId: formName,
             formData: values,
-            lang: languagePreference
+            lang: loc
         },
         success : function(response) {
             if (response.includes("***")) {
@@ -660,7 +635,7 @@ if (languageSet == 'es') {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -671,7 +646,7 @@ if (languageSet == 'es') {
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "Último",
+                        "sLast":     "Ãšltimo",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },
@@ -968,7 +943,7 @@ function changeReportThreeHeaderAccordingToLanguage(){
 		languageSet = "es"
 	}
 	if (languageSet == 'es') {
-		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','effchart': 'Gráfico de esfuerzo','emochart': 'Gráfico de emociones'};
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','effchart': 'GrÃ¡fico de esfuerzo','emochart': 'GrÃ¡fico de emociones'};
 		return header;
 	}else{
 	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','effchart': 'Effort Chart','emochart': 'Emotion Chart'};
@@ -1051,7 +1026,7 @@ if (languageSet == 'es') {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1062,7 +1037,7 @@ if (languageSet == 'es') {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "Último",
+                "sLast":     "Ãšltimo",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1149,7 +1124,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1160,7 +1135,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "Último",
+                "sLast":     "Ãšltimo",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1216,7 +1191,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1227,7 +1202,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "Último",
+                "sLast":     "Ãšltimo",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1286,7 +1261,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1297,7 +1272,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "Último",
+                "sLast":     "Ãšltimo",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1381,7 +1356,7 @@ else {
                             var emo = "undefined";
                                           
                             if (key == "Frustration") {
-                            	emo = "Frustración";
+                            	emo = "FrustraciÃ³n";
                             }
                             if (key == "Confidence") {
                             	emo = "Confianza";
@@ -1534,7 +1509,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1545,7 +1520,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "Último",
+                "sLast":     "Ãšltimo",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1812,7 +1787,7 @@ else {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1823,7 +1798,7 @@ else {
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "Último",
+                        "sLast":     "Ãšltimo",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },
@@ -1897,7 +1872,7 @@ else {
             url: pgContext + "/tt/tt/createMoreStudentIds",
             data: {
                 formData: values,
-                lang: languagePreference
+                lang: loc
             },
             success: function (data) {
                 if (data.includes("***")) {
@@ -2446,7 +2421,7 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perStudentPerProblemSetReport',
-                lang: languagePreference
+                lang: loc
             },
             success : function(data) {
                 $('#collapseOne').find('.loader').hide();
@@ -2526,7 +2501,7 @@ var completeDataChart;
                     perProblemSetReport.destroy();
                     $('#perTopicStudentReport').empty();
                 }
-                
+
                 if (languageSet == "es") {
                 perProblemSetReport = $('#perTopicStudentReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
@@ -2538,7 +2513,7 @@ var completeDataChart;
                             "sProcessing":     "Procesando...",
                             "sLengthMenu":     "Mostrar _MENU_ registros",
                             "sZeroRecords":    "No se encontraron resultados",
-                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -2549,7 +2524,7 @@ var completeDataChart;
                             "sLoadingRecords": "Cargando...",
                             "oPaginate": {
                                 "sFirst":    "Primero",
-                                "sLast":     "Último",
+                                "sLast":     "Ãšltimo",
                                 "sNext":     "Siguiente",
                                 "sPrevious": "Anterior"
                             },
@@ -2612,6 +2587,254 @@ var completeDataChart;
 
     });
 
+    $('#collapseSix').on('show.bs.collapse', function ()  {
+        $('#collapseSix').find('.loader').show();
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'perStudentPerProblemReport',
+                lang: loc
+
+            },
+            success : function(data) {
+                $('#collapseSix').find('.loader').hide();
+                //alert(data);
+                var jsonData = $.parseJSON(data);
+                perProblemSetLevelOne = jsonData.levelOneData;
+                perStudentPerProblemColumnNamesMap = jsonData.columns;
+				
+                
+                var txt="";
+                var abbr="";
+                var indexcolumn = 3;
+                var columNvalues = $.map(perStudentPerProblemColumnNamesMap, function (v) {
+                        var temp = {
+  		
+                            "title": v, "name": v.replace(/\s/g, ''), "targets": indexcolumn,
+                            "createdCell": function (td, cellData, rowData, row, col) {
+                                if (cellData == '') {
+                                    $(td).text("");
+                                    return;
+                                }
+								
+                                if ((cellData == null) || (cellData == "null")) {
+                                	cellData = " ";
+                                    $(td).html("");
+                                }                                
+                                else if (cellData == "SKIP") {                                	
+                                	txt = "<%= rb.getString("skip")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SKIP');
+                                }
+                                else if (cellData == "NOTR") {
+                                	txt = "<%= rb.getString("notr")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-NOTR');
+                                }
+                                else if (cellData == "GIVEUP") {
+                                	txt = "<%= rb.getString("giveup")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-GIVEUP');
+                                }
+                                else if (cellData == "SOF") {
+                                	txt = "<%= rb.getString("sof")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SOF');
+                                }
+                                else if (cellData == "ATT") {
+                                	txt = "<%= rb.getString("att")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-ATT');
+                                }
+                                else if (cellData == "GUESS") {
+                                	txt = "<%= rb.getString("guess")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-GUESS');
+                                }
+                                else if (cellData == "SHINT") {
+                                	txt = "<%= rb.getString("shint")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SHINT');
+                                }
+                                else if (cellData == "SHELP") {
+                                	txt = "<%= rb.getString("shelp")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-SHELP');
+                                }
+                                else if (cellData == "NODATA") {
+                                	txt = "<%= rb.getString("no_data")%>";
+                                    var abbr = txt.split(":");
+                                    $(td).html(""+abbr[0]);
+                                	$(td).addClass('span-NODATA');
+                                }
+                                else {
+                                    $(td).html("");
+                                }
+                            }
+                        };
+                        indexcolumn++;
+                        return temp;
+                    }
+                );
+
+
+
+                columNvalues.unshift({"title" : "<%= rb.getString("student_name")%>","name":"studentName" , "targets": [0]},
+                                     {"title" : "<%= rb.getString("username")%>","name":"userName", "targets": [1]}, 
+                                     {"title" : "<%= rb.getString("student_id")%>","name":"studentId", "targets": [2], visible : false} );
+
+
+<%
+/**
+                indexcolumn = 3;
+                
+				var columDvalues = $.map(perStudentPerProblemColumnNamesMap, function(v) {
+                    var temp = {
+                        "title": "problemId",
+                        "name": "problemId",
+                        "width": "10%", 
+                        "data" : v,
+                        "targets": [indexcolumn],
+                        "render": function (data, type, full, meta) {
+                            var problemId = full['problemId'];
+                            var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                            var window = "'" + problemImageWindow[problemId] + "'" + attri ;
+                            var imageURL = problem_imageURL+full['problemId']+'.jpg';
+                            return '<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+problemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
+                        }
+                    }
+                    indexcolumn++;
+   	                return temp;
+                });
+**/
+%>
+				var columDvalues = $.map(perStudentPerProblemColumnNamesMap, function(v) {
+                    v = v.replace(/\s/g, '');
+                    var imageURL = problem_imageURL+v+'.jpg';
+                    var problemImgHTML = "<a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + v + "</a>";
+                    return  { width: "10%", data : v };
+                }
+            	);
+               
+                columDvalues.unshift({data: "studentName"},{data: "userName"},{data: "studentId"});
+                var perProblemSetLevelOneFullTemp = [];
+                $.map(perProblemSetLevelOne, function (item,k) {
+                        var perProblemSetLevelOneTemp = {};
+                                    item.forEach(function(e){
+                                        var itemArrays = e.split("~~~");
+                                        perProblemSetLevelOneTemp[itemArrays[0]] = itemArrays[1]
+                                        perProblemSetLevelOneTemp['studentId'] = k;
+                                })
+                        perProblemSetLevelOneFullTemp.push(perProblemSetLevelOneTemp);
+                    }
+                );
+
+      
+
+                if (perProblemSetReport) {
+                    perProblemSetReport.destroy();
+                    $('#perStudentPerProblemReport').empty();
+                }
+                if (languageSet == "es") {
+                perProblemSetReport = $('#perStudentPerProblemReport').DataTable({
+                    data: perProblemSetLevelOneFullTemp,
+                    destroy: true,
+                    "columns": columDvalues,
+                    "columnDefs": columNvalues,
+                    "bPaginate": true,
+                    "language": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
+                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Ãšltimo",
+                                "sNext":     "Siguiente",
+                                "sPrevious": "Anterior"
+                            },
+                            "oAria": {
+                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                            }
+                    },
+                    "scrollX": true,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": false,
+                    "drawCallback": function () {
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+
+                    }
+
+                });
+                }
+                else {
+                perProblemSetReport = $('#perStudentPerProblemReport').DataTable({
+                    data: perProblemSetLevelOneFullTemp,
+                    destroy: true,
+                    "columns": columDvalues,
+                    "columnDefs": columNvalues,
+                    "bPaginate": true,
+                    "scrollX": true,
+                    "bFilter": false,
+                    "bLengthChange": false,
+                    rowReorder: false,
+                    "bSort": false,
+                    "drawCallback": function () {
+                        $('a[rel=popoverPerProblem]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            container: 'body',
+                            content: function () {
+                                return '<img src="' + $(this).data('img') + '" />';
+                            }
+                        });
+
+                    }
+
+                });
+                }
+                
+                
+                
+            }
+        });
+
+
+    });
+
+
+    
     $('#collapseTwo').on('show.bs.collapse', function ()  {
         $('#collapseTwo').find('.loader').show();
         $.ajax({
@@ -2621,7 +2844,7 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perProblemReport',
-                lang: languagePreference
+                lang: loc
             },
             success : function(data) {
                 $('#collapseTwo').find('.loader').hide();
@@ -2757,7 +2980,7 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'perStudentReport',
-                lang: languagePreference
+                lang: loc
             },
             success : function(data) {
                 var jsonData = $.parseJSON(data);
@@ -2785,7 +3008,7 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'commonCoreClusterReport',
-                lang: languagePreference
+                lang: loc
             },
             success : function(data) {
                 $('#collapseFourLoader').hide();
@@ -2864,7 +3087,7 @@ var completeDataChart;
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
                         "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                         "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                         "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                         "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -2875,7 +3098,7 @@ var completeDataChart;
                         "sLoadingRecords": "Cargando...",
                         "oPaginate": {
                             "sFirst":    "Primero",
-                            "sLast":     "Último",
+                            "sLast":     "Ãšltimo",
                             "sNext":     "Siguiente",
                             "sPrevious": "Anterior"
                         },
@@ -2935,7 +3158,7 @@ var completeDataChart;
                 classId: classID,
                 teacherId: teacherID,
                 reportType: 'summarySurveyReport',
-                lang: languagePreference
+                lang: loc
             },
             success : function(data) {
             	$('#collapseFive').find('.loader').hide();
@@ -2972,7 +3195,7 @@ var completeDataChart;
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
                         "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                         "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                         "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                         "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -2983,7 +3206,7 @@ var completeDataChart;
                         "sLoadingRecords": "Cargando...",
                         "oPaginate": {
                             "sFirst":    "Primero",
-                            "sLast":     "Último",
+                            "sLast":     "Ãšltimo",
                             "sNext":     "Siguiente",
                             "sPrevious": "Anterior"
                         },
@@ -3069,7 +3292,7 @@ var completeDataChart;
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sEmptyTable":     "NingÃºn dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -3080,7 +3303,7 @@ var completeDataChart;
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "Último",
+                        "sLast":     "Ãšltimo",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },
