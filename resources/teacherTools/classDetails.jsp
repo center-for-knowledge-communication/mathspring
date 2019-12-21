@@ -1,6 +1,7 @@
 <!-- Frank 	10-15-19	Issue #7 perStudentperProblemReport report -->
 <!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
 <!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
+<!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -36,7 +37,6 @@ catch (Exception e) {
 HttpSession mySession = request.getSession();
 TeacherLogger tLogger = (TeacherLogger) mySession.getAttribute("tLogger");
 int teacherId = (int) mySession.getAttribute("teacherId");
-Connection conn = (Connection) mySession.getAttribute("conn");
 tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
 
 %>

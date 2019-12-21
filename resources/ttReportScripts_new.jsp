@@ -7,6 +7,8 @@
  * Frank 	10-22-19	Issue #14 fix locale string parameter in some reports
  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
  * Frank 	11-26-19	Issue #33 class summary 'today's problems' not working - 'faulty date compare'
+ * Frank 	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
+ *						  The entire file should be replaced during 'pull request & comparison' process.
  */
  
  //Report1 Variables

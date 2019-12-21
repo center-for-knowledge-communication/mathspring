@@ -1,105 +1,46 @@
 package edu.umass.ckc.wo.log;
 
-import edu.umass.ckc.wo.db.DbProblem;
-import edu.umass.ckc.wo.event.NavigationEvent;
-import edu.umass.ckc.wo.smgr.SessionManager;
-import edu.umass.ckc.wo.event.tutorhut.*;
-import edu.umass.ckc.wo.tutor.response.HintResponse;
-import edu.umass.ckc.wo.tutor.response.ProblemResponse;
-import edu.umass.ckc.wo.tutor.response.Response;
-import edu.umass.ckc.wo.tutor.response.InterventionResponse;
-import edu.umass.ckc.wo.tutor.response.AttemptResponse;
-import edu.umass.ckc.wo.tutor.response.ExampleResponse;
-import edu.umass.ckc.wo.tutor.response.HintSequenceResponse;
-import edu.umass.ckc.wo.content.Hint;
+
+import edu.umass.ckc.wo.tutor.Settings;
+
 
 import java.sql.*;
-import java.util.List;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+import org.springframework.jndi.JndiTemplate;
 
 /**
 
  * Frank 	12-09-19	Issue #21 add teacher activity logger support
+ * Frank 	12-21-19	Issue #21r2 add reworked database access setup
 
  */
 public class TeacherLogger {
     //private SessionManager smgr;
+    private static Logger logger = Logger.getLogger(TeacherLogger.class);
+
     Connection conn;
+    DataSource ds;
     public static final String TeacherEventLog = "teacherlog";
 
     public static final String[] TEACHER_EVENTS = { "Login", "Logout" };
 
-    boolean tableExists = true;
-    
-
-
-    public TeacherLogger (Connection conn) {
+    public TeacherLogger (ServletContext ctx) {
         //this.smgr = smgr;
-        this.conn = conn;
-        
-        testTable();
-        
-        if (!tableExists) {
-        	createTable();
+       try {
+            JndiTemplate jndiTemplate = new JndiTemplate();
+            String dataSourceLookup = ctx.getInitParameter("wodb.datasource");
+            Settings.webContentPath = ctx.getInitParameter("webContentPath");
+            ds = (DataSource) jndiTemplate.lookup("java:comp/env/" + dataSourceLookup);
+            this.conn = ds.getConnection();
+        } catch (Exception e) {
+        	logger.error(e.getMessage());
+        	logger.error(e.getStackTrace());
         }
-
     }
-
-    private void testTable() {
- 
-    	
-    	
-     String querytest = "SELECT COLUMN_NAME FROM information_schema.columns where table_name = 'teacherlog';"; 
-     try {
-
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;        
-            ps = this.conn.prepareStatement(querytest);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-            	tableExists = false;
-        	}
-            ps.close();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }        
-    }
-    
-    private void createTable() {
-    	
-        String querycreate = 
-        		
-        		"CREATE TABLE `teacherlog` (" + 
-        		"  `id` int(10) unsigned NOT NULL AUTO_INCREMENT," + 
-        		"  `teacherId` int(11) DEFAULT NULL," + 
-        		"  `sessNum` int(11) DEFAULT NULL," + 
-        		"  `action` varchar(45) NOT NULL," + 
-        		"  `elapsedTime` int(10) unsigned NOT NULL DEFAULT 0," + 
-        		"  `activityName` varchar(200) DEFAULT NULL," + 
-        		"  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," + 
-        		"  PRIMARY KEY (`id`)," + 
-        		"  KEY `FK_eventlog_sess` (`sessNum`)," + 
-        		"  KEY `tchid` (`teacherId`)," + 
-        		"  KEY `timeindex` (`time`)," + 
-        		"  CONSTRAINT `FK_teventlog_sess` FOREIGN KEY (`sessNum`) REFERENCES `session` (`id`)," + 
-        		"  CONSTRAINT `FK_teventlog_tch` FOREIGN KEY (`teacherId`) REFERENCES `teacher` (`ID`)" + 
-        		")" + 
-        		"ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;";
-
-        
-        try {
-            PreparedStatement ps = null;
-            ResultSet rs = null;        
-
-               ps = this.conn.prepareStatement(querycreate);
-               ps.executeUpdate();
-               ps.close();
-           }
-           catch (SQLException e) {
-               e.printStackTrace();
-           }        
-       }
-
     
     public int insertLoginEntry(int teacherId, String action, String activityName) throws SQLException {
 
@@ -133,5 +74,8 @@ public class TeacherLogger {
             e.printStackTrace();
             return -1;
         }
+    }
+    public Connection getConn( ) {
+    	return(this.conn);
     }
 }
