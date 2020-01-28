@@ -21,6 +21,9 @@ import edu.umass.ckc.wo.db.DbProblem;
 
 /**
  * Created by Neeraj on 4/5/2017.
+ * 
+ * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
+ * 
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -49,6 +52,8 @@ public class TTUtil {
     /** SQL Queries For Reports **/
     public static final String PER_STUDENT_QUERY_FIRST ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,count(problemId) AS noOfProblems  from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.mode != 'demo' GROUP BY studId order by studId ; ";
     public static final String PER_STUDENT_QUERY_SECOND ="select sh.id,sh.problemId, pg.description,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL,sh.isSolved,sh.numMistakes,sh.numHints,sh.numAttemptsToSolve,sh.effort,sh.videoSeen,sh.exampleSeen,pr.standardID, round(od.diff_level,2) as diff_level,sh.mastery,sh.topicId,pg.description from studentproblemhistory sh, problem pr, problemgroup pg,overallprobdifficulty od where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.mode != 'demo'and sh.problemId = pr.id and sh.problemId = od.problemId and sh.topicId=pg.id order by sh.problemEndTime desc;";
+    public static final String PER_STUDENT_PER_PROBLEM = "select s.id as studentId, concat(s.fname,' ',s.lname) As studentName, s.username as username, sh.studId, sh.problemId as problemId,sh.effort as effort, p.name as description, p.nickname nickname from student s JOIN studentproblemhistory sh ON sh.studId = s.id JOIN problem as p ON sh.problemId = p.id where s.classId=(:classId) and p.standardID like (:filter)  order by s.id, p.name;";
+
     public static final String PER_TOPIC_QUERY_FIRST = "select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,sh.topicId,pg.description,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh ,problemgroup pg where s.id=sh.studId and s.classId=(:classId) and  sh.topicId = pg.id  and sh.mode != 'demo' group by sh.topicId,studId order by studId";
     public static final String PER_TOPIC_QUERY_SECOND = "select sh.topicId,sh.problemId,CAST(sh.mastery AS DECIMAL(16,2)) AS mastery,sh.effort,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL from studentproblemhistory sh,problem pr where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.topicId=(:topicId) and sh.mode != 'demo' and sh.problemId = pr.id order by sh.topicId,problemEndTime asc";
 
@@ -61,7 +66,7 @@ public class TTUtil {
     public static final String PER_PROBLEM_QUERY_THIRD = "select sh.effort from studentproblemhistory sh where sh.studid in (select id from student where classId=(:classId)) and sh.problemId =(:problemId) and sh.effort != 'null' and sh.effort != '' ";
     public static final String PER_PROBLEM_QUERY_FOURTH = "select h.* from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and h.effort != 'null' and h.effort != '' and student.id = h.studId order by student.id, h.id";
     public static final String PER_PROBLEM_QUERY_FIFTH = "select count(distinct h.studId) as noOfStudents from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and student.id = h.studId;";
-
+    		
     public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster from studentproblemhistory h, standard std, probstdmap map, cluster cc where studid in (select id from student where classId=(:classId)) and std.clusterID = cc.id and h.mode != 'demo' and std.id=map.stdId and map.probId=h.problemId group by std.clusterID";
     public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, probstdmap map where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";
     public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, probstdmap map,problem pr where studid in (select id from student where classId=(:classId)) and std.clusterID=(:clusterID) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and h.problemId = pr.id";

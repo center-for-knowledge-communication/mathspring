@@ -1,4 +1,6 @@
 //Module pattern for better scoping
+// Frank 10-22-19 issue #14 translation
+// Frank 11-25-19 issue #15 hide short answer box and buttons
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -13,7 +15,7 @@ m.build = function(activity, previewMode) {
     var problem = activity.problem;
     theProblem = problem;
     var questType = problem.questType;
-    var mode = problem.mode;
+    var mode = problem.mode; 
     var probContentPath = activity.probContentPath || problem.probContentPath;
     probContentPath = probContentPath.replace(/\/$/g, ""); // removes a trailing slash from the content path
     theProblem.contentPath = probContentPath; // save this so that at play hint time we can get this and build URLs.
@@ -61,6 +63,16 @@ m.build = function(activity, previewMode) {
         document.getElementById("Units").innerHTML = parameterizeText(formatText(window.parent.getUnits(), resource, probContentPath, problemParams, previewMode), problemParams);
     }
 
+	var languagePreference = window.navigator.language;
+	
+	var stepText = "";
+	if (languagePreference == "en") {
+		stepText = "Step";
+	}
+	else {
+		stepText = "Paso";
+	}
+
     var hint_labels = [];
     var hint_thumbs = document.getElementById("HintThumbs");
     if(isNotEmpty(hints)) {
@@ -73,7 +85,7 @@ m.build = function(activity, previewMode) {
             hint_thumb.id = hintId + "Thumb";
             hint_thumb.style.visibility = "hidden";
             var stepNumber = i+1;
-            hint_thumb.innerHTML = "Step"+" "+stepNumber;
+            hint_thumb.innerHTML = stepText + " " + stepNumber;
             hint_thumb.addEventListener("click",
                 //This looks weird but is necessary to save the hintLabel value properly
                 function(hint) {
@@ -131,7 +143,8 @@ m.build = function(activity, previewMode) {
     }
 
     //For demo and example modes all answers should stay hidden
-    // if (mode !== "demo" && mode !== "example") {
+    //alert("mode is " + mode + " questType is " + questType);
+//    if (mode !== "demo" && mode !== "example") {
     	console.log("Show answers")
         if (questType.match(/^multi(Choice|Select)$/)) {
             var multi_answers = document.getElementById("MultipleChoiceAnswers");
@@ -153,8 +166,10 @@ m.build = function(activity, previewMode) {
                     }
                 }
             }
-            if(multiSelect) {
-                document.getElementById("submit_answer").addEventListener("click", submitMultiSelectAnswer);
+            if (mode !== "demo" && mode !== "example") {
+            	if(multiSelect) {
+            		document.getElementById("submit_answer").addEventListener("click", submitMultiSelectAnswer);
+            	}
             }
             ///////  -----------  shuffle ANSWER SHUFFLING -------------
             // This moves the answers around with the flaw that it sends the orginal letters
@@ -164,15 +179,19 @@ m.build = function(activity, previewMode) {
             // it also shows the non-shuffled answer letter below the problem which sucks.
             // if(!previewMode) problemUtils.shuffleAnswers(!multiSelect);
         } else {
-            if(questType === "shortAnswer") {
-                document.getElementById("ShortAnswerBox").style.display = "block";
-                document.getElementById("submit_answer").addEventListener("click", submitShortAnswer);
+            if (mode !== "demo" && mode !== "example") {
+            	if(questType === "shortAnswer") {
+            		document.getElementById("ShortAnswerBox").style.display = "block";
+            		document.getElementById("submit_answer").addEventListener("click", submitShortAnswer);
+            	}
             }
         }
-        if(questType.match(/^(multiSelect|shortAnswer)$/)) {
-            document.getElementById("SubmitAnswerBox").style.display = "block";
-        }
-    //}
+        if (mode !== "demo" && mode !== "example") {
+        	if(questType.match(/^(multiSelect|shortAnswer)$/)) {
+        		document.getElementById("SubmitAnswerBox").style.display = "block";
+        	}
+//        }
+    }
 
     if(previewMode) {
         problemContainer.style.float = "left";

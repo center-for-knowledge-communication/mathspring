@@ -185,10 +185,15 @@ function showHourglassCursor(b) {
 function displayHintCount () {
 	
 	var languagePreference = window.navigator.language;
-
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
 
 	var hintText = "";
-	if (languagePreference === "en-US") {
+	if (languageSet === "en") {
 		hintText = "Hint";
 	}
 	else {
@@ -438,7 +443,7 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 	var languagePreference = window.navigator.language;
 	
 	var amsg = "";
-	if (languagePreference == "en-US") {
+	if (languagePreference == "en") {
 		 amsg = "There is not an example to show for this problem.";
 	}
 	else {
@@ -712,7 +717,6 @@ function checkError (responseText) {
 }
 
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
-    debugAlert("Server returns " + responseText);
     $("#next_prob_spinner").show();
 	$("#nextProb").addClass("disable_a_href");
     checkError(responseText);

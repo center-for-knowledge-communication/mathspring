@@ -240,6 +240,20 @@
 								<include>log4j.properties</include>
 							</includes>
 						</resource>
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>MathSpring.properties</include>
+							</includes>
+						</resource>
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>MathSpring_es.properties</include>
+							</includes>
+						</resource>
 					</webResources>
 					<archive>
 						<index>true</index>
