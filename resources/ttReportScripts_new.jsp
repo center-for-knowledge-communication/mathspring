@@ -6,6 +6,9 @@
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
  * Frank 	10-22-19	Issue #14 fix locale string parameter in some reports
  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
+ * Frank 	11-26-19	Issue #33 class summary 'today's problems' not working - 'faulty date compare'
+ * Frank 	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
+ *						  The entire file should be replaced during 'pull request & comparison' process.
  */
  
  //Report1 Variables
@@ -2130,7 +2133,7 @@ else {
             var secondHeader;
             var thirdHeader;
 
-            var currentDate = new Date();
+          
             outputStudentDataList.sort(function(a,b) {
                 if(a[10] == 'Problem was not completed')
                     return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
@@ -2139,14 +2142,22 @@ else {
                 else
                     return new Date(b[10]).getTime() - new Date(a[10]).getTime();
             });
-
             for ( var i=0; i< 3 ; i++ ) {
                 if(i == 0){
+                	
+                    var currentDate = new Date();
+                    var yr = currentDate.getFullYear();
+                    var mon = currentDate.getMonth() + 1;
+                    var day = currentDate.getDate();
+                    var today = yr + "-" + mon + "-" + day + " " + "00:00:00.0";       			
+        			var midnight = new Date(today);
+        			var cmpDate = midnight.getTime();
+
                     outputStudentDataList.forEach(function(e){
-                        var tempDateHolder  = new Date(e[10]).getTime();
-                        if(currentDate === tempDateHolder){
-                            outputStudentDataTodayList.push(e);
-                        }
+                    var tempDateHolder  = new Date(e[10]).getTime();
+                    if (tempDateHolder > cmpDate){
+                        outputStudentDataTodayList.push(e);                            
+   	                }
                     });
                   if(jQuery.isEmptyObject(outputStudentDataTodayList)) {
                       secondHeader = '<div id=' + "panel1" + rowID + ' class="panel-body animated zoomOut"> <%= rb.getString("no_problems_done_today")%></div>'

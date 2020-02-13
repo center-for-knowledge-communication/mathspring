@@ -1,12 +1,19 @@
 <!-- Frank 	10-15-19	Issue #7 perStudentperProblemReport report -->
 <!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
 <!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
+<!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="springForm" uri="http://www.springframework.org/tags/form" %>
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
+
+<%@ page import="javax.servlet.http.HttpSession"%>
+<%@ page import="java.sql.Connection"%>
+<%@ page import="edu.umass.ckc.wo.log.TeacherLogger"%>
+
 <% 
 
 Locale loc = request.getLocale();
@@ -26,6 +33,12 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
+
+HttpSession mySession = request.getSession();
+TeacherLogger tLogger = (TeacherLogger) mySession.getAttribute("tLogger");
+int teacherId = (int) mySession.getAttribute("teacherId");
+tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
+
 %>
 
 <!DOCTYPE HTML>
@@ -732,13 +745,12 @@ catch (Exception e) {
                                 <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
                                     <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                 </a>
-                            </div>         
+                            </div>                          
                             <div class="panel-body">                           
 								  <label><%= rb.getString("standards_e_g") %></label>
 								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn type="submit" value="<%= rb.getString("submit") %>">
 							</div>
-
-                            <div class="panel-body">
+                             <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
                                     <thead>

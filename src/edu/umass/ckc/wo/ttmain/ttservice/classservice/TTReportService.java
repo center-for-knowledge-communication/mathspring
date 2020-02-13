@@ -16,9 +16,9 @@ import java.util.Set;
  * Created by nsmenon on 5/19/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
-
  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
-
+ * Frank	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
+ *						  The entire file should be replaced during 'pull request & comparison' process.
  * 
  */
 
@@ -36,7 +36,6 @@ public interface TTReportService {
     public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId);
 
     public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException;
-
 
     public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException;
 
