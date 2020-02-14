@@ -80,7 +80,7 @@ public class TeacherToolsMainLoginController {
         System.out.println("logging out");
     	try {
             int teacherId = (int) logoutSession.getAttribute("teacherId");
-    		TeacherLogger tlog = (TeacherLogger) logoutSession.getAttribute("tlogger");
+    		TeacherLogger tlog = (TeacherLogger) logoutSession.getAttribute("tLogger");
     		tlog.insertLoginEntry(teacherId, "logout", "");
     	}
     	catch (SQLException e ) {
