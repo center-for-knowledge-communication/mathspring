@@ -8,7 +8,9 @@
 /** Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object 
  *  Frank   01-20-20    Issue #39 use classId as alternative password
  *  Framk   01-29-20	Issue #47 removed random color rotator for class selection display. Use green for active, red for inactive
- *  Frank   02-16-20  Issue #48 Student Name an d password creation
+
+ *  Frank   02-16-20    Issue #48 Student Name an d password creation
+ *  Frank   02-17-20    ttfixesR3
  */
 
 Locale loc = request.getLocale();
@@ -920,7 +922,7 @@ function registerAllEvents(){
                                             <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
                                             <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
                                             <springForm:option value="above1"><%= rb.getString("one_grades_above") %></springForm:option>
-                                            <springForm:option value="above0"><%= rb.getString("one_grades_above") %></springForm:option>
+                                            <springForm:option value="above0"><%= rb.getString("no_grades_above") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>

@@ -9,8 +9,8 @@
  * Frank 	11-26-19	Issue #33 class summary 'today's problems' not working - 'faulty date compare'
  * Frank 	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
  *						  The entire file should be replaced during 'pull request & comparison' process.
- * Frank	01-16-2019	Restore corrupted Spanish Special Characters
-
+ * Frank	01-16-20  	Restore corrupted Spanish Special Characters
+ * Frank    02-17-20    ttfixesR3
  */
  
  //Report1 Variables
@@ -80,7 +80,6 @@ var effortLabelMap;
 if (languageSet == 'es') {
 
 	effortLabelMap = {
-
 			"SKIP" : "El estudiante salt� el problema (no hizo nada al respecto)",
             "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondi� demasiado r�pido, en menos de 4 segundos",
             "GIVEUP" : "El estudiante comenz� a trabajar en el problema, pero luego AUMENT� y sigui� adelante sin resolverlo correctamente.",
@@ -122,7 +121,6 @@ function loadEffortMap (rows,flag) {
                 labels: ["Tipo de comportamiento en problema"],
                 datasets: [{
                     backgroundColor: "#8dd3c7",
-
                     label: 'OMITIR: El estudiante salt� el problema (no hizo nada al respecto)',
                     data: [effortValues[0]]
                 }, {
@@ -643,7 +641,6 @@ if (languageSet == 'es') {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-
                     "sEmptyTable":     "Ning�n dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
@@ -1200,7 +1197,6 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-
             "sEmptyTable":     "Ning�n dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
