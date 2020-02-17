@@ -1,4 +1,3 @@
-
 package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
 import edu.umass.ckc.wo.beans.StudentDetails;
@@ -10,14 +9,17 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.studmod.StudentProblemHistory;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
@@ -45,8 +46,10 @@ import java.util.stream.Collectors;
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
  * Frank 	10-22-19	Issue #14 remove debugging
-  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
-* 
+ * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
+ * Frank	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
+ *						  The entire file should be replaced during 'pull request & comparison' process.
+ * Frank 	01-14-20	Issue #45 & #21 add log report 
  */
 
 @Service
@@ -206,6 +209,17 @@ public class TTReportServiceImpl implements TTReportService {
                 	Map<String, Map<Integer, StudentDetails>> result1 = generateSurveyReport(classId);
                     ObjectMapper perClusterReportMapper1 = new ObjectMapper();
                     return perClusterReportMapper1.writeValueAsString(result1);
+                	
+                case "perTeacherReport":
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+                    List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
+                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(),TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
+                    ObjectMapper teacherMapper = new ObjectMapper();
+                    Map<String, Object> teacherMap = new HashMap<>();
+                    teacherMap.put("levelOneData", teacherData);
+                    System.out.println("result=" + teacherMapper.writeValueAsString(teacherMap));
+                    return teacherMapper.writeValueAsString(teacherMap);
+         
             }
         } catch (IOException e) {
            logger.error(e.getMessage());
@@ -215,6 +229,7 @@ public class TTReportServiceImpl implements TTReportService {
         	logger.error(e.getMessage());
         	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
         }
+    	System.out.println("Unknown report type: " + reportType);
         return null;
     }
 
@@ -677,8 +692,9 @@ public class TTReportServiceImpl implements TTReportService {
                 	effort = effort.trim();
                 }
                 String description = ((String) mappedrow.getString("description")).trim();
+                description = description.replace(".", "_");
               
-            	logger.debug("[" + studentId + String.valueOf(problemId) + description + effort + "]");
+            	logger.debug("[" + studentId + " " + String.valueOf(problemId) + " " + description + " " + effort + "]");
 
                 
                 List<String> studentValuesList = null;
@@ -1300,4 +1316,17 @@ public class TTReportServiceImpl implements TTReportService {
         else
             return false;
     }
+    
+
+    @Override
+    public List<TeacherLogEntry> generateTeacherLogReport(String targetId) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter. 
+        SqlParameterSource namedParameters = new MapSqlParameterSource("targetId", targetId);
+        List<TeacherLogEntry> teacherLogEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LOG_QUERY_FIRST, namedParameters, new TeacherLogEntryMapper());
+        return teacherLogEntries;
+    }
+
+
+
+    
 }

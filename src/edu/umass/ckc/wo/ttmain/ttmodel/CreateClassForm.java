@@ -2,6 +2,8 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
 
 /**
  * Created by Neeraj on 3/26/2017.
+ * 
+ * Frank	02-16-2020	Issue #48 add hypen and useClass for pwd
  */
 
 public class CreateClassForm {
@@ -150,6 +152,9 @@ public class CreateClassForm {
 
     public void setUserPrefix(String userPrefix) {
         this.userPrefix = userPrefix;
+    	if (!this.userPrefix.endsWith("-")) {
+    		this.userPrefix += "-";
+    	}
     }
 
     public String getPasswordToken() {
@@ -157,7 +162,12 @@ public class CreateClassForm {
     }
 
     public void setPasswordToken(String passwordToken) {
-        this.passwordToken = passwordToken;
+    	if (passwordToken.length() == 0) {
+    		this.passwordToken = "useClass";	
+    	}
+    	else {
+    		this.passwordToken = passwordToken;
+    	}
     }
 
     public int getNoOfStudentAccountsForClass() {
