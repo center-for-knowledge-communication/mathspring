@@ -23,7 +23,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Created by Neeraj on 4/5/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
- * 
+ * Frank 	01-14-20	Issue #45 & #21 add sql query for log report 
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -94,7 +94,10 @@ public class TTUtil {
     		"ppp.answer, ppp.problemSet, ppp.aChoice, ppp.bChoice, ppp.cChoice, ppp.dChoice, ppp.eChoice " + 
     		"from student s, preposttestdata pptd, preposttest ppt, prepostproblemtestmap ppptm, prepostproblem ppp " + 
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
+  
     
+    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+
     /* A private Constructor prevents any other
     * class from instantiating.
     */

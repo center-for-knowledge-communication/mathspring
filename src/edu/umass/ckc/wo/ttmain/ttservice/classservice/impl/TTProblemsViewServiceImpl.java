@@ -31,6 +31,8 @@ import edu.umass.ckc.wo.tutor.Settings;
 
 /**
  * Created by nsmenon on 4/14/2017.
+ * 
+ * Frank	02-16-20	Issue #48
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -181,7 +183,8 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 
         try {
             ClassInfo info = DbClass.getClass(connection.getConnection(),Integer.valueOf(formValues[4]));
-            DbClass.createStudentRoster(connection.getConnection(),info,formValues[0].trim(),formValues[1].trim(),Integer.valueOf(formValues[2]));
+            String prefix = formValues[0].trim() + "-" + formValues[4];
+            DbClass.createStudentRoster(connection.getConnection(),info,prefix,formValues[4].trim(),Integer.valueOf(formValues[2]));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

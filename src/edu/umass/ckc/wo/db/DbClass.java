@@ -24,6 +24,8 @@ import java.util.List;
  * Written by: David Marshall
  * Date: Jan 22, 2008
  * Time: 11:03:58 AM
+ * 
+ * Frank	02-16-20	Issue #48 Fixed assignment of additional ids - wasn't working properly
  */
 public class DbClass {
 
@@ -1095,11 +1097,24 @@ public class DbClass {
     public static void createStudentRoster(Connection conn, ClassInfo classInfo, String prefix, String password, int noOfStudentAccount) throws Exception {
         List<String> pedIds = DbClassPedagogies.getClassPedagogyIds(conn, classInfo.getClassid());
         for (int studIndex=1;studIndex <= noOfStudentAccount; studIndex++ ) {
-            StringBuffer username = new StringBuffer(prefix);
-            username.append(studIndex);
-               if (DbUser.getStudent(conn, username.toString(), password) != -1)
+            for (int i = 1; i<100; i++) {
+            	StringBuffer username = new StringBuffer(prefix);
+            	if (studIndex < 10) {
+            		username.append("0");            	
+            	}
+            	username.append(i);
+                if (i >= 99) {
                     throw new UserException("Cannot create users.  User: " + username.toString() + " already exists.");
-            UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                }
+            	if (DbUser.getStudent(conn, username.toString()) != -1) {
+            		continue;
+            	}
+            	else {
+                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                    break;
+            	}
+            }
+           
         }
     }
 
