@@ -35,6 +35,7 @@ import java.util.Map;
 
 /**
  * Created by Neeraj on 3/26/2017.
+ * Frank	02-16-2020	Issue #48 
  */
 
 @Service
@@ -123,7 +124,11 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     @Override
     public void createStudentRoster(Integer classId, ClassInfo info, CreateClassForm createForm) throws TTCustomException {
         try {
-            DbClass.createStudentRoster(connection.getConnection(),info,createForm.getUserPrefix(),createForm.getPasswordToken(),createForm.getNoOfStudentAccountsForClass());
+        	String password = createForm.getPasswordToken();
+        	password = classId.toString();
+
+        	String userPrefix = createForm.getUserPrefix() + classId.toString();
+            DbClass.createStudentRoster(connection.getConnection(),info,userPrefix,password,createForm.getNoOfStudentAccountsForClass());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

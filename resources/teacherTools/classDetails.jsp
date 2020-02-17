@@ -2,6 +2,7 @@
 <!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
 <!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
 <!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
+<!-- Frank  01-20-20    Issue #39 and #48 use classId as alternative password -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -333,7 +334,9 @@ tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            <strong>${classInfo.name}</strong>
+
+            <strong>${classInfo.name}</strong>&nbsp;[<%= rb.getString("class_code") %>:${classInfo.classid}]
+          
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -748,9 +751,10 @@ tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
                             </div>                          
                             <div class="panel-body">                           
 								  <label><%= rb.getString("standards_e_g") %></label>
-								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn type="submit" value="<%= rb.getString("submit") %>">
-							</div>
-                             <div class="panel-body">
+								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn class="btn btn-lg btn-success" type="submit" value="<%= rb.getString("show_report") %>">
+                            </div>
+							
+                            <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
                                     <thead>
@@ -957,10 +961,10 @@ tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
                                                           placeholder="" class="form-control" type="text"/>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group hidden">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken"
+                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
                                                           placeholder="" class="form-control" type="password"/>
                                     </div>
                                 </div>
