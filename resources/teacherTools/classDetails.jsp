@@ -3,6 +3,7 @@
 <!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
 <!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
 <!-- Frank  01-20-20    Issue #39 and #48 use classId as alternative password -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -333,7 +334,9 @@ tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
+
             <strong>${classInfo.name}</strong>&nbsp;[<%= rb.getString("class_code") %>:${classInfo.classid}]
+          
         </h1>
 
         <div id="content-conatiner" class="container-fluid">

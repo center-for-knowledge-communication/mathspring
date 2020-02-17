@@ -1325,8 +1325,5 @@ public class TTReportServiceImpl implements TTReportService {
         List<TeacherLogEntry> teacherLogEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LOG_QUERY_FIRST, namedParameters, new TeacherLogEntryMapper());
         return teacherLogEntries;
     }
-
-
-
     
 }
