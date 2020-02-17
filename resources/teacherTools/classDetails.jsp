@@ -1,12 +1,20 @@
 <!-- Frank 	10-15-19	Issue #7 perStudentperProblemReport report -->
 <!-- Frank 	10-15-19	Issue #8 X buttons to close accordian -->
 <!-- Frank 	11-25-19	Issue #13 add standards filter for per student per problem report -->
+<!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
+<!-- Frank  01-20-20    Issue #39 and #48 use classId as alternative password -->
+<!-- Frank  02-17-20    ttfixesR3 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="springForm" uri="http://www.springframework.org/tags/form" %>
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
+
+<%@ page import="javax.servlet.http.HttpSession"%>
+<%@ page import="java.sql.Connection"%>
+<%@ page import="edu.umass.ckc.wo.log.TeacherLogger"%>
+
 <% 
 
 Locale loc = request.getLocale();
@@ -26,6 +34,12 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
+
+HttpSession mySession = request.getSession();
+TeacherLogger tLogger = (TeacherLogger) mySession.getAttribute("tLogger");
+int teacherId = (int) mySession.getAttribute("teacherId");
+tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
+
 %>
 
 <!DOCTYPE HTML>
@@ -320,7 +334,7 @@ catch (Exception e) {
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            <strong>${classInfo.name}</strong>
+            <strong>${classInfo.name}</strong>&nbsp;[<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -732,12 +746,12 @@ catch (Exception e) {
                                 <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
                                     <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                 </a>
-                            </div>         
+                            </div>                          
                             <div class="panel-body">                           
 								  <label><%= rb.getString("standards_e_g") %></label>
-								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn type="submit" value="<%= rb.getString("submit") %>">
-							</div>
-
+								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn class="btn btn-lg btn-success" type="submit" value="<%= rb.getString("show_report") %>">
+                            </div>
+							
                             <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
@@ -945,10 +959,10 @@ catch (Exception e) {
                                                           placeholder="" class="form-control" type="text"/>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group hidden">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken"
+                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
                                                           placeholder="" class="form-control" type="password"/>
                                     </div>
                                 </div>
@@ -1135,7 +1149,7 @@ catch (Exception e) {
                 <%= rb.getString("some_text_in_modal") %>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><%= rb.getString("close") %>Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><%= rb.getString("close") %></button>
             </div>
         </div>
 

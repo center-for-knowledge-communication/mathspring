@@ -4,7 +4,10 @@
 <%@ page import="java.util.ResourceBundle"%>
 
 <% 
-
+/**
+ * Frank 01-20-2020 Issue #39 use classId as alternative password
+ * Frank 02-17-2020 ttfixes issue #45
+*/
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -91,7 +94,7 @@ else {
                                             name="password"
                                             value="${password}"
                                             class="form-control nav-login"
-                                            placeholder="<%= rb.getString("password") %>"
+                                            placeholder="<%= rb.getString("password_placeholder") %>"
                                     />
                                 </div>
 
