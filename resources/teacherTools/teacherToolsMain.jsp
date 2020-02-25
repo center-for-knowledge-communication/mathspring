@@ -8,7 +8,6 @@
 /** Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object 
  *  Frank   01-20-20    Issue #39 use classId as alternative password
  *  Framk   01-29-20	Issue #47 removed random color rotator for class selection display. Use green for active, red for inactive
-
  *  Frank   02-16-20    Issue #48 Student Name an d password creation
  *  Frank   02-17-20    ttfixesR3
  */
@@ -306,8 +305,37 @@ catch (Exception e) {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#form-wrapper").hide();
+/*                
+                $.ajax({
+                    type : "POST",
+                    url : pgContext+"/tt/tt/getTeacherList",
+                    data : {
+                        classId: '0',
+                        teacherId: teacherID,
+                        reportType: 'teacherList',
+                        lang: loc,
+                        filter: ''
+                    },
+                    success : function(data) {
+                    	if (data) {
+                        	var jsonData = $.parseJSON(data);
+        	                eachTeacherData = jsonData.levelOneData;
+            	            perTeacherReport.clear().draw();
+                	        perTeacherReport.rows.add(jsonData.levelOneData).draw();
+                    	    perTeacherReport.columns.adjust().draw();            	    
+                    	}
+                    	else {
+                    		alert("response data is null");
+                    	}
+                    },
+                    error : function(e) {
+                    	alert("error");
+                        console.log(e);
+                    }
+                });
+*/
                 
-                document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba</li><li class='dropdown-content' onClick=selectTeacher(this);>FrankS</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3</li>";
+                document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
 
                 $("#teacher-activities-wrapper").show();
             	
@@ -337,7 +365,11 @@ catch (Exception e) {
         	}
 
 		function selectTeacher(t) {
+			
 			document.getElementById("myInput").value = t.innerHTML;
+			var temp = t.innerHTML;
+			var temp2 = temp.split(":");
+			targetTeacherID = temp2[1];
 			filterFunction();
             $("#panel-wrapper").show();
         	document.getElementById("myDropdown").classList.toggle("show");
@@ -528,8 +560,8 @@ function registerAllEvents(){
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
             data : {
-                classId: '840',
-                teacherId: teacherID,
+                classId: targetTeacherID,
+                teacherId: ${teacherId},
                 reportType: 'perTeacherReport',
                 lang: loc,
                 filter: ''
