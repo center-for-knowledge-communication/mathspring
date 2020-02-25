@@ -80,14 +80,14 @@ var effortLabelMap;
 if (languageSet == 'es') {
 
 	effortLabelMap = {
-			"SKIP" : "El estudiante saltï¿½ el problema (no hizo nada al respecto)",
-            "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondiï¿½ demasiado rï¿½pido, en menos de 4 segundos",
-            "GIVEUP" : "El estudiante comenzï¿½ a trabajar en el problema, pero luego AUMENTï¿½ y siguiï¿½ adelante sin resolverlo correctamente.",
-            "SOF" :  "El estudiante resolviï¿½ el problema correctamente en el PRIMER intento, sin ninguna ayuda.",
-            "ATT" : "El estudiante INTENTï¿½ una vez incorrectamente, pero se corrigiï¿½ (contestï¿½ correctamente) en el segundo intento, no se solicitï¿½ ayuda.",
-            "GUESS" : "El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiï¿½ pistas / videos, etc.",
-            "SHINT" : "El estudiante resolviï¿½ el problema correctamente despuï¿½s de ver PISTAS.",
-            "SHELP" : "Consiguiï¿½ el problema correcto, pero vio al menos un video.",
+			"SKIP" : "El estudiante saltó el problema (no hizo nada al respecto)",
+            "NOTR" : "Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos",
+            "GIVEUP" : "El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.",
+            "SOF" :  "El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.",
+            "ATT" : "El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.",
+            "GUESS" : "El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.",
+            "SHINT" : "El estudiante resolvió el problema correctamente después de ver PISTAS.",
+            "SHELP" : "Consiguió el problema correcto, pero vio al menos un video.",
             "NO DATA" : "No se pudieron recopilar datos."
     }
 }
@@ -121,35 +121,35 @@ function loadEffortMap (rows,flag) {
                 labels: ["Tipo de comportamiento en problema"],
                 datasets: [{
                     backgroundColor: "#8dd3c7",
-                    label: 'OMITIR: El estudiante saltï¿½ el problema (no hizo nada al respecto)',
+                    label: 'OMITIR: El estudiante saltó el problema (no hizo nada al respecto)',
                     data: [effortValues[0]]
                 }, {
                     backgroundColor: "#ffffb3",
-                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondiï¿½ demasiado rï¿½pido, en menos de 4 segundos',
+                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
                     data: [effortValues[1]]
                 }, {
                     backgroundColor: "#bebada",
-                    label: 'ABANDONO: El estudiante comenzï¿½ a trabajar en el problema, pero luego AUMENTï¿½ y siguiï¿½ adelante sin resolverlo correctamente.',
+                    label: 'ABANDONO: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                     data: [effortValues[2]]
                 }, {
                     backgroundColor: "#fb8072",
-                    label: 'CORRECTO: El estudiante resolviï¿½ el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
+                    label: 'CORRECTO: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                     data: [effortValues[3]]
                 }, {
                     backgroundColor: "#b3de69",
-                    label: 'AUTOCORRIGIO: El estudiante INTENTï¿½ una vez incorrectamente, pero se corrigiï¿½ (contestï¿½ correctamente) en el segundo intento, no se solicitï¿½ ayuda.',
+                    label: 'AUTOCORRIGIO: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                     data: [effortValues[4]]
                 }, {
                     backgroundColor: "#fccde5",
-                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiï¿½ pistas / videos, etc.',
+                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                     data: [effortValues[5]]
                 }, {
                     backgroundColor: "#80b1d3",
-                    label: 'CONAYUDA: El estudiante resolviï¿½ el problema correctamente despuï¿½s de ver PISTAS.',
+                    label: 'CONAYUDA: El estudiante resolvió el problema correctamente después de ver PISTAS.',
                     data: [effortValues[6]]
                 }, {
                     backgroundColor: "#fdb462",
-                    label: 'SCONAYUDA: Consiguiï¿½ el problema correcto, pero vio al menos un video.',
+                    label: 'SCONAYUDA: Consiguió el problema correcto, pero vio al menos un video.',
                     data: [effortValues[7]]
                 }, {
                     label: 'NOHAYDATOS: No se pudieron recopilar datos.',
@@ -267,35 +267,35 @@ function loadEffortMap (rows,flag) {
             labels: ["Tipo de comportamiento en problema"],
             datasets: [{
                 backgroundColor: "#8dd3c7",
-                label: 'SKIP: El estudiante saltï¿½ el problema (no hizo nada al respecto)',
+                label: 'SKIP: El estudiante saltó el problema (no hizo nada al respecto)',
                 data: [effortValues[0]]
             }, {
                 backgroundColor: "#ffffb3",
-                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondiï¿½ demasiado rï¿½pido, en menos de 4 segundos',
+                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
                 data: [effortValues[1]]
             }, {
                 backgroundColor: "#bebada",
-                label: 'GIVEUP: El estudiante comenzï¿½ a trabajar en el problema, pero luego AUMENTï¿½ y siguiï¿½ adelante sin resolverlo correctamente.',
+                label: 'GIVEUP: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                 data: [effortValues[2]]
             }, {
                 backgroundColor: "#fb8072",
-                label: 'SOF: El estudiante resolviï¿½ el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
+                label: 'SOF: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                 data: [effortValues[3]]
             }, {
                 backgroundColor: "#b3de69",
-                label: 'ATT: El estudiante INTENTï¿½ una vez incorrectamente, pero se corrigiï¿½ (contestï¿½ correctamente) en el segundo intento, no se solicitï¿½ ayuda.',
+                label: 'ATT: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                 data: [effortValues[4]]
             }, {
                 backgroundColor: "#fccde5",
-                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidiï¿½ pistas / videos, etc.',
+                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                 data: [effortValues[5]]
             }, {
                 backgroundColor: "#80b1d3",
-                label: 'SHINT: El estudiante resolviï¿½ el problema correctamente despuï¿½s de ver PISTAS.',
+                label: 'SHINT: El estudiante resolvió el problema correctamente después de ver PISTAS.',
                 data: [effortValues[6]]
             }, {
                 backgroundColor: "#fdb462",
-                label: 'SHELP: Consiguiï¿½ el problema correcto, pero vio al menos un video.',
+                label: 'SHELP: Consiguió el problema correcto, pero vio al menos un video.',
                 data: [effortValues[7]]
             }, {
                 label: 'NO DATA: NO DATA: No se pudieron recopilar datos.',
@@ -641,7 +641,7 @@ if (languageSet == 'es') {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -652,7 +652,7 @@ if (languageSet == 'es') {
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "ï¿½ltimo",
+                        "sLast":     "Último",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },
@@ -949,7 +949,7 @@ function changeReportThreeHeaderAccordingToLanguage(){
 		languageSet = "es"
 	}
 	if (languageSet == 'es') {
-		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','effchart': 'Grï¿½fico de esfuerzo','emochart': 'Grï¿½fico de emociones'};
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','effchart': 'Gráfico de esfuerzo','emochart': 'Gráfico de emociones'};
 		return header;
 	}else{
 	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','effchart': 'Effort Chart','emochart': 'Emotion Chart'};
@@ -1032,7 +1032,7 @@ if (languageSet == 'es') {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1043,7 +1043,7 @@ if (languageSet == 'es') {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "ï¿½ltimo",
+                "sLast":     "Último",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1130,7 +1130,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1141,7 +1141,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "ï¿½ltimo",
+                "sLast":     "Último",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1197,7 +1197,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1208,7 +1208,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "ï¿½ltimo",
+                "sLast":     "Último",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1267,7 +1267,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1278,7 +1278,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "ï¿½ltimo",
+                "sLast":     "Último",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1362,7 +1362,7 @@ else {
                             var emo = "undefined";
                                           
                             if (key == "Frustration") {
-                            	emo = "Frustraciï¿½n";
+                            	emo = "Frustración";
                             }
                             if (key == "Confidence") {
                             	emo = "Confianza";
@@ -1515,7 +1515,7 @@ else {
             "sProcessing":     "Procesando...",
             "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1526,7 +1526,7 @@ else {
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
-                "sLast":     "ï¿½ltimo",
+                "sLast":     "Último",
                 "sNext":     "Siguiente",
                 "sPrevious": "Anterior"
             },
@@ -1793,7 +1793,7 @@ else {
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -1804,7 +1804,7 @@ else {
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "ï¿½ltimo",
+                        "sLast":     "Último",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },
@@ -2528,7 +2528,7 @@ var completeDataChart;
                             "sProcessing":     "Procesando...",
                             "sLengthMenu":     "Mostrar _MENU_ registros",
                             "sZeroRecords":    "No se encontraron resultados",
-                            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
                             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -2539,7 +2539,7 @@ var completeDataChart;
                             "sLoadingRecords": "Cargando...",
                             "oPaginate": {
                                 "sFirst":    "Primero",
-                                "sLast":     "ï¿½ltimo",
+                                "sLast":     "Último",
                                 "sNext":     "Siguiente",
                                 "sPrevious": "Anterior"
                             },
@@ -2774,7 +2774,7 @@ var completeDataChart;
                             "sProcessing":     "Procesando...",
                             "sLengthMenu":     "Mostrar _MENU_ registros",
                             "sZeroRecords":    "No se encontraron resultados",
-                            "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
                             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -2785,7 +2785,7 @@ var completeDataChart;
                             "sLoadingRecords": "Cargando...",
                             "oPaginate": {
                                 "sFirst":    "Primero",
-                                "sLast":     "ï¿½ltimo",
+                                "sLast":     "Último",
                                 "sNext":     "Siguiente",
                                 "sPrevious": "Anterior"
                             },
@@ -3107,7 +3107,7 @@ var completeDataChart;
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
                         "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
                         "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                         "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                         "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -3118,7 +3118,7 @@ var completeDataChart;
                         "sLoadingRecords": "Cargando...",
                         "oPaginate": {
                             "sFirst":    "Primero",
-                            "sLast":     "ï¿½ltimo",
+                            "sLast":     "Último",
                             "sNext":     "Siguiente",
                             "sPrevious": "Anterior"
                         },
@@ -3216,7 +3216,7 @@ var completeDataChart;
                         "sProcessing":     "Procesando...",
                         "sLengthMenu":     "Mostrar _MENU_ registros",
                         "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
                         "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                         "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                         "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -3227,7 +3227,7 @@ var completeDataChart;
                         "sLoadingRecords": "Cargando...",
                         "oPaginate": {
                             "sFirst":    "Primero",
-                            "sLast":     "ï¿½ltimo",
+                            "sLast":     "Último",
                             "sNext":     "Siguiente",
                             "sPrevious": "Anterior"
                         },
@@ -3313,7 +3313,7 @@ var completeDataChart;
                     "sProcessing":     "Procesando...",
                     "sLengthMenu":     "Mostrar _MENU_ registros",
                     "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningï¿½n dato disponible en esta tabla",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
                     "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                     "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                     "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -3324,7 +3324,7 @@ var completeDataChart;
                     "sLoadingRecords": "Cargando...",
                     "oPaginate": {
                         "sFirst":    "Primero",
-                        "sLast":     "ï¿½ltimo",
+                        "sLast":     "Último",
                         "sNext":     "Siguiente",
                         "sPrevious": "Anterior"
                     },

@@ -25,6 +25,8 @@ import java.util.ArrayList;
  * Written by: David Marshall
  * Date: Feb 11, 2008
  * Time: 4:38:15 PM
+ * 
+ * Frank 01-20-2020 Issue #39 use classId as alternative password - test for class id
  */
 public class DbUser {
 
@@ -301,17 +303,37 @@ public class DbUser {
 
 
     public static int getStudent(Connection conn, String userName, String password) throws Exception {
-        String q = "select id, password from Student where userName=?";
+        String q = "select id, password, classId from Student where userName=?";
         PreparedStatement ps = conn.prepareStatement(q);
         ps.setString(1, userName);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             String token = rs.getString("password");
+            //boolean pwMatch = true;
             boolean pwMatch = PasswordAuthentication.getInstance().authenticate(password.toCharArray(), token);
-            if (pwMatch)
+            if (pwMatch) {
                 return rs.getInt(1);
-            else return -1;
-        } else return -1;
+            }
+            else {
+                int classId = rs.getInt("classId");
+                try {
+                	int testClassId = Integer.parseInt(password);               	
+                	if (testClassId == classId) {
+                		System.out.println("Student logging in with class ID");
+                		return rs.getInt(1);            		
+                	}
+                	else {
+                		return -1;
+                	}
+                }
+                catch (java.lang.NumberFormatException e) {
+                	return -1;
+                }
+            }
+        } 
+        else {
+        	return -1;
+        }
     }
 
 

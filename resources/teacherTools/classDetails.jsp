@@ -13,7 +13,7 @@
 
 <%@ page import="javax.servlet.http.HttpSession"%>
 <%@ page import="java.sql.Connection"%>
-<%@ page import="edu.umass.ckc.wo.log.TeacherLogger"%>
+<%@ page import="edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger"%>
 
 <% 
 
@@ -34,11 +34,6 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
-
-HttpSession mySession = request.getSession();
-TeacherLogger tLogger = (TeacherLogger) mySession.getAttribute("tLogger");
-int teacherId = (int) mySession.getAttribute("teacherId");
-tLogger.logEntryWorker(teacherId, 0, "Report", "Class Details");
 
 %>
 
