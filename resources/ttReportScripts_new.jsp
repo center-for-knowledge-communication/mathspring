@@ -532,12 +532,7 @@ function resetPassWordForThisStudent(id,uname){
 }
 
 function cnfirmStudentPasswordForTagDownload() {
-    var dataForm = $("#validatestudentPasswordForDownload").serializeArray();
-    var values = [];
-    $.each(dataForm, function (i, field) {
-        values[i] = field.value;
-    });
-    window.location.href = pgContext + "/tt/tt/printStudentTags" + "?classId=" + classID + "&formdata=" + values[0];
+    window.location.href = pgContext + "/tt/tt/printStudentTags" + "?classId=" + classID + "&formdata=" + classID;
     cnfirmPasswordToDownLoadTag
 }
 
