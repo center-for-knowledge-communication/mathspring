@@ -108,10 +108,6 @@ catch (Exception e) {
             registerAllEvents();
             handleclickHandlers();
 
-            $('#cnfirmPasswordToDownLoadTag').on('hidden.bs.modal', function(){
-                $(this).find('form')[0].reset();
-            });
-
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
                 "bFilter": false,
@@ -939,7 +935,7 @@ catch (Exception e) {
                         </div>
                         <div class="panel-body">
                             <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
-                            <a  data-toggle="modal" data-target="#cnfirmPasswordToDownLoadTag" title="<%= rb.getString("download_student_tags") %>" class="btn btn-primary btn-lg pull-right"><%= rb.getString("download_student_tags") %></a>
+                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
                         </div>
 
                         <div class="panel-body" id="addMoreStudents" style="display: none;">
@@ -948,8 +944,8 @@ catch (Exception e) {
                                              modelAttribute="createClassForm" onsubmit="event.preventDefault();">
 
                                 <div class="form-group">
+                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
                                         <springForm:input path="userPrefix" id="userPrefix" name="userPrefix"
                                                           placeholder="" class="form-control" type="text"/>
                                     </div>
@@ -962,8 +958,8 @@ catch (Exception e) {
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-location-arrow"></i></span>
                                         <springForm:input path="noOfStudentAccountsForClass" id="noOfStudentAccountsForClass" name="noOfStudentAccountsForClass"
                                                           placeholder="" class="form-control" type="text"/>
                                     </div>
@@ -1188,41 +1184,6 @@ catch (Exception e) {
         </div>
     </div>
 </div>
-
-
-<!-- Modal For Mastery Trajecotory Report-->
-<div id="cnfirmPasswordToDownLoadTag" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><%= rb.getString("confirm_password_to_download_tags") %></h4>
-            </div>
-            <div class="modal-body" role="alert">
-                <div class="panel-body">
-                    <span class="input-group label label-warning">P.S</span>
-                    <label><%= rb.getString("provide_password_for_download") %></label>
-                </div>
-                <div class="panel-body">
-                    <form id="validatestudentPasswordForDownload" onsubmit="event.preventDefault();">
-                        <div class="form-group">
-                            <div class="input-group"><label for="newPassword"><%= rb.getString("password_created_for_this_class") %></label>
-                            </div>
-                            <div class="input-group"><input type="password" placeholder="Password provided on setup" id="newPassword" class="form-control" name="newPassword"/>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <button role="button" onclick="cnfirmStudentPasswordForTagDownload()" type="button" data-dismiss="modal" class="btn btn-primary"><%= rb.getString("submit") %>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
 
 <!-- Modal For Mastery Trajecotory Report-->
 <div id="masteryTrajectoryReport" class="modal fade" role="dialog" style="display: none;">
