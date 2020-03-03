@@ -10,11 +10,13 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConsta
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherListEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
@@ -49,7 +51,8 @@ import java.util.stream.Collectors;
  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
  * Frank	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
  *						  The entire file should be replaced during 'pull request & comparison' process.
- * Frank 	01-14-20	Issue #45 & #21 add log report 
+ * Frank 	01-14-20	Issue #45 & #21 add log report
+ * Frank    03-02-2020  Added teacherList case: 
  */
 
 @Service
@@ -213,12 +216,21 @@ public class TTReportServiceImpl implements TTReportService {
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                     List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
-                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(),TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
+                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(),TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
                     ObjectMapper teacherMapper = new ObjectMapper();
                     Map<String, Object> teacherMap = new HashMap<>();
                     teacherMap.put("levelOneData", teacherData);
                     System.out.println("result=" + teacherMapper.writeValueAsString(teacherMap));
                     return teacherMapper.writeValueAsString(teacherMap);
+                case "teacherList":
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+                    List<TeacherListEntry> TeacherListEntries = generateTeacherList(classId);
+                    String[][] tchData = TeacherListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getUserName()}).toArray(String[][]::new);
+                    ObjectMapper tchMapper = new ObjectMapper();
+                    Map<String, Object> tchMap = new HashMap<>();
+                    tchMap.put("levelOneData", tchData);
+                    System.out.println("result=" + tchMapper.writeValueAsString(tchMap));
+                    return tchMapper.writeValueAsString(tchMap);
          
             }
         } catch (IOException e) {
@@ -1326,4 +1338,12 @@ public class TTReportServiceImpl implements TTReportService {
         return teacherLogEntries;
     }
     
+    @Override
+    public List<TeacherListEntry> generateTeacherList(String targetId) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter. 
+        SqlParameterSource namedParameters = new MapSqlParameterSource("targetId", targetId);
+        List<TeacherListEntry> teacherListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LIST_QUERY_FIRST, namedParameters, new TeacherListEntryMapper());
+        return teacherListEntries;
+    }
+
 }

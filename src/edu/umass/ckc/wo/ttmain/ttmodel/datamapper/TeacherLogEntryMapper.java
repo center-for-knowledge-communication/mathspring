@@ -7,7 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Frank 	01-14-20	Issue #45 & #21 
+ * Frank 	01-14-20	Issue #45 & #21
+ * Frank    03-02-2020  fix - use sql timestamp data type 
  */
 public class TeacherLogEntryMapper implements RowMapper {
     @Override
@@ -18,7 +19,7 @@ public class TeacherLogEntryMapper implements RowMapper {
     	teacherLogEntry.setUserName(resultSet.getString("userName"));
     	teacherLogEntry.setAction(resultSet.getString("action"));
     	teacherLogEntry.setActivityName(resultSet.getString("activityName"));
-    	teacherLogEntry.setTimestamp(resultSet.getDate("timestamp"));
+    	teacherLogEntry.setTimestamp(resultSet.getTimestamp("timestamp"));
         return teacherLogEntry;
     }
 }

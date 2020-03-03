@@ -10,6 +10,7 @@
  *  Framk   01-29-20	Issue #47 removed random color rotator for class selection display. Use green for active, red for inactive
  *  Frank   02-16-20    Issue #48 Student Name an d password creation
  *  Frank   02-17-20    ttfixesR3
+ *  Frank   03-2-2020   Issue #45 added dynamic teacherlist selection
  */
 
 Locale loc = request.getLocale();
@@ -134,6 +135,8 @@ catch (Exception e) {
 
 .teacher-dropdown li:hover {
   background-color: lightgreen;
+  min-width: 100%;
+  size: 3;
 }
 
 .show {display: block;}
@@ -179,9 +182,10 @@ catch (Exception e) {
     	var perTeacherReport;
     	var eachTeacherData = [];    	
     	var pgContext = "${pageContext.request.contextPath}";
-        var classID = '1540';
-        var teacherID = '840';
-        
+        var classID = '';
+        var teacherID = '';
+        var targetTeacherID = "";
+        var targetTeacherName = "";
         
         $(document).ready(function () {
             $('#wrapper').toggleClass('toggled');
@@ -206,7 +210,29 @@ catch (Exception e) {
         function myFunction() {
           alert("Input field lost focus.");
         }
+        
 
+        function addToTeacherList(item, index) {
+          
+        	var titem = "" + item;
+        	var tlist = titem.split(",");
+        	
+        	document.getElementById("teacherList").innerHTML += "<li class='dropdown-content' onClick=selectTeacher(this);>" + tlist[1] + "</li>";
+        }
+
+        
+        function findSelectedInTeacherList(item, index) {
+            
+        	
+        	var titem = "" + item;
+        	var tlist = titem.split(",");
+        	
+        	if (tlist[1] == targetTeacherName) {
+        		targetTeacherID = tlist[0];
+        	}
+        }
+        
+        
         document.getElementById("className").addEventListener("blur", myFunction);
         
         function handleclickHandlers() {
@@ -305,12 +331,12 @@ catch (Exception e) {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#form-wrapper").hide();
-/*                
+                
                 $.ajax({
                     type : "POST",
-                    url : pgContext+"/tt/tt/getTeacherList",
+                    url : pgContext+"/tt/tt/getTeacherReports",
                     data : {
-                        classId: '0',
+                        classId: targetTeacherID,
                         teacherId: teacherID,
                         reportType: 'teacherList',
                         lang: loc,
@@ -320,9 +346,10 @@ catch (Exception e) {
                     	if (data) {
                         	var jsonData = $.parseJSON(data);
         	                eachTeacherData = jsonData.levelOneData;
-            	            perTeacherReport.clear().draw();
-                	        perTeacherReport.rows.add(jsonData.levelOneData).draw();
-                    	    perTeacherReport.columns.adjust().draw();            	    
+        	                
+        	                document.getElementById("teacherList").innerHTML = "";
+        	                eachTeacherData.forEach(addToTeacherList);
+
                     	}
                     	else {
                     		alert("response data is null");
@@ -333,9 +360,9 @@ catch (Exception e) {
                         console.log(e);
                     }
                 });
-*/
+
                 
-                document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
+                //document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
 
                 $("#teacher-activities-wrapper").show();
             	
@@ -367,9 +394,8 @@ catch (Exception e) {
 		function selectTeacher(t) {
 			
 			document.getElementById("myInput").value = t.innerHTML;
-			var temp = t.innerHTML;
-			var temp2 = temp.split(":");
-			targetTeacherID = temp2[1];
+			targetTeacherName = t.innerHTML;
+			eachTeacherData.forEach(findSelectedInTeacherList);
 			filterFunction();
             $("#panel-wrapper").show();
         	document.getElementById("myDropdown").classList.toggle("show");
@@ -561,7 +587,7 @@ function registerAllEvents(){
             url : pgContext+"/tt/tt/getTeacherReports",
             data : {
                 classId: targetTeacherID,
-                teacherId: ${teacherId},
+                teacherId: teacherID,
                 reportType: 'perTeacherReport',
                 lang: loc,
                 filter: ''
@@ -776,7 +802,7 @@ function registerAllEvents(){
             <div class="row">
 	           	<div class="col-lg-2 teacher-dropdown">
 					  <ul id="myDropdown" class="nobull">
-					    <i class="fa fa-search" aria-hidden="true"></i><input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()" >
+					    <i class="fa fa-search" aria-hidden="true"></i><input type="text" placeholder="Search..." id="myInput" onkeyup="filterFunction()" >
 					    <div id="teacherList">
 					  </ul>
 				</div>
