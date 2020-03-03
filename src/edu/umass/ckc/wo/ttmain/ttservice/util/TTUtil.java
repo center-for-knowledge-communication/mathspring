@@ -23,7 +23,8 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Created by Neeraj on 4/5/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
- * Frank 	01-14-20	Issue #45 & #21 add sql query for log report 
+ * Frank 	01-14-20	Issue #45 & #21 add sql query for log report
+ * Frank    03-02-2020  Added teacherlist query string 
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -97,6 +98,7 @@ public class TTUtil {
   
     
     public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+    public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
 
     /* A private Constructor prevents any other
     * class from instantiating.

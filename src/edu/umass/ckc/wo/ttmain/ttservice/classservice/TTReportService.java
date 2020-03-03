@@ -5,6 +5,7 @@ import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
@@ -22,6 +23,8 @@ import java.util.Set;
  * Frank	12-21-19	Issue #21 this file is being re-released with issue 21 to correct EOL characters which were inadvertently changed to unix style
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank	02-16-2019  Issue #45 Teacher Log report
+ * Frank    03-02-2020  Added generateTeacherList
+
  */
 
 public interface TTReportService {
@@ -54,4 +57,6 @@ public interface TTReportService {
     public Map<String, Map<Integer,StudentDetails>> generateSurveyReport(String classId) throws TTCustomException;
     
     public List<TeacherLogEntry> generateTeacherLogReport(String targetId);
+
+    public List<TeacherListEntry> generateTeacherList(String targetId);
 }
