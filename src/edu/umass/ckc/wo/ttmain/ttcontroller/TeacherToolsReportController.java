@@ -46,7 +46,9 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/getTeacherReports", method = RequestMethod.POST)
     public @ResponseBody String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType,  @RequestParam("lang") String lang,  @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
     	try {
-    		tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, reportType, classId);
+    		if (!reportType.equals("teacherList")) {
+    			tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, reportType, classId);
+    		}
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());

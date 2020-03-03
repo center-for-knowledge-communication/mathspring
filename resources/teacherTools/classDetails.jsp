@@ -4,6 +4,7 @@
 <!-- Frank 	11-25-19	Issue #21 added logging of teacher event -->
 <!-- Frank  01-20-20    Issue #39 and #48 use classId as alternative password -->
 <!-- Frank  02-17-20    ttfixesR3 -->
+<!-- Frank  03-03-20    Issue #48 more instructions -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -930,14 +931,16 @@ catch (Exception e) {
                         <small><%= rb.getString("reconfigure_student_info") %></small>
                     </h3>
 
-                    <div class="panel panel-default"  style="width: 60%;">
-                        <div class="panel-body"><%= rb.getString("create_more_ids_instructions") %>
-                        </div>
+                    <div class="panel panel-default"  style="width: 80%;">
+                        <div class="panel-header text-center"><h3><%= rb.getString("create_more_ids_instructions_heading") %></h3></div>
                         <div class="panel-body">
+                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_left") %></div>
+                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_right") %></div>
                             <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
                             <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
                         </div>
-
+					</div>
+                    <div class="panel panel-default"  style="width: 100%;">
                         <div class="panel-body" id="addMoreStudents" style="display: none;">
                             <springForm:form id="create_Student_id" method="post"
                                              action="${pageContext.request.contextPath}/tt/tt/createStudentId"

@@ -132,15 +132,15 @@ function loadEffortMap (rows,flag) {
                     label: 'ABANDONO: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                     data: [effortValues[2]]
                 }, {
-                    backgroundColor: "#fb8072",
+                    backgroundColor: "#26f213",
                     label: 'CORRECTO: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                     data: [effortValues[3]]
                 }, {
-                    backgroundColor: "#b3de69",
+                    backgroundColor: "#9beb94",
                     label: 'AUTOCORRIGIO: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                     data: [effortValues[4]]
                 }, {
-                    backgroundColor: "#fccde5",
+                    backgroundColor: "#fb8072",
                     label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                     data: [effortValues[5]]
                 }, {
@@ -174,15 +174,15 @@ function loadEffortMap (rows,flag) {
                             label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
                             data: [effortValues[2]]
                         }, {
-                            backgroundColor: "#fb8072",
+                            backgroundColor: "#26f213",
                             label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
                             data: [effortValues[3]]
                         }, {
-                            backgroundColor: "#b3de69",
+                            backgroundColor: "#9beb94",
                             label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
                             data: [effortValues[4]]
                         }, {
-                            backgroundColor: "#fccde5",
+                            backgroundColor: "#fb8072",
                             label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
                             data: [effortValues[5]]
                         }, {
@@ -278,15 +278,15 @@ function loadEffortMap (rows,flag) {
                 label: 'GIVEUP: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
                 data: [effortValues[2]]
             }, {
-                backgroundColor: "#fb8072",
+                backgroundColor: "#26f213",
                 label: 'SOF: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
                 data: [effortValues[3]]
             }, {
-                backgroundColor: "#b3de69",
+                backgroundColor: "#9beb94",
                 label: 'ATT: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
                 data: [effortValues[4]]
             }, {
-                backgroundColor: "#fccde5",
+                backgroundColor: "#fb8072",
                 label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
                 data: [effortValues[5]]
             }, {
@@ -308,41 +308,41 @@ function loadEffortMap (rows,flag) {
 			effortData = {
 		            labels: ["Type of behaviour in problem"],
 		            datasets: [{
-		                backgroundColor: "#8dd3c7",
-		                label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
-		                data: [effortValues[0]]
-		            }, {
-		                backgroundColor: "#ffffb3",
-		                label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
-		                data: [effortValues[1]]
-		            }, {
-		                backgroundColor: "#bebada",
-		                label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
-		                data: [effortValues[2]]
-		            }, {
-		                backgroundColor: "#fb8072",
-		                label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
-		                data: [effortValues[3]]
-		            }, {
-		                backgroundColor: "#b3de69",
-		                label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
-		                data: [effortValues[4]]
-		            }, {
-		                backgroundColor: "#fccde5",
-		                label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
-		                data: [effortValues[5]]
-		            }, {
-		                backgroundColor: "#80b1d3",
-		                label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
-		                data: [effortValues[6]]
-		            }, {
-		                backgroundColor: "#fdb462",
-		                label: 'SHELP: Got the problem correct but saw atleast one video.',
-		                data: [effortValues[7]]
-		            }, {
-		                label: 'NO DATA: No data could be gathered.',
-		                backgroundColor: "#d9d9d9",
-		                data: [effortValues[8]],
+                        backgroundColor: "#8dd3c7",
+                        label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
+                        data: [effortValues[0]]
+                    }, {
+                        backgroundColor: "#ffffb3",
+                        label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
+                        data: [effortValues[1]]
+                    }, {
+                        backgroundColor: "#bebada",
+                        label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
+                        data: [effortValues[2]]
+                    }, {
+                        backgroundColor: "#26f213",
+                        label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
+                        data: [effortValues[3]]
+                    }, {
+                        backgroundColor: "#9beb94",
+                        label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
+                        data: [effortValues[4]]
+                    }, {
+                        backgroundColor: "#fb8072",
+                        label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
+                        data: [effortValues[5]]
+                    }, {
+                        backgroundColor: "#80b1d3",
+                        label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
+                        data: [effortValues[6]]
+                    }, {
+                        backgroundColor: "#fdb462",
+                        label: 'SHELP: Got the problem correct but saw atleast one video.',
+                        data: [effortValues[7]]
+                    }, {
+                        label: 'NO DATA: No data could be gathered.',
+                        backgroundColor: "#d9d9d9",
+                        data: [effortValues[8]],
 		            },]
 		        };        	
         }
