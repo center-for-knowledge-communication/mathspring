@@ -56,12 +56,17 @@ catch (Exception e) {
     <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
 
     <!-- Datatables Css Files -->
-    <link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.datatables.net/rowreorder/1.2.0/css/rowReorder.dataTables.min.css" rel="stylesheet"
           type="text/css">
     <link href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css" rel="stylesheet"
           type="text/css">
-
+          
+    <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" 
+    	type="text/css">
+    
+	<link href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet"
+          type="text/css">
     <style>
         .buttonCustomColor {
             color: #FFFFFF;
@@ -72,15 +77,18 @@ catch (Exception e) {
     <!-- js for bootstrap-->
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/bootstrap.min.js" />"></script>
     <script src="<c:url value="/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js"/>"></script>
-    <script type="text/javascript" src="<c:url value="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js" />"></script>
+    <script type="text/javascript" src="<c:url value="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" />"></script>
 
 
     <script type="text/javascript"
-            src="<c:url value="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap4.min.js" />"></script>
+            src="<c:url value="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdn.datatables.net/rowreorder/1.2.0/js/dataTables.rowReorder.min.js" />"></script>
     <script type="text/javascript"
-            src="<c:url value="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js" />"></script>
+            src="<c:url value="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js" />"></script>
+
+    <script type="text/javascript"            
+			src="<c:url value="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js" />"></script>
 
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js" />"></script>
@@ -741,7 +749,19 @@ catch (Exception e) {
                             </div>                          
                             <div class="panel-body">                           
 								  <label><%= rb.getString("standards_e_g") %></label>
-								  <input id=standardsFilter style="width:50px" type="text" name="" value="">   <input id=standardsBtn class="btn btn-lg btn-success" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="">
+							</div>
+                            <div class="panel-body">                           
+								  <label><%= rb.getString("show_only_last") %></label>
+								  <input id="daysFilter" style="width:32px" type="text" name="" value="">   
+								  <label><%= rb.getString("days") %></label>
+							</div>
+                            <div class="panel-body">                           
+								  <label><%= rb.getString("show_names") %></label>
+								  <input id="showNames" style="width:16px" type="text" name="" value="Y">   
+							</div>
+                            <div class="panel-body">                           
+								  <input id=standardsBtn class="btn btn-lg btn-success" type="submit" value="<%= rb.getString("show_report") %>">
                             </div>
 							
                             <div class="panel-body">
@@ -949,8 +969,8 @@ catch (Exception e) {
                                 <div class="form-group">
                                     <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
                                     <div class="input-group">
-                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix"
-                                                          placeholder="" class="form-control" type="text"/>
+                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
+                                                          placeholder="Math" class="form-control" type="text"/>
                                     </div>
                                 </div>
                                 <div class="form-group hidden">
