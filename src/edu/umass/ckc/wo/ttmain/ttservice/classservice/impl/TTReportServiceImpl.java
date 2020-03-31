@@ -21,6 +21,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.studmod.StudentProblemHistory;
+import edu.umass.ckc.wo.util.StringUtils;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -43,6 +45,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 /**
  * Created by nsmenon on 5/19/2017.
  * 
@@ -64,6 +68,8 @@ public class TTReportServiceImpl implements TTReportService {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private static Logger logger = Logger.getLogger(TTReportServiceImpl.class);
 	private ResourceBundle rb = null;
+	private String showNames = "Y";
+	private Locale ploc;
 
 
     @Override
@@ -74,6 +80,7 @@ public class TTReportServiceImpl implements TTReportService {
         	System.out.println("TTReportServiceImpl  filter = " + filter);
     		// Multi=lingual enhancement
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
         	switch (reportType) {
@@ -681,33 +688,96 @@ public class TTReportServiceImpl implements TTReportService {
     public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException {
 
     	System.out.println("generateClassReportPerStudentPerProblem for class " + classId + "filter= " + filter);
-    	String modFilter = filter + "%";
+    	Timestamp ts = null;
+    	int xDays = 0;
+    	//filter = "6~0~Y";
+    	String filters[] = filter.split("~");
+    	String modFilter = "%";
+    	if (filter.length() > 0) {
+    		modFilter = filters[0].trim() + "%";
+    	}
+    	if (filter.length() > 1) {
+    		try {
+    			xDays = Integer.parseInt(filters[1].trim());
+    		}
+    		catch (Exception e) {
+    			logger.error(e.getMessage());
+    		}
+    		if (xDays == 0) {
+    			xDays = 365;
+    		}
+    		Date currentDate = new Date();
+    		// convert date to calendar
+    		Calendar c = Calendar.getInstance();
+    		c.setTime(currentDate);
+    		c.add(Calendar.DAY_OF_MONTH, (xDays * -1)); 
+
+    		// convert calendar to date
+    		Date xDate = c.getTime();
+    		ts = new Timestamp(xDate.getTime());
+    	}
+    	if (filter.length() >= 2) {
+    		if (filters[2].trim().equals("N")) {
+    			showNames = "N";
+    		}
+    		else {
+    			showNames = "Y";   			
+    		}
+    	}
+    		
     	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
         params.put("classId", classId);
+        params.put("ts", ts);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);
         
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
         Map<String, String> columnNamesMap = new LinkedHashMap<>();
+        Map<String, String> descriptionIdMap = new LinkedHashMap<>();
         Map<String, Object> allResult = new HashMap<>();
+        
+
         Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_PER_PROBLEM, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
                 String studentId = ((String) mappedrow.getString("studId")).trim();
                 Integer problemId = mappedrow.getInt("problemId");
+                String strProblemId = String.valueOf(problemId);
                 String effort = mappedrow.getString("effort");
-                if ((effort == null) || (effort == "unknown") || (effort == "null")) {
-                	effort = " ";                
+                if ((effort == null) || (effort == "unknown") || (effort == "null") || (effort == "undefined")) {
+                	effort = "NoData";                
                 }
                 else {
-                	effort = effort.trim();
+                	 if (effort.length() > 0) {
+                     	effort = effort.trim();                		 
+                	 }
+                	 else {
+                		 effort = "NoData"; 
+                	 }
+                }
+                if (effort.equals("NoData") ) {
+                	continue;
                 }
                 String description = ((String) mappedrow.getString("description")).trim();
                 description = description.replace(".", "_");
-              
-            	logger.debug("[" + studentId + " " + String.valueOf(problemId) + " " + description + " " + effort + "]");
+                
+                Timestamp beginTime = mappedrow.getTimestamp("problemBeginTime");
+                
+                long t = beginTime.getTime();
+                String strBeginTime = String.valueOf(t);
+                
+            	String tsFormat = "dd-MMM-YY";
+                Date dd = StringUtils.timestampToDate(beginTime);
+                SimpleDateFormat formatter =  new SimpleDateFormat (tsFormat, ploc) ;                
+                String problemDate = formatter.format(dd);              
 
+
+                String URI = Settings.probPreviewerPath;
+                String html5ProblemURI = Settings.html5ProblemURI;
+
+                descriptionIdMap.put(description,strProblemId);
+                
                 
                 List<String> studentValuesList = null;
                 List<String> tempProblemDescriptionList = null;
@@ -726,18 +796,27 @@ public class TTReportServiceImpl implements TTReportService {
                     studentValuesList = finalMapLevelOne.get(studentId);
                     tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
 //                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
-                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort);
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate );
                     tempProblemDescriptionList.add(description.trim().replace(" ", ""));
                 } else {
                     studentValuesList = new ArrayList<>();
                     tempProblemDescriptionList = new ArrayList<>();
+                    if (showNames.equals("N")) {
+                        studentValuesList.add("studentName" + "~~~" + "XXXXXXXXX");
+                        studentValuesList.add("userName" + "~~~" +"XXXXXX-XX");
 
-                    studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
-                    studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
+                    }
+                    else {
+                    	studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
+                    	studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
+                    }
 //                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
-                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort);
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate );
                     tempProblemDescriptionList.add(description.trim().replace(" ", ""));
                 }
+
+                String strDebug = "[" + mappedrow.getString("studentName") + " " + studentId + " " + strProblemId + " " + description + " " + effort + " " + strBeginTime + " " + problemDate + "]";
+            	System.out.println(strDebug);
 
                 columnNamesMap.put(problemId.toString(), description);
                 finalMapLevelOne.put(studentId, studentValuesList);
@@ -747,9 +826,9 @@ public class TTReportServiceImpl implements TTReportService {
             return finalMapLevelOne;
         });
         finalMapLevelOne.forEach((studentId, studentDetails) -> {
-            Map<String, String> selectParams = new LinkedHashMap<String, String>();
-            selectParams.put("classId", classId);
-            selectParams.put("studId", studentId);
+            //Map<String, String> selectParams = new LinkedHashMap<String, String>();
+            //selectParams.put("classId", classId);
+            //selectParams.put("studId", studentId);
 
             List<String> tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
             List<String> columnList = new ArrayList<String>(columnNamesMap.values());
@@ -766,9 +845,11 @@ public class TTReportServiceImpl implements TTReportService {
                 }
             }
         });
+
         allResult.put("levelOneData", finalMapLevelOne);
         allResult.put("columns", columnNamesMap);
         logger.debug(columnNamesMap);
+        allResult.put("IdXref", descriptionIdMap);
         //logger.info(allResult.toString());
         return allResult;
     }
