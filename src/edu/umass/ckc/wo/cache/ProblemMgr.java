@@ -20,6 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
 import org.apache.log4j.Logger;
 
+import edu.umass.ckc.wo.beans.ProbProbGroupEntry;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.content.CCStandard;
 import edu.umass.ckc.wo.content.Hint;
@@ -75,6 +76,7 @@ public class ProblemMgr {
             stdsByTopic = new HashMap<Integer,Set<CCStandard>>();
             loadTopics(conn);
             loadAllProblems(conn);
+            updateProbProbGroup(conn);
             fillTopicProblemMap(conn);
             fillTopicStandardMap(conn);
             // once problems are built, we pass over them and set their examples using the StandardExampleSelector
@@ -108,7 +110,98 @@ public class ProblemMgr {
 //        }
 //    }
     
-    private static Map<Integer,List<Double>> getProblemStatsProblemStats(Connection conn) throws SQLException {
+    private static void updateProbProbGroup(Connection conn) throws SQLException {
+    	
+    	List<ProbProbGroupEntry> probProbGroupEntries = getProbProbGroupEntries(conn);
+    	removeExistingEntries(conn, probProbGroupEntries);
+    	PreparedStatement ps = null;
+		ResultSet rs = null;
+		String q = " insert into probprobgroup (pgroupId, probId)"
+		        + " values (?, ?)";
+		try {
+			ps = conn.prepareStatement(q);
+			for (ProbProbGroupEntry probProbGroupEntry : probProbGroupEntries) {
+
+				double pgroupId = probProbGroupEntry.getPgroupId();
+				double probId = probProbGroupEntry.getProbId();
+										
+				ps.setDouble(1, pgroupId);
+				ps.setDouble(2, probId);
+				
+				ps.executeUpdate();
+			}
+
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (ps != null)
+				ps.close();
+
+		}
+
+    }
+    
+    private static List<ProbProbGroupEntry> getProbProbGroupEntries(Connection conn) throws SQLException {
+    	PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<ProbProbGroupEntry> probProbGroupEntries = new ArrayList<>();
+        try {
+            String q = "select t.topicid, p.id, p.standardID, p.idABC " + 
+            		"from " + 
+            		"(select problem.id, problem.standardID, standard.idABC " + 
+            		"from problem, standard " + 
+            		"where problem.standardID = standard.id) as p ,(select standardid, topicid " + 
+            		"from topicstandardmap " + 
+            		"where topicid in (select id from problemgroup where active=1)) as t " + 
+            		"where p.idABC = t.standardid " + 
+            		"order by t.topicid, p.id"; 
+            ps = conn.prepareStatement(q);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+            	ProbProbGroupEntry probProbGroupEntry = new ProbProbGroupEntry();
+            	probProbGroupEntry.setPgroupId(rs.getInt("topicid"));
+            	probProbGroupEntry.setProbId(rs.getInt("id"));
+            	probProbGroupEntry.setStandardId(rs.getString("standardID"));
+            	probProbGroupEntry.setStandardIdABC(rs.getString("idABC"));
+                
+            	probProbGroupEntries.add(probProbGroupEntry);
+            }
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+        return probProbGroupEntries;
+	}
+
+	private static void removeExistingEntries(Connection conn, List<ProbProbGroupEntry> probProbGroupEntries) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String q = "delete from probprobgroup where pgroupId = ?";
+		try {
+			ps = conn.prepareStatement(q);
+			for (ProbProbGroupEntry probProbGroupEntry : probProbGroupEntries) {
+
+				int pgroupId = probProbGroupEntry.getPgroupId();
+										
+				ps.setInt(1, pgroupId);
+	
+				ps.executeUpdate();
+			}
+
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (ps != null)
+				ps.close();
+
+		}
+	
+}
+
+	private static Map<Integer,List<Double>> getProblemStatsProblemStats(Connection conn) throws SQLException {
     	  PreparedStatement ps = null;
           ResultSet rs = null;
           Map<Integer,List<Double>> probStatsEntries = new HashMap<>();

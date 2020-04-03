@@ -363,6 +363,7 @@ background-color: #FF4766;
 .span-SKIP {
   color: #000000;
   background-color: #8dd3c7;
+
 }
 .span-NOTR {
   color: #000000;
@@ -374,15 +375,15 @@ background-color: #FF4766;
 }
 .span-SOF {
   color: #000000;
-  background-color: #fb8072;
+  background-color: #26f213;
 }
 .span-ATT {
   color: #000000;
-  background-color: #b3de69;
+  background-color: #9beb94;
 }
 .span-GUESS {
   color: #000000;
-  background-color: #fccde5;
+  background-color: #fb8072;
 }
 .span-SHINT {
   color: #000000;
@@ -398,6 +399,59 @@ background-color: #FF4766;
 }
 
 
+.p-SKIP {
+  color: #000000;
+  background-color: #8dd3c7;
+  font-size: 12px;
+}
+.p-NOTR {
+  color: #000000;
+  background-color: #ffffb3;
+  font-size: 12px;
+}
+.p-GIVEUP {
+  color: #000000;
+  background-color: #bebada;
+  font-size: 12px;
+}
+.p-SOF {
+  color: #000000;
+  background-color: #26f213;
+  font-size: 12px;
+}
+.p-ATT {
+  color: #000000;
+  background-color: #9beb94;
+  font-size: 12px;
+}
+.p-GUESS {
+  color: #000000;
+  background-color: #fb8072;
+  font-size: 12px;
+}
+.p-SHINT {
+  color: #000000;
+  background-color: #80b1d3;
+  font-size: 12px;
+}
+.p-SHELP {
+  color: #000000;
+  background-color: #fdb462";
+  font-size: 12px;
+}
+.p-NODATA {
+  color: #000000;
+  background-color: #d9d9d9;
+  background-color: #d9d9d9;
+  font-size: 12px;
+}
+
+.report_filters {
+	color: #000000;
+  	background-color: #d7c9a8;
+  	font-size: 16px;
+	
+}
 
 .modal-content {
   max-width: 1500px;
@@ -410,7 +464,22 @@ background-color: #FF4766;
   max-height: 1500px; //Sets the height to 80/100ths of the viewport.
 }
 
+.pspp-modal-dialog {
+          width: 200px;
+          height: 100px !important;
+        }
+.pspp-modal-content {
+    /* 80% of window height */
 
+    height: 60%;
+    background-color:#DADADA;
+}        
+.pspp-modal-header {
+
+    background-color: #0275d8;
+    padding:16px 16px;
+    color:#FFF;
+ }
 
 
 /* Tab Navigation */

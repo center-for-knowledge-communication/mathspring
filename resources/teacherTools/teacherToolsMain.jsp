@@ -5,6 +5,13 @@
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
 <% 
+/** Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object 
+ *  Frank   01-20-20    Issue #39 use classId as alternative password
+ *  Framk   01-29-20	Issue #47 removed random color rotator for class selection display. Use green for active, red for inactive
+ *  Frank   02-16-20    Issue #48 Student Name an d password creation
+ *  Frank   02-17-20    ttfixesR3
+ *  Frank   03-2-2020   Issue #45 added dynamic teacherlist selection
+ */
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -40,8 +47,8 @@ catch (Exception e) {
     <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.datatables.net/colreorder/1.3.2/css/colReorder.bootstrap4.min.css" rel="stylesheet"
           type="text/css">
-
-    <jsp:useBean id="random" class="java.util.Random" scope="application"/>
+    <link href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css" rel="stylesheet"
+          type="text/css">
 
     <style>
         .buttonCustomColor {
@@ -53,26 +60,181 @@ catch (Exception e) {
     <!-- js for bootstrap-->
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/bootstrap.min.js" />"></script>
     <script src="<c:url value="/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js"/>"></script>
+    <script type="text/javascript" src="<c:url value="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js" />"></script>
+
+
+    <script type="text/javascript"
+            src="<c:url value="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap4.min.js" />"></script>
+    <script type="text/javascript"
+            src="<c:url value="https://cdn.datatables.net/rowreorder/1.2.0/js/dataTables.rowReorder.min.js" />"></script>
+    <script type="text/javascript"
+            src="<c:url value="https://cdn.datatables.net/select/1.2.1/js/dataTables.select.min.js" />"></script>
+
+    <script type="text/javascript"
+            src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js" />"></script>
+    <script type="text/javascript"
+            src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
     <script type="text/javascript"
             src="<c:url value="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js" />"></script>
-    <script type="text/javascript"
-            src="<c:url value="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap4.min.js" />"></script>
+
     <script type="text/javascript"
             src="<c:url value="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js" />"></script>
       <script type="text/javascript" src="<c:url value="/js/bootstrap/js/language_es.js" />"></script>        
-    <script type="text/javascript">
-        var servletContextPath = "${pageContext.request.contextPath}";
+    
+    <jsp:useBean id="random" class="java.util.Random" scope="application"/>
+
+
+<style>
+
+ .nobull {
+  list-style-type: none;
+ }
+ 
+#myInput {
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  font-size: 20px;
+  min-width: 100%;
+  padding: 6px 4px 6px 4px;
+  border: 1px solid #ddd;
+}
+
+#myInput:focus {
+	background-color: #ddd;
+	outline: 3px solid black;
+}
+
+#myInput:hover {
+	background-color: #ddd;
+	outline: 3px solid black;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  background-color: #f6f6f6;
+  font-size: 16px;
+  min-width: 100%;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+}
+
+.dropdown-content li {
+  color: black;
+  text-decoration: none;
+  display: block;
+  list-style-type: none;
+}
+
+.teacher-dropdown li:hover {
+  background-color: lightgreen;
+  min-width: 100%;
+  size: 3;
+}
+
+.show {display: block;}
+</style>
+
+
+<script type="text/javascript">
+
+    var languagePreference = window.navigator.language;
+    var languageSet = "en";
+    var loc = "en-US";
+
+	var emsg_classLanguage   = 'Class language is mandatory field';
+	var emsg_className       = 'Class name is mandatory field';
+	var emsg_classGrade      = 'Class grade is mandatory field';
+	var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
+	var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
+	var emsg_town            = 'Town name is mandatory field';
+	var emsg_schoolName      = 'School name is mandatory field';
+	var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
+	var emsg_schoolYear      = 'School year is a mandatory field';
+	var emsg_gradeSection    = 'Section name is a mandatory field';
+	
+
+    if (languagePreference.includes("en")) {
+    	languageSet = "en"
+    	loc = "en-US";
+    } else if (languagePreference.includes("es")) {
+    	languageSet = "es"
+    	loc = "es-Ar";
+    	emsg_classLanguage   = '(sp)Class language is mandatory field';
+    	emsg_className       = '(sp)Class name is mandatory field';
+    	emsg_classGrade      = '(sp)Class grade is mandatory field';
+    	emsg_lowEndDiff      = '(sp)Grade level of problems - Lower is mandatory field';
+    	emsg_highEndDiff     = '(sp)Grade level of problems - Higher is mandatory field';
+    	emsg_town            = '(sp)Town name is mandatory field';
+    	emsg_schoolName      = '(sp)School name is mandatory field';
+    	emsg_schoolYearRange = '(sp)The academic year should not be greater than 2050 and less than current year';
+    	emsg_schoolYear      = '(sp)School year is a mandatory field';
+    	emsg_gradeSection    = '(sp)Section name is a mandatory field';
+
+    }   
+    	var perTeacherReport;
+    	var eachTeacherData = [];    	
+    	var pgContext = "${pageContext.request.contextPath}";
+        var classID = '';
+        var teacherID = '';
+        var targetTeacherID = "";
+        var targetTeacherName = "";
+        
         $(document).ready(function () {
             $('#wrapper').toggleClass('toggled');
             $("#report-wrapper").show();
             $("#report-wrapper2").show();
+            $("#teacher-activities-wrapper").hide();
+            $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
+            registerAllEvents();
             handleclickHandlers();
         });
-      
+
+        function displayCreateRosterInstructions() {
+        	
+    		document.getElementById("passwordToken").value = "useClass";
+        	var pwd = document.getElementById("passwordToken").value;
+    		//alert(pwd);
+       		alert("Once the class has been created, <br> click on the new class and click 'Manage Students' to add the class roster");
+        }
+        
+ 
+        function myFunction() {
+          alert("Input field lost focus.");
+        }
+        
+
+        function addToTeacherList(item, index) {
+          
+        	var titem = "" + item;
+        	var tlist = titem.split(",");
+        	
+        	document.getElementById("teacherList").innerHTML += "<li class='dropdown-content' onClick=selectTeacher(this);>" + tlist[1] + "</li>";
+        }
+
+        
+        function findSelectedInTeacherList(item, index) {
+            
+        	
+        	var titem = "" + item;
+        	var tlist = titem.split(",");
+        	
+        	if (tlist[1] == targetTeacherName) {
+        		targetTeacherID = tlist[0];
+        	}
+        }
+        
+        
+        document.getElementById("className").addEventListener("blur", myFunction);
+        
         function handleclickHandlers() {
             $("#create_class_form").bootstrapValidator({
                 // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
@@ -82,42 +244,49 @@ catch (Exception e) {
                     validating: 'glyphicon glyphicon-refresh'
                 },
                 fields: {
+                	classLanguage: {
+                        validators: {
+                            notEmpty: {
+                                message: emsg_classLanguage
+                            }
+                        }
+                    },                    
                     className: {
                         validators: {
                             notEmpty: {
-                                message: 'Class name is mandatory field'
+                                message: emsg_className
                             }
                         }
                     },
                     classGrade: {
                         validators: {
                             notEmpty: {
-                                message: 'Class grade is mandatory field'
+                                message: emsg_classGrade
                             }
                         }
                     },
                     lowEndDiff: {
                         validators: {
                             notEmpty: {
-                                message: 'Grade level of problems - Lower is mandatory field'
+                                message: emsg_lowEndDiff
                             }
                         }
                     }, highEndDiff: {
                         validators: {
                             notEmpty: {
-                                message: 'Grade level of problems - Higher is mandatory field'
+                                message: emsg_highEndDiff
                             }
                         }
                     }, town: {
                         validators: {
                             notEmpty: {
-                                message: 'Town name is a mandatory field'
+                                message: emsg_town
                             }
                         }
                     }, schoolName: {
                         validators: {
                             notEmpty: {
-                                message: 'School name is a mandatory field'
+                                message: emsg_schoolName
                             }
                         }
                     }, schoolYear: {
@@ -126,17 +295,17 @@ catch (Exception e) {
                             between: {
                                 min: new Date().getFullYear(),
                                 max: 2050,
-                                message: 'The academic year should not be greater than 2050 and less than current year'
+                                message: emsg_schoolYearRange
                             },
 
                             notEmpty: {
-                                message: 'School year is a mandatory field'
+                                message: emsg_schoolYear
                             }
                         }
                     }, gradeSection: {
                         validators: {
                             notEmpty: {
-                                message: 'Section name is a mandatory field'
+                                message: emsg_gradeSection
                             }
                         }
                     }
@@ -153,15 +322,308 @@ catch (Exception e) {
             $("#createClass_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
+                $("#teacher-activities-wrapper").hide();
+                $("#panel-wrapper").hide();
                 $("#form-wrapper").show();
+            });
+
+            $("#teacher_activities_handler").click(function () {
+                $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
+                $("#form-wrapper").hide();
+                
+                $.ajax({
+                    type : "POST",
+                    url : pgContext+"/tt/tt/getTeacherReports",
+                    data : {
+                        classId: targetTeacherID,
+                        teacherId: teacherID,
+                        reportType: 'teacherList',
+                        lang: loc,
+                        filter: ''
+                    },
+                    success : function(data) {
+                    	if (data) {
+                        	var jsonData = $.parseJSON(data);
+        	                eachTeacherData = jsonData.levelOneData;
+        	                
+        	                document.getElementById("teacherList").innerHTML = "";
+        	                eachTeacherData.forEach(addToTeacherList);
+
+                    	}
+                    	else {
+                    		alert("response data is null");
+                    	}
+                    },
+                    error : function(e) {
+                    	alert("error");
+                        console.log(e);
+                    }
+                });
+
+                
+                //document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
+
+                $("#teacher-activities-wrapper").show();
+            	
             });
 
             $('#PageRefresh').click(function () {
                 location.reload();
             });
+  
         }
+        
+        function filterFunction() {
+        	  var input, filter, ul, li, a, i;
+        	  input = document.getElementById("myInput");
+        	  filter = input.value.toUpperCase();
+        	  div = document.getElementById("myDropdown");
+        	  a = div.getElementsByTagName("li");
+        	  for (i = 0; i < a.length; i++) {
+        	    txtValue = a[i].textContent || a[i].innerText;
+        	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        	      a[i].style.display = "block";
+        	    } 
+        	    if (txtValue.toUpperCase().indexOf(filter) == -1) {
+        	      a[i].style.display = "none";
+        	    }
+        	  }
+        	}
 
-    </script>
+		function selectTeacher(t) {
+			
+			document.getElementById("myInput").value = t.innerHTML;
+			targetTeacherName = t.innerHTML;
+			eachTeacherData.forEach(findSelectedInTeacherList);
+			filterFunction();
+            $("#panel-wrapper").show();
+        	document.getElementById("myDropdown").classList.toggle("show");
+
+		}
+</script>
+    
+<script>
+
+
+
+
+
+function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'tstamp':  'Timestamp','tid':  'Numero Identificador del maestro','tname': 'Nombre del  meastro','uname':  'Nombre de usuario','action': 'Action', 'activityName': 'Activity'};
+		return header;
+	}else{
+	 	var header = {'tstamp':  'Timestamp','tid':  'Teacher ID','tname': 'Teacher Name','uname':  'Username','action': 'Action', 'activityName': 'Activity'};
+	 	return header;
+	}
+}
+
+
+function registerAllEvents(){
+	//alert("registerAllEvents begin");
+
+	var headers = changeTeacherActivitiesReportHeaderAccordingToLanguage();
+	
+    if (languageSet == 'es') {
+        
+        perTeacherReport  =  $('#perTeacherReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers['tstamp'] },
+                { title: headers['tid'] },
+                { title: headers['tname']  },
+                { title: headers['uname']  },
+                { title: headers['action']  },
+                { title: headers['activityName']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "language": {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            },
+
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "5%",
+                    "targets": [ 0 ],
+                    "visible": true
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 1 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 2 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 3 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 4 ],
+                    "visible": true
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 5 ],
+                    "visible": true
+
+                }            	        	
+            ]
+        }    
+        );
+    }
+    else {
+        perTeacherReport  =  $('#perTeacherReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers['tstamp'] },
+                { title: headers['tid'] },
+                { title: headers['tname']  },
+                { title: headers['uname']  },
+             	{ title: headers['action']  },
+             	{ title: headers['activityName']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "5%",
+                    "targets": [ 0 ],
+                    "visible": true
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 1 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 2 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 3 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 4 ],
+                    "visible": true
+
+                },
+                {
+                    "width": "5%",
+                    "targets": [ 5 ],
+                    "visible": true
+
+                }            	        	
+            ]
+        }    
+        );
+    }
+
+    
+
+	
+	
+    $('#teacherActivities').on('show.bs.collapse', function ()  {
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: targetTeacherID,
+                teacherId: teacherID,
+                reportType: 'perTeacherReport',
+                lang: loc,
+                filter: ''
+            },
+            success : function(data) {
+            	if (data) {
+                	var jsonData = $.parseJSON(data);
+	                eachTeacherData = jsonData.levelOneData;
+    	            perTeacherReport.clear().draw();
+        	        perTeacherReport.rows.add(jsonData.levelOneData).draw();
+            	    perTeacherReport.columns.adjust().draw();            	    
+            	}
+            	else {
+            		alert("response data is null");
+            	}
+            },
+            error : function(e) {
+            	alert("error");
+                console.log(e);
+            }
+        });
+        
+
+
+    
+    
+    
+    });
+
+    
+	//alert("registerAllEvents end");
+    
+}
+
+</script>
+    
 </head>
 
 <body>
@@ -204,6 +666,9 @@ catch (Exception e) {
             <li>
                 <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i><%= rb.getString("create_surveys_and_math_problems") %></a>
             </li>
+            <li>
+                <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("view_teacher_activities") %></a>
+            </li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -238,7 +703,7 @@ catch (Exception e) {
                 <div class="row">
                     </c:if>
                     <div class="col-lg-3 col-md-6">
-                        <div class="panel ${colorpicker[randomColorIndex]}">
+                        <div class="panel panel-green">
                             <div class="panel-heading">
 
                                 <div class="row">
@@ -255,6 +720,7 @@ catch (Exception e) {
                             <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
                                 <div class="panel-footer">
                                     <span class="pull-left"><%= rb.getString("view_details") %></span>
+                                    <span class="pull-left">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -291,7 +757,7 @@ catch (Exception e) {
                 <div class="row">
                     </c:if>
                     <div class="col-lg-3 col-md-6">
-                        <div class="panel ${colorpicker[randomColorIndex]}">
+                        <div class="panel panel-red">
                             <div class="panel-heading">
 
                                 <div class="row">
@@ -308,6 +774,7 @@ catch (Exception e) {
                             <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
                                 <div class="panel-footer">
                                     <span class="pull-left"><%= rb.getString("view_details") %></span>
+                                    <span class="pull-left">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -325,6 +792,74 @@ catch (Exception e) {
             </c:forEach>
             </c:if>
             </div>
+            
+         <div id="teacher-activities-wrapper" style="display: none;">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    <small><%= rb.getString("view_teacher_activities") %></small>
+                </h1>
+            </div>
+            <div class="row">
+	           	<div class="col-lg-2 teacher-dropdown">
+					  <ul id="myDropdown" class="nobull">
+					    <i class="fa fa-search" aria-hidden="true"></i><input type="text" placeholder="Search..." id="myInput" onkeyup="filterFunction()" >
+					    <div id="teacherList">
+					  </ul>
+				</div>
+	           	<div id="teacher-activities-content" class="col-lg-10">
+	           		
+	           	</div>
+            </div>
+        </div>
+
+        <div id="panel-wrapper" class="row" style="display:none;width: 100%;">
+
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a id="report_three" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#teacherActivities">
+                                <%= rb.getString("teacher_log_report") %>
+                            </a>
+                            <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                        </h4>
+                    </div>
+                    <div id="teacherActivities" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <ul>
+                                <li>
+                                    <label style="padding-right: 10px;"><%= rb.getString("download_student_data") %></label>
+                                    <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentReport?teacherId=${teacherId}&classId=${classInfo.classid}"
+                                       data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
+                                       class="downloadPerStudentReport" aria-expanded="true"
+                                       aria-controls="teacherActivities">
+                                        <i class="fa fa-download fa-2x" aria-hidden="true"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <label style="padding-right: 10px;<%= rb.getString("download_emotion_data") %>></label>
+                                    <a href="${pageContext.request.contextPath}/tt/tt/downloadStudentEmotions?teacherId=${teacherId}&classId=${classInfo.classid}"
+                                       data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
+                                       class="downloadPerStudentReport" aria-expanded="true"
+                                       aria-controls="teacherActivities">
+                                        <i class="fa fa-download fa-2x" aria-hidden="true"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="panel-body">
+                            <table id="perTeacherReport" class="table table-striped table-bordered hover" width="100%"></table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="class_Level_Reports_Container" class="row" style="display:none;width: 75%;">
+            </div>
+		</div>
+
+
         <div id="form-wrapper" style="display: none;">
             <div class="col-lg-12">
                 <h1 class="page-header">
@@ -445,7 +980,7 @@ catch (Exception e) {
                                             <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
                                             <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
                                             <springForm:option value="above1"><%= rb.getString("one_grades_above") %></springForm:option>
-                                            <springForm:option value="above0"><%= rb.getString("one_grades_above") %></springForm:option>
+                                            <springForm:option value="above0"><%= rb.getString("no_grades_above") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -467,23 +1002,20 @@ catch (Exception e) {
                                 <div class="form-group">
                                     <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
                                         <springForm:input path="userPrefix" id="userPrefix" name="userPrefix"
                                                           class="form-control" type="text"/>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group hidden">
                                     <label for="passwordToken"><%= rb.getString("student_password") %></label>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken"
+                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
                                                           class="form-control" type="password"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-location-arrow"></i></span>
                                         <springForm:input path="noOfStudentAccountsForClass"
                                                           id="noOfStudentAccountsForClass"
                                                           name="noOfStudentAccountsForClass" class="form-control"
@@ -496,17 +1028,17 @@ catch (Exception e) {
                     </div>
                 </div>
                 <div style="text-align:center;">
-                    <button role="button" type="submit" class="btn btn-primary"><%= rb.getString("create_class") %></button>
+                    <button role="button" type="submit" class="btn btn-primary" onclick=displayCreateRosterInstructions();><%= rb.getString("create_class") %></button>
                 </div>
             </springForm:form>
         </div>
     </div>
+
     <!--#page-container ends-->
 </div>
 <!--#page-content-wrapper ends-->
 
 <!--Wrapper!-->
-
 
 </body>
 </html>

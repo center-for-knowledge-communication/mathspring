@@ -23,7 +23,8 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Created by Neeraj on 4/5/2017.
  * 
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
- * 
+ * Frank 	01-14-20	Issue #45 & #21 add sql query for log report
+ * Frank    03-02-2020  Added teacherlist query string 
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -52,7 +53,7 @@ public class TTUtil {
     /** SQL Queries For Reports **/
     public static final String PER_STUDENT_QUERY_FIRST ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,count(problemId) AS noOfProblems  from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.mode != 'demo' GROUP BY studId order by studId ; ";
     public static final String PER_STUDENT_QUERY_SECOND ="select sh.id,sh.problemId, pg.description,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL,sh.isSolved,sh.numMistakes,sh.numHints,sh.numAttemptsToSolve,sh.effort,sh.videoSeen,sh.exampleSeen,pr.standardID, round(od.diff_level,2) as diff_level,sh.mastery,sh.topicId,pg.description from studentproblemhistory sh, problem pr, problemgroup pg,overallprobdifficulty od where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.mode != 'demo'and sh.problemId = pr.id and sh.problemId = od.problemId and sh.topicId=pg.id order by sh.problemEndTime desc;";
-    public static final String PER_STUDENT_PER_PROBLEM = "select s.id as studentId, concat(s.fname,' ',s.lname) As studentName, s.username as username, sh.studId, sh.problemId as problemId,sh.effort as effort, p.name as description, p.nickname nickname from student s JOIN studentproblemhistory sh ON sh.studId = s.id JOIN problem as p ON sh.problemId = p.id where s.classId=(:classId) and p.standardID like (:filter)  order by s.id, p.name;";
+    public static final String PER_STUDENT_PER_PROBLEM = "select s.id as studentId, concat(s.fname,' ',s.lname) As studentName, s.username as username, sh.studId, sh.problemId as problemId,sh.effort as effort,sh.problemBeginTime as problemBeginTime, p.name as description, p.nickname nickname from student s JOIN studentproblemhistory sh ON sh.studId = s.id JOIN problem as p ON sh.problemId = p.id where s.classId=(:classId) and p.standardID like (:filter) and sh.problemBeginTime >= (:ts) order by s.username, sh.problemBeginTime desc;";
 
     public static final String PER_TOPIC_QUERY_FIRST = "select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,sh.topicId,pg.description,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh ,problemgroup pg where s.id=sh.studId and s.classId=(:classId) and  sh.topicId = pg.id  and sh.mode != 'demo' group by sh.topicId,studId order by studId";
     public static final String PER_TOPIC_QUERY_SECOND = "select sh.topicId,sh.problemId,CAST(sh.mastery AS DECIMAL(16,2)) AS mastery,sh.effort,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL from studentproblemhistory sh,problem pr where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.topicId=(:topicId) and sh.mode != 'demo' and sh.problemId = pr.id order by sh.topicId,problemEndTime asc";
@@ -94,7 +95,11 @@ public class TTUtil {
     		"ppp.answer, ppp.problemSet, ppp.aChoice, ppp.bChoice, ppp.cChoice, ppp.dChoice, ppp.eChoice " + 
     		"from student s, preposttestdata pptd, preposttest ppt, prepostproblemtestmap ppptm, prepostproblem ppp " + 
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
+  
     
+    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+    public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
+
     /* A private Constructor prevents any other
     * class from instantiating.
     */
