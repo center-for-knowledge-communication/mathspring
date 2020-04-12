@@ -95,6 +95,12 @@ public class TTUtil {
     		"from student s, preposttestdata pptd, preposttest ppt, prepostproblemtestmap ppptm, prepostproblem ppp " + 
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
     
+    /**
+     * Query to get all AU prediction
+     */
+    public static final String ALL_AU_PREDS = "Select * from auprediction";
+    
+    
     /* A private Constructor prevents any other
     * class from instantiating.
     */

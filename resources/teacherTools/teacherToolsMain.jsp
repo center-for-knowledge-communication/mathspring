@@ -40,6 +40,8 @@ catch (Exception e) {
     <link href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.datatables.net/colreorder/1.3.2/css/colReorder.bootstrap4.min.css" rel="stylesheet"
           type="text/css">
+          
+    <link rel="stylesheet" href="<c:url value="/css/live_dashboard.css" />"/>
 
     <jsp:useBean id="random" class="java.util.Random" scope="application"/>
 
@@ -62,7 +64,11 @@ catch (Exception e) {
             src="<c:url value="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js" />"></script>
-      <script type="text/javascript" src="<c:url value="/js/bootstrap/js/language_es.js" />"></script>        
+      <script type="text/javascript" src="<c:url value="/js/bootstrap/js/language_es.js" />"></script>
+      <script src="<c:url value="https://d3js.org/d3.v4.min.js" />"></script> 
+      <script type="text/javascript" src="<c:url value="/js/live_student_details.js" />"></script>  
+      <script type="text/javascript" src="<c:url value="/js/dashboard.js" />"></script>
+           
     <script type="text/javascript">
         var servletContextPath = "${pageContext.request.contextPath}";
         $(document).ready(function () {
@@ -153,9 +159,30 @@ catch (Exception e) {
             $("#createClass_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
+                $("#liveDashboard").hide();
+                $("#live_student_details").hide();
                 $("#form-wrapper").show();
             });
+            
+            $("#live_dashboard").click(function () {
+                $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
+                $("#form-wrapper").hide();
+                $("#live_student_details").hide();
+                $("#liveDashboard").show();
+                loadStudents();
+            });
 
+            $(".StudentButton").click(function () {
+                $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
+                $("#form-wrapper").hide();
+                $("#liveDashboard").hide();
+                $("#live_student_details").show();
+                //getStudentDetails();
+                console.log("live_student_details is clicked!");
+            });
+            
             $('#PageRefresh').click(function () {
                 location.reload();
             });
@@ -199,6 +226,10 @@ catch (Exception e) {
                         class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
             <li>
+                <a id="live_dashboard" href="#"><i
+                        class="fa fa-fw fa-line-chart"></i> <%= "Live dashboard"%></a>
+            </li>
+            <li>
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
             </li>
             <li>
@@ -208,7 +239,70 @@ catch (Exception e) {
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
-        <div id="content-conatiner" class="container-fluid">
+        <div id="content-container" class="container-fluid">
+        
+            <div id="liveDashboard" style="display: none;">
+	            <h1 class="studentId">Real-Time Student Dashboard</h1>
+	           <!--  <script type="text/javascript" src="./js/dashboard.js"></script> 
+	            <script type="text/javascript" src="<c:url value="/js/dashboard.js" />"></script>-->
+	            <div id="student_tiles"></div>
+        	</div>
+        	
+        	<div id="live_student_details" style="display: none;text-align:center">
+	            <h1>Live Student Details</h1>
+	            <h3 id="studentname"></h3>
+			    <div>
+			    <span id="linechart"></span>
+			    
+    			<span id="pie_chart"></span>
+    			<!-- 
+    			<span id="bar_chart"></span>
+    			<!--  
+    			<span><div id="linechart"></div></span>
+			    
+    			<span><div id="pie_chart"></div></span>
+    			-->
+			    <!--<script src="<c:url value="https://d3js.org/d3.v4.min.js" />"></script>
+	             <script type="text/javascript" src="<c:url value="/js/live_student_details.js" />"></script> -->
+	             </div>
+	             <br>
+	             <br>
+	             <div>
+	             	
+	             	<div class="split left">
+	             	<div id="bar_chart"></div>
+	             	 </div>
+	             	 
+	             	 <div class="split right">
+		             	<div class="centered">
+		             	 
+				            <div id="last5masteries"></div>
+						    <br><br>
+			    			<div id="last5efforts"></div>
+			    			<br><br>
+			    			<div id="last2topics"></div>
+		            	 
+		             	</div>
+	             	</div>
+	             	
+	             	
+	             </div>
+	             <!-- 
+	             <div>
+	             <div id="last5masteries"></div>
+			    <br>
+    			<div id="last5efforts"></div>
+    			<br>
+    			<div id="last2topics"></div>
+	             </div>
+	              -->
+	             <br>
+	             <div id="refresh">
+	             	<button id="refreshButton">Refresh</button>
+	             </div>
+	             
+        	</div>
+        	
 
             <div id="report-wrapper" class="row">
                 <div class="row">

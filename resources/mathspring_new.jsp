@@ -104,6 +104,14 @@ else
 <script type="text/javascript" src="js/tutorintervention.js"></script>
 <script type="text/javascript" src="js/intervhandlers_new.js"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
+
+	<!-- Import TensorFlow.js -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <!-- Import tfjs-vis -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+    
+	<script type="text/javascript" src="js/face-api.js"></script>
+	
 <script type="text/javascript">
         var globals = {
             lastProbType: '${lastProbType}',
@@ -209,6 +217,8 @@ else
             } else {
                 $('.huytran-practice__character-window').width(250);
             }
+            
+            
         });
     </script>
 
@@ -386,6 +396,14 @@ label {
 			</div>
 
 			<div class="huytran-practice__container">
+			
+				<!-- <video autoplay  muted id="webcam" width="250" height="250" style="display: none;"></video> -->
+				<!-- <video autoplay  muted id="webcam2" width="250" height="250" ></video>-->
+	
+				<div id="prediction_val" style="display: none;">
+					<input id="pred_val" value ="" disabled />
+				</div>
+				
 				<div class="huytran-practice__main" id="frameContainer">
 					<div class="huytran-practice__topic">
 						<div id="problemTopicAndStandards" style="clear: both;"></div>
@@ -407,6 +425,7 @@ label {
 								${globals.answer}</p>
 						</div>
 					</div>
+					<video autoplay  muted id="webcam" width="250" height="250" ></video>
 				</div>
 				<div class="huytran-practice__character">
 					<div class="huytran-practice__hide-button"
@@ -783,7 +802,7 @@ label {
 			</div>
 		</div>
 	</div>
-
+	
 
 	<script>
     function toggleNav() {
@@ -841,6 +860,6 @@ label {
 	<%--<div id="problemTopicAndStandards" style="display: none;">Topic:<br/>Standards:</div>--%>
 	<%-- Only shown to test users--%>
 	<div id="varBindings" style="display: none;"></div>
-
+<script type="text/javascript" src="js/expression_recog.js" async></script>
 </body>
 </html>
