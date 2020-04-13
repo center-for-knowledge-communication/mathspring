@@ -171,7 +171,7 @@ async function auApi(predictions) {
         	console.log("save prediction api call failed with status "+ this.status);
         }
     };
-    xhttp.open("POST", "http://ec2-34-203-204-126.compute-1.amazonaws.com:8080/AUPredictor/saveAuPred", true);
+    xhttp.open("POST", "http://ec2-34-203-204-126.compute-1.amazonaws.com:80/AUPredictor/saveAuPred", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(jsonObj);
 }
@@ -520,6 +520,7 @@ async function setupWebcam() {
                 },
                 error => reject());
         } else {
+        	console.log("no userMedia found");
             reject();
         }
     });

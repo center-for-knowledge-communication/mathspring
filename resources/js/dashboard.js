@@ -10,7 +10,7 @@ function loadStudents(){
      var auimage = "none";
      var masteries ="";
      var efforts ="";
-	var api = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:8080/AUPredictor/getActiveStudentandhist';
+	var api = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:80/AUPredictor/getActiveStudentandhist';
     fetch(api).then(function (response) {
     	var datajson = response.json();
     	//console.log("response = "+datajson);

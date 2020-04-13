@@ -14,7 +14,7 @@ function getStudentDetails(studentId, sessionId) {
 	document.getElementById('refreshButton').onclick = function (){getStudentDetails(studentId, sessionId);};
 	//var api = 'https://api.coindesk.com/v1/bpi/historical/close.json?start=2017-12-31&end=2018-04-01';
 	var requestJson = {	"studentId":studentId, "fromTime":"2019-12-16T06:54:29.678Z","toTime":"2019-12-16T07:47:29.678Z"};
-	var api = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:8080/AUPredictor/getAuPreds';
+	var api = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:80/AUPredictor/getAuPreds';
 	fetch(api, {
 		  method: 'POST', // or 'PUT'
 		  headers: {
@@ -35,7 +35,7 @@ function getStudentDetails(studentId, sessionId) {
         
         var requestJson = {	"sessions":[sessionId]};
         console.log("requestjson = "+ JSON.stringify(requestJson));
-    	var probHistApi = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:8080/AUPredictor/getActiveStudentandhist';
+    	var probHistApi = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:80/AUPredictor/getActiveStudentandhist';
     	fetch(probHistApi, {
     		  method: 'GET', // or 'PUT'
     		  headers: {
