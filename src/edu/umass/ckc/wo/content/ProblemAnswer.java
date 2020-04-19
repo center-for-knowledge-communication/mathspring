@@ -11,6 +11,7 @@ import java.sql.SQLException;
  * Date: 12/5/14
  * Time: 3:41 PM
  * To change this template use File | Settings | File Templates.
+ * Frank 04-01-2020 Issue #91 remove all white space in short answer user input
  */
 public class ProblemAnswer {
 
@@ -99,8 +100,11 @@ public class ProblemAnswer {
     }
 
     public boolean grade (String studentInput) {
-        if (val != null)
-            return val.equalsIgnoreCase(studentInput.trim());
+        if (val != null) {
+        	
+        	String condensedVal = val.replaceAll("\\s+", "");
+            return condensedVal.equalsIgnoreCase(studentInput.trim());
+        }
         else return false;
     }
 }
