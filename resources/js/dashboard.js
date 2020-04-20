@@ -10,6 +10,7 @@ function loadStudents(){
      var auimage = "none";
      var masteries ="";
      var efforts ="";
+     var topics ="";
 	var api = 'http://ec2-34-203-204-126.compute-1.amazonaws.com:80/AUPredictor/getActiveStudentandhist';
     fetch(api).then(function (response) {
     	var datajson = response.json();
@@ -101,9 +102,20 @@ function loadStudents(){
                 	
                 }
                 
+                topics = 'Last topics :  <br>';
+                var colornum = 1;
+                var topicNames = data[""+sessionId]["topicNames"];
+                var topicLen = topicNames.length>1? 1:topicNames.length;
+                for(k=topicNames.length-1;k>=topicNames.length-topicLen;k--){
+                	topics +='<span class="masteryboxdashboard color'+colornum+ '">'+topicNames[k]+'</span>';
+                }
+                
+                
             	masteries = '<div id="last5masteriesdashboard">'+masteries+'</div><br>';
 			    
-            	efforts = '<div id="last5effortsdashboard">'+efforts+'</div>';
+            	efforts = '<div id="last5effortsdashboard">'+efforts+'</div><br>';
+            	
+            	topics = '<div id="last5topicsdashboard">'+topics+'</div><br>';
             	
         	}
        
@@ -115,7 +127,7 @@ function loadStudents(){
         		mytable += '<td><button class="StudentButton tooltipp studentIconColor'+auimage+'" onclick="getStudentDetails('+studentId+',' +sessionId+')"><img src="../../img/'+auimage+'.png"><br>'+studentName+ '<span class="tooltiptext">No Performance Data Available</span></button></td>';
         	}else {
         		
-        		mytable += '<td><button class="StudentButton tooltipp studentIconColor'+auimage+'" onclick="getStudentDetails('+studentId+' ,'+sessionId+')"><img src="../../img/'+auimage+'.png"><br>'+studentName+ masteries + efforts+/*'<span class="tooltiptext">'+ masteries + efforts+'</span>*/'</button></td>';
+        		mytable += '<td><button class="StudentButton tooltipp studentIconColor'+auimage+'" onclick="getStudentDetails('+studentId+' ,'+sessionId+')"><img src="../../img/'+auimage+'.png"><br>'+ studentName + masteries + efforts + topics +/*'<span class="tooltiptext">'+ masteries + efforts+'</span>*/'</button></td>';
         	}
           
         }
