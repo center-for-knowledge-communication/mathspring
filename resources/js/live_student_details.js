@@ -221,11 +221,11 @@ function getAUCounts(data){
     	if(parseFloat(data[i].au1).toFixed(2) >0.5){
         	au1count++;
         }
-        if(parseFloat(data[i].au2).toFixed(2) >0.5){
+        if(parseFloat(data[i].au2).toFixed(2) >0.1){
         	au2count++;
         }
         
-        if(parseFloat(data[i].au3).toFixed(2) >0.5){
+        if(parseFloat(data[i].au3).toFixed(2) >0.0){
         	au3count++;
         }
         
