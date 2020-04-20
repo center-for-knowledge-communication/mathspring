@@ -230,9 +230,9 @@ function getAUCounts(data){
         }
         
     }
-    arr.push({"au":"au1","count":au1count});
-    arr.push({"au":"au2","count":au2count});
-    arr.push({"au":"au3","count":au3count});
+    arr.push({"au":"Frown","count":au1count});
+    arr.push({"au":"Detest","count":au2count});
+    arr.push({"au":"Smile","count":au3count});
    // console.log("au3 pred 0 = "+arr[0].value);
     //console.log("date value = "+arr[0].date);
     return arr;
@@ -283,7 +283,7 @@ function drawLineChart(data,data2,data3) {
     var margin = { top: 20, right: 20, bottom: 30, left: 50 };
     var width = svgWidth - margin.left - margin.right; 
     var height = svgHeight - margin.top - margin.bottom;
-    var svg = d3.select('#linechart').append('svg').attr("width", svgWidth).attr("height", svgHeight+30);
+    var svg = d3.select('#linechart').append('svg').attr("width", svgWidth).attr("height", svgHeight+100);
     var g = svg.append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")" );
     var x = d3.scaleTime().rangeRound([0, width]);
     var y = d3.scaleLinear().rangeRound([height, 0]);
@@ -354,6 +354,31 @@ function drawLineChart(data,data2,data3) {
     .append("text")
     .text("Action Unit Prediction With Time")
     .attr("class", "title");
+    
+    svg.append("g")
+    .attr("transform", "translate(" + (width / 4 - 50) + "," + (svgHeight+50) + ")")
+    .append("text")
+    .text("Frown")
+    .attr("class", "legend")
+    .style("fill","orange");
+    
+    svg.append("g")
+    .attr("transform", "translate(" + (width / 2 - 50) + "," + (svgHeight+50) + ")")
+    .append("text")
+    .text("Detest")
+    .attr("class", "legend")
+    .style("fill","steelblue");
+    
+    svg.append("g")
+    .attr("transform", "translate(" + (width /1.5 - 50) + "," + (svgHeight+50) + ")")
+    .append("text")
+    .text("Smile")
+    .attr("class", "legend")
+    .style("fill","green");
+    
+    
+    
+    
 
 }
 
@@ -446,7 +471,7 @@ function drawPieChart(data,len) {
 
     var label = d3.arc()
         .outerRadius(radius)
-        .innerRadius(radius - 80);
+        .innerRadius(radius - 130);
 
     var arc = g.selectAll(".arc")
         .data(pie(data))
