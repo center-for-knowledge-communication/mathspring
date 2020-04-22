@@ -254,7 +254,7 @@ catch (Exception e) {
 			    <div class="upperStudentDetail">
 					<div id="linechart" class="split left">
 					</div>
-					<div id="piechart" class="split right">
+					<div id="pie_chart" class="split right">
 					</div>
 				</div>
 	             <br>
