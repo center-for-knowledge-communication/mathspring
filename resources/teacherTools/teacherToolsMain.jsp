@@ -251,51 +251,25 @@ catch (Exception e) {
         	<div id="live_student_details" style="display: none;text-align:center">
 	            <h1>Live Student Details</h1>
 	            <h3 id="studentname"></h3>
-			    <div>
-			    <span id="linechart"></span>
-			    
-    			<span id="pie_chart"></span>
-    			<!-- 
-    			<span id="bar_chart"></span>
-    			<!--  
-    			<span><div id="linechart"></div></span>
-			    
-    			<span><div id="pie_chart"></div></span>
-    			-->
-			    <!--<script src="<c:url value="https://d3js.org/d3.v4.min.js" />"></script>
-	             <script type="text/javascript" src="<c:url value="/js/live_student_details.js" />"></script> -->
-	             </div>
+			    <div class="upperStudentDetail">
+					<div id="linechart" class="split left">
+					</div>
+					<div id="piechart" class="split right">
+					</div>
+				</div>
 	             <br>
-	             <br>
-	             <div>
-	             	
-	             	<div class="split left">
-	             	<div id="bar_chart"></div>
-	             	 </div>
-	             	 
-	             	 <div class="split right">
-		             	<div class="centered">
-		             	 
-				            <div id="last5masteries"></div>
-						    <br><br>
-			    			<div id="last5efforts"></div>
-			    			<br><br>
-			    			<div id="last2topics"></div>
-		            	 
-		             	</div>
-	             	</div>
-	             	
-	             	
-	             </div>
-	             <!-- 
-	             <div>
-	             <div id="last5masteries"></div>
-			    <br>
-    			<div id="last5efforts"></div>
-    			<br>
-    			<div id="last2topics"></div>
-	             </div>
-	              -->
+	             <div id="lowerStudentdetail">
+					<div id="bar_chart" class="split left">
+					</div>
+					<div id="perf_detail" class="split right">
+						<div id="last5masteries"></div>
+						<br><br>
+						<div id="last5efforts"></div>
+						<br><br>
+						<div id="last2topics"></div>
+					</div>
+				 </div>
+	
 	             <br>
 	             <div id="refresh">
 	             	<button id="refreshButton">Refresh</button>

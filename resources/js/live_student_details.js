@@ -279,7 +279,7 @@ function parseData3(data) {
 
 function drawLineChart(data,data2,data3) {
 	
-    var svgWidth = 600, svgHeight = 400;
+    var svgWidth = 500, svgHeight = 400;
     var margin = { top: 20, right: 20, bottom: 30, left: 50 };
     var width = svgWidth - margin.left - margin.right; 
     var height = svgHeight - margin.top - margin.bottom;
@@ -296,8 +296,9 @@ function drawLineChart(data,data2,data3) {
                                                    return y(d.value)});
     var line3 = d3.line().x(function(d) { return x(d.date)}).y(function(d) {return y(d.value)});
 
-    x.domain(d3.extent(data2, function(d) { return d.date }));
-    y.domain(d3.extent(data, function(d) { return d.value }));
+    x.domain(d3.extent(data, function(d) { return d.date }));
+    //y.domain(d3.extent(data, function(d) { return d.value }));
+    y.domain(d3.extent([0,1]));
     
     g.append("g").attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x))
@@ -356,21 +357,21 @@ function drawLineChart(data,data2,data3) {
     .attr("class", "title");
     
     svg.append("g")
-    .attr("transform", "translate(" + (width / 4 - 50) + "," + (svgHeight+50) + ")")
+    .attr("transform", "translate(" + (width / 4) + "," + (svgHeight+50) + ")")
     .append("text")
     .text("Frown")
     .attr("class", "legend")
     .style("fill","orange");
     
     svg.append("g")
-    .attr("transform", "translate(" + (width / 2 - 50) + "," + (svgHeight+50) + ")")
+    .attr("transform", "translate(" + (width / 2) + "," + (svgHeight+50) + ")")
     .append("text")
     .text("Detest")
     .attr("class", "legend")
     .style("fill","steelblue");
     
     svg.append("g")
-    .attr("transform", "translate(" + (width /1.5 - 50) + "," + (svgHeight+50) + ")")
+    .attr("transform", "translate(" + (width - 100) + "," + (svgHeight+50) + ")")
     .append("text")
     .text("Smile")
     .attr("class", "legend")
@@ -444,7 +445,7 @@ function drawPieChart(data,len) {
 
     //var data = [2, 4, 8, 10];
 
-    var svgWidth = 500, svgHeight = 400;
+    var svgWidth = 350, svgHeight = 320;
     //var margin = { top: 20, right: 20, bottom: 30, left: 50 };
     var width = svgWidth;// - margin.left - margin.right;
     var height = svgHeight;// - margin.top - margin.bottom;
@@ -471,7 +472,7 @@ function drawPieChart(data,len) {
 
     var label = d3.arc()
         .outerRadius(radius)
-        .innerRadius(radius - 130);
+        .innerRadius(radius - 110);
 
     var arc = g.selectAll(".arc")
         .data(pie(data))

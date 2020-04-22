@@ -117,15 +117,16 @@
 
 /* Control the left side */
 .left {
-  left: 0;
-  
+    /* left: 0; */
+    float: left;
 }
 
 /* Control the right side */
 .right {
-  right: 0;
-  float:right;
-  margin-top:-500px;
+    /* right: 0; */
+    float: right;
+    margin-right: 100px;
+    /* margin-top: -500px; */
 }
 
 /* If you want the content centered horizontally and vertically */
@@ -136,6 +137,15 @@
   text-align: center;
 }
 
+.upperStudentDetail {
+
+	height: 400px;
+}
+
+.lowerStudentDetail {
+
+	height: 450px;
+}
 
 .color1 {
   background-color: #4daf4a;
