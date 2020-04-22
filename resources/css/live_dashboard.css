@@ -77,6 +77,12 @@
   visibility: visible;
 }
 
+#last5masteriesdashboard{
+	margin-bottom:10px;
+}
+#last5effortsdashboard{
+	margin-bottom:10px;
+}
 .masteryboxdashboard {
   
   height:40px;

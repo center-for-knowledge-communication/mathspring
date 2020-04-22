@@ -111,11 +111,11 @@ function loadStudents(){
                 }
                 
                 
-            	masteries = '<div id="last5masteriesdashboard">'+masteries+'</div><br>';
+            	masteries = '<div id="last5masteriesdashboard">'+masteries+'</div>';
 			    
-            	efforts = '<div id="last5effortsdashboard">'+efforts+'</div><br>';
+            	efforts = '<div id="last5effortsdashboard">'+efforts+'</div>';
             	
-            	topics = '<div id="last5topicsdashboard">'+topics+'</div><br>';
+            	topics = '<div id="last5topicsdashboard">'+topics+'</div>';
             	
         	}
        
