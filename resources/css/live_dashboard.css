@@ -106,13 +106,15 @@
 
 /* Split the screen in half */
 .split {
-  height: 600px;
-  width: 50%;
   
+  width: 40%;
+  /* 
+  height: 600px;
   z-index: 1;
   top: 0;
   overflow-x: hidden;
   padding-top: 20px;
+  */
 }
 
 /* Control the left side */
@@ -139,7 +141,7 @@
 
 .upperStudentDetail {
 
-	height: 400px;
+	height: 500px;
 }
 
 .lowerStudentDetail {
@@ -147,6 +149,10 @@
 	height: 450px;
 }
 
+.refreshStudent {
+	margin-top: 450px;
+	margin-bottom: 50px;
+}
 .color1 {
   background-color: #4daf4a;
 }

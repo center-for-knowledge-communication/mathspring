@@ -271,7 +271,7 @@ catch (Exception e) {
 				 </div>
 	
 	             <br>
-	             <div id="refresh">
+	             <div class="refreshStudent">
 	             	<button id="refreshButton">Refresh</button>
 	             </div>
 	             
