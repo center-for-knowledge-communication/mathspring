@@ -4,6 +4,8 @@
  * Date: 8/26/13
  * Time: 5:03 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank 04-24-2020 issue #16 removed done button from example dialog
  */
 
 function requestSolution(globals) {
@@ -119,13 +121,20 @@ function playHint (hintLabel) {
     }
 }
 
-
+var exampleHintStatus = true;
 function example_playHint(hintLabel) {
+	
     if (isHTML5Example() || isFlashExample()) {
-        if (isHTML5Example())
-            document.getElementById(EXAMPLE_FRAME).contentWindow.prob_playHint(hintLabel);
-        else
-            document.getElementById(EXAMPLE_FLASH_PROB_PLAYER).playHint(hintLabel);
+       	try {
+	        if (isHTML5Example())
+	            document.getElementById(EXAMPLE_FRAME).contentWindow.prob_playHint(hintLabel);
+	        else
+	            document.getElementById(EXAMPLE_FLASH_PROB_PLAYER).playHint(hintLabel);
+    	}
+		catch(err) {
+	        exampleHintStatus = false;
+        	console.log(err.message);
+		}
     }
 }
 
@@ -143,8 +152,15 @@ function solveNextHint () {
 function example_solveNextHint () {
     var index = globals.exampleHintSequence.indexOf(globals.exampleCurHint);
     if (index < globals.exampleHintSequence.length) {
-        example_playHint(globals.exampleCurHint);
+    	var currHint = globals.exampleCurHint;
         globals.exampleCurHint = globals.exampleHintSequence[index+1];
+        exampleHintStatus = true;
+        example_playHint(currHint);
+        if (!exampleHintStatus) {
+        	alert(hint_not_found);
+        	globals.exampleCurHint = "undefined";
+        }
+
     }
 }
 

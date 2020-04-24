@@ -1,3 +1,5 @@
+// Frank 04-24-2020 issue #16 removed done button from example dialog
+
 var globals;
 var sysGlobals;
 var transients;
@@ -184,22 +186,6 @@ function showHourglassCursor(b) {
 
 function displayHintCount () {
 	
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-
-	var hintText = "";
-	if (languageSet === "en") {
-		hintText = "Hint";
-	}
-	else {
-		hintText = "Ayuda";
-	}
-
     if (globals.numHints >= 0 && globals.numHintsSeen == 0) {
         $("#hint_label").html(hintText + "(" + globals.numHints + ")");
     } else if (globals.numHintsSeen <= globals.numHints) {
@@ -209,23 +195,10 @@ function displayHintCount () {
 
 function showProblemInfo (pid, name, topic, standards) {
     $("#pid").text(pid + ":" + name);  // shows the problem ID + resource
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-		if (languageSet == 'es') {
-			 $("#problemTopicAndStandards").html(
-            "<p style='float: left'>Tema actual: " + topic + "</p>" +
-            "<p style='float: right'>Area curricular: " + standards + "</p>");
-		}else{
-			$("#problemTopicAndStandards").html(
-            "<p style='float: left'>Current Topic: " + topic + "</p>" +
-            "<p style='float: right'>Standards: " + standards + "</p>"
-			);
-	}
+	 $("#problemTopicAndStandards").html(
+			 "<p style='float: left'>" + problem_current_topic + " " + topic + "</p>" +
+			 "<p style='float: right'>" + problem_standards + " "  + standards + "</p>"
+	 );
     displayHintCount();
 }
 
@@ -325,7 +298,7 @@ function showInstructionsDialog (instructions) {
 function instructions () {
     // probably want something slicker than this alert dialog.
     if (globals.instructions == "")
-        alert("Sorry.  There are no instructions for this problem.");
+        alert(no_instructions_to_show);
     else {
         showInstructionsDialog(globals.instructions)
 //        $(INSTRUCTIONS_TEXT_ELT).text(globals.instructions);
@@ -440,16 +413,8 @@ function showDashboard () {
 
 
 function processShowExample (responseText, textStatus, XMLHttpRequest) {
-	var languagePreference = window.navigator.language;
 	
-	var amsg = "";
-	if (languagePreference == "en") {
-		 amsg = "There is not an example to show for this problem.";
-	}
-	else {
-		 amsg = "No hay un ejemplo para mostrar para este problema.";
-	}
-
+	var amsg = no_example_to_show;
 	checkError(responseText);
     var activity = JSON.parse(responseText);
     if (activity.activityType === NO_MORE_PROBLEMS) {
@@ -483,7 +448,7 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     // khanacademy won't play inside an iFrame because it sets X-Frame-Options to SAMEORIGIN.
     if (video != null)
         window.open(video, "width=500, height=500");
-    else alert("There is no video to show for this problem");
+    else alert(no_video_to_show);
 }
 
 function openExampleDialog(solution){
@@ -498,6 +463,7 @@ function openExampleDialog(solution){
     // show a div that contains the example.
 //    $("#frameContainer").hide();              // hide the current problem
     $(EXAMPLE_CONTAINER_DIV_ID).dialog("open");        // TODO need to shrink height
+
 }
 
 // makes a beeping sound which is used at the beginning of each problem when the classconfig.soundSync is true.
@@ -726,6 +692,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     // Replaceing the example div for the same reason as the above.
     $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="600" height="600" src="" frameborder="no" scrolling="no"></iframe>');
     var activity = JSON.parse(responseText);
+    console.log(responseText);
     var mode = activity.mode;
     var activityType = activity.activityType;
     var type = activity.type;
@@ -1275,13 +1242,10 @@ function clickHandling () {
             if (id_exists)  {
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
-			var languagePreference = window.navigator.language;
-			if (languagePreference.includes("es")) {
-				$("#exampleContainer").attr('title', 'Ve y Eschcha a Este Ejemplo. Usa “Paso Siguiente” Para Continuar.');
-				$("#pulsate_play_button").text('Paso Siguiente');
-				$("#example_button_done").text('Terminé de ver');
-			}
+			$("#exampleContainer").attr('title', watch_and_listen_instructions);
+			$("#pulsate_play_button").text(example_problem_play_hints);
 
+			//TBD			$("#video").click(globals);
         },
         close: function () { exampleDialogCloseHandler(); } ,
         buttons: [
@@ -1293,31 +1257,38 @@ function clickHandling () {
                     if (id_exists)  {
                         document.getElementById('pulsate_play_button').id = 'play_button';
                     }
+                    var txt = $("#play_button").text();
+                    if (txt == example_problem_done) {
+                		$( this ).dialog( "close" );
+                		return;
+                    }
                     clicks++;  //count clicks
                     if(clicks === 1) {
                         timer = setTimeout(function() {
+                     
                             example_solveNextHint();  // perform single-click action
+                            var index = globals.exampleHintSequence.indexOf(globals.exampleCurHint);
+                            if (index == -1) {
+                            	$("#play_button").text(example_problem_done);
+                            }
                             clicks = 0;             //after action performed, reset counter
 
                         }, DELAY);
 
                     } else {
 
-                        clearTimeout(timer);    //prevent single-click action
-                        example_solveNextHint();  //perform double-click action
+                    	clearTimeout(timer);    //prevent single-click action
+                    	example_solveNextHint();  //perform double-click action
+                        var index = globals.exampleHintSequence.indexOf(globals.exampleCurHint);
+                        if (index == -1) {
+                        	$("#play_button").text(example_problem_done);
+                        }
                         clicks = 0;             //after action performed, reset counter
                     }
                 },
                 dblclick: (function (e) {
                     e.preventDefault();
                 })
-            },
-            {	
-            	id: 'example_button_done',
-                text: "Done",
-                click: function() {
-                    $( this ).dialog( "close" );
-                }
             }
         ]
     });

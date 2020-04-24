@@ -5,6 +5,7 @@
 <% 
 
 // Frank 10-22-19 Issue # 9 Add Enable Flash message at bottom of screen
+// Frank 04-24-20 Issue # 16 Added Multi-lingual text for tutorhut_new.js
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -93,6 +94,24 @@ else
 
 	<!-- js for bootstrap-->
 </c:if>
+
+	<!-- Multi-lingual text for tutorhut_new.js -->
+<script type="text/javascript">
+	var stepText = "<%= rb.getString("step") %>";
+	var hintText = "<%= rb.getString("hint") %>";
+	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";
+	var no_video_to_show = "<%= rb.getString("no_video_to_show") %>";
+	var no_instructions_to_show = "<%= rb.getString("no_instructions_to_show") %>";
+	var problem_current_topic = "<%= rb.getString("problem_current_topic") %>";
+	var problem_standards = "<%= rb.getString("problem_standards") %>";
+	var watch_and_listen_instructions = "<%= rb.getString("watch_and_listen_instructions") %>";
+	var example_problem_play_hints = "<%= rb.getString("example_problem_play_hints") %>";
+	var example_problem_done = "<%= rb.getString("example_problem_done") %>";
+	var hint_not_found = "<%= rb.getString("hint_not_found") %>"; 
+	
+	var yes_choice = "<%= rb.getString("yes") %>";	
+	var no_choice = "<%= rb.getString("no") %>";
+</script>
 
 
 <script type="text/javascript" src="js/simple-slider.js"></script>
@@ -187,7 +206,6 @@ else
             componentAction: null,
             learningCompanionTextMessage: null
         }
-
 
         // Unfortunately the back button will run this function too which means that it can generate a BeginExternalActivity
         $(document).ready(function () {
@@ -400,7 +418,7 @@ label {
 						<p id="pid">${probId}</p>
 						<h2>&nbsp</h2>
 						<h2>&nbsp</h2>
-						<h2>If no problems appear, try 'Enable Flash'</h2>
+						<h2><%= rb.getString("if_no_problems_appear") %></h2>
 						<div class="dev-view">
 							<p id="effort">${effort}</p>
 							<p class="dev-view-label" id="answer"><%= rb.getString("answer")%>:
