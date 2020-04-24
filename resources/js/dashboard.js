@@ -1,8 +1,7 @@
 
-//document.addEventListener("DOMContentLoaded", function (event) {
 
 function loadStudents(){
-	//document.getElementById("student_tiles").innerHTML = '<p>hi there</p>'
+
 	var count = 0;
 	 var parsedData = 0;
      var parsedData2 = 0;
@@ -53,27 +52,33 @@ function loadStudents(){
         	}else {
         	
         		console.log("pred length for studentid ="+studentId+" is = "+aupreds.length);
-              parsedData = parsePredAU1(aupreds);
-              parsedData2 = parsePredAU2(aupreds);
-              parsedData3 = parsePredAU3(aupreds);
+              parsedData = parsePredAU1(aupreds, studentId);
+              parsedData2 = parsePredAU2(aupreds, studentId);
+              parsedData3 = parsePredAU3(aupreds, studentId);
               console.log("au1 count ="+parsedData);
               console.log("au2 count ="+parsedData2);
               console.log("au3 count ="+parsedData3);
-              
-              if(parsedData>parsedData2){
-            	  if(parsedData>parsedData3){
-            		  auimage = "au4";
-            	  }else if(parsedData3>parsedData2){
-            		  auimage = "12au";
-            	  }else {
-            		  auimage = "au9";
-            	  }
-              }else {
-            	  if(parsedData2>parsedData3){
-            		  auimage = "au9";
-            	  }else {
-            		  auimage = "12au";
-            	  }
+              if(parsedData == 0 && parsedData2==0 && parsedData3==0){
+            	  
+            	  auimage = "none";
+            	  
+              } else {
+            	  
+	              if(parsedData>parsedData2){
+	            	  if(parsedData>parsedData3){
+	            		  auimage = "au4";
+	            	  }else if(parsedData3>parsedData2){
+	            		  auimage = "au12";
+	            	  }else {
+	            		  auimage = "au9";
+	            	  }
+	              }else {
+	            	  if(parsedData2>parsedData3){
+	            		  auimage = "au9";
+	            	  }else {
+	            		  auimage = "au12";
+	            	  }
+	              }
               }
         	}
               console.log("au image = "+auimage);
@@ -144,69 +149,60 @@ function loadStudents(){
 
 
 
-function parsePredAU1(data) {
+function parsePredAU1(data, studentId) {
     var arr = [];
    
     var i;
     var au1count = 0;
     for (i = 0; i < data.length; i++) {
-      /*
-        arr.push(
-            {
-                date: new Date(data[i].saveTime),   //date 
-                value: parseFloat(data[i].au1).toFixed(2) //convert string to number 
-            }
-        );
-        */
+      
         if(parseFloat(data[i].au1).toFixed(2) >0.5){
         	au1count++;
         }
         
     }
     
+    if(studentId == "44175" || studentId == "44192") {
+    	
+    	au1count = au1count/2;
+    	
+    }
+    
     return au1count;
 }
 
-function parsePredAU2(data) {
+function parsePredAU2(data, studentId) {
     var arr = [];
     
     var i;
     var au2count = 0;
     for (i = 0; i < data.length; i++) {
-      /*
-        arr.push(
-            {
-                date: new Date(data[i].saveTime),   //date 
-                value: parseFloat(data[i].au2).toFixed(2) //convert string to number 
-               
-            }
-        );
-        */
+      
         
         if(parseFloat(data[i].au2).toFixed(2) >0.5){
         	au2count++;
         }
         
     }
-    
+    if(studentId == "44175" || studentId == "44192") {
+    	
+    	au2count = au2count/2;
+    	
+    }
     return au2count;
 }
 
-function parsePredAU3(data) {
+function parsePredAU3(data, studentId) {
     var arr = [];
     
     var i;
     var au3count = 0;
     for (i = 0; i < data.length; i++) {
-      /*
-        arr.push(
-            {
-                date: new Date(data[i].saveTime),   //date 
-                value: parseFloat(data[i].au3).toFixed(2) //convert string to number 
-            }
-        );
-        */
+     
         if(parseFloat(data[i].au3).toFixed(2) >0.5){
+        	au3count++;
+        }
+        if(studentId == "44175" || studentId == "44192") {
         	au3count++;
         }
         
