@@ -18,10 +18,12 @@ import java.io.IOException;
  * 1b    An error, The user is already logged in.    Generate loginExistingsession.jsp (asks if they want to continue by logging out existing session)
  * 2.   Successful login (first login for this user).   Generate login_2.jsp (asks for name)
  * 3.   Successful login (not first login).   Generate login_3.jsp (asks for flanking users)
+ * 
+ *  Frank 04-24-2020 issue #28
  */
 public class LoginK12_2 extends Login2 {
 
-    public static final String LOGIN_JSP = "login/loginK12.jsp";
+    public static final String LOGIN_JSP = "login/loginK12_new.jsp";
     public static final String LOGIN_JSP_NEW = "login/loginK12_new.jsp";
 
     public LoginK12_2() {

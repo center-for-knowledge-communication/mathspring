@@ -7,10 +7,11 @@ import java.util.List;
 
 /**
  * Created by Neeraj on 3/24/2017.
+ * Frank 04-24-2020 issue #28
  */
 public interface TTLoginService{
 
-    public int loginAssist(String uname,String password) throws TTCustomException;
+    public int loginAssist(String uname,String password, String forgotPassword) throws TTCustomException;
 
     public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException;
 

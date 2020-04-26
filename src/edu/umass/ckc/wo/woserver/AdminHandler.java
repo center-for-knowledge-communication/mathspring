@@ -142,6 +142,10 @@ public class AdminHandler {
             new TeacherRegistrationHandler().handleEvent(conn, (AdminTeacherRegistrationEvent) e, servletRequest, servletResponse);
             return false; // forward to JSP , tell caller not to generate output
         }
+        if (e instanceof AdminTeacherEditEvent) {
+            new TeacherEditHandler().handleEvent(conn, (AdminTeacherEditEvent) e, servletRequest, servletResponse);
+            return false; // forward to JSP , tell caller not to generate output
+        }
         else if (e instanceof AdminChooseActivityEvent) {
             AdminChooseActivityEvent ee = (AdminChooseActivityEvent) e;
             int teacherId = ee.getTeacherId();
