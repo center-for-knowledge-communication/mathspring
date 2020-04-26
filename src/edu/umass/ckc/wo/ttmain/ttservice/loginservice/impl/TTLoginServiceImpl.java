@@ -7,12 +7,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
+import edu.umass.ckc.email.Emailer;
+import edu.umass.ckc.wo.beans.Teacher;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
 import edu.umass.ckc.wo.cache.ProblemMgr;
@@ -29,6 +32,7 @@ import edu.umass.ckc.wo.tutor.Settings;
 
 /**
  * Created by Neeraj on 3/25/2017.
+ * * Frank 	02-24-20	Issue #28
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -38,11 +42,25 @@ public class TTLoginServiceImpl implements TTLoginService {
     private TTConfiguration connection;
 
     @Override
-    public int loginAssist(String uname, String password) throws TTCustomException {
+    public int loginAssist(String uname, String password, String forgotPassword) throws TTCustomException {
         try {
             int teacherId = DbTeacher.getTeacherId(connection.getConnection(), uname, password);
-            if (teacherId == -1)
+            if (teacherId == -1) {
+            	if (forgotPassword.equals("on")) {
+                    Teacher teacher = DbTeacher.getTeacherFromUsername(connection.getConnection(), uname);
+                    Random rand = new Random();
+                    int x = rand.nextInt(999999);
+                    String pw = Integer.toString(x);
+                    logger.info(uname + ":" + pw);
+                    System.out.println(uname + ":" + pw);
+                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
+            		String emailAddress = teacher.getEmail();
+            		String myMailserver = "mail.cs.umass.edu";
+            		Emailer em = new Emailer();
+            		//em.sendEmail(emailAddress,"noreply@mathspring.com", myMailserver, "Here is your pw ", "1234");
+            	}
                 return -1;
+            }
             else
                 return teacherId;
         } catch (Exception e) {
@@ -71,8 +89,12 @@ public class TTLoginServiceImpl implements TTLoginService {
             Collections.reverse(classInfoListLatest);
             Classes classbean = new Classes(classInfoListLatest.toArray(new ClassInfo[classInfoListLatest.size()]));
             Classes classbeanArchived = new Classes(classInfoListArchived.toArray(new ClassInfo[classInfoListArchived.size()]));
-            String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
-            model.addAttribute("teacherName", teacherName);
+            //String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
+            Teacher teacher = DbTeacher.getTeacher(connection.getConnection(), teacherId);
+            model.addAttribute("teacherName", teacher.getFname() + " " + teacher.getLname());
+            model.addAttribute("teacherFname", teacher.getFname());
+            model.addAttribute("teacherLname", teacher.getLname());
+            model.addAttribute("teacherEmail", teacher.getEmail());
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
             
