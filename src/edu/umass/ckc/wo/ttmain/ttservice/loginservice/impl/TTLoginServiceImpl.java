@@ -32,7 +32,8 @@ import edu.umass.ckc.wo.tutor.Settings;
 
 /**
  * Created by Neeraj on 3/25/2017.
- * * Frank 	02-24-20	Issue #28
+ * Frank 	02-24-20	Issue #28
+ * Frank	04-27-2020  Disable password update until email is working
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -53,11 +54,11 @@ public class TTLoginServiceImpl implements TTLoginService {
                     String pw = Integer.toString(x);
                     logger.info(uname + ":" + pw);
                     System.out.println(uname + ":" + pw);
-                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
+                    //DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
             		String emailAddress = teacher.getEmail();
             		String myMailserver = "mail.cs.umass.edu";
             		Emailer em = new Emailer();
-            		//em.sendEmail(emailAddress,"noreply@mathspring.com", myMailserver, "Here is your pw ", "1234");
+            		em.sendEmail(emailAddress,"noreply@mathspring.com", myMailserver, "Here is your pw ", pw);
             	}
                 return -1;
             }
