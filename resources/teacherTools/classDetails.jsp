@@ -5,6 +5,7 @@
 <!-- Frank  01-20-20    Issue #39 and #48 use classId as alternative password -->
 <!-- Frank  02-17-20    ttfixesR3 -->
 <!-- Frank  03-03-20    Issue #48 more instructions -->
+<!-- Frank  04-30-20    Issue #96 download not using filter -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -135,6 +136,7 @@ var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
+var psppFilter = "~~Y";
 //var urlColumnNames;
 
 //Report2 Varriables
@@ -218,6 +220,24 @@ else {
           "NO DATA" : "No data could be gathered."
     }
 }
+
+function getFilter() {
+	var showNamesState = "N";
+	if (document.getElementById("showNames").checked == true) {
+		showNamesState = "Y";
+	}
+	var psppFilter = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
+	
+	var a_href = '${pageContext.request.contextPath}';
+	a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
+	a_href = a_href + teacherID;
+	a_href = a_href + "&classId=";
+	a_href = a_href + ${classInfo.classid};
+	a_href = a_href + "&filter=";
+	a_href = a_href + psppFilter;
+	document.getElementById("downloadReportSixBtn").href = a_href;
+}
+
 
 function ftest(problemId) {
 	var tmp1 = '<img style="display: block; margin: 0 auto" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
@@ -2747,7 +2767,7 @@ var completeDataChart;
 
     	}
 */    
-    $('#standardsBtn').on('click', function ()  {
+    $('#showReportSixBtn').on('click', function ()  {
         $('#collapseSix').find('.loader').show();
         var showNamesState = "N";
         if (document.getElementById("showNames").checked == true) {
@@ -4226,7 +4246,7 @@ var completeDataChart;
                                         </a>
                                     </li>
                                     <li>
-                                        <label style="padding-right: 10px;<%= rb.getString("download_emotion_data") %>></label>
+                                        <label style="padding-right: 10px;"><%= rb.getString("download_emotion_data") %>></label>
                                         <a href="${pageContext.request.contextPath}/tt/tt/downloadStudentEmotions?teacherId=${teacherId}&classId=${classInfo.classid}"
                                            data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
                                            class="downloadPerStudentReport" aria-expanded="true"
@@ -4421,28 +4441,22 @@ var completeDataChart;
                         </div>
 
                         <div id="collapseSix" class="panel-collapse collapse">                
-                            <div class="panel-body">
-                                <label><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></label>
-                                <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
-                                    <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                </a>
-                            </div>                          
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="">
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilter();">
 							</div>
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-								  <input id="daysFilter" style="width:32px" type="text" name="" value="">   
+								  <input id="daysFilter" style="width:32px" type="text" name="" value="" onblur="getFilter();">   
 								  <label class="report_filters"><%= rb.getString("days") %></label>
 							</div>
                             <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNames" name="" value="Y" checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNames" name="" value="Y"  onblur="getFilter();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
-								  <input id=standardsBtn class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
                             </div>
-							
                             <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
