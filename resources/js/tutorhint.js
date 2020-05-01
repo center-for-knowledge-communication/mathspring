@@ -7,6 +7,7 @@
  * 
  * Frank 04-24-2020 issue #16 removed done button from example dialog
  * Frank 04-27-2020 Issue #16 handle problems with duplicate hint labels hanging the example processing"
+ * Frank 05-01-2020 Issue #16R2 cut and paste Typo caused catastrophic failure 
  */
 
 function requestSolution(globals) {
@@ -153,7 +154,6 @@ function solveNextHint () {
 function example_solveNextHint () {
     var index = globals.exampleHintSequence.indexOf(globals.exampleCurHint);
     if (index < globals.exampleHintSequence.length) {
-    	if (index )
     	var currHint = globals.exampleCurHint;
         globals.exampleCurHint = globals.exampleHintSequence[index+1];
         if (globals.exampleHintSequence[index+1] == globals.exampleHintSequence[index]) {
