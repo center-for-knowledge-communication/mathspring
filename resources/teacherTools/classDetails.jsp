@@ -3816,7 +3816,7 @@ var completeDataChart;
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
-
+            getFilter();
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
                 "bFilter": false,

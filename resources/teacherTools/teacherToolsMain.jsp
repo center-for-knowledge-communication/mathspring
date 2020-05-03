@@ -869,22 +869,15 @@ function registerAllEvents(){
                         <div class="panel-body">
                             <ul>
                                 <li>
-                                    <label style="padding-right: 10px;"><%= rb.getString("download_student_data") %></label>
+                                    <label style="padding-right: 10px;">Download Teacher Report (TBD)</label>
+<!--
                                     <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentReport?teacherId=${teacherId}&classId=${classInfo.classid}"
                                        data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
                                        class="downloadPerStudentReport" aria-expanded="true"
                                        aria-controls="teacherActivities">
                                         <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                     </a>
-                                </li>
-                                <li>
-                                    <label style="padding-right: 10px;"><%= rb.getString("download_emotion_data") %>></label>
-                                    <a href="${pageContext.request.contextPath}/tt/tt/downloadStudentEmotions?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                       data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                       class="downloadPerStudentReport" aria-expanded="true"
-                                       aria-controls="teacherActivities">
-                                        <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                    </a>
+-->
                                 </li>
                             </ul>
                         </div>
