@@ -1,4 +1,5 @@
 // Frank 04-24-2020 issue #16 removed done button from example dialog
+// Frank 05-06-2020 issue #87 call showVideo() at start of example problem
 
 var globals;
 var sysGlobals;
@@ -332,15 +333,19 @@ function myprogress() {
 
 function callReadProb() {
     debugAlert("In  callReadProb");
-    if (isFlashProblem() || isHTML5Problem())   {
-        incrementTimers(globals);
-        servletGet("ReadProblem", {probElapsedTime: globals.probElapsedTime});
-    }
-    if (isHTML5Problem())
-        document.getElementById(PROBLEM_WINDOW).contentWindow.prob_readProblem();
-    else if (isFlashProblem())
-        document.getElementById(FLASH_PROB_PLAYER).readProblem();
-
+   	try {
+	    if (isFlashProblem() || isHTML5Problem())   {
+	        incrementTimers(globals);
+	        servletGet("ReadProblem", {probElapsedTime: globals.probElapsedTime});
+	    }
+	    if (isHTML5Problem())
+	        document.getElementById(PROBLEM_WINDOW).contentWindow.prob_readProblem();
+	    else if (isFlashProblem())
+	        document.getElementById(FLASH_PROB_PLAYER).readProblem();
+   	}
+	catch(err) {
+    	console.log(err.message);
+	}    
 }
 
 // fields the click on the hint button.
@@ -1242,10 +1247,10 @@ function clickHandling () {
             if (id_exists)  {
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
+	        showVideo(globals);
 			$("#exampleContainer").attr('title', watch_and_listen_instructions);
 			$("#pulsate_play_button").text(example_problem_play_hints);
-
-			//TBD			$("#video").click(globals);
+		    
         },
         close: function () { exampleDialogCloseHandler(); } ,
         buttons: [
