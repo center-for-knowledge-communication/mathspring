@@ -6,6 +6,7 @@
 <!-- Frank  02-17-20    ttfixesR3 -->
 <!-- Frank  03-03-20    Issue #48 more instructions -->
 <!-- Frank  04-30-20    Issue #96 download not using filter -->
+<!-- Frank  05-07-20    Issue #73 restrict thumbnail sizes in reports Max-width 400 max-height 400 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -240,20 +241,19 @@ function getFilter() {
 
 
 function ftest(problemId) {
-	var tmp1 = '<img style="display: block; margin: 0 auto" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
+	var tmp1 = '<img style="display: block; margin: 0 auto; max-width:400px; max-height:400px;" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
     var tmp2 = '.jpg" />';
     var tmp3 = tmp1 + problemId + tmp2;
     $('#perStudentPerProblemImage').empty();
     $('#perStudentPerProblemImage').append(tmp3);
     
-    document.getElementById("abcde").textContent = "";
-    
+    document.getElementById("perStudentPerProblemImageHdr").textContent = "";
     var tmp;
     var strProblemId = "" + problemId;
     for (const Desc in perStudentPerProblemXrefMap) {
     	tmp = "" + perStudentPerProblemXrefMap[Desc];
     	if (tmp === strProblemId) {
-    		document.getElementById("abcde").textContent = "" + Desc;
+    		document.getElementById("perStudentPerProblemImageHdr").textContent = "" + Desc;
     		break;
     	}
     }
@@ -1798,10 +1798,10 @@ else {
                         $('a[rel=popoverPerProblem]').popover({
                             html: true,
                             trigger: 'hover',
-                            placement: 'top',
+                            placement: 'right',
                             container: 'body',
                             content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
+                                return '<img  style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                             }
                         });
                         $(rowID).toggleClass('zoomIn zoomOut');
@@ -1921,7 +1921,7 @@ else {
                             placement: 'top',
                             container: 'body',
                             content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                             }
                         });
                         $(rowID).toggleClass('zoomIn zoomOut');
@@ -2214,9 +2214,9 @@ else {
                         $('a[rel=popover]').popover({
                             html: true,
                             trigger: 'hover',
-                            placement: 'right',
+                            placement: 'top',
                             content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                             }
                         });
                         $('a[rel=popoverLabel]').popover({
@@ -2400,7 +2400,7 @@ else {
                 placement: 'top',
                 container: 'body',
                 content: function () {
-                    return '<img src="' + $(this).data('img') + '" />';
+                    return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                 }
             });
             $('a[rel=popoverLabel]').popover({
@@ -3119,10 +3119,10 @@ var completeDataChart;
                         $('a[rel=popoverPerProblem]').popover({
                             html: true,
                             trigger: 'hover',
-                            placement: 'right',
+                            placement: 'top',
                             container: 'body',
                             content: function () {
-                                return '<img src="' + $(this).data('img') + '" />';
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                             }
                         });
 
@@ -3754,10 +3754,10 @@ var completeDataChart;
                             $('a[rel=popoverPerProblem]').popover({
                                 html: true,
                                 trigger: 'hover',
-                                placement: 'top',
+                                placement: 'right',
                                 container: 'body',
                                 content: function () {
-                                    return '<img src="' + $(this).data('img') + '" />';
+                                    return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
                                 }
                             });
 
@@ -4849,7 +4849,7 @@ var completeDataChart;
         <!-- Modal content-->
         <div class="pspp-modal-content perStudentperProblem-modal-content">
             <div class="pspp-modal-header">
-            	<span id="abcde" class="modal-title"></span></div>
+            	<span id="perStudentPerProblemImageHdr" class="modal-title"></span></div>
             <div>
             	<div id="perStudentPerProblemImage" ></div>
             </div>
