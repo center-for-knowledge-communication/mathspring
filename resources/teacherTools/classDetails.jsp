@@ -7,6 +7,7 @@
 <!-- Frank  03-03-20    Issue #48 more instructions -->
 <!-- Frank  04-30-20    Issue #96 download not using filter -->
 <!-- Frank  05-07-20    Issue #73 restrict thumbnail sizes in reports Max-width 400 max-height 400 -->
+<!-- Frank  05-07-20    Issue #73 change thumbnail locations to 'top' for some reports. Fixes thumbnails off-screen.  -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -1798,7 +1799,7 @@ else {
                         $('a[rel=popoverPerProblem]').popover({
                             html: true,
                             trigger: 'hover',
-                            placement: 'right',
+                            placement: 'top',
                             container: 'body',
                             content: function () {
                                 return '<img  style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
@@ -3300,7 +3301,7 @@ var completeDataChart;
                         $('a[rel=popoverCluster]').popover({
                             html: false,
                             trigger: 'hover',
-                            placement: 'right',
+                            placement: 'top',
                             container: 'body',
                         });
                     }
@@ -3321,7 +3322,7 @@ var completeDataChart;
                             $('a[rel=popoverCluster]').popover({
                                 html: false,
                                 trigger: 'hover',
-                                placement: 'right',
+                                placement: 'top',
                                 container: 'body',
                             });
                         }
@@ -3754,7 +3755,7 @@ var completeDataChart;
                             $('a[rel=popoverPerProblem]').popover({
                                 html: true,
                                 trigger: 'hover',
-                                placement: 'right',
+                                placement: 'top',
                                 container: 'body',
                                 content: function () {
                                     return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';

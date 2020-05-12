@@ -14,7 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
-import edu.umass.ckc.email.Emailer;
+import com.sun.mail.smtp.SMTPTransport;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Date;
+import java.util.Properties;
+
 import edu.umass.ckc.wo.beans.Teacher;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
@@ -34,6 +43,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Created by Neeraj on 3/25/2017.
  * Frank 	02-24-20	Issue #28
  * Frank	04-27-2020  Disable password update until email is working
+ * Frank    05-12-2020  send password in email now working 
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -50,15 +60,56 @@ public class TTLoginServiceImpl implements TTLoginService {
             	if (forgotPassword.equals("on")) {
                     Teacher teacher = DbTeacher.getTeacherFromUsername(connection.getConnection(), uname);
                     Random rand = new Random();
-                    int x = rand.nextInt(999999);
-                    String pw = Integer.toString(x);
+                    int x = rand.nextInt(99999);
+                    String symbols = "!#$%";
+                    int mod = x % 3;
+                    String pw = uname.substring(0,2) + Integer.toString(x) + symbols.substring(mod,mod+1);
                     logger.info(uname + ":" + pw);
                     System.out.println(uname + ":" + pw);
-                    //DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
-            		String emailAddress = teacher.getEmail();
-            		String myMailserver = "mail.cs.umass.edu";
-            		Emailer em = new Emailer();
-            		em.sendEmail(emailAddress,"noreply@mathspring.com", myMailserver, "Here is your pw ", pw);
+
+                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
+                   
+                    Properties prop = System.getProperties();
+                    prop.put("mail.smtp.host", "mailsrv.cs.umass.edu"); //optional, defined in SMTPTransport
+                    prop.put("mail.smtp.auth", "true");
+                    prop.put("mail.smtp.port", "25"); // default port 25
+                    
+                    Session session = Session.getInstance(prop, null);
+                    Message msg = new MimeMessage(session);
+                    try {
+
+            			// from
+                        msg.setFrom(new InternetAddress("mathspring@cs.umass.edu"));
+
+            			// to
+                        msg.setRecipients(Message.RecipientType.TO,
+                                InternetAddress.parse(teacher.getEmail(), false));
+
+            			// subject
+                        msg.setSubject("Your replacement Mathspring password");
+
+            			// content
+                        msg.setText(pw);
+
+                        msg.setSentDate(new Date());
+
+            			// Get SMTPTransport
+                        SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+
+            			// connect
+                        t.connect("mailsrv.cs.umass.edu", "mathspring@cs.umass.edu", "m4thspr1ng!");
+
+                        // send
+                        t.sendMessage(msg, msg.getAllRecipients());
+
+                        //System.out.println("Response: " + t.getLastServerResponse());
+
+                        t.close();
+
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+
             	}
                 return -1;
             }

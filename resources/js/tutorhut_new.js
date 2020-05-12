@@ -1,5 +1,6 @@
 // Frank 04-24-2020 issue #16 removed done button from example dialog
 // Frank 05-06-2020 issue #87 call showVideo() at start of example problem
+// Frank 05-12-2020 issue #87 commented out this feature for now
 
 var globals;
 var sysGlobals;
@@ -451,9 +452,15 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     var activity = JSON.parse(responseText);
     var video = activity.video;
     // khanacademy won't play inside an iFrame because it sets X-Frame-Options to SAMEORIGIN.
-    if (video != null)
+    if (video != null) {
+    	if (sysGlobals.exampleWindowActive) {
+    		alert(please_watch_video);
+    	}
         window.open(video, "width=500, height=500");
-    else alert(no_video_to_show);
+	}
+    else {
+    	alert(no_video_to_show);
+    }
 }
 
 function openExampleDialog(solution){
@@ -1247,7 +1254,7 @@ function clickHandling () {
             if (id_exists)  {
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
-	        showVideo(globals);
+	        //showVideo(globals);
 			$("#exampleContainer").attr('title', watch_and_listen_instructions);
 			$("#pulsate_play_button").text(example_problem_play_hints);
 		    

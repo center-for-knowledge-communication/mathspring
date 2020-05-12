@@ -21,6 +21,8 @@ import java.util.ResourceBundle;
  * Copyright (c) University of Massachusetts
  * Written by: Frank Sylvia
  * Date: Apr 24, 2020
+ * 
+ * Frank	05-12-2020 Remove email sender - not needed
  */
 public class TeacherEditHandler {
 
@@ -59,18 +61,10 @@ public class TeacherEditHandler {
         	Teacher dbValues = DbTeacher.getTeacher(conn, event.getIntId());
         	
             DbTeacher.editTeacher(conn,event.getIntId(),event.getFname(),event.getLname(),event.getEmail(),event.getPw1());
-            String msg =  "Profile changes have been processed.";
+            String msg = rb.getString("profile_changes_processed");
             
         	if (event.getPw1().length() >= 4) {
-        		msg = msg + "\n Please remember it (and your password). \n You will need it for creating classes and getting reports about how your students are doing.";
-        		new Thread(new Runnable() {
-
-        			@Override
-        			public void run() {
-        				Emailer.sendPassword("no-reply@wayangoutpost.net", Settings.mailServer,dbValues.getUserName(),event.getPw1(),event.getEmail());
-
-                    	}
-                	}).start();
+        		msg = msg + rb.getString("please_remember_password");
         	}
         
             req.setAttribute("message",msg);
