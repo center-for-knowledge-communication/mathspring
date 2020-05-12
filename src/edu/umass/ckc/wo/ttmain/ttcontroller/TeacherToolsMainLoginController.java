@@ -30,6 +30,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
   * Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
  * Frank 	02-24-20	Issue #28
+ * Frank	05-12-20    Test for empty username and password 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -60,6 +61,11 @@ public class TeacherToolsMainLoginController {
     	
     	if (forgotPassword == null) {
     		forgotPassword = "off";
+    	}
+    	
+    	if ((username.length() == 0) || (password.length() == 0)) {
+            request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
+            return "login/loginK12_teacher";    		
     	}
     	
     	int loginAllowed  = loginService.loginAssist(username,password,forgotPassword);

@@ -108,7 +108,7 @@ else
 	var example_problem_play_hints = "<%= rb.getString("example_problem_play_hints") %>";
 	var example_problem_done = "<%= rb.getString("example_problem_done") %>";
 	var hint_not_found = "<%= rb.getString("hint_not_found") %>"; 
-	
+	var please_watch_video = "<%= rb.getString("please_watch_video") %>";
 	var yes_choice = "<%= rb.getString("yes") %>";	
 	var no_choice = "<%= rb.getString("no") %>";
 </script>
