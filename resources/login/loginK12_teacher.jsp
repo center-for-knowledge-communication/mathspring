@@ -5,6 +5,7 @@
 /**
  * Frank 01-20-2020 Issue #39 use classId as alternative password
  * Frank 02-17-2020 ttfixes issue #45
+ * Frank 05-14-2020 fixed missing mathspring image
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -183,7 +184,7 @@ else {
 <header class="site-header" role="banner">
     <div class="row" id="wrapper">
         <div class="navbar-header">
-            <img class="logo" src="img/ms_mini_logo_new.png">
+            <img class="logo" src="../../img/ms_mini_logo_new.png">
         </div><!-- navbar-header -->
     </div>
 </header>
