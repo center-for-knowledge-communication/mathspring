@@ -6,6 +6,7 @@
  * Frank 01-20-2020 Issue #39 use classId as alternative password
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-14-2020 fixed missing mathspring image
+ * Frank 05-16-2020 issue #123 
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -190,8 +191,8 @@ else {
 </header>
 <body>
 <div>
-    <div class="bootstrap">
-        <div class="container fullscreen">
+    <div class="bootstrap fullscreen">
+        <div class="container">
 	        <div class="row vertical-center">
 	            <div class="col-sm-9 col-sm-offset-2 main-box">
 			        <c:if test="${message != null && not empty message}">
