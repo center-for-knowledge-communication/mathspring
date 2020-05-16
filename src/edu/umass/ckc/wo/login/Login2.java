@@ -1,19 +1,14 @@
 package edu.umass.ckc.wo.login;
 
-import edu.umass.ckc.wo.db.DbSession;
-import edu.umass.ckc.servlet.servbase.ServletAction;
 import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.smgr.SessionManager;
-import edu.umass.ckc.wo.smgr.User;
-import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.woserver.ServletInfo;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
-import java.util.List;
+
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,6 +16,8 @@ import java.util.Locale;
  * Date: Jul 12, 2012
  * Time: 6:49:18 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank 	04-24-20	Issue #28 
  */
 public class Login2 implements LoginServletAction {
     public static String login1_jsp;
@@ -33,8 +30,20 @@ public class Login2 implements LoginServletAction {
         ServletParams params = servletInfo.getParams();
         Connection conn= servletInfo.getConn();
         HttpServletRequest req = servletInfo.getRequest();
+        
+    	Locale rbloc = req.getLocale();
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",rbloc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+        
         String uName = params.getString(LoginParams.USER_NAME,"");
         String pw = params.getString(LoginParams.PASSWORD,"");
+        String forgotPassword = params.getString("forgotPassword","");;
         boolean logoutExistingSession = params.getBoolean(LoginParams.LOGOUT_EXISTING_SESSION,false);
         Locale loc = (Locale) req.getLocales().nextElement();
 
@@ -56,7 +65,12 @@ public class Login2 implements LoginServletAction {
         }
         // Some other error happened during login, so reprompt and show a message about what went wrong
         else {
-            req.setAttribute(LoginParams.MESSAGE,lr.getMessage());
+        	if (forgotPassword.equals("on")) {
+        		req.setAttribute(LoginParams.MESSAGE,rb.getString("ask_teacher_for_password"));
+        	}
+        	else {
+        		req.setAttribute(LoginParams.MESSAGE,lr.getMessage());        		
+        	}
             lr.setForwardedToJSP(true);
             req.getRequestDispatcher(login1_jsp).forward(req, servletInfo.getResponse());
             return lr;

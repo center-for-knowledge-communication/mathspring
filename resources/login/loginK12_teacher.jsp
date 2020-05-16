@@ -5,6 +5,7 @@
 /**
  * Frank 01-20-2020 Issue #39 use classId as alternative password
  * Frank 02-17-2020 ttfixes issue #45
+ * Frank 05-14-2020 fixed missing mathspring image
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -28,31 +29,33 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
-    <script type="text/javascript" src="login/js/p7EHCscripts.js"></script>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link href="../../css/common_new.css" rel="stylesheet" type="text/css" />
+    <link href="../../login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../../js/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="../../login/js/p7EHCscripts.js"></script>
     <script type="text/javascript">
-    $(document).ready(function() {
-
-    	var $userSwitcher = $('#usertypeswitcher');
-        var $userLoginForm = $('.user-login-form');
-        var $userLoginFormUsername = $('.user-login-form-username');
-        var $loginSubmitBtn = $('.js-login-btn');
-        $userSwitcher.change(function() {
-            if ($(this).is(':checked')) {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
-                $userLoginFormUsername.attr('name', 'userName');
-                $loginSubmitBtn.attr('name', 'login');
-                $loginSubmitBtn.attr('value', 'Login');
-            } else {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
-                $userLoginFormUsername.attr('name', 'uname');
-            }
+        $(document).ready(function() {            
+        	//alert("loginK12_teacher.jsp");
+        	var $userSwitcher = $('#usertypeswitcher');
+            var $userLoginForm = $('.user-login-form');
+            var $userLoginFormUsername = $('.user-login-form-username');
+            var $loginSubmitBtn = $('.js-login-btn');
+            $userSwitcher.change(function() {
+                if ($(this).is(':checked')) {
+                    $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
+                    $userLoginFormUsername.attr('name', 'userName');
+                    $loginSubmitBtn.attr('name', 'login');
+                    $loginSubmitBtn.attr('value', 'Login');
+                } else {
+                    $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
+                    $userLoginFormUsername.attr('name', 'uname');
+                }
+            });
         });
-    });
-           
+        
+        
+        
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
         }
@@ -181,7 +184,7 @@ else {
 <header class="site-header" role="banner">
     <div class="row" id="wrapper">
         <div class="navbar-header">
-            <img class="logo" src="img/ms_mini_logo_new.png">
+            <img class="logo" src="../../img/ms_mini_logo_new.png">
         </div><!-- navbar-header -->
     </div>
 </header>
@@ -238,8 +241,8 @@ else {
 	                                      <div class="row">
                                 <div class="col-sm-6">
                                     <div class="switch-group-1">
-                                        <div class="switch-label pull-left"><%= rb.getString("are_you_teacher") %></div>
-                                        <div class="onoffswitch pull-left">
+                                        <div class="switch-label"><%= rb.getString("are_you_teacher") %></div>
+                                        <div class="onoffswitch">
                                             <input
                                                     type="checkbox"
                                                     name="usertype"

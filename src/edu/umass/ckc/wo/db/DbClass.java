@@ -26,6 +26,7 @@ import java.util.List;
  * Time: 11:03:58 AM
  * 
  * Frank	02-16-20	Issue #48 Fixed assignment of additional ids - wasn't working properly
+ * Frank    04-27-2020  fix createStudentRoster() - was not formatting new ids correctly
  */
 public class DbClass {
 
@@ -1096,12 +1097,28 @@ public class DbClass {
 
     public static void createStudentRoster(Connection conn, ClassInfo classInfo, String prefix, String password, int noOfStudentAccount) throws Exception {
         List<String> pedIds = DbClassPedagogies.getClassPedagogyIds(conn, classInfo.getClassid());
+    	int added=0;
+
         for (int studIndex=1;studIndex <= noOfStudentAccount; studIndex++ ) {
-            for (int i = 1; i<100; i++) {
+            for (int start = 1; start<10; start++) {
             	StringBuffer username = new StringBuffer(prefix);
-            	if (studIndex < 10) {
-            		username.append("0");            	
+        		username.append("0");            	
+            	username.append(start);
+            	if (DbUser.getStudent(conn, username.toString()) != -1) {
+            		continue;
             	}
+            	else {
+                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                    added++;
+                    break;
+            	}
+            }
+        }
+        
+        int remaining = noOfStudentAccount -= added;
+        for (int studIndex=1;studIndex <= remaining; studIndex++ ) {        
+        	for (int i = 10; i<100; i++) {
+            	StringBuffer username = new StringBuffer(prefix);
             	username.append(i);
                 if (i >= 99) {
                     throw new UserException("Cannot create users.  User: " + username.toString() + " already exists.");

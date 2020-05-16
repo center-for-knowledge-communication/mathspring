@@ -21,6 +21,7 @@ import java.util.List;
  * Date: 1/30/14
  * Time: 2:23 PM
  * To change this template use File | Settings | File Templates.
+ * Frank 04-01-2020 Issue #91 remove all white space in short answer user input
  */
 public class ProblemGrader {
     private static Logger logger = Logger.getLogger(ProblemGrader.class);
@@ -75,7 +76,7 @@ public class ProblemGrader {
                 possibleAnswers.add(new ProblemAnswer(p.getAnswer(),probId));
             }
             else possibleAnswers = p.getAnswers();
-            return findAnswerMatch(possibleAnswers,userInput);
+            return findAnswerMatch(possibleAnswers,userInput.replaceAll("\\s+", ""));
         }
         else if (p != null) {
             if (p.isParametrized()) {

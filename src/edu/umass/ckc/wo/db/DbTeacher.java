@@ -18,6 +18,7 @@ import java.util.List;
  * Date: 7/31/15
  * Time: 9:32 AM
  * To change this template use File | Settings | File Templates.
+ * Frank 04-23-2020 Added function to support user profile self-maintenance
  */
 public class DbTeacher {
 
@@ -33,7 +34,9 @@ public class DbTeacher {
             boolean m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
             if (m)
                 return id;
-            else return -1;
+            else {
+            	return -1;
+            }
         }
         else return -1;
     }
@@ -74,6 +77,33 @@ public class DbTeacher {
 
     }
 
+    public static Teacher getTeacherFromUsername(Connection conn, String username) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            String q = "select fname,lname,id, email from teacher where username=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,username);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                String f = rs.getString(1);
+                String l = rs.getString(2);
+                int i    = rs.getInt(3);
+                String e = rs.getString(4);
+                return new Teacher(e,i,f,l,username,null);
+            }
+            return null;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+
+    
     public static List<Teacher> getAllTeachers(Connection conn, boolean includeClasses) throws SQLException {
         ResultSet rs=null;
         PreparedStatement stmt=null;
@@ -129,6 +159,40 @@ public class DbTeacher {
         }
     }
 
+    // Supports Teacher Profile self-maintenance
+    public static boolean editTeacher(Connection conn, int teacherId, String fname, String lname, String email, String pw) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            if (pw.length() > 0) {
+                String q = "update teacher set fname=?, lname=?, email=?, password=? where id=?";
+                ps = conn.prepareStatement(q);
+                ps.setString(1, fname);
+                ps.setString(2, lname);
+                ps.setString(3, email);
+                ps.setString(4, PasswordAuthentication.getInstance().hash(pw.toCharArray()));
+                ps.setInt(5, teacherId);
+                int n = ps.executeUpdate();
+                return n == 1;
+            } else {
+                String q = "update teacher set fname=?, lname=?, email=? where id=?";
+                ps = conn.prepareStatement(q);
+                ps.setString(1, fname);
+                ps.setString(2, lname);
+                ps.setString(3, email);
+                ps.setInt(4, teacherId);
+                int n = ps.executeUpdate();
+                return n == 1;
+            }
+        }
+            finally{
+                if (ps != null)
+                    ps.close();
+            }
+
+    }
+
+
+ 
     public static boolean modifyTeacher(Connection conn, int teacherId, String fname, String lname, String uname, String pw) throws SQLException {
         PreparedStatement ps = null;
         try {
@@ -157,6 +221,28 @@ public class DbTeacher {
                 if (ps != null)
                     ps.close();
             }
+
+    }
+
+    public static boolean modifyTeacherPassword(Connection conn, String uname, String pw) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            if (pw.length() > 0) {
+                String q = "update teacher set password=? where username=?";
+                ps = conn.prepareStatement(q);
+                ps.setString(1, PasswordAuthentication.getInstance().hash(pw.toCharArray()));
+                ps.setString(2, uname);
+                int n = ps.executeUpdate();
+                return n == 1;
+            }
+            else {
+            	return false;
+            }
+        }
+        finally{
+            if (ps != null)
+                 ps.close();
+        }
 
     }
 

@@ -7,12 +7,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
+import com.sun.mail.smtp.SMTPTransport;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Date;
+import java.util.Properties;
+
+import edu.umass.ckc.wo.beans.Teacher;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
 import edu.umass.ckc.wo.cache.ProblemMgr;
@@ -29,6 +41,9 @@ import edu.umass.ckc.wo.tutor.Settings;
 
 /**
  * Created by Neeraj on 3/25/2017.
+ * Frank 	02-24-20	Issue #28
+ * Frank	04-27-2020  Disable password update until email is working
+ * Frank    05-12-2020  send password in email now working 
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -38,11 +53,66 @@ public class TTLoginServiceImpl implements TTLoginService {
     private TTConfiguration connection;
 
     @Override
-    public int loginAssist(String uname, String password) throws TTCustomException {
+    public int loginAssist(String uname, String password, String forgotPassword) throws TTCustomException {
         try {
             int teacherId = DbTeacher.getTeacherId(connection.getConnection(), uname, password);
-            if (teacherId == -1)
+            if (teacherId == -1) {
+            	if (forgotPassword.equals("on")) {
+                    Teacher teacher = DbTeacher.getTeacherFromUsername(connection.getConnection(), uname);
+                    Random rand = new Random();
+                    int x = rand.nextInt(99999);
+                    String symbols = "!#$%";
+                    int mod = x % 3;
+                    String pw = uname.substring(0,2) + Integer.toString(x) + symbols.substring(mod,mod+1);
+                    logger.info(uname + ":" + pw);
+                    System.out.println(uname + ":" + pw);
+
+                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
+                   
+                    Properties prop = System.getProperties();
+                    prop.put("mail.smtp.host", "mailsrv.cs.umass.edu"); //optional, defined in SMTPTransport
+                    prop.put("mail.smtp.auth", "true");
+                    prop.put("mail.smtp.port", "25"); // default port 25
+                    
+                    Session session = Session.getInstance(prop, null);
+                    Message msg = new MimeMessage(session);
+                    try {
+
+            			// from
+                        msg.setFrom(new InternetAddress("mathspring@cs.umass.edu"));
+
+            			// to
+                        msg.setRecipients(Message.RecipientType.TO,
+                                InternetAddress.parse(teacher.getEmail(), false));
+
+            			// subject
+                        msg.setSubject("Your replacement Mathspring password");
+
+            			// content
+                        msg.setText(pw);
+
+                        msg.setSentDate(new Date());
+
+            			// Get SMTPTransport
+                        SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+
+            			// connect
+                        t.connect("mailsrv.cs.umass.edu", "mathspring@cs.umass.edu", "m4thspr1ng!");
+
+                        // send
+                        t.sendMessage(msg, msg.getAllRecipients());
+
+                        //System.out.println("Response: " + t.getLastServerResponse());
+
+                        t.close();
+
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+
+            	}
                 return -1;
+            }
             else
                 return teacherId;
         } catch (Exception e) {
@@ -71,8 +141,12 @@ public class TTLoginServiceImpl implements TTLoginService {
             Collections.reverse(classInfoListLatest);
             Classes classbean = new Classes(classInfoListLatest.toArray(new ClassInfo[classInfoListLatest.size()]));
             Classes classbeanArchived = new Classes(classInfoListArchived.toArray(new ClassInfo[classInfoListArchived.size()]));
-            String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
-            model.addAttribute("teacherName", teacherName);
+            //String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
+            Teacher teacher = DbTeacher.getTeacher(connection.getConnection(), teacherId);
+            model.addAttribute("teacherName", teacher.getFname() + " " + teacher.getLname());
+            model.addAttribute("teacherFname", teacher.getFname());
+            model.addAttribute("teacherLname", teacher.getLname());
+            model.addAttribute("teacherEmail", teacher.getEmail());
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
             

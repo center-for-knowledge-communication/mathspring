@@ -11,6 +11,7 @@
  *  Frank   02-16-20    Issue #48 Student Name an d password creation
  *  Frank   02-17-20    ttfixesR3
  *  Frank   03-2-2020   Issue #45 added dynamic teacherlist selection
+ *  Frank	02-26-2020	Issue #28 teacher password and profile self-maintenance
  */
 
 Locale loc = request.getLocale();
@@ -140,6 +141,31 @@ catch (Exception e) {
 }
 
 .show {display: block;}
+
+.registration-box {
+  background-color: white;
+  border: 1px solid #003364;
+}
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+  min-height: 75vh;
+}
+
+.teacher-registration-form {
+  padding-bottom: 70px;
+  padding-right: 35px;
+}
+
+.teacher-button {
+  background: #f6a623;
+  border-radius: 0;
+  color: white;
+  border: 1px solid #003364;
+  padding: 10px 30px;
+}
+
 </style>
 
 
@@ -194,6 +220,7 @@ catch (Exception e) {
             $("#teacher-activities-wrapper").hide();
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
+            $("#edit-teacher-wrapper").hide();
             registerAllEvents();
             handleclickHandlers();
         });
@@ -324,13 +351,24 @@ catch (Exception e) {
                 $("#report-wrapper2").hide();
                 $("#teacher-activities-wrapper").hide();
                 $("#panel-wrapper").hide();
+                $("#edit-teacher-wrapper").hide();
                 $("#form-wrapper").show();
+            });
+
+            $("#editTeacher_handler").click(function () {
+                $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
+                $("#teacher-activities-wrapper").hide();
+                $("#panel-wrapper").hide();
+                $("#form-wrapper").hide();
+                $("#edit-teacher-wrapper").show();
             });
 
             $("#teacher_activities_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#form-wrapper").hide();
+                $("#edit-teacher-wrapper").hide();
                 
                 $.ajax({
                     type : "POST",
@@ -669,6 +707,9 @@ function registerAllEvents(){
             <li>
                 <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("view_teacher_activities") %></a>
             </li>
+            <li>
+                <a href="#" id="editTeacher_handler"><i class="fa fa-fw fa-pencil"></i><%= rb.getString("edit_teacher_profile") %></a>
+            </li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -828,22 +869,15 @@ function registerAllEvents(){
                         <div class="panel-body">
                             <ul>
                                 <li>
-                                    <label style="padding-right: 10px;"><%= rb.getString("download_student_data") %></label>
+                                    <label style="padding-right: 10px;">Download Teacher Report (TBD)</label>
+<!--
                                     <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentReport?teacherId=${teacherId}&classId=${classInfo.classid}"
                                        data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
                                        class="downloadPerStudentReport" aria-expanded="true"
                                        aria-controls="teacherActivities">
                                         <i class="fa fa-download fa-2x" aria-hidden="true"></i>
                                     </a>
-                                </li>
-                                <li>
-                                    <label style="padding-right: 10px;<%= rb.getString("download_emotion_data") %>></label>
-                                    <a href="${pageContext.request.contextPath}/tt/tt/downloadStudentEmotions?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                       data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                       class="downloadPerStudentReport" aria-expanded="true"
-                                       aria-controls="teacherActivities">
-                                        <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                    </a>
+-->
                                 </li>
                             </ul>
                         </div>
@@ -1028,10 +1062,70 @@ function registerAllEvents(){
                     </div>
                 </div>
                 <div style="text-align:center;">
-                    <button role="button" type="submit" class="btn btn-primary" onclick=displayCreateRosterInstructions();><%= rb.getString("create_class") %></button>
+                    <button role="button" type="submit" class="btn btn-primary" onclick="displayCreateRosterInstructions();"><%= rb.getString("create_class") %></button>
                 </div>
             </springForm:form>
         </div>
+        <div id="edit-teacher-wrapper" style="display: none;">
+    		<div class="registration-form vertical-center">
+		        <div class="col-sm-6 col-sm-offset-3 registration-box">
+		            <c:if test="${message != null && not empty message}">
+		                <div class="alert alert-danger msg-bar" role="alert">${message}</div>
+		            </c:if>
+		            <h3 class="text-center form-label form-title"><%= rb.getString("signup_teacher")%></h3>
+		            <hr>
+		            <form
+		                    class="form-horizontal"
+		                    method="post"
+		                    action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherEdit"
+		            >
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="first_name"><%= rb.getString("first_name")%>:</label>
+		                    <div class="col-sm-6">
+		                        <input type="text" name="fname" class="form-control" id="first_name" value="${teacherFname}">
+		                    </div>
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="last_name"><%= rb.getString("last_name")%>:</label>
+		                    <div class="col-sm-6">
+		                        <input type="text" name="lname" class="form-control" id="last_name" value="${teacherLname}">
+		                    </div>
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="email"><%= rb.getString("email")%>:</label>
+		                    <div class="col-sm-6">
+		                        <input type="email" name="email" class="form-control" id="email" value="${teacherEmail}">
+		                    </div>
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="password"><%= rb.getString("password")%>:</label>
+		                    <div class="col-sm-6">
+		                        <input type="password" name="pw1" class="form-control" id="password">
+		                    </div>
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="password"><%= rb.getString("re_enter_password")%>:</label>
+		                    <div class="col-sm-6">
+		                        <input type="password" name="pw2" class="form-control" id="password-confirmation">
+		                    </div>
+		                </div><!-- form-group -->
+		
+		                <div class="form-group row">
+		                    <div class="col-sm-offset-4 col-sm-4">
+		                        <button type="submit" class="btn btn-default pull-right btn-block teacher-button"><%= rb.getString("submit")%></button>
+		                    </div>
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <label class="control-label col-sm-4" for="password">Teacher Id:</label>
+		                    <div class="col-sm-6">
+		                        <input type="text" name="teacherId" class="form-control" id="teacherId" value="${teacherId}" readonly>
+		                    </div>
+		                </div><!-- form-group -->
+		            </form>
+		        </div>
+	        </div>
+        </div>
+
     </div>
 
     <!--#page-container ends-->

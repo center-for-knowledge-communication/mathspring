@@ -1,6 +1,8 @@
 //Module pattern for better scoping
 // Frank 10-22-19 issue #14 translation
 // Frank 11-25-19 issue #15 hide short answer box and buttons
+// Frank 04-24-20 fixed multi-lingual bug
+
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -64,9 +66,15 @@ m.build = function(activity, previewMode) {
     }
 
 	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
 	
 	var stepText = "";
-	if (languagePreference == "en") {
+	if (languageSet == "en") {
 		stepText = "Step";
 	}
 	else {

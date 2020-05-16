@@ -57,6 +57,7 @@ import java.text.SimpleDateFormat;
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank 	01-14-20	Issue #45 & #21 add log report
  * Frank    03-02-2020  Added teacherList case: 
+ * Frank    04-30-2020  Issue #96 missing locale 
  */
 
 @Service
@@ -764,12 +765,14 @@ public class TTReportServiceImpl implements TTReportService {
                 
                 Timestamp beginTime = mappedrow.getTimestamp("problemBeginTime");
                 
+        		Locale tloc = new Locale("en","US");
+
                 long t = beginTime.getTime();
                 String strBeginTime = String.valueOf(t);
                 
             	String tsFormat = "dd-MMM-YY";
                 Date dd = StringUtils.timestampToDate(beginTime);
-                SimpleDateFormat formatter =  new SimpleDateFormat (tsFormat, ploc) ;                
+                SimpleDateFormat formatter =  new SimpleDateFormat (tsFormat, tloc) ;                
                 String problemDate = formatter.format(dd);              
 
 

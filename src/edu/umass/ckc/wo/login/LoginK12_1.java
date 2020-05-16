@@ -18,6 +18,7 @@ import java.io.IOException;
  * Date: Jul 12, 2012
  * Time: 3:47:51 PM
  * The first login page for a k12 user.    Presents user/password inputs plus other buttons
+ * Frank 04-24-2020 issue #28
  */
 public class LoginK12_1 implements LoginServletAction {
 
@@ -42,7 +43,7 @@ public class LoginK12_1 implements LoginServletAction {
             name = name.substring(name.lastIndexOf('.')+1);
         req.setAttribute(LoginParams.START_PAGE,name);  // must be name of this class
         req.setAttribute(LoginParams.MESSAGE,null);
-        String jsp = "login/loginK12.jsp";
+        String jsp = "login/loginK12_new.jsp";
         req.getRequestDispatcher(jsp).forward(req, servletInfo.getResponse());
         LoginResult lr = new LoginResult(-1,null,LoginResult.PRE_LOGIN,LoginResult.FORWARDED_TO_JSP);
         return lr;
