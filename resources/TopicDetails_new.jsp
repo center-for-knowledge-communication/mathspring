@@ -3,7 +3,9 @@
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
 <% 
-
+/**
+ * Frank 05-18-2020 issue #117 restrict thumbnail sixe to 500px x 500px
+*/
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -173,7 +175,7 @@ catch (Exception e) {
 
                     if (!isFormality) {
                         $("#js-problem-view").text(effortFeedback);
-                        $("#js-problem-view").append("<img id='problemImage' />");
+                        $("#js-problem-view").append("<img id='problemImage' style='max-width:500px; max-height:500px;' />");
                         document.getElementById("problemImage").src = problem_imageURL+currentProblemId+".jpg";
                         console.log("CCSS: " + problemList[index-1][6]);
                     } else {
@@ -208,7 +210,6 @@ catch (Exception e) {
                 }
             });
             
-            langPrefrenceForTopicDetailsPage();
         });
     </script>
 </head>
