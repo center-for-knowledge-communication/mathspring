@@ -35,6 +35,7 @@ import java.util.List;
  * Date: 8/16/12
  * Time: 3:30 PM
  * To change this template use File | Settings | File Templates.
+ * Frank 05-18-2020 issue #125 cast elapsedtime from (double) to (int) - fixes url parameter of 'Logou' selection. 
  */
 public class MyProgressHandler {
 
@@ -73,6 +74,7 @@ public class MyProgressHandler {
             double elapsedTime = ee.getElapsedTime();  // DAM causes a compile error
             int sessionId = e.getSessionId();
             double mastery = ee.getMastery();
+            
             String topicName = ee.getTopicName();
             int problemsDone= ee.getProblemsDone();
             int totalProblems= ee.getTotalProblems();
@@ -93,7 +95,7 @@ public class MyProgressHandler {
 
             request.setAttribute("topicDetails", td);
             request.setAttribute("mastery", mastery);
-            request.setAttribute("elapsedTime", elapsedTime);    // DAM causes compile error
+            request.setAttribute("elapsedTime", (int)elapsedTime);    // DAM causes compile error
             request.setAttribute("topicId", topicId);
 
             request.setAttribute("topicName", topicName);
@@ -119,7 +121,7 @@ public class MyProgressHandler {
             request.getRequestDispatcher(Settings.useNewGUI()
                     ? "TopicDetails_new.jsp"
                     : "TopicDetails.jsp").forward(request,response);
-            logger.info("<< JSP: TopicDetails.jsp");
+            logger.info("<< JSP: Topic_Details.jsp");
             return null;
         }
 
