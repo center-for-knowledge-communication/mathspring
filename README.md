@@ -25,8 +25,7 @@ It will go smoother for you if you make sure your commits are small and commente
 Mathspring developers: Clone the repository on your local machine.
    - On Windows use Git Bash/  Linux use CLI git.  Mac Users are on your own.
    - cd to dir where you want it
-   - git clone git@github.com:nsmenon/mathspring-V2.git
-
+   - git clone https://github.com/center-for-knowledge-communication/mathspring.git
 
 2. You will need to install Tomcat 8 (apache-tomcat-8.0.53 recommended) and configure eclipse to find its installation directory.
 
