@@ -22,6 +22,7 @@ import java.sql.SQLException;
  * <p>Company: </p>
  * @author unascribed
  * @version 1.0
+ * Frank 5-24-2020 issue #130 change mailServer="mailsrv.cs.umass.edu"
  */
 
 public class Settings {
@@ -86,7 +87,7 @@ public class Settings {
     public static  boolean useLearningCompanions = true;
     public static String prePostProblemURI= "";
     public static String techEmail="marshall@cs.umass.edu";
-    public static String mailServer="mail.cs.umass.edu";
+    public static String mailServer="mailsrv.cs.umass.edu";
     public static boolean useAdminServletSession = true; // controls whether servlet sessions are used in the WoAdminServlet
                                                 // They should be on in normal use.   For debugging the servlet I turn off
     public static int adminServletSessionTimeoutSeconds= 60 * 60; // default is 60 min.

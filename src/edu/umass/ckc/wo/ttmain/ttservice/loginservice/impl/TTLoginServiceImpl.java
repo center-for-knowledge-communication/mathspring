@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import edu.umass.ckc.wo.beans.Teacher;
+import edu.umass.ckc.email.Emailer;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
 import edu.umass.ckc.wo.cache.ProblemMgr;
@@ -43,7 +44,8 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Created by Neeraj on 3/25/2017.
  * Frank 	02-24-20	Issue #28
  * Frank	04-27-2020  Disable password update until email is working
- * Frank    05-12-2020  send password in email now working 
+ * Frank    05-12-2020  send password in email now working
+ * Frank    05-24-2020  issue #130 Restore call to original emailer, now that it is working
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -64,52 +66,9 @@ public class TTLoginServiceImpl implements TTLoginService {
                     String symbols = "!#$%";
                     int mod = x % 3;
                     String pw = uname.substring(0,2) + Integer.toString(x) + symbols.substring(mod,mod+1);
-                    logger.info(uname + ":" + pw);
-                    System.out.println(uname + ":" + pw);
-
-                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);
-                   
-                    Properties prop = System.getProperties();
-                    prop.put("mail.smtp.host", "mailsrv.cs.umass.edu"); //optional, defined in SMTPTransport
-                    prop.put("mail.smtp.auth", "true");
-                    prop.put("mail.smtp.port", "25"); // default port 25
-                    
-                    Session session = Session.getInstance(prop, null);
-                    Message msg = new MimeMessage(session);
-                    try {
-
-            			// from
-                        msg.setFrom(new InternetAddress("mathspring@cs.umass.edu"));
-
-            			// to
-                        msg.setRecipients(Message.RecipientType.TO,
-                                InternetAddress.parse(teacher.getEmail(), false));
-
-            			// subject
-                        msg.setSubject("Your replacement Mathspring password");
-
-            			// content
-                        msg.setText(pw);
-
-                        msg.setSentDate(new Date());
-
-            			// Get SMTPTransport
-                        SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
-
-            			// connect
-                        t.connect("mailsrv.cs.umass.edu", "mathspring@cs.umass.edu", "m4thspr1ng!");
-
-                        // send
-                        t.sendMessage(msg, msg.getAllRecipients());
-
-                        //System.out.println("Response: " + t.getLastServerResponse());
-
-                        t.close();
-
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
-
+                    logger.debug(uname + ":" + pw);
+                    DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);                   
+                    Emailer.sendPassword("mathspring@mathspring.org", Settings.mailServer,uname,pw,teacher.getEmail());
             	}
                 return -1;
             }

@@ -66,7 +66,7 @@ public class TeacherRegistrationHandler {
 
                 @Override
                 public void run() {
-                    Emailer.sendPassword("no-reply@wayangoutpost.net", Settings.mailServer,event.getUn(),event.getPw1(),event.getEmail());
+                    Emailer.sendPassword("mathspring@mathspring.org", Settings.mailServer,event.getUn(),event.getPw1(),event.getEmail());
 
                     }
                 }).start();
