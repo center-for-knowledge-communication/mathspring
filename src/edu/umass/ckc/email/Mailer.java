@@ -5,6 +5,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.*;
 
+import com.sun.mail.smtp.SMTPTransport;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -12,6 +14,8 @@ import javax.activation.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
+ * 
+ * Frank	05-24-2020 Issue #130 change Transport protocol to smtps
  */
 
 public class Mailer extends Object
@@ -104,7 +108,9 @@ public class Mailer extends Object
 
                                 // Setup mail server
                                 props.put("mail.smtp.host", host);
-
+                                props.put("mail.smtp.auth", "true");
+                                props.put("mail.smtp.port", "25"); // default port 25
+                                
                                 // Get session
                                 Session session = Session.getInstance(props, null);
 
@@ -159,8 +165,11 @@ public class Mailer extends Object
                                 }
 
                                 // Send the message
-                                Transport.send(message);
-
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
+                                
                                 // Inform user that mail was sent successfully
                                 return true;
                         }
@@ -227,7 +236,10 @@ public class Mailer extends Object
                                 }
 
                                 // Send the message
-                                Transport.send(message);
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
 
                                 // Inform user that mail was sent successfully
                                 return true;
@@ -263,7 +275,10 @@ public class Mailer extends Object
                                 message.setText(body);
 
                                 // Send the message
-                                Transport.send(message);
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
 
                                 // Inform user that mail was sent successfully
                                 return true;
