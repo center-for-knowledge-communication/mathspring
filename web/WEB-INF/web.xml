@@ -26,7 +26,7 @@ The results of this go into out/artifacts/MathSpring_exploded
     </context-param>
     <context-param>
         <param-name>error.smtpserver</param-name>
-        <param-value>loki.cs.umass.edu</param-value>
+        <param-value>mailsrv.cs.umass.edu</param-value>
     </context-param>
     <!-- imgFileDir not used on localhost -->
     <context-param>

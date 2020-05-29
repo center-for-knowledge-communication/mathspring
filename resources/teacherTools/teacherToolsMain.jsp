@@ -230,7 +230,7 @@ catch (Exception e) {
     		document.getElementById("passwordToken").value = "useClass";
         	var pwd = document.getElementById("passwordToken").value;
     		//alert(pwd);
-       		alert("Once the class has been created, <br> click on the new class and click 'Manage Students' to add the class roster");
+       		alert("<%= rb.getString("add_students_to_roster_instructions") %>");
         }
         
  
@@ -681,7 +681,7 @@ function registerAllEvents(){
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a id= "profile_selector" href="#"><i class="fa fa-fw fa-user"></i> <%= rb.getString("profile") %></a>
+                        <a id= "editTeacher_handler" href="#"><i class="fa fa-fw fa-user"></i> <%= rb.getString("profile") %></a>
                     </li>
                     <li class="divider"></li>
                     <li>
@@ -706,9 +706,6 @@ function registerAllEvents(){
             </li>
             <li>
                 <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("view_teacher_activities") %></a>
-            </li>
-            <li>
-                <a href="#" id="editTeacher_handler"><i class="fa fa-fw fa-pencil"></i><%= rb.getString("edit_teacher_profile") %></a>
             </li>
         </ul>
         <!-- /#sidebar-end -->
@@ -866,7 +863,7 @@ function registerAllEvents(){
                         </h4>
                     </div>
                     <div id="teacherActivities" class="panel-collapse collapse">
-                        <div class="panel-body">
+                        <div class="panel-body hidden">
                             <ul>
                                 <li>
                                     <label style="padding-right: 10px;">Download Teacher Report (TBD)</label>
@@ -982,7 +979,7 @@ function registerAllEvents(){
                                             <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
                                             <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
                                             <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
-                                            <springForm:option value="adult"><%= rb.getString("adult") %>Adult</springForm:option>
+                                            <springForm:option value="adult"><%= rb.getString("adult") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -1072,7 +1069,7 @@ function registerAllEvents(){
 		            <c:if test="${message != null && not empty message}">
 		                <div class="alert alert-danger msg-bar" role="alert">${message}</div>
 		            </c:if>
-		            <h3 class="text-center form-label form-title"><%= rb.getString("signup_teacher")%></h3>
+		            <h3 class="text-center form-label form-title"><%= rb.getString("edit_teacher_profile")%></h3>
 		            <hr>
 		            <form
 		                    class="form-horizontal"
