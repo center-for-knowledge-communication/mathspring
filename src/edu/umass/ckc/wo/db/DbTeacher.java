@@ -19,6 +19,7 @@ import java.util.List;
  * Time: 9:32 AM
  * To change this template use File | Settings | File Templates.
  * Frank 04-23-2020 Added function to support user profile self-maintenance
+ * Frank 05-29-2020 issue #28 new functions for password reset
  */
 public class DbTeacher {
 
@@ -102,6 +103,53 @@ public class DbTeacher {
         }
     }
 
+    public static Teacher getTeacherFromEmail(Connection conn, String email) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            String q = "select fname,lname,id, userName from teacher where email=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,email);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                String f = rs.getString(1);
+                String l = rs.getString(2);
+                int i    = rs.getInt(3);
+                String u = rs.getString(4);
+                return new Teacher(email,i,f,l,u,null);
+            }
+            return null;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public static int countEmailAddrs(Connection conn, String email) throws SQLException {
+    	
+    	int count = 0;
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+        	String q = "select count(email) as EMAILCOUNT from teacher where email = ?";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,email);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                count    = rs.getInt("EMAILCOUNT");
+            }
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        return count;
+    }
 
     
     public static List<Teacher> getAllTeachers(Connection conn, boolean includeClasses) throws SQLException {

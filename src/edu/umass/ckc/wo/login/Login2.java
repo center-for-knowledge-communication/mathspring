@@ -17,7 +17,8 @@ import java.util.ResourceBundle;
  * Time: 6:49:18 PM
  * To change this template use File | Settings | File Templates.
  * 
- * Frank 	04-24-20	Issue #28 
+ * Frank 	04-24-20	Issue #28
+ * Frank    05-29-2020  issue #28 remove password reset for students
  */
 public class Login2 implements LoginServletAction {
     public static String login1_jsp;
@@ -43,7 +44,7 @@ public class Login2 implements LoginServletAction {
         
         String uName = params.getString(LoginParams.USER_NAME,"");
         String pw = params.getString(LoginParams.PASSWORD,"");
-        String forgotPassword = params.getString("forgotPassword","");;
+        String forgotPassword = params.getString("forgotPassword","");
         boolean logoutExistingSession = params.getBoolean(LoginParams.LOGOUT_EXISTING_SESSION,false);
         Locale loc = (Locale) req.getLocales().nextElement();
 
@@ -65,12 +66,8 @@ public class Login2 implements LoginServletAction {
         }
         // Some other error happened during login, so reprompt and show a message about what went wrong
         else {
-        	if (forgotPassword.equals("on")) {
-        		req.setAttribute(LoginParams.MESSAGE,rb.getString("ask_teacher_for_password"));
-        	}
-        	else {
-        		req.setAttribute(LoginParams.MESSAGE,lr.getMessage());        		
-        	}
+        	 String msg = lr.getMessage() + "  " + rb.getString("ask_teacher_for_password");
+     		req.setAttribute(LoginParams.MESSAGE,msg);
             lr.setForwardedToJSP(true);
             req.getRequestDispatcher(login1_jsp).forward(req, servletInfo.getResponse());
             return lr;

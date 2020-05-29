@@ -681,7 +681,7 @@ function resetPassWordForThisStudent(id,uname){
                  $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                  $('#errorMsgModelPopup').modal('show');
              }else{
-                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%>"+response+"");
+                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
          }
@@ -4215,8 +4215,8 @@ var completeDataChart;
                     </div>
 
                     <span class="input-group label label-warning">P.S</span>
-                    <label><span><%= rb.getString("you_are_about_to_clone_class") %></span><span><c:out value="${classInfo.name}"/></span><span> <%= rb.getString("and_section") %></span><span><c:out
-                            value="${classInfo.section}"/>.</span><span><%= rb.getString("you_must_change_name_and_section") %></span></label>
+                    <label><span><%=rb.getString("you_are_about_to_clone_class")%>&nbsp</span><span><c:out value="${classInfo.name}"/></span><span>&nbsp<%= rb.getString("and_section")%>&nbsp</span><span><c:out
+                            value="${classInfo.section}"/>.</span><span>&nbsp&nbsp<%= rb.getString("you_must_change_name_and_section") %></span></label>
 
 
                 </springForm:form>

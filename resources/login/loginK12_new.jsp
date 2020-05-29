@@ -41,15 +41,20 @@ catch (Exception e) {
         var $userLoginForm = $('.user-login-form');
         var $userLoginFormUsername = $('.user-login-form-username');
         var $loginSubmitBtn = $('.js-login-btn');
+
+        $("#forgotPasswordBtn").hide();
+        
         $userSwitcher.change(function() {
             if ($(this).is(':checked')) {
                 $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
                 $userLoginFormUsername.attr('name', 'userName');
                 $loginSubmitBtn.attr('name', 'login');
                 $loginSubmitBtn.attr('value', 'Login');
+                $("#forgotPasswordBtn").show();
             } else {
                 $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
                 $userLoginFormUsername.attr('name', 'uname');
+                $("#forgotPasswordBtn").hide();
             }
         });
     });
@@ -57,17 +62,7 @@ catch (Exception e) {
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
         }
-        
-        function setForgot() {
-        	if (document.getElementById("forgotPassword").checked) {
-        		document.getElementById("forgot").value = "on";	
-        	}
-        	else {
-        		document.getElementById("forgot").value = "off";	
-        	}      		
-        };
-        
-        
+
     </script>
 
 <style>
@@ -231,7 +226,7 @@ else {
 	                                        type="hidden"
 	                                        name="forgot"
 	                                        id="forgot";
-	                                        value="off"
+	                                        value="on"
 	                                        class="form-control nav-login"
 	                                />
 	                            </div>
@@ -258,17 +253,15 @@ else {
                                             type="submit"
                                             class="btn btn-default btn-block sign-in-btn js-login-btn"><%= rb.getString("login") %></button>
                                 </div>
+                                <div class="col-sm-6">
+                                	<p> </p>
+                                    <a <button id="forgotPasswordBtn"
+                                            href='${pageContext.request.contextPath}/login/forgotPassword.jsp'
+                                            class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>
+                                    </a>
+                                </div>
                             </div>
-	                            
-	                            
-	                            <div class="form-check form-check-inline <c:if test="${message != null}">has-error</c:if>">   
-		  							<input class="form-check-input" 
-		  								type="checkbox" 
-		  								id="forgotPassword" 
-		  								name="forgotPassword" onClick="setForgot();">
-		  							<label><%= rb.getString("forgot_password") %></label>  								
-								</div>
-	                        </form>
+	                       	</form>
 	                    </div>                
 	
 	                

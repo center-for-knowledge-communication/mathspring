@@ -30,7 +30,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
   * Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
  * Frank 	02-24-20	Issue #28
- * Frank	05-12-20    Test for empty username and password 
+ * Frank	05-12-20    Test for empty username and password
+ * Frank    05-29-2020  issue #28 re-work password reset 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -57,25 +58,15 @@ public class TeacherToolsMainLoginController {
 //    		logger.error(e.getMessage());	
     	}
 
-    	String forgotPassword = request.getParameter("forgot");
-    	
-    	if (forgotPassword == null) {
-    		forgotPassword = "off";
-    	}
-    	
+   	
     	if ((username.length() == 0) || (password.length() == 0)) {
             request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
             return "login/loginK12_teacher";    		
     	}
     	
-    	int loginAllowed  = loginService.loginAssist(username,password,forgotPassword);
+    	int loginAllowed  = loginService.loginAssist(username,password);
             if(loginAllowed == -1) {
-            	if (forgotPassword.equals("off")) {
-                    request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
-            	}
-            	else {
-            		request.setAttribute(LoginParams.MESSAGE,rb.getString("password_will_be_emailed"));
-            	}
+                request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
                 return "login/loginK12_teacher";
             }else{
             	HttpSession session = request.getSession();
@@ -112,4 +103,47 @@ public class TeacherToolsMainLoginController {
         return "login/loginK12_teacher";
         
     }
+    
+    @RequestMapping(value = "/tt/ttPassword", method = RequestMethod.POST)
+    public String resetPassword(@RequestParam("userName") String username, @RequestParam("email") String email, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
+
+    	Locale loc = request.getLocale();
+    	String lang = loc.getDisplayLanguage();
+
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+  	
+    	if (username.length() == 0) {
+    		if (email.length() == 0) {
+            	request.setAttribute(LoginParams.MESSAGE,rb.getString("enter_username_or_email"));
+            	return "login/forgotPassword_error";
+    		}
+    	}
+    	else {
+    		if (email.length() > 0) {
+            	request.setAttribute(LoginParams.MESSAGE,rb.getString("enter_username_or_email"));
+            	return "login/forgotPassword_error";
+    		}    		
+    	}
+    	
+    	int result  = loginService.resetPassword(username, email);
+    	if (result > 0) {
+        	request.setAttribute(LoginParams.MESSAGE,rb.getString("email_not_unique"));
+            return "login/forgotPassword_error";
+        }
+    		
+        if(result == -1) {
+        	request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
+            return "login/forgotPassword_error";
+        }
+        else {
+        	request.setAttribute(LoginParams.MESSAGE,rb.getString("password_will_be_emailed"));
+            return "login/loginK12_teacher";            	}
+        }    
 }
+
