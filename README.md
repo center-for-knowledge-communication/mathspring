@@ -39,6 +39,12 @@ https://www.youtube.com/watch?v=sNYvYTmOGhU
 A few videos that were useful for installing Eclipse for the MAC:
 https://www.youtube.com/watch?v=CL36-szyr1c
 
+There is a Video here where Ankit explains how to set up Eclipse with Maven and Tomcat and the database:
+https://drive.google.com/drive/u/0/folders/1QdoEQaZ1iBiVH0J6bGjFv6BiZ9xHQDoY
+
+We got an error at the end, as apparently it needed Java 8 and no later.
+See here how to install an older version of Java on a MAC:
+https://support.planwithvoyant.com/hc/en-us/articles/209725003-Install-or-revert-to-a-prior-version-of-Java-Mac-OS-X
 
 4.  Project dependencies are managed by Maven so you will want to make sure you have the eclipse with maven plugin installed.
 The project is maintained as a single module (pom.xml) with all the dependencies and plugins configured under them.You should make changes to the Project's pom.xml unless you
