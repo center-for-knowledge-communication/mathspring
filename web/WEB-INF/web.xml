@@ -58,8 +58,8 @@ The results of this go into out/artifacts/MathSpring_exploded
     options are wodbcadmium for cadmium db or wodblocal for db on localhost -->
     <context-param>
         <param-name>wodb.datasource</param-name>
-        <param-value>jdbc/wodbrose</param-value>
-        <!--<param-value>jdbc/wodblocal</param-value>-->
+        <!--<param-value>jdbc/wodbrose</param-value>-->
+        <param-value>jdbc/wodblocal</param-value>
     </context-param>
 
     <context-param>
