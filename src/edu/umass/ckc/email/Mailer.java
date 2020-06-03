@@ -3,9 +3,13 @@ package edu.umass.ckc.email;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import org.apache.log4j.Logger;
+
 import javax.activation.*;
 
 import com.sun.mail.smtp.SMTPTransport;
+
 
 /**
  * <p>Title: </p>
@@ -21,7 +25,10 @@ import com.sun.mail.smtp.SMTPTransport;
 
 public class Mailer extends Object
 {
-        private String[] to = new String[0];
+    private static Logger logger = Logger.getLogger(Mailer.class);
+
+	
+	private String[] to = new String[0];
         private String from = "";
         private String subject = "";
         private String body = "";
@@ -102,6 +109,14 @@ public class Mailer extends Object
         public boolean send()
         {
             Properties props = System.getProperties();
+            
+            logger.info("sending an email");
+            logger.info(host);
+            logger.info(to[0]);
+            logger.info(from);
+            logger.info(subject);
+            logger.info(body);
+            
 
             // Setup mail server
             props.put("mail.smtp.host", host);
@@ -177,6 +192,7 @@ public class Mailer extends Object
                         }
                         catch (Exception e)
                         {
+                        		logger.error(e.getMessage());
                                 e.printStackTrace();
                                 return false;
                         }
@@ -267,7 +283,7 @@ public class Mailer extends Object
 
                                 // Fill the message
                                 message.setText(body);
-
+                              
                                 // Send the message
                                 SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
                                 t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
