@@ -151,9 +151,9 @@ public class TTLoginServiceImpl implements TTLoginService {
                 String symbols = "!#$%";
                 int mod = x % 3;
                 String pw = uname.substring(0,2) + Integer.toString(x) + symbols.substring(mod,mod+1);
-                logger.debug(uname + ":" + pw);
+                logger.info(uname + pw);
                 DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);                   
-                Emailer.sendPassword("mathspring@mathspring.org", Settings.mailServer,uname,pw,teacher.getEmail());
+                Emailer.sendPassword("DoNotReply@mathspring.org", Settings.mailServer,uname,pw,teacher.getEmail());
                 return 0;
             }
         } catch (Exception e) {
