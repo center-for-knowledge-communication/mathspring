@@ -187,7 +187,7 @@ The results of this go into out/artifacts/MathSpring_exploded
         </init-param>
         <init-param>
             <param-name>mailServer</param-name>
-            <param-value>loki.cs.umass.edu</param-value>
+            <param-value>mailsrv.cs.umass.edu</param-value>
         </init-param>
     </servlet>
 
