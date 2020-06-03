@@ -16,6 +16,7 @@ import com.sun.mail.smtp.SMTPTransport;
  * @version 1.0
  * 
  * Frank	05-24-2020 Issue #130 change Transport protocol to smtps
+ * Frank	06-03-2020 Issue #141 fix port assignment
  */
 
 public class Mailer extends Object
@@ -100,16 +101,17 @@ public class Mailer extends Object
         // sends out the email
         public boolean send()
         {
-                if (filenames.length > 0)
+            Properties props = System.getProperties();
+
+            // Setup mail server
+            props.put("mail.smtp.host", host);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "25"); // default port 25
+
+            	if (filenames.length > 0)
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
-                                props.put("mail.smtp.auth", "true");
-                                props.put("mail.smtp.port", "25"); // default port 25
                                 
                                 // Get session
                                 Session session = Session.getInstance(props, null);
@@ -183,10 +185,6 @@ public class Mailer extends Object
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
 
                                 // Get session
                                 Session session = Session.getInstance(props, null);
@@ -254,10 +252,6 @@ public class Mailer extends Object
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
 
                                 // Get session
                                 Session session = Session.getInstance(props, null);
