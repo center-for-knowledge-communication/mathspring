@@ -3,7 +3,9 @@
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
 <% 
-
+/**
+* Frank 05-18-2020 Commented out obsolete code which would not compile properly
+*/
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -113,25 +115,25 @@ catch (Exception e) {
             </c:forEach>
         }
 
-        function challengeComplete (topicId) {
-            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=challenge&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
-        }
+//        function challengeComplete (topicId) {
+//            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=challenge&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
+//        }
 
-        function tryThisComplete (topicId) {
-            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=continue&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
-        }
+//        function tryThisComplete (topicId) {
+//            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=continue&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
+//        }
 
-        function continueComplete (topicId) {
-            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=continue&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
-        }
+//        function continueComplete (topicId) {
+//            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=continue&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
+//        }
 
-        function reviewComplete (topicId) {
-            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=review&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
-        }
+//        function reviewComplete (topicId) {
+//            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&topicId=' +topicId+ '&eventCounter=${eventCounter + 1}&mode=review&elapsedTime='+updateElapsedTime()+'&learningChoice=true&learningCompanion=${learningCompanion}&var=b';
+//        }
 
-        function returnToHutComplete () {
-            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&elapsedTime='+ updateElapsedTime()+'&learningCompanion=${learningCompanion}&var=b';
-        }
+//        function returnToHutComplete () {
+//            window.location='${backToVillageURL}&sessionId=${sessionId}&learningHutChoice=true&elapsedTime='+ updateElapsedTime()+'&learningCompanion=${learningCompanion}&var=b';
+//        }
 
         function addComments() {
             <c:forEach var="ts" items="${topicSummaries}">
@@ -180,27 +182,27 @@ catch (Exception e) {
             });
 
             $("#continue_${ts.topicId}").click(function(){
-                if (useHybridTutor)
+//                if (useHybridTutor)
                     window.location = "${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=continue&var=b&comment=";
-                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=continue&var=b&comment=",continueComplete(${ts.topicId}));
+//                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=continue&var=b&comment=",continueComplete(${ts.topicId})
             });
 
             $("#review_${ts.topicId}").click(function(){
-                if (useHybridTutor)
+//              if (useHybridTutor)
                     window.location = "${pageContext.request.contextPath}/TutorBrain?action=MPPReviewTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=review&var=b&comment=";
-                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReviewTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=review&var=b&comment=",reviewComplete(${ts.topicId}));
+//                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReviewTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=review&var=b&comment=",reviewComplete(${ts.topicId})
             });
 
             $("#challenge_${ts.topicId}").click(function(){
-                if (useHybridTutor)
+//                if (useHybridTutor)
                     window.location = "${pageContext.request.contextPath}/TutorBrain?action=MPPChallengeTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=challenge&var=b&comment=";
-                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPChallengeTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=challenge&var=b&comment=", challengeComplete(${ts.topicId}));
+//                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPChallengeTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=challenge&var=b&comment=", challengeComplete(${ts.topicId})
             });
 
             $("#tryThis_${ts.topicId}").click(function(){
-                if (useHybridTutor)
+//                if (useHybridTutor)
                     window.location = "${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=tryThis&var=b&comment=";
-                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=tryThis&var=b&comment=",tryThisComplete(${ts.topicId}));
+//                else $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=tryThis&var=b&comment=",tryThisComplete(${ts.topicId})
             });
             </c:forEach>
         }
@@ -305,11 +307,11 @@ catch (Exception e) {
 
             $("#backToVillage").click(function(){
                 updateElapsedTime();
-                if (useHybridTutor)
+//                if (useHybridTutor)
                     window.location =  "${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=" +currentTopicId+"&probId=" + currentProblemId +
                         "&studentAction=backToSatHut&elapsedTime="+elapsedTime+ "&probElapsedTime="+probElapsedTime+"&learningCompanion=${learningCompanion}"+"&var=b";
-                else
-                    $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
+//                else
+//                    $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
             });
 
             $("#Performance").click(function(){
@@ -460,16 +462,16 @@ catch (Exception e) {
 
             $(".js-go-to-my-garden").click(function() {
                 updateElapsedTime();
-                if (useHybridTutor) {
+//                if (useHybridTutor) {
                     window.location = "${pageContext.request.contextPath}/TutorBrain?action=Home&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=" + currentTopicId
                         + "&probId=" + currentProblemId
                         + "&elapsedTime=" + elapsedTime
                         + "&probElapsedTime=" + probElapsedTime
                         + "&learningCompanion=${learningCompanion}"
                         + "&var=b";
-                } else {
-                    $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
-                }
+//                } else {
+//                    $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
+//                }
             });
         });
     </script>

@@ -14,7 +14,7 @@
   <display-name>mathspring-V2</display-name>
   <context-param>
     <param-name>error.smtpserver</param-name>
-    <param-value>loki.cs.umass.edu</param-value>
+    <param-value>mailsrv.cs.umass.edu</param-value>
   </context-param>
   <context-param>
     <param-name>host</param-name>
@@ -113,7 +113,7 @@
     </init-param>
     <init-param>
       <param-name>mailServer</param-name>
-      <param-value>loki.cs.umass.edu</param-value>
+      <param-value>mailsrv.cs.umass.edu</param-value>
     </init-param>
   </servlet>
   <servlet>

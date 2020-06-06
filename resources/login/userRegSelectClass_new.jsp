@@ -2,7 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
-<% 
+<%
+
+/**
+* Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+*/
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -30,9 +34,18 @@ catch (Exception e) {
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link href="css/common_new.css" rel="stylesheet" type="text/css" />
     <link href="login/css/userRegSelectClass_new.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+        	var cid = "${classId}";
+        	if (!(cid == "0")) {
+        		document.getElementById("singleClass").click();
+        	}
+        });
+    </script>        	
 </head>
 <body>
-    <div class="main-content">
+    <div id="mainContent"  class="main-content">
         <header class="site-header" role="banner">
             <div class="row" id="wrapper">
                 <div class="navbar-header">
@@ -52,6 +65,12 @@ catch (Exception e) {
                 </tr>
                 </thead>
                 <tbody>
+                
+                <c:forEach var="c" begin="0" end="0" items="${classes}">
+                    <a 	id="singleClass" class+"hidden" href="${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationClassSelection&classId=${classId}&studId=${studId}&startPage=${startPage}&var=b">
+                    </a>
+				</c:forEach>
+                
                 <c:forEach var="c" items="${classes}">
                     <tr>
                         <td>${c.teacherName}</td>
@@ -59,7 +78,7 @@ catch (Exception e) {
                         <td>${c.name}</td>
                         <td>${c.town}</td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationClassSelection&classId=${c.classid}&studId=${studId}&startPage=${startPage}&var=b">
+                            <a 	href="${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationClassSelection&classId=${c.classid}&studId=${studId}&startPage=${startPage}&var=b">
                                 <img src="images/arrow.gif" width="18" height="16" border="0">
                             </a>
                         </td>
@@ -72,5 +91,6 @@ catch (Exception e) {
     <footer class="bottom-sticky-footer">
         &copy; <%= rb.getString("copyright")%>
     </footer>
+        
 </body>
 </html>

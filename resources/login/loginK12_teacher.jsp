@@ -6,6 +6,7 @@
  * Frank 01-20-2020 Issue #39 use classId as alternative password
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-14-2020 fixed missing mathspring image
+ * Frank 05-16-2020 issue #123 
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -36,40 +37,34 @@ catch (Exception e) {
     <script type="text/javascript" src="../../login/js/p7EHCscripts.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {            
-        	//alert("loginK12_teacher.jsp");
         	var $userSwitcher = $('#usertypeswitcher');
             var $userLoginForm = $('.user-login-form');
             var $userLoginFormUsername = $('.user-login-form-username');
             var $loginSubmitBtn = $('.js-login-btn');
+
+            $("#forgotPasswordBtn").hide();
+            
             $userSwitcher.change(function() {
                 if ($(this).is(':checked')) {
                     $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
                     $userLoginFormUsername.attr('name', 'userName');
                     $loginSubmitBtn.attr('name', 'login');
                     $loginSubmitBtn.attr('value', 'Login');
-                } else {
+                    $("#forgotPasswordBtn").show();
+               } else {
                     $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
                     $userLoginFormUsername.attr('name', 'uname');
+                    $("#forgotPasswordBtn").hide();
                 }
             });
         });
-        
-        
+              
         
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
         }
         
-        function setForgot() {
-        	if (document.getElementById("forgotPassword").checked) {
-        		document.getElementById("forgot").value = "on";	
-        	}
-        	else {
-        		document.getElementById("forgot").value = "off";	
-        	}      		
-        };
-        
-        
+       
     </script>
 
 <style>
@@ -190,8 +185,8 @@ else {
 </header>
 <body>
 <div>
-    <div class="bootstrap">
-        <div class="container fullscreen">
+    <div class="bootstrap fullscreen">
+        <div class="container">
 	        <div class="row vertical-center">
 	            <div class="col-sm-9 col-sm-offset-2 main-box">
 			        <c:if test="${message != null && not empty message}">
@@ -233,7 +228,7 @@ else {
 	                                        type="hidden"
 	                                        name="forgot"
 	                                        id="forgot";
-	                                        value="off"
+	                                        value="on"
 	                                        class="form-control nav-login"
 	                                />
 	                            </div>
@@ -241,8 +236,8 @@ else {
 	                                      <div class="row">
                                 <div class="col-sm-6">
                                     <div class="switch-group-1">
-                                        <div class="switch-label"><%= rb.getString("are_you_teacher") %></div>
-                                        <div class="onoffswitch">
+                                        <div class="switch-label pull-left"><%= rb.getString("are_you_teacher") %></div>
+                                        <div class="onoffswitch pull-left">
                                             <input
                                                     type="checkbox"
                                                     name="usertype"
@@ -260,16 +255,15 @@ else {
                                             type="submit"
                                             class="btn btn-default btn-block sign-in-btn js-login-btn"><%= rb.getString("login") %></button>
                                 </div>
+                                <div class="col-sm-6">
+                                	<p> </p>
+                                    <a <button id="forgotPasswordBtn"
+                                            href='${pageContext.request.contextPath}/login/forgotPassword.jsp'
+                                            class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>
+                                    </a>
+                                </div>
                             </div>
-	                            
-	                            
-	                            <div class="form-check form-check-inline <c:if test="${message != null}">has-error</c:if>">   
-		  							<input class="form-check-input" 
-		  								type="checkbox" 
-		  								id="forgotPassword" 
-		  								name="forgotPassword" onClick="setForgot();">
-		  							<label><%= rb.getString("forgot_password") %></label>  								
-								</div>
+
 	                        </form>
 	                    </div>                
 	

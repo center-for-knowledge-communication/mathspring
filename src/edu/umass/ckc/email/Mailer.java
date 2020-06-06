@@ -3,7 +3,13 @@ package edu.umass.ckc.email;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import org.apache.log4j.Logger;
+
 import javax.activation.*;
+
+import com.sun.mail.smtp.SMTPTransport;
+
 
 /**
  * <p>Title: </p>
@@ -12,11 +18,17 @@ import javax.activation.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
+ * 
+ * Frank	05-24-2020 Issue #130 change Transport protocol to smtps
+ * Frank	06-03-2020 Issue #141 fix port assignment
  */
 
 public class Mailer extends Object
 {
-        private String[] to = new String[0];
+    private static Logger logger = Logger.getLogger(Mailer.class);
+
+	
+	private String[] to = new String[0];
         private String from = "";
         private String subject = "";
         private String body = "";
@@ -96,15 +108,26 @@ public class Mailer extends Object
         // sends out the email
         public boolean send()
         {
-                if (filenames.length > 0)
+            Properties props = System.getProperties();
+            
+            logger.info("sending an email");
+            logger.info(host);
+            logger.info(to[0]);
+            logger.info(from);
+            logger.info(subject);
+            logger.info(body);
+            
+
+            // Setup mail server
+            props.put("mail.smtp.host", host);
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.port", "25"); // default port 25
+
+            	if (filenames.length > 0)
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
-
+                                
                                 // Get session
                                 Session session = Session.getInstance(props, null);
 
@@ -159,13 +182,17 @@ public class Mailer extends Object
                                 }
 
                                 // Send the message
-                                Transport.send(message);
-
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
+                                
                                 // Inform user that mail was sent successfully
                                 return true;
                         }
                         catch (Exception e)
                         {
+                        		logger.error(e.getMessage());
                                 e.printStackTrace();
                                 return false;
                         }
@@ -174,10 +201,6 @@ public class Mailer extends Object
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
 
                                 // Get session
                                 Session session = Session.getInstance(props, null);
@@ -227,7 +250,10 @@ public class Mailer extends Object
                                 }
 
                                 // Send the message
-                                Transport.send(message);
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
 
                                 // Inform user that mail was sent successfully
                                 return true;
@@ -242,10 +268,6 @@ public class Mailer extends Object
                 {
                         try
                         {
-                                Properties props = System.getProperties();
-
-                                // Setup mail server
-                                props.put("mail.smtp.host", host);
 
                                 // Get session
                                 Session session = Session.getInstance(props, null);
@@ -261,9 +283,12 @@ public class Mailer extends Object
 
                                 // Fill the message
                                 message.setText(body);
-
+                              
                                 // Send the message
-                                Transport.send(message);
+                                SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
+                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.sendMessage(message, message.getAllRecipients());
+                                t.close();
 
                                 // Inform user that mail was sent successfully
                                 return true;

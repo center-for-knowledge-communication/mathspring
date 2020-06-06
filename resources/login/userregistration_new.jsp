@@ -1,7 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
-<% 
+<%
+
+/**
+* Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+*/
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -96,6 +100,12 @@ catch (Exception e) {
                             <input type="password" class="form-control" id="password" placeholder="" name="password">
                         </div>
                     </div><!-- form-group -->
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="classId"><%= rb.getString("class_code_if_known") %>:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="classId" placeholder="" name="classId">
+                        </div>
+                    </div>
                     <div class="form-group row">
                         <div class="col-md-offset-4 col-md-8">
                             <div class="form-check">
@@ -142,7 +152,8 @@ catch (Exception e) {
                 $.ajax({
                     url: "${pageContext.request.contextPath}/WoAdmin"
                     + "?action=UserRegistrationValidateUsername"
-                    + "&userName=" + $('#username').val(),
+                    + "&userName=" + $('#username').val()
+                    + "&classId=" + $('#classId').val(),
                     success: function(responseText) {
                         if ($('#password').val() === '') {
                             messageBar.removeClass('hidden');
@@ -156,6 +167,7 @@ catch (Exception e) {
                             var age = $('#age').val();
                             var gender = $('#gender').val();
                             var password = $('#password').val();
+                            var classId = $('#classId').val();
                             var userType = $('input:radio[name=userType]:checked').val();
                             location.href = "${pageContext.request.contextPath}/WoAdmin?"
                                     + "action=UserRegistrationAuthenticationInfo"
@@ -166,6 +178,7 @@ catch (Exception e) {
                                     + "&password=" + password
                                     + "&age=" + age
                                     + "&gender=" + gender
+                                    + "&classId=" + classId
                                     + "&userType=" + userType
                                     + "&startPage=${startPage}"
                                     + "&var=b";
