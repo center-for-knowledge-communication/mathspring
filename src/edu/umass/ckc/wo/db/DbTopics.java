@@ -14,12 +14,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <p> Created by IntelliJ IDEA.
  * User: david
  * Date: Jul 17, 2008
  * Time: 10:31:46 AM
+ * 
+ ** Frank 	06-13-2020 	issue #106 replace use of probstdmap
  */
 public class DbTopics {
 
@@ -79,6 +82,42 @@ public class DbTopics {
         }
     }
 
+    public static Set<CCStandard> getRptTopicStandards(Connection conn, int id) throws SQLException {
+        //List<CCStandard> result = new ArrayList<CCStandard>();
+        Set<CCStandard> result = new TreeSet<CCStandard>();
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            // the type indicates we want problems that relate to the standard (P means prereq)
+            String q = "select s.id,s.description,s.category,s.grade,s.idABC from topicstandardmap t, standard s where t.topicid=? and s.idABC=t.standardid;";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,id);
+            rs = stmt.executeQuery();
+            int count = 0;
+            while (rs.next()) {
+                String code= rs.getString(1);
+                String descr= rs.getString(2);
+                String category= rs.getString(3);
+                String grade = rs.getString(4);
+                String idABC = rs.getString(5);
+                result.add(new CCStandard(code,descr,category,grade,idABC));
+                count += 1;
+            }
+            if (count == 0) {
+            	System.out.println("Missing topic:" + String.valueOf(id));
+            }
+            return result;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        } 
+    }
+
+    
+    
  public static List<Topic> getClassInactiveTopics(Connection conn, List<Topic> activeTopics) throws SQLException {
         ResultSet rs=null;
         PreparedStatement stmt=null;

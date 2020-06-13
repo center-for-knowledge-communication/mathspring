@@ -44,6 +44,8 @@ import edu.umass.ckc.wo.util.Pair;
  * Time: 2:40:23 PM
  * 
  * Frank 10-15-19 Issue #4 new status value in-progress
+ * Frank 06-13-2020 issue #106 replace use of probstdmap
+ * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -206,7 +208,8 @@ public class ProblemMgr {
           ResultSet rs = null;
           Map<Integer,List<Double>> probStatsEntries = new HashMap<>();
           try {
-              String q = "select stats.probId,stats.meanHints, stats.meanAttempts,stats.meanTime,ov.avghints ,ov.avgincorrect ,ov.avgsecsprob, prob.gradeFromStandard from probstats stats join overallprobdifficulty ov on stats.probId = ov.problemId join problem prob on prob.id = ov.problemId where stats.n >=10  order by probId"; 
+              // issue #108 use problem.standardID instead of problem.gradeFromStandard
+              String q = "select stats.probId,stats.meanHints, stats.meanAttempts,stats.meanTime,ov.avghints ,ov.avgincorrect ,ov.avgsecsprob, prob.standardID from probstats stats join overallprobdifficulty ov on stats.probId = ov.problemId join problem prob on prob.id = ov.problemId where stats.n >=10  order by probId"; 
               ps = conn.prepareStatement(q);
               rs = ps.executeQuery();
               while (rs.next()) {
@@ -218,7 +221,25 @@ public class ProblemMgr {
                   probStats.add(rs.getDouble("avghints"));
                   probStats.add(rs.getDouble("avgincorrect"));
                   probStats.add(rs.getDouble("avgsecsprob"));
-                  probStats.add(rs.getDouble("gradeFromStandard"));
+                  
+                  // issue #108 obsolete probStats.add(rs.getDouble("gradeFromStandard"));
+                  
+                  // issue #108 replacement
+                  Double dblGrade = 1.0;
+                  try {
+                	  String standardID = rs.getString("standardID");
+                	  String gradeFromStandard = standardID.substring(0, 1);
+                	  if (gradeFromStandard.toLowerCase().equals("h")) {
+                		  gradeFromStandard = "9";
+                	  }
+                	  gradeFromStandard += ".0";
+                	  dblGrade = Double.parseDouble(gradeFromStandard);
+                  }
+                  catch (Exception e) {
+                	  logger.error(e.getMessage() + " on " + rs.getInt("probId"));
+                  }
+                  probStats.add(dblGrade);
+              
                   probStatsEntries.put(rs.getInt("probId"), probStats);
               }
           } finally {
@@ -387,6 +408,8 @@ public class ProblemMgr {
         int video;
         try {
             video = rs.getInt("video");
+            // test value video = 111;
+            
         } catch (Exception e) {
             video = -1;
         }
@@ -749,9 +772,12 @@ public class ProblemMgr {
 
     public static List<Problem> getStandardProblems (Connection conn, String ccss) throws SQLException{
         String[] standards = ccss.split(",");
+        if (standards.length != 1) {
+        	logger.error("Wrong number of standards " + String.valueOf(standards.length));
+        }
         List<Problem> problems = new ArrayList<Problem>();
-        String q = "select p.id from problem p, OverallProbDifficulty d, " +
-                "ProbStdMap std where p.id = std.probID and d.problemId = p.id and p.status='ready' and std.stdId in ";
+        String q = "select p.id from problem p, OverallProbDifficulty d " +
+                "where d.problemId = p.id and p.status='ready' and p.standardID in ";
         String vars = "(";
         //Start at 1 to get the right number of commas
         for(int i = 1; i < standards.length; i++){
@@ -802,7 +828,7 @@ public class ProblemMgr {
         PreparedStatement stmt=null;
         try {
             List<Pair<String,Integer>> res = new ArrayList<Pair<String,Integer>>();
-            String q = "select m.stdid, count(m.probId) from probstdmap m, problem p where m.probid=p.id and p.status='ready' group by m.stdid";
+            String q = "select s.idABC, count(p.id) from standard s, problem p where s.idABC=p.standardID and p.status='ready' group by m.stdid";
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {

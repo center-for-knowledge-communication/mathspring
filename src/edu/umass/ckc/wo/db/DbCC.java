@@ -12,6 +12,8 @@ import java.util.List;
  * Date: 8/1/14
  * Time: 11:37 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank 	06-13-2020 	issue #106 replace use of probstdmap
  */
 public class DbCC {
 
@@ -88,13 +90,13 @@ public class DbCC {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String q = "select probId,stdId from probstdmap where stdId=?";
+            String q = "select id, standardID from problem p where p.standardID=?";
             ps = conn.prepareStatement(q);
             ps.setString(1, stdId);
             rs = ps.executeQuery();
             List<Integer> probIds = new ArrayList<Integer>();
             while (rs.next()) {
-                int pid = rs.getInt("probId");
+                int pid = rs.getInt("id");
                 probIds.add(pid);
             }
             return probIds;

@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletResponse;
  * (if topic passed in) For Topic:  TTT
  * <p/>
  * For each problem: We produce information about how the class performed on it.
+ * 
+ * Frank 06-13-2020 issue #106 replace use of probstdmap
  */
 public class ProblemDifficultyReport extends Report {
 
@@ -203,7 +205,7 @@ public class ProblemDifficultyReport extends Report {
         if (semiabsskillId == -1 && clusterId == -1)
             q = "select * from problem where status='ready'";
         else  if (clusterId != -1)
-            q = "select p.* from problem p, probstdmap m, standard s where p.id=m.probId and s.id=m.stdId and s.clusterId=? and p.status='ready'";
+            q = "select p.* from problem p, standard s where p.standardID = s.idABC and s.clusterId=? and p.status='ready'";
         else q = "select * from problem where id in (select distinct problemid\n" +
                 "from hint h, skill s\n" +
                 "where problemid>0 and h.skillid=s.id\n" +
