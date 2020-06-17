@@ -8,6 +8,7 @@
 <!-- Frank  04-30-20    Issue #96 download not using filter -->
 <!-- Frank  05-07-20    Issue #73 restrict thumbnail sizes in reports Max-width 400 max-height 400 -->
 <!-- Frank  05-07-20    Issue #73 change thumbnail locations to 'top' for some reports. Fixes thumbnails off-screen.  -->
+<!-- Frank  06-17-20    Issue #149 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -1167,7 +1168,7 @@ function registerAllEvents(){
     });
 
 if (languageSet == 'es') {
-    perProblemSetReport = $('#perTopicStudentReport').DataTable({
+    perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
         data: [],
         destroy: true,
         columns: [
@@ -1210,7 +1211,7 @@ if (languageSet == 'es') {
     } );
 }
 else {
-    perProblemSetReport = $('#perTopicStudentReport').DataTable({
+    perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
         data: [],
         destroy: true,
         columns: [
@@ -2668,11 +2669,11 @@ var completeDataChart;
 
                 if (perProblemSetReport) {
                     perProblemSetReport.destroy();
-                    $('#perTopicStudentReport').empty();
+                    $('#perStudentPerProblemSetReport').empty();
                 }
 
                 if (languageSet == "es") {
-                perProblemSetReport = $('#perTopicStudentReport').DataTable({
+                perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
 
@@ -2723,7 +2724,7 @@ var completeDataChart;
                 });
                 }
                 else {
-                perProblemSetReport = $('#perTopicStudentReport').DataTable({
+                perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
                    
@@ -4229,7 +4230,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_three" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
-                                    <%= rb.getString("class_summary_per_student") %>
+                                    <%= rb.getString("perStudentReport") %>
                                 </a>
                                 <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4269,7 +4270,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_four" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                                    <%= rb.getString("class_summary_common_core_cluster") %>
+                                    <%= rb.getString("commonCoreClusterReport") %>
                                 </a>
                                 <button id="fourButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4366,7 +4367,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    <%= rb.getString("class_summary_per_student_per_problem_set") %>
+                                    <%= rb.getString("perStudentPerProblemSetReport") %>
                                 </a>
                                 <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4423,7 +4424,7 @@ var completeDataChart;
                             </div>
 
                             <div class="panel-body">
-                                <table id="perTopicStudentReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
                             </div>
 
                         </div>
@@ -4435,7 +4436,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
-                                    <%= rb.getString("class_summary_per_student_per_problem") %>
+                                    <%= rb.getString("perStudentPerProblemReport") %>
                                 </a>
                                	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4495,7 +4496,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
-                                    <%= rb.getString("summary_surveys_test_report") %>
+                                    <%= rb.getString("summarySurveyReport") %>
                                 </a>
                                 <button id="fiveButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4725,7 +4726,7 @@ var completeDataChart;
                                          </a>
                                      </td>--%>
                                 <td>
-                                    <a  onclick="resetStudentData(5,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                    <a  onclick="resetStudentData(${studentInfo.id})" class="success details-control" aria-expanded="true">
                                         <i class="fa fa-window-close" aria-hidden="true"></i>
                                     </a>
                                 </td>
@@ -4745,7 +4746,7 @@ var completeDataChart;
                                          </a>
                                      </td>--%>
                                 <td>
-                                    <a  onclick="resetStudentData(9,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                    <a  onclick="resetStudentData(${studentInfo.id})" class="success details-control" aria-expanded="true">
                                         <i class="fa fa-window-close" aria-hidden="true"></i>
                                     </a>
                                 </td>

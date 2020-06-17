@@ -7,6 +7,7 @@ import java.util.Locale;
 import edu.umass.ckc.wo.util.StringUtils;
 /**
  *  Frank 	03-02-2020	Issue #45 teacher selection list & fix - use sql timestamp data type
+ * Frank 	06-17-20	Issue #149
  */
 public class TeacherLogEntry {
 
@@ -14,6 +15,7 @@ public class TeacherLogEntry {
     private String teacherName;
     private String userName;
     private String action;
+    private String classId;
     private String activityName;
     private java.sql.Timestamp timestamp;
 	private static final String tsFormat_us = "MM/dd/yyyy HH:mm:ss.SSS";
@@ -49,6 +51,14 @@ public class TeacherLogEntry {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getClassId() {
+        return classId;
+    }
+
+    public void setClassId(String classId) {
+        this.classId = classId;
     }
 
     public String getActivityName() {
