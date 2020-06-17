@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  * Frank 	11-25-19	Issue #13 add standards filter for per student per problem report
  * Frank 	12-10-19	Issue #21 add teacher logging by using the request object to get the TeacherLogger object
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
+ * Frank 	06-17-20	Issue #149
  */
 @Controller
 public class TeacherToolsReportController {
@@ -45,14 +46,6 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/getTeacherReports", method = RequestMethod.POST)
     public @ResponseBody String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType,  @RequestParam("lang") String lang,  @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
-    	try {
-    		if (!reportType.equals("teacherList")) {
-    			tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, reportType, classId);
-    		}
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
     	return reportService.generateTeacherReport(teacherId, classId, reportType, lang, filter);
 
     }
@@ -61,7 +54,7 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getCompleteMasteryProjectionForStudent(ModelMap map,@RequestParam("classId") String classId, @RequestParam("chartType") String chartType, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "CompleteMasteryProjectionForStudent", classId+" "+studentId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "CompleteMasteryProjectionForStudent", classId+" "+studentId);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -73,7 +66,7 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getMasterProjectionsForCurrentTopic(ModelMap map,@RequestParam("classId") String classId, @RequestParam("topicID") String topicID, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "MasterProjectionsForCurrentTopic", topicID);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "MasterProjectionsForCurrentTopic", "Topic: " + topicID);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -86,7 +79,7 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getProblemDetailsPerCluster(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("clusterId") String clusterId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "ProblemsInCluster", clusterId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "Problems In Cluster", "Cluster: " + clusterId);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -97,7 +90,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerStudentReport", method = RequestMethod.GET)
        public ModelAndView downLoadPerStudentReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerStudentReport", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerStudentReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -115,7 +108,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerProblemSetReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerProblemSetReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerProblemSetReport", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemSetReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -131,7 +124,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerStudentPerProblemReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerStudentPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerStudentPerProblemReport", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "downLoadPerStudentPerProblemReport", filter);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -147,7 +140,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerProblemReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerProblemReport", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -163,7 +156,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerClusterReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerClusterReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerClusterReport", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerClusterReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -180,7 +173,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downloadStudentEmotions", method = RequestMethod.GET)
     public ModelAndView downloadStudentEmotions(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downloadStudentEmotions", classId);
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downloadStudentEmotions", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -197,7 +190,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/printStudentTags", method = RequestMethod.GET)
     public ModelAndView printStudentTags(ModelMap map, @RequestParam("classId") String classId,@RequestParam("formdata") String formData, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "printStudentTags", "");
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "printStudentTags", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -213,7 +206,7 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/downLoadPerSummSurReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerPerSummSurReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "downLoadPerSummSurReport", "");
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerSummSurReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());

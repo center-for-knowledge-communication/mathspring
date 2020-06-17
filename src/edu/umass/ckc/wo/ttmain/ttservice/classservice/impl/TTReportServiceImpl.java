@@ -19,6 +19,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherListEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
+import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.studmod.StudentProblemHistory;
 import edu.umass.ckc.wo.util.StringUtils;
@@ -58,6 +59,7 @@ import java.text.SimpleDateFormat;
  * Frank 	01-14-20	Issue #45 & #21 add log report
  * Frank    03-02-2020  Added teacherList case: 
  * Frank    04-30-2020  Issue #96 missing locale 
+ * Frank 	06-17-20	Issue #149
  */
 
 @Service
@@ -67,6 +69,10 @@ public class TTReportServiceImpl implements TTReportService {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    
+    @Autowired
+    private TeacherLogger tLogger;
+    
     private static Logger logger = Logger.getLogger(TTReportServiceImpl.class);
 	private ResourceBundle rb = null;
 	private String showNames = "Y";
@@ -78,7 +84,6 @@ public class TTReportServiceImpl implements TTReportService {
 
         try {
         	
-        	System.out.println("TTReportServiceImpl  filter = " + filter);
     		// Multi=lingual enhancement
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		ploc = loc;
@@ -86,6 +91,12 @@ public class TTReportServiceImpl implements TTReportService {
 
         	switch (reportType) {
                 case "perStudentReport":
+                	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                     List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
                     Map<String, String> studentIdMap = classStudents.stream().collect(Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
@@ -195,40 +206,75 @@ public class TTReportServiceImpl implements TTReportService {
                     return objMapper.writeValueAsString(dataMap);
 
                 case "perProblemReport":
-                    Map<String, PerProblemReportBean> resultBean = generatePerProblemReportForClass(classId);
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, reportType, "");
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
+                     Map<String, PerProblemReportBean> resultBean = generatePerProblemReportForClass(classId);
                     ObjectMapper perStudentPerProblemReportMapper = new ObjectMapper();
                     Map<String, Object> dataMapper = new HashMap<>();
                     dataMapper.put("levelOneDataPerProblem", resultBean);
                     return perStudentPerProblemReportMapper.writeValueAsString(dataMapper);
 
                 case "commonCoreClusterReport":
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId,  rb.getString(reportType), "");
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                     Map<String, PerClusterObjectBean> resultsPerStandard = generatePerCommonCoreClusterReport(classId);
                     ObjectMapper perStudentPerProblemSetReportMapper = new ObjectMapper();
                     return perStudentPerProblemSetReportMapper.writeValueAsString(resultsPerStandard);
 
                 case "perStudentPerProblemSetReport":
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                     Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
                     
                 case "perStudentPerProblemReport":
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), filter);
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                     Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter);
                     ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
                     return perStudentPerProblemReportMapper2.writeValueAsString(result2);
                     
                 case "summarySurveyReport":
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                 	Map<String, Map<Integer, StudentDetails>> result1 = generateSurveyReport(classId);
                     ObjectMapper perClusterReportMapper1 = new ObjectMapper();
                     return perClusterReportMapper1.writeValueAsString(result1);
                 	
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
+                   	try {
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "", rb.getString("view_teacher_activities"), classId);
+                	}
+                	catch (Exception e) {
+                		System.out.println("TeacherLogger error " + e.getMessage());
+                	}
                     List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
-                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(),TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
+                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
                     ObjectMapper teacherMapper = new ObjectMapper();
                     Map<String, Object> teacherMap = new HashMap<>();
                     teacherMap.put("levelOneData", teacherData);
-                    System.out.println("result=" + teacherMapper.writeValueAsString(teacherMap));
                     return teacherMapper.writeValueAsString(teacherMap);
                 case "teacherList":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
@@ -237,7 +283,6 @@ public class TTReportServiceImpl implements TTReportService {
                     ObjectMapper tchMapper = new ObjectMapper();
                     Map<String, Object> tchMap = new HashMap<>();
                     tchMap.put("levelOneData", tchData);
-                    System.out.println("result=" + tchMapper.writeValueAsString(tchMap));
                     return tchMapper.writeValueAsString(tchMap);
          
             }
