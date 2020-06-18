@@ -48,6 +48,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank    05-12-2020  send password in email now working
  * Frank    05-24-2020  issue #130 Restore call to original emailer, now that it is working
  * Frank    05-29-2020  issue #28 re-work password reset
+ * Frank 	06-18-2020	issue #135 added method sendHelpMessage()
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -160,6 +161,19 @@ public class TTLoginServiceImpl implements TTLoginService {
             e.printStackTrace();
             logger.error(e.getMessage());
             throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURED_ON_AUTHENTICATE);
+        }
+    }
+
+    @Override
+    public int sendHelpMessage(String subject, String email, String helpmsg) {
+        try {
+        	String helpDeskEmail = Settings.getString(connection.getConnection(), "teacher_login_help_email");
+            Emailer.sendHelpEmail(helpDeskEmail, subject, email, helpmsg);
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return 1;
         }
     }
 
