@@ -26,6 +26,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank 	01-14-20	Issue #45 & #21 add sql query for log report
  * Frank    03-02-2020  Added teacherlist query string 
  * Frank 	06-13-2020 	issue #106 replace use of probstdmap
+ * Frank 	06-17-20	Issue #149
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -99,7 +100,7 @@ public class TTUtil {
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
   
     
-    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
 
     /* A private Constructor prevents any other

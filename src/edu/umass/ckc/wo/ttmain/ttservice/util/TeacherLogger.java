@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * Frank 	12-09-19	Issue #21 add teacher activity logger support
  * Frank 	12-21-19	Issue #21r2 add reworked database access setup
  * Frank 	01-14-20	Issue #45 & #21 add teacher logging by using the request object to get the TeacherLogger object
-
+ * Frank 	06-17-20	Issue #149
  */
 @Component
 public class TeacherLogger {
@@ -45,10 +45,17 @@ public class TeacherLogger {
 
     public int logEntryWorker(int teacherId, int sessionId, String action, String activityName) {
 
-    	System.out.println("logEntryWorker before ");
     	loggerService.tloggerAssist(teacherId, sessionId, action, activityName);
     	
     	return 0;
     	
     }
+    public int logEntryWorker(int teacherId, int sessionId, String classId, String action, String activityName) {
+
+    	loggerService.tloggerAssist(teacherId, sessionId, classId, action, activityName);
+    	
+    	return 0;
+    	
+    }
+
 }

@@ -9,7 +9,8 @@ import java.sql.SQLException;
 /**
  * Frank 	01-14-20	Issue #45 & #21
  * Frank    03-02-2020  fix - use sql timestamp data type 
- */
+ * Frank 	06-17-20	Issue #149
+  */
 public class TeacherLogEntryMapper implements RowMapper {
     @Override
     public Object mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -18,6 +19,7 @@ public class TeacherLogEntryMapper implements RowMapper {
     	teacherLogEntry.setTeacherName(resultSet.getString("teacherName"));
     	teacherLogEntry.setUserName(resultSet.getString("userName"));
     	teacherLogEntry.setAction(resultSet.getString("action"));
+    	teacherLogEntry.setClassId(resultSet.getString("classId"));
     	teacherLogEntry.setActivityName(resultSet.getString("activityName"));
     	teacherLogEntry.setTimestamp(resultSet.getTimestamp("timestamp"));
         return teacherLogEntry;

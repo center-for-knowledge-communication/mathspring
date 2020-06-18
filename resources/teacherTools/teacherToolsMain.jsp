@@ -12,6 +12,7 @@
  *  Frank   02-17-20    ttfixesR3
  *  Frank   03-2-2020   Issue #45 added dynamic teacherlist selection
  *  Frank	02-26-2020	Issue #28 teacher password and profile self-maintenance
+ *  Frank   06-17-20    Issue #149
  */
 
 Locale loc = request.getLocale();
@@ -456,10 +457,10 @@ function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
 		languageSet = "es"
 	}
 	if (languageSet == 'es') {
-		var header = {'tstamp':  'Timestamp','tid':  'Numero Identificador del maestro','tname': 'Nombre del  meastro','uname':  'Nombre de usuario','action': 'Action', 'activityName': 'Activity'};
+		var header = {'tstamp':  'Timestamp','tid':  'Numero Identificador del maestro','tname': 'Nombre del  meastro','uname':  'Nombre de usuario','action': 'Acción','classId': 'Código de clase',  'activityName': 'Actividad'};
 		return header;
 	}else{
-	 	var header = {'tstamp':  'Timestamp','tid':  'Teacher ID','tname': 'Teacher Name','uname':  'Username','action': 'Action', 'activityName': 'Activity'};
+	 	var header = {'tstamp':  'Timestamp','tid':  'Teacher ID','tname': 'Teacher Name','uname':  'Username','action': 'Action','classId': 'Class Id', 'activityName': 'Activity'};
 	 	return header;
 	}
 }
@@ -481,6 +482,7 @@ function registerAllEvents(){
                 { title: headers['tname']  },
                 { title: headers['uname']  },
                 { title: headers['action']  },
+                { title: headers['classId']  },
                 { title: headers['activityName']  },
             ],
             "bPaginate": false,
@@ -550,6 +552,12 @@ function registerAllEvents(){
                     "targets": [ 5 ],
                     "visible": true
 
+                },            	        	
+                {
+                    "width": "5%",
+                    "targets": [ 6 ],
+                    "visible": true
+
                 }            	        	
             ]
         }    
@@ -565,6 +573,7 @@ function registerAllEvents(){
                 { title: headers['tname']  },
                 { title: headers['uname']  },
              	{ title: headers['action']  },
+                { title: headers['classId']  },
              	{ title: headers['activityName']  },
             ],
             "bPaginate": false,
@@ -607,6 +616,11 @@ function registerAllEvents(){
                 {
                     "width": "5%",
                     "targets": [ 5 ],
+                    "visible": true
+
+                },                   {
+                    "width": "5%",
+                    "targets": [ 6 ],
                     "visible": true
 
                 }            	        	
