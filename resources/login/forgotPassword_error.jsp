@@ -14,6 +14,11 @@ try {
 catch (Exception e) {
 	//logger.error(e.getMessage());
 }
+
+/**
+ * Frank 06-18-2020 issue #135 link to login help message page
+*/
+
 %>
 <!DOCTYPE html>
 <html>
@@ -31,6 +36,7 @@ catch (Exception e) {
     <link href="../../login/css/forgotPassword.css" rel="stylesheet" type="text/css" />
       <script type="text/javascript" src="../../js/jquery-1.10.2.js"></script>
     <script type="text/javascript">
+
     </script>
 </head>
 
@@ -57,14 +63,14 @@ catch (Exception e) {
                     action="${pageContext.request.contextPath}/tt/tt/ttPassword"
             >
                 <div class="form-group">
-                    <label class="control-label col-sm-4" for="username"><%= rb.getString("username")%>:</label>
+                    <label id="usernameLabel" class="control-label col-sm-4" for="username"><%= rb.getString("username")%>:</label>
                     <div class="col-sm-6">
                         <input type="text" name="userName" class="form-control" id="username" placeholder="">
                     </div>
                 </div><!-- form-group -->
 
                 <div class="form-group">
-                    <label class="control-label col-sm-4" >  ----- <%= rb.getString("or")%> -----  </label>
+                    <label id="orText" class="control-label col-sm-4" >  ----- <%= rb.getString("or")%> -----  </label>
                 </div><!-- form-group -->
 
                 <div class="form-group">
@@ -76,13 +82,13 @@ catch (Exception e) {
 
                 <div class="form-group row">
                     <div class="col-sm-offset-4 col-sm-4">
-                        <button type="submit" class="btn btn-default pull-right btn-block teacher-button"><%= rb.getString("submit")%></button>
+                        <button type="submit" class="btn btn-default pull-right btn-block teacher-submit-button"><%= rb.getString("submit")%></button>
                     </div>
                 </div><!-- form-group -->
 				<div class="row information-box">
-				     <p class="text-center"><%= rb.getString("login_help_request") %></p>
-				     <p class="text-center"><%= rb.getString("send_help_email") %></p>
-			 	</div>
+				     <p class="text-center">
+				     <a href='${pageContext.request.contextPath}/login/loginHelpRequest.jsp' class="text-center"><%= rb.getString("login_help_request") %>: <%= rb.getString("send_help_email") %></p></a>
+ 			 	</div>
             </form>
         </div>
     </div>

@@ -23,6 +23,7 @@ import java.sql.SQLException;
  * @author unascribed
  * @version 1.0
  * Frank 5-24-2020 issue #130 change mailServer="mailsrv.cs.umass.edu"
+ * Frank 06-18-2020 issue #135 added method getString()
  */
 
 public class Settings {
@@ -155,6 +156,28 @@ public class Settings {
         }
     }
 
+    public static String getString (Connection conn, String column) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+    	String result = null;        
+        try {
+            String q = "select " + column + " from globalsettings";
+            stmt = conn.prepareStatement(q);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        return result;
+    }
+    
+    
     public static String problemPreviewerPath () {
         return probplayerPath.replace("probplayer","problem_checker");
     }
