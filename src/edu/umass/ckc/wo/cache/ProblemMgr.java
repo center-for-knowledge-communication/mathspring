@@ -46,6 +46,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 10-15-19 Issue #4 new status value in-progress
  * Frank 06-13-2020 issue #106 replace use of probstdmap
  * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
+ * Frank 06-13-2020 issue #106R2 missed one - replace use of probstdmap
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -801,8 +802,8 @@ public class ProblemMgr {
     public static int getStandardNumProblems (Connection conn, String ccss) throws SQLException{
         String[] standards = ccss.split(",");
         List<Problem> problems = new ArrayList<Problem>();
-        String q = "select count(p.id) from problem p, OverallProbDifficulty d, " +
-                "ProbStdMap std where p.id = std.probID and d.problemId = p.id and p.status='ready' and std.stdId in ";
+        String q = "select count(p.id) from problem p, OverallProbDifficulty d " +
+                "where d.problemId = p.id and p.status='ready' and p.standardID in ";        
         String vars = "(";
         //Start at 1 to get the right number of commas
         for(int i = 1; i < standards.length; i++){
