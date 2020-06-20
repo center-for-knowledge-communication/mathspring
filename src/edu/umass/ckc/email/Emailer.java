@@ -56,13 +56,16 @@ public class Emailer {
  
  public static boolean sendHelpEmail(String helpDeskEmail, String subject, String userEmail, String message)
  {
-  String body=
-		  "My email is: "+userEmail+'\n'+ 
-		  "My problem is: "+message;
+	boolean mailSent = false;
+	String body="My email is: "+userEmail+'\n'+ "My message is: "+message;;
   
-  // String to, String from, String subj, String body, String host
-  boolean mailSent = Mailer.send(helpDeskEmail, "Mathspring@cs.umass.edu", subject, body, Settings.mailServer);
-  return mailSent;
+	String toAddrs[] = helpDeskEmail.split(",");
+	for(int i=0;i<toAddrs.length;i++) {
+		// String to, String from, String subj, String body, String host
+		mailSent = Mailer.send(toAddrs[i], "Mathspring@cs.umass.edu", subject, body, Settings.mailServer);
+  	}
+  
+	return mailSent;
  }
  
  
