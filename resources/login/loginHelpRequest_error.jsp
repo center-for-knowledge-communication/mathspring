@@ -70,9 +70,10 @@ catch (Exception e) {
                 </div><!-- form-group -->
 
                 <div class="form-group">
-                    <label id="helpmsgLabel" class="control-label col-sm-4" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
+                    <label id="helpmsgLabel" class="control-label col-sm-4" for="helpmsg"><%= rb.getString("type_your_message_here")%>:</label>
                     <div class="col-sm-6">
-                        <input type="helpmsg" name="helpmsg" class="form-control" id="helpmsg" placeholder="">
+                    	<textarea id="helpmsg" name="helpmsg" class="form-control" rows="6" cols="50">
+                    	</textarea>
                     </div>
                 </div><!-- form-group -->
 
