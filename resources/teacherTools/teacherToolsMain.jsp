@@ -194,16 +194,16 @@ catch (Exception e) {
     } else if (languagePreference.includes("es")) {
     	languageSet = "es"
     	loc = "es-Ar";
-    	emsg_classLanguage   = '(sp)Class language is mandatory field';
-    	emsg_className       = '(sp)Class name is mandatory field';
-    	emsg_classGrade      = '(sp)Class grade is mandatory field';
-    	emsg_lowEndDiff      = '(sp)Grade level of problems - Lower is mandatory field';
-    	emsg_highEndDiff     = '(sp)Grade level of problems - Higher is mandatory field';
-    	emsg_town            = '(sp)Town name is mandatory field';
-    	emsg_schoolName      = '(sp)School name is mandatory field';
-    	emsg_schoolYearRange = '(sp)The academic year should not be greater than 2050 and less than current year';
-    	emsg_schoolYear      = '(sp)School year is a mandatory field';
-    	emsg_gradeSection    = '(sp)Section name is a mandatory field';
+    	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
+    	emsg_className       = 'El nombre de la clase es obligatorio';
+    	emsg_classGrade      = 'El grado de la clase es obligatorio';
+    	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
+    	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
+    	emsg_town            = 'El nombre de la ciudad es obligatorio';
+    	emsg_schoolName      = 'El nombre de la escuela es obligatorio';
+    	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
+    	emsg_schoolYear      = 'El año escolar es obligatorio';
+    	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
 
     }   
     	var perTeacherReport;
