@@ -23,6 +23,7 @@ import java.util.TreeSet;
  * Time: 10:31:46 AM
  * 
  ** Frank 	06-13-2020 	issue #106 replace use of probstdmap
+ *  Frank   06-30-2020  issue #132 use idABC field when user-facing 
  */
 public class DbTopics {
 
@@ -89,7 +90,7 @@ public class DbTopics {
         PreparedStatement stmt=null;
         try {
             // the type indicates we want problems that relate to the standard (P means prereq)
-            String q = "select s.id,s.description,s.category,s.grade,s.idABC from topicstandardmap t, standard s where t.topicid=? and s.idABC=t.standardid;";
+            String q = "select s.idABC,s.description,s.category,s.grade,s.idABC from topicstandardmap t, standard s where t.topicid=? and s.idABC=t.standardid order by s.idABC ;";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,id);
             rs = stmt.executeQuery();
@@ -491,6 +492,7 @@ public class DbTopics {
      * @throws SQLException
      */
     public static void insertLessonPlanWithDefaultTopicSequence(Connection conn, int classId) throws SQLException {
+    	DbTopics.removeClassActiveTopics(conn, classId);
         List<Topic> topics = getDefaultTopicsSequence(conn);
         insertTopics(conn,classId,topics);
     }
