@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Neeraj on 3/31/2017.
+ * Frank	07-08-20	issue #134 & #156 added isClassInUse method
  */
 
 @Controller
@@ -46,13 +47,9 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map,@RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId ) throws TTCustomException {
-    	System.out.println("/tt/viewClassDetails 1");
         ccService.setTeacherInfo(map,teacherId,classId);
-    	System.out.println("/tt/viewClassDetails 2");
         ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
-    	System.out.println("/tt/viewClassDetails 3");
         map.addAttribute("createClassForm", new CreateClassForm());
-    	System.out.println("/tt/viewClassDetails 4");
         return "teacherTools/classDetails";
     }
 
@@ -149,4 +146,11 @@ public class TeacherToolsViewClassDetailsController {
         return message;
     }
 
+    @RequestMapping(value = "/tt/isClassInUse", method = RequestMethod.POST)
+    public @ResponseBody
+    String isClassInUse(@RequestParam(value = "classId") String classId) {
+    	return pvService.isClassInUse(classId);
+    }
+
+   
 }

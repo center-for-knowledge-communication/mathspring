@@ -35,7 +35,8 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Created by nsmenon on 4/14/2017.
  * 
  * Frank	02-16-20	Issue #48
- * Frank 	06-13-2020  issue #106 replace use of probstdmap 
+ * Frank 	06-13-2020  issue #106 replace use of probstdmap
+ * Frank	07-08-20	issue #134 & #156 added setClassActive flag handling and editClass method 
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -223,4 +224,24 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         return true;
     }
 
+    @Override
+    public String isClassInUse(String classId) {
+    	
+    	boolean result = true;
+  		
+        try {
+        	result = DbClass.isClassInUse(connection.getConnection(), Integer.valueOf(classId.trim()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        if (result) {
+        	return "Y";
+        }
+        else {
+        	return "N";
+        }
+    }
+
+    
 }

@@ -16,6 +16,8 @@ public interface TTCreateClassAssistService {
 
     public void setTeacherInfo(ModelMap map, String teacherId, String classId);
 
+    public void editClass(CreateClassForm createForm,String tid, int classId) throws TTCustomException;
+
     public Integer createNewClass(CreateClassForm createForm,String tid) throws TTCustomException;
 
     public Integer cloneExistingClass(Integer classId,CreateClassForm createForm) throws TTCustomException;
@@ -33,4 +35,8 @@ public interface TTCreateClassAssistService {
     public boolean restSurveySettings(Integer classId, CreateClassForm createForm) throws TTCustomException;
     
     public String continousContentApply(List<Integer> classIDtoApply,Integer srcClass, Integer teacherId) throws TTCustomException;
+
+    public String setClassActiveFlag(Integer teacherId, Integer classId, String activeFlag);
+
 }
+

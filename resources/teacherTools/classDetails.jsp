@@ -9,6 +9,7 @@
 <!-- Frank  05-07-20    Issue #73 restrict thumbnail sizes in reports Max-width 400 max-height 400 -->
 <!-- Frank  05-07-20    Issue #73 change thumbnail locations to 'top' for some reports. Fixes thumbnails off-screen.  -->
 <!-- Frank  06-17-20    Issue #149 -->
+<!-- Frank	07-08-20	Issue #134 156 162 -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -693,7 +694,6 @@ function resetPassWordForThisStudent(id,uname){
 
 function cnfirmStudentPasswordForTagDownload() {
     window.location.href = pgContext + "/tt/tt/printStudentTags" + "?classId=" + classID + "&formdata=" + classID;
-    cnfirmPasswordToDownLoadTag
 }
 
 
@@ -989,12 +989,43 @@ function handleclickHandlers() {
     });
 
     $("#reconfigure_student_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
+    	$('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
     });
+
+    $("#manage_class_handler").click(function () {  
+        $('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+/**
+        $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/isClassInUse",
+            data : {
+                classId: classID
+            },
+            success : function(response) {
+                if (response == "Y") {
+                	$("#archiveClassBtn").show();
+                	$("#deleteClassBtn").hide();
+                }else{
+                	$("#archiveClassBtn").hide();
+                	$("#deleteClassBtn").show();
+                }
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+*/
+        $("#class_profile_out").show();
+       
+    });
+
 
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
@@ -3208,32 +3239,32 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
@@ -3656,9 +3687,9 @@ var completeDataChart;
                                 if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
                                     $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
                                 }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-danger-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
                                     $(td).addClass('span-warning-layer-one');
+                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
+                                    $(td).addClass('span-danger-layer-one');
                                 }
                             },"render": function ( data, type, full, meta ) {
                             return data+" %";
@@ -3819,6 +3850,14 @@ var completeDataChart;
             registerAllEvents();
             handleclickHandlers();
             getFilter();
+            
+            $('#grade').val("${classInfo.grade}").change();
+            $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
+            $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
+            $('#classLanguage').val("${classInfo.classLanguageCode}").change();
+
+            
+            
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
                 "bFilter": false,
@@ -4022,6 +4061,8 @@ var completeDataChart;
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-book"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
             <li><a id="reconfigure_student_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_students") %></a></li>
+
+            <li><a id="manage_class_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class") %></a></li>
             <li>
                 <a href="#" id="copyClass_handler"><i class="fa fa-files-o"></i> <%= rb.getString("replicate_class") %></a>
             </li>
@@ -4720,47 +4761,170 @@ var completeDataChart;
                                 <td>${studentInfo.fname}</td>
                                 <td>${studentInfo.lname}</td>
                                 <td>${studentInfo.uname}</td>
-                                    <%-- <td>
-                                         <a  onclick="resetStudentData(4,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>--%>
                                 <td>
-                                    <a  onclick="resetStudentData(${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-window-close" aria-hidden="true"></i>
-                                    </a>
-                                </td>
-                                    <%-- <td>
-                                         <a  onclick="resetStudentData(6,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>
-                                     <td>
-                                         <a  onclick="resetStudentData(7,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>
-                                     <td>
-                                         <a  onclick="resetStudentData(8,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>--%>
-                                <td>
-                                    <a  onclick="resetStudentData(${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-window-close" aria-hidden="true"></i>
-                                    </a>
+                                     <a  onclick="resetStudentData(4,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+                                     </a>
                                 </td>
                                 <td>
-                                    <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                    </a>
+                                     <a  onclick="resetStudentData(9,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+                                     </a>
                                 </td>
+	                            <td>
+	                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
+	                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+	                                 </a>
+	                            </td>
                             </tr>
                         </c:forEach>
                         </tbody>
                     </table>
                 </div>
             </div>
+            
+            <div id="class_profile_out" style="display:none;width: 100%;">
+
+                <div>
+                    <h3 class="page-header">
+                        <%= rb.getString("class_configuration") %>
+                    </h3>
+
+                        <div class="panel-body" id="editClassProfile">
+				            <springForm:form id="edit_class_form" method="post"
+				                             action="${pageContext.request.contextPath}/tt/tt/ttEditClass"
+				                             modelAttribute="createClassForm">
+				                <div class="row">
+				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
+				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                    <div id="create_class_out" class="col-md-6 col-sm-6">
+				                        <div class="panel panel-default">
+				                             <div class="panel-body">
+				                               <div class="form-group hidden">
+				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
+				                                                           name="classLanguage">
+				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
+				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="className"><%= rb.getString("class_name") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-blackboard"></i></span>
+				                                        <springForm:input path="className" id="className" name="className"
+				                                                          class="form-control" type="text" value="${classInfo.name}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="town"><%= rb.getString("town") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-tree-deciduous"></i></span>
+				                                        <springForm:input path="town" id="town" name="town"
+				                                                          class="form-control"
+				                                                          type="text" value="${classInfo.town}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="schoolName"><%= rb.getString("school") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i class="fa fa-university"></i></span>
+				                                        <springForm:input path="schoolName" id="schoolName" name="schoolName"
+				                                                          class="form-control" type="text" value="${classInfo.school}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-hourglass"></i></span>
+				                                        <springForm:input path="schoolYear" id="schoolYear" name="schoolYear"
+				                                                          class="form-control" type="text" value="${classInfo.schoolYear}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="gradeSection"><%= rb.getString("section") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+				                                        <springForm:input path="gradeSection" id="gradeSection" name="gradeSection"
+				                                                          class="form-control" type="text" value="${classInfo.section}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="classGrade"><%= rb.getString("class_grade") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classGrade" class="form-control" id="grade"
+				                                                           name="classGrade" value="${classInfo.grade}">
+				                                            <springForm:option value=""><%= rb.getString("select_grade") %></springForm:option>
+				                                            <springForm:option value="5"><%= rb.getString("grade") %> 5</springForm:option>
+				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
+				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
+				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
+				                                            <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
+				                                            <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+				                                            <springForm:option value="adult"><%= rb.getString("adult") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				
+				                                <div class="form-group">
+				                                    <label for="lowEndDiff"><%= rb.getString("problem_complexity_lower") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="lowEndDiff" class="form-control" id="lowEndDiff"
+				                                                           name="lowEndDiff" value="${classInfo.simpleLowDiff}">
+				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+				                                            <springForm:option value="below3"><%= rb.getString("three_grades_below") %></springForm:option>
+				                                            <springForm:option value="below2"><%= rb.getString("two_grades_below") %></springForm:option>
+				                                            <springForm:option value="below1"><%= rb.getString("one_grades_below") %></springForm:option>
+				                                            <springForm:option value="below0"><%= rb.getString("no_grades_below") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				
+				                                <div class="form-group">
+				                                    <label for="highEndDiff"><%= rb.getString("problem_complexity_higher") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="highEndDiff" class="form-control" id="highEndDiff"
+				                                                           name="highEndDiff">
+				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+				                                            <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
+				                                            <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
+				                                            <springForm:option value="above1"><%= rb.getString("one_grades_above") %></springForm:option>
+				                                            <springForm:option value="above0"><%= rb.getString("no_grades_above") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                            </div>
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="row">
+				                        <div class="panel-body class="col-md-6 col-sm-6">
+				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                        </div>
+				                </div>
+				            </springForm:form>
+                        </div>
+                                         
+                 </div>
+            </div>
+            
+ 
+            
              <div id="content_apply_handle" style="display:none;width: 100%;">
              <div>
                     <h3 class="page-header">

@@ -4,6 +4,7 @@ import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
+import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
@@ -60,7 +61,9 @@ import java.text.SimpleDateFormat;
  * Frank    03-02-2020  Added teacherList case: 
  * Frank    04-30-2020  Issue #96 missing locale 
  * Frank 	06-17-20	Issue #149
- */
+ * Frank	07-08-20	issue #153 added access code checker
+*/
+
 
 @Service
 public class TTReportServiceImpl implements TTReportService {
@@ -277,15 +280,28 @@ public class TTReportServiceImpl implements TTReportService {
                     teacherMap.put("levelOneData", teacherData);
                     return teacherMapper.writeValueAsString(teacherMap);
                 case "teacherList":
-                	// Note: classId parameter is used to communicate target teacherId for this report only
-                    List<TeacherListEntry> TeacherListEntries = generateTeacherList(classId);
-                    String[][] tchData = TeacherListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getUserName()}).toArray(String[][]::new);
-                    ObjectMapper tchMapper = new ObjectMapper();
-                    Map<String, Object> tchMap = new HashMap<>();
-                    tchMap.put("levelOneData", tchData);
-                    return tchMapper.writeValueAsString(tchMap);
-         
-            }
+                	try {
+                		int test = DbTeacher.getTeacherId(connection.getConnection(), "SuperFly", filter);
+                		if (test == -1) {
+                			return "InvalidAccessCode";
+                		}
+                		else {
+    	                	// Note: classId parameter is used to communicate target teacherId for this report only
+	                		List<TeacherListEntry> TeacherListEntries = generateTeacherList(classId);
+		                    String[][] tchData = TeacherListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getUserName()}).toArray(String[][]::new);
+		                    ObjectMapper tchMapper = new ObjectMapper();
+		                    Map<String, Object> tchMap = new HashMap<>();
+		                    tchMap.put("levelOneData", tchData);
+		                    return tchMapper.writeValueAsString(tchMap);       
+                		}
+                		
+                	}
+                	catch (Exception e) {
+            			return "Unexpected Error";
+                	}
+                	
+
+        	}
         } catch (IOException e) {
            logger.error(e.getMessage());
            throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
