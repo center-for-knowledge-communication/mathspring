@@ -35,7 +35,9 @@ import java.util.Map;
 
 /**
  * Created by Neeraj on 3/26/2017.
- * Frank	02-16-2020	Issue #48 
+ * Frank	02-16-2020	Issue #48
+ * Frank	07-08-20	issue #134 & #156 added editClass method
+ 
  */
 
 @Service
@@ -93,6 +95,39 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     }
 
+    @Override
+    public void editClass(CreateClassForm createForm, String tid, int classId) throws TTCustomException {
+        try {
+        	
+        	String strClassId = String.valueOf(classId);
+        	
+            // Make sure to check initial fields of create class are validated before proceeding ahead
+            int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
+            DbClass.editClass(connection.getConnection(),
+            		classId,
+            		createForm.getClassName(), 
+            		createForm.getSchoolName(), 
+            		createForm.getSchoolYear(), 
+            		createForm.getTown(), 
+            		createForm.getGradeSection(), 
+//            		  tid,
+//                    defaultPropGroup, 
+//                    0, 
+                    createForm.getClassGrade(),
+                    createForm.getClassLanguage());
+           
+            DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
+            ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
+            info.setSimpleConfigDefaults();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+//            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
+        }
+
+    }
+    
+    
     @Override
     public Integer cloneExistingClass(Integer classId, CreateClassForm createForm) throws TTCustomException {
         try {
@@ -326,4 +361,22 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 		}
 		return "success";
 	}
+	
+    @Override
+    public String setClassActiveFlag(Integer teacherId, Integer classId, String activeFlag) {
+        try {
+        	if (activeFlag.equals("-1")) {
+        		DbClass.deleteClass(connection.getConnection(), classId);
+        	}
+        	else {
+                DbClass.setIsActiveFlag(connection.getConnection(), classId, activeFlag);
+        	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        return "success";
+    }
+
+
 }

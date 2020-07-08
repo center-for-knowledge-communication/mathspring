@@ -49,6 +49,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank    05-24-2020  issue #130 Restore call to original emailer, now that it is working
  * Frank    05-29-2020  issue #28 re-work password reset
  * Frank 	06-18-2020	issue #135 added method sendHelpMessage()
+ * Frank	07-08-20	issue #134 & #156 changed archive vs active class to include isClassActive test
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -86,7 +87,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             }
             ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), teacherId);
             List<ClassInfo> classInfoList = new  ArrayList<>(Arrays.asList(classes));
-            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> (c.getSchoolYear() == Year.now().getValue())));
+            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> ((c.getSchoolYear() == Year.now().getValue()) && (c.getIsActive() > 0))));                                           
             List<ClassInfo> classInfoListLatest = groups.get(true);
             List<ClassInfo> classInfoListArchived = groups.get(false);
             Collections.reverse(classInfoListLatest);

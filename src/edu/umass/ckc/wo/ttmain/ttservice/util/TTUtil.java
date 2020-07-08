@@ -103,6 +103,9 @@ public class TTUtil {
     public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
 
+    
+    public static final String COUNT_STUDENTS_USING_CLASS = "select count(distinct h.studId), s.userName, s.classId from studentproblemhistory h, student s where h.studId = s.id and s.classId = ?";
+
     /* A private Constructor prevents any other
     * class from instantiating.
     */

@@ -13,6 +13,7 @@
  *  Frank   03-2-2020   Issue #45 added dynamic teacherlist selection
  *  Frank	02-26-2020	Issue #28 teacher password and profile self-maintenance
  *  Frank   06-17-20    Issue #149
+ *  Frank	07-08-20	Issue #134 153 156 162
  */
 
 Locale loc = request.getLocale();
@@ -141,6 +142,8 @@ catch (Exception e) {
   size: 3;
 }
 
+
+
 .show {display: block;}
 
 .registration-box {
@@ -208,6 +211,7 @@ catch (Exception e) {
     }   
     	var perTeacherReport;
     	var eachTeacherData = [];    	
+    	var eachTeacherListData = [];    	
     	var pgContext = "${pageContext.request.contextPath}";
         var classID = '';
         var teacherID = '';
@@ -238,7 +242,6 @@ catch (Exception e) {
         function myFunction() {
           alert("Input field lost focus.");
         }
-        
 
         function addToTeacherList(item, index) {
           
@@ -250,11 +253,9 @@ catch (Exception e) {
 
         
         function findSelectedInTeacherList(item, index) {
-            
-        	
+                    	
         	var titem = "" + item;
         	var tlist = titem.split(",");
-        	
         	if (tlist[1] == targetTeacherName) {
         		targetTeacherID = tlist[0];
         	}
@@ -365,45 +366,58 @@ catch (Exception e) {
                 $("#edit-teacher-wrapper").show();
             });
 
+
             $("#teacher_activities_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#form-wrapper").hide();
                 $("#edit-teacher-wrapper").hide();
-                
-                $.ajax({
-                    type : "POST",
-                    url : pgContext+"/tt/tt/getTeacherReports",
-                    data : {
-                        classId: targetTeacherID,
-                        teacherId: teacherID,
-                        reportType: 'teacherList',
-                        lang: loc,
-                        filter: ''
-                    },
-                    success : function(data) {
-                    	if (data) {
-                        	var jsonData = $.parseJSON(data);
-        	                eachTeacherData = jsonData.levelOneData;
-        	                
-        	                document.getElementById("teacherList").innerHTML = "";
-        	                eachTeacherData.forEach(addToTeacherList);
-
-                    	}
-                    	else {
-                    		alert("response data is null");
-                    	}
-                    },
-                    error : function(e) {
-                    	alert("error");
-                        console.log(e);
-                    }
+                $("#teacher-activities-wrapper").show();
+                $("#teacher-activities-input").show();
+                $("#dropdownDiv").hide();
+                               
                 });
+
+             $("#pwdBtn").click(function () {                    
+                   var pwd = document.getElementById("pwd").value; 
+                   $.ajax({
+                       type : "POST",
+                       url : pgContext+"/tt/tt/getTeacherReports",
+                       data : {
+                           classId: targetTeacherID,
+                           teacherId: teacherID,
+                           reportType: 'teacherList',
+                           lang: loc,
+                           filter: pwd
+                       },
+                       success : function(data) {
+                       	    if (data) {
+	                       		var msg = "" + data;
+	                       		if (msg == "InvalidAccessCode") {
+	                           		alert("<%= rb.getString("invalid_access_code") %>");
+	                       		}
+	                       		else {
+		                           	var jsonData = $.parseJSON(data);
+		           	                eachTeacherListData = jsonData.levelOneData;
+		           	                
+		           	                document.getElementById("teacherList").innerHTML = "";
+		           	                eachTeacherListData.forEach(addToTeacherList);		           	             	
+		           	             	$("#dropdownDiv").show();
+	                       		}
+	                       	}
+	                       	else {
+	                       		alert("response data is null");
+	                       	}
+                       },
+                       error : function(e) {
+                       	alert("error");
+                           console.log(e);
+                       }
+                   });
 
                 
                 //document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
 
-                $("#teacher-activities-wrapper").show();
             	
             });
 
@@ -434,9 +448,10 @@ catch (Exception e) {
 			
 			document.getElementById("myInput").value = t.innerHTML;
 			targetTeacherName = t.innerHTML;
-			eachTeacherData.forEach(findSelectedInTeacherList);
+			eachTeacherListData.forEach(findSelectedInTeacherList);
 			filterFunction();
             $("#panel-wrapper").show();
+           	$("#teacher-activities-content").show();
         	document.getElementById("myDropdown").classList.toggle("show");
 
 		}
@@ -747,6 +762,7 @@ function registerAllEvents(){
                 <c:if test="${noClass == false}">
                 <c:set var="colorpicker" value="${['panel-green','panel-red','panel-primary','panel-yellow']}"/>
                 <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
+
                 <c:forEach var="c" items="${classbean.classes}" varStatus="loop">
                 <c:set var="randomColorIndex" value="${random.nextInt(fn:length(colorpicker))}"/>
                 <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
@@ -757,26 +773,32 @@ function registerAllEvents(){
                     <div class="col-lg-3 col-md-6">
                         <div class="panel panel-green">
                             <div class="panel-heading">
-
                                 <div class="row">
-
                                     <div class="col-xs-3">
                                         <i class="fa ${thumbNailPicker[randomChartIndex]}
 										fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
+	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
                             </div>
-                            <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
-                                <div class="panel-footer">
-                                    <span class="pull-left"><%= rb.getString("view_details") %></span>
-                                    <span class="pull-left">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
+                            <div class="panel-footer">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
+                                  <div> 
+                                  	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
+                                  	<span class="pull-left"><%= rb.getString("view_class") %></span>
+                                  </div>
+                              	</a>
+                                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=0">
+                               		<div>
+	                                  	<span class="pull-right"><%= rb.getString("archive_class") %></span>
+	                                  	<span class="pull-right"><i class="fa fa-archive fa-2x">&nbsp;</i></span>
+	                                  </div>
+	                            </a>
+                                <div class="clearfix"></div>
+                             </div>
                         </div>
                     </div>
                     <c:if test="${loop.index == terminator}">
@@ -811,27 +833,44 @@ function registerAllEvents(){
                     <div class="col-lg-3 col-md-6">
                         <div class="panel panel-red">
                             <div class="panel-heading">
-
                                 <div class="row">
-
                                     <div class="col-xs-3">
                                         <i class="fa ${thumbNailPicker[randomChartIndex]}
 										fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
+	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
                             </div>
-                            <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
-                                <div class="panel-footer">
-                                    <span class="pull-left"><%= rb.getString("view_details") %></span>
-                                    <span class="pull-left">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
+                            <div class="panel-footer">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
+                                  <div> 
+                                  	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
+                                  	<span class="pull-left"><%= rb.getString("view_class") %>&nbsp;&nbsp;&nbsp;</span>
+                                  </div>
+                              	</a>
+                                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=1">
+                               		<div>
+	                                  	<span class="pull-left"><i class="fa fa-undo fa-2x"></i>&nbsp;</span>
+	                                  	<span class="pull-left"><%= rb.getString("restore_class") %>&nbsp;&nbsp;&nbsp;</span>
+	                                  </div>
+	                            </a>
+                               <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=-1">
+                               		<div>
+	                                  	<span class="pull-left"><i class="fa fa-trash fa-2x">&nbsp;</i></span>
+	                                  	<span class="pull-left"><%= rb.getString("delete_class") %></span>
+	                                  </div>
+	                            </a>
+                                <div class="clearfix"></div>
+                             </div>
                         </div>
+
+
+
+
+
                     </div>
                     <c:if test="${loop.index == terminator}">
                     <!-- t div-->
@@ -845,26 +884,45 @@ function registerAllEvents(){
             </c:if>
             </div>
             
-         <div id="teacher-activities-wrapper" style="display: none;">
-            <div class="col-lg-12">
-                <h1 class="page-header">
-                    <small><%= rb.getString("view_teacher_activities") %></small>
-                </h1>
+       	<div id="teacher-activities-wrapper" style="display: none;">
+	        <div class="row">
+	            <div class="col-lg-12">
+	                <h1 class="page-header">
+	                    <small><%= rb.getString("view_teacher_activities") %></small>
+	                </h1>
+	            </div>
             </div>
-            <div class="row">
-	           	<div class="col-lg-2 teacher-dropdown">
-					  <ul id="myDropdown" class="nobull">
-					    <i class="fa fa-search" aria-hidden="true"></i><input type="text" placeholder="Search..." id="myInput" onkeyup="filterFunction()" >
-					    <div id="teacherList">
-					  </ul>
-				</div>
-	           	<div id="teacher-activities-content" class="col-lg-10">
-	           		
-	           	</div>
-            </div>
-        </div>
-
+			<div>
+		        <div class="row">
+		           	<div id="teacher-activities-input" class="col-lg-12">
+			            <div class="row">
+			                <label class="pull-left" for="pwd"><%= rb.getString("access_code")%>: </label>
+			                <div class="col-sm-2">
+			                    <input type="text" name="pwd" class="form-control pull-left" id="pwd">
+			                </div>		 		 
+			                <div class="col-sm-2">
+			                    <button id="pwdBtn" type="text" class="btn btn-success pull-left" onclick="pwdBtn();"><%= rb.getString("submit")%></button>
+			                </div> 							
+						</div>
+			        </div>
+		        </div>
+				      
+		        <div class="row">
+		        	<p> </p>
+		        </div>
+		        <div class="row">
+		           	<div id="dropdownDiv" class="col-lg-2 teacher-dropdown">
+						  <ul id="myDropdown" class="nobull">
+						    <i class="fa fa-search" aria-hidden="true"></i>
+						    <input type="text" class="report_filters" placeholder="Search..." id="myInput" onkeyup="filterFunction()" >
+						    <div id="teacherList">
+						  </ul>
+					</div>			           		
+		        </div>
+		    </div>
+		</div>
         <div id="panel-wrapper" class="row" style="display:none;width: 100%;">
+
 
             <div class="panel-group" id="accordion">
                 <div class="panel panel-default">
@@ -883,7 +941,7 @@ function registerAllEvents(){
                                     <label style="padding-right: 10px;">Download Teacher Report (TBD)</label>
 <!--
                                     <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentReport?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                       data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
+                                       data-toggle="tooltip" title="rb.getString("download_this_report")>"
                                        class="downloadPerStudentReport" aria-expanded="true"
                                        aria-controls="teacherActivities">
                                         <i class="fa fa-download fa-2x" aria-hidden="true"></i>
@@ -894,7 +952,9 @@ function registerAllEvents(){
                         </div>
 
                         <div class="panel-body">
-                            <table id="perTeacherReport" class="table table-striped table-bordered hover" width="100%"></table>
+				           	<div id="teacher-activities-content" class="col-lg-10">
+	                            <table id="perTeacherReport" class="table table-striped table-bordered hover" width="100%"></table>
+				           	</div>
                         </div>
 
                     </div>
@@ -918,7 +978,7 @@ function registerAllEvents(){
                     <div id="create_class_out" class="col-md-6 col-sm-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <%= rb.getString("part_one_class_configuration") %>
+                                <%= rb.getString("part_one") %>: <%= rb.getString("class_configuration") %>
                             </div>
                              <div class="panel-body">
                                <div class="form-group">
