@@ -201,6 +201,12 @@ renderCharts : function(problemList, c, containerId) {
                 effortFeedback = languageSet == "es" ? "No has visto este problema todavía" : "You have not tried this problem yet.";
                 break;
 
+            case "SKIP":
+                table.className ="warningCard";
+                cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "Te has saltado el problema (no hizo nada al respecto)." : "You SKIPPED the problem (didn't do anything on the problem).";
+                break;
+
             case "SOF":
                 table.className ="correctCard";
                 cell.innerHTML="★";
