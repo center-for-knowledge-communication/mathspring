@@ -10,6 +10,7 @@
 <!-- Frank  05-07-20    Issue #73 change thumbnail locations to 'top' for some reports. Fixes thumbnails off-screen.  -->
 <!-- Frank  06-17-20    Issue #149 -->
 <!-- Frank	07-08-20	Issue #134 156 162 -->
+<!-- Frank	07-13-20	Issue #156 added continue? modal for deletes -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -127,6 +128,7 @@ catch (Exception e) {
  * Frank    02-17-20    ttfixesR3
  */
  
+ 
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -178,7 +180,6 @@ if (languagePreference.includes("en")) {
 	loc = "es-Ar";
 }
 
-
 <% 
 /**
 try {
@@ -220,7 +221,7 @@ else {
           "ATT" : "The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help request.",
           "GUESS" : "The student apparently GUESSED, clicked through 3-5 answers until getting the right one, and did not ask for hints/videos etc.",
           "SHINT" : "Student SOLVED problem correctly after seeing HINTS.",
-          "SHELP" : "Got the problem correct but saw atleast one video.",
+          "SHELP" : "Got the problem correct but saw at least one video.",
           "NO DATA" : "No data could be gathered."
     }
 }
@@ -644,14 +645,33 @@ function loadEmotionMap (rows) {
     }
 }
 
+var resetStudentDataTitle = "";
+var resetStudentDataId = "";
 
-function resetStudentData( title,studentId) {
-    $.ajax({
+function resetStudentDataModal( title,studentId,username) {
+		resetStudentDataTitle = title;
+		resetStudentDataId = studentId;
+		var temp4 = "<%= rb.getString("delete_math_data")%>" + ": " + username;
+		var temp9 = "<%= rb.getString("delete_username_and_data")%>" + ": " + username;
+		
+		if (title == "4") {
+        	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp4);        	
+        	$('#resetStudentDataModalPopup').modal('show');
+		}
+		else if (title == "9") {
+        	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp9);
+        	$('#resetStudentDataModalPopup').modal('show');
+		}	
+}
+
+function resetStudentData() {
+
+    	$.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/resetStudentdata",
         data : {
-            studentId: studentId,
-            action: title,
+            studentId: resetStudentDataId,
+            action: resetStudentDataTitle,
             lang: loc
         },
         success : function(response) {
@@ -4762,12 +4782,12 @@ var completeDataChart;
                                 <td>${studentInfo.lname}</td>
                                 <td>${studentInfo.uname}</td>
                                 <td>
-                                     <a  onclick="resetStudentData(4,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
                                          <i class="fa fa-window-close" aria-hidden="true"></i>
                                      </a>
                                 </td>
                                 <td>
-                                     <a  onclick="resetStudentData(9,${studentInfo.id})" class="success details-control" aria-expanded="true">
+                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
                                          <i class="fa fa-window-close" aria-hidden="true"></i>
                                      </a>
                                 </td>
@@ -4987,6 +5007,26 @@ var completeDataChart;
 </div>
 <!-- Modal -->
 
+<div id="resetStudentDataModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><%= rb.getString("are_you_sure_continue") %></h4>
+            </div>
+            <div class="modal-body alert alert-primary" role="alert">
+                <%= rb.getString("some_text_in_modal") %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="resetStudentData();" ><%= rb.getString("yes") %></button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 
 <!-- Modal Error-->
 <div id="errorMsgModelPopup" class="modal fade" role="dialog" style="display: none;">
@@ -5104,6 +5144,8 @@ var completeDataChart;
         </div>
     </div>
 </div>
+
+
 <!-- Modal -->
 </body>
 </html>
