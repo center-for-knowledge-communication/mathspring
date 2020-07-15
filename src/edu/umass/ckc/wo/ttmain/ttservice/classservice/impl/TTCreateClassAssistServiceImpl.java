@@ -244,7 +244,10 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     @Override
     public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder, String activateFlag) throws TTCustomException {
-        try {
+    	int updated_topic_count = 0;
+    	long maxTimeInTopic = 10 * 60 * 1000;
+    	Map<String, Integer> insertParams = null;
+    	try {
             if ("deactivate".equals(activateFlag)) {
                 //Deactivate ProblemSets
                 List<Topic> topics = DbTopics.getClassActiveTopics(connection.getConnection(), classId);
@@ -253,7 +256,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                 int seqPos = 1;
                 for (Topic problemSet : activeproblemSetModified) {
                     if (problemSetsToReorder.contains(problemSet.getId())) {
-                        Map<String, Integer> insertParams = new HashMap<String, Integer>();
+                        insertParams = new HashMap<String, Integer>();
                         insertParams.put("classId", classId);
                         insertParams.put("seqPos", seqPos++);
                         insertParams.put("probGroupId", problemSet.getId());
@@ -261,6 +264,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                         namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
                     }
                 }
+                updated_topic_count = problemSetsToReorder.size();
 
             } else {
                 //Activate ProblemSets
@@ -271,15 +275,25 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                 while (sequenceNoToBeadded.next())
                     SequenceEntryIndex = Math.max(1, sequenceNoToBeadded.getInt(1));
                 for (Integer probSetsForReorder : problemSetsToReorder) {
-                    Map<String, Integer> insertParams = new HashMap<String, Integer>();
+                    insertParams = new HashMap<String, Integer>();
                     insertParams.put("classId", classId);
                     insertParams.put("seqPos", SequenceEntryIndex++);
                     insertParams.put("probGroupId", probSetsForReorder);
                     insertParams.put("isDefault", 0);
                     namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
-
                 }
+                updated_topic_count = SequenceEntryIndex - 1;
             }
+            
+            if (updated_topic_count < 5) {
+            	maxTimeInTopic = Math.round(45.0 / updated_topic_count) * 60 * 1000;
+            }
+            insertParams = new HashMap<String, Integer>();
+            insertParams.put("maxTimeInTopic", (int)maxTimeInTopic);
+            insertParams.put("classId", classId);
+            namedParameterJdbcTemplate.update(TTUtil.UPDATE_MAX_TIMEIN_TOPIC_FOR_CLASS, insertParams);
+            
+            
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
