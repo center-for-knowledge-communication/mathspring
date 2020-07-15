@@ -13,11 +13,11 @@ import java.util.List;
  */
 public interface TTLoginService{
 
-    public int loginAssist(String uname,String password) throws TTCustomException;
+    public int loginAssist(String uname,String password);
 
     public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException;
 
-    public int resetPassword(String uname,String email) throws TTCustomException;
+    public int resetPassword(String uname,String email);
 
     public int sendHelpMessage(String subject, String email,String helpmsg) throws TTCustomException;
 }
