@@ -47,6 +47,9 @@ public class TTUtil {
     public static final String VALIDATE_STUDENT_PASSWORD_TO_DOWNLOAD = "select s.password from student s,class c where s.classId=c.id and s.classId=(:classId) order by s.id limit 1";
     public static final String PASSWORD_TOKEN = "M8$tek@12";
 
+    /** SQL Queries for Class Config **/
+    public static final String UPDATE_MAX_TIMEIN_TOPIC_FOR_CLASS = "UPDATE classconfig SET maxTimeInTopic=(:maxTimeInTopic) where classId=(:classId)";
+    
     /** SQL Queries for Survey Settings **/
     public static final String UPDATE_SURVEY_SETTING_FOR_CLASS_ALL = "UPDATE classconfig SET pretest=(:pretest), posttest=(:posttest), showPostSurvey=(:showPostSurvey) where classId=(:classId)";
     public static final String UPDATE_SURVEY_SETTING_FOR_CLASS_PRE = "UPDATE classconfig SET pretest=(:pretest) where classId=(:classId)";
