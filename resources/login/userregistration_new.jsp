@@ -5,6 +5,7 @@
 
 /**
 * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+* Frank	07-17-20	Issue #122 modified for distance learning option
 */
 
 Locale loc = request.getLocale();
@@ -81,7 +82,7 @@ catch (Exception e) {
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div id="emailRow" class="form-group">
                         <label class="control-label col-sm-4" for="email"><%= rb.getString("email") %>:</label>
                         <div class="col-sm-6">
                             <input type="email" class="form-control" id="email" placeholder="" name="email">
@@ -97,16 +98,16 @@ catch (Exception e) {
                     <div class="form-group">
                         <label class="control-label col-sm-4" for="password"><%= rb.getString("password") %>:</label>
                         <div class="col-sm-6">
-                            <input type="password" class="form-control" id="password" placeholder="" name="password">
+                            <input type="text" class="form-control" id="password" placeholder="" name="password">
                         </div>
                     </div><!-- form-group -->
-                    <div class="form-group">
+                    <div id="classcodeRow" class="form-group">
                         <label class="control-label col-sm-4" for="classId"><%= rb.getString("class_code_if_known") %>:</label>
                         <div class="col-sm-6">
                             <input type="text" class="form-control" id="classId" placeholder="" name="classId">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div id="studentTypeRow" class="form-group row">
                         <div class="col-md-offset-4 col-md-8">
                             <div class="form-check">
                              <input class="form-check-input" type="radio" name="userType" id="exampleRadios1" value="student" checked>
@@ -143,7 +144,22 @@ catch (Exception e) {
     <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
     <script src="js/bootstrap/js/language_es.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
+
+
+    $(document).ready(function() {
+		var tClassId = '${classId}';
+		if (tClassId.length > 1) {
+			document.getElementById("classId").value = tClassId;
+			document.getElementById("password").value = tClassId;
+			document.getElementById("password").readOnly = true;
+			$("#studentTypeRow").hide();
+			$("#emailRow").hide();
+			$("#classcodeRow").hide();
+		}
+    });
+    
+    $(document).ready(function() {
+
             var usernameInput = $('.username-wrapper');
             var passwordInput = $('.password-wrapper');
             var messageBar = $('.msg-bar');
