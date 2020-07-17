@@ -7,6 +7,7 @@
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-14-2020 fixed missing mathspring image
  * Frank 05-16-2020 issue #123 
+ * Frank 07-17-2020 issue #122 added classId to signup() function 
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -61,7 +62,7 @@ catch (Exception e) {
               
         
         function signup() {
-            location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
+            location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
         }
         
        

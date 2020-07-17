@@ -6,6 +6,7 @@
  * Frank 01-20-2020 Issue #39 use classId as alternative password
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-16-2020 issue #123 
+ * Frank 07-17-2020 issue #122 added classId to signup() function 
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -60,7 +61,7 @@ catch (Exception e) {
     });
            
         function signup() {
-            location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}';
+            location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
         }
 
     </script>

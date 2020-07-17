@@ -11,6 +11,8 @@
 <!-- Frank  06-17-20    Issue #149 -->
 <!-- Frank	07-08-20	Issue #134 156 162 -->
 <!-- Frank	07-13-20	Issue #156 added continue? modal for deletes -->
+<!-- Frank	07-13-20	Issue #170 removed profile option -->
+<!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -41,7 +43,11 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
-
+String msContext = request.getContextPath();
+String msURL = request.getRequestURL().toString();
+int index = msURL.indexOf(msContext);
+String msHost = msURL.substring(0,index);
+System.out.println("msHost = " + msHost + msContext);
 %>
 
 <!DOCTYPE HTML>
@@ -997,7 +1003,6 @@ function handleclickHandlers() {
         $("#reset_survey_setting_out").show();
     });
 
-
     $("#addMoreStudentsToClass").click(function () {
         $("#addMoreStudents").show();
         $("#addMoreStudentsToClass").prop('disabled', true);
@@ -1015,7 +1020,7 @@ function handleclickHandlers() {
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
     });
-
+    
     $("#manage_class_handler").click(function () {  
         $('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
@@ -4056,10 +4061,6 @@ var completeDataChart;
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#"><i class="fa fa-fw fa-user"></i> <%= rb.getString("profile") %></a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
                         <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
                     </li>
@@ -4702,105 +4703,148 @@ var completeDataChart;
 
             <div id="student_roster_out" style="display:none;width: 100%;">
 
-                <div>
-                    <h3 class="page-header">
-                        <small><%= rb.getString("reconfigure_student_info") %></small>
-                    </h3>
-
-                    <div class="panel panel-default"  style="width: 80%;">
-                        <div class="panel-header text-center"><h3><%= rb.getString("create_more_ids_instructions_heading") %></h3></div>
-                        <div class="panel-body">
-                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_left") %></div>
-                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_right") %></div>
-                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
-                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="page-header">
+	                        <small><%= rb.getString("reconfigure_student_info") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                 <div class="panel-group" id="accordion2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseClassroom">
+                                    <%= rb.getString("in_the_classroom") %>
+                                </a>
+                                <button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
                         </div>
-					</div>
-                    <div class="panel panel-default"  style="width: 100%;">
-                        <div class="panel-body" id="addMoreStudents" style="display: none;">
-                            <springForm:form id="create_Student_id" method="post"
-                                             action="${pageContext.request.contextPath}/tt/tt/createStudentId"
-                                             modelAttribute="createClassForm" onsubmit="event.preventDefault();">
-
-                                <div class="form-group">
-                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
-                                    <div class="input-group">
-                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
-                                                          placeholder="Math" class="form-control" type="text"/>
-                                    </div>
-                                </div>
-                                <div class="form-group hidden">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
-                                                          placeholder="" class="form-control" type="password"/>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
-                                    <div class="input-group">
-                                        <springForm:input path="noOfStudentAccountsForClass" id="noOfStudentAccountsForClass" name="noOfStudentAccountsForClass"
-                                                          placeholder="" class="form-control" type="text"/>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-                                <input type="hidden" name="classId" id="classId" value="${classInfo.classid}">
-                                <div class="form-group">
-                                    <button role="button" type="submit" id="createMoreStudentId" class="btn btn-primary"><%= rb.getString("add_student_ids") %></button>
-                                    <button role="button" type="button" id="cancelForm" class="btn btn-default"><%= rb.getString("cancel") %></button>
-                                </div>
-                            </springForm:form>
-
+                        <div id="collapseClassroom" class="panel-collapse collapse">
+                            <div class="panel-body">
+			                	<div id="inClassOption">
+				                    <div class="panel panel-default"  style="width: 80%;">
+				                        <div class="panel-body">
+				                        	<div class="col-md-12"><%= rb.getString("create_more_ids_instructions_heading") %></div>
+				                        	<br>
+				                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
+				                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+				                        </div>
+									</div>
+				                    <div class="panel panel-default"  style="width: 100%;">
+				                        <div class="panel-body" id="addMoreStudents" style="display: none;">
+				                            <springForm:form id="create_Student_id" method="post"
+				                                             action="${pageContext.request.contextPath}/tt/tt/createStudentId"
+				                                             modelAttribute="createClassForm" onsubmit="event.preventDefault();">
+				
+				                                <div class="form-group">
+				                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
+				                                    <div class="input-group">
+				                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
+				                                                          placeholder="Math" class="form-control" type="text"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group hidden">
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+				                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
+				                                                          placeholder="" class="form-control" type="password"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
+				                                    <div class="input-group">
+				                                        <springForm:input path="noOfStudentAccountsForClass" id="noOfStudentAccountsForClass" name="noOfStudentAccountsForClass"
+				                                                          placeholder="" class="form-control" type="text"/>
+				                                    </div>
+				                                </div>
+				                                <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                                <input type="hidden" name="classId" id="classId" value="${classInfo.classid}">
+				                                <div class="form-group">
+				                                    <button role="button" type="submit" id="createMoreStudentId" class="btn btn-primary"><%= rb.getString("add_student_ids") %></button>
+				                                    <button role="button" type="button" id="cancelForm" class="btn btn-danger"><%= rb.getString("cancel") %></button>
+				                                </div>
+				                            </springForm:form>
+				
+				                        </div>
+				                    </div>
+				                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
+				                        <thead>
+				                        <tr>
+				                            <th rowspan="2"><%= rb.getString("student_id") %></th>
+				                            <th rowspan="2"><%= rb.getString("first_name") %></th>
+				                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
+				                            <th rowspan="2"><%= rb.getString("username") %></th>
+				                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
+				                        </tr>
+				
+				                        <tr>
+				                            <%--  <th>Clear All</th>--%>
+				                            <th><%= rb.getString("delete_math_data") %></th>
+				                            <%-- <th>Reset Practice Hut</th>
+				                             <th>Clear Pretest</th>
+				                             <th>Clear Posttest</th>--%>
+				                            <th><%= rb.getString("delete_username_and_data") %></th>
+				                            <th><%= rb.getString("change_password_and_username") %></th>
+				                        </tr>
+				                        </thead>
+				                        <tbody>
+				                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
+				                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
+				                            <tr>
+				                                <td>${studentInfo.id}</td>
+				                                <td>${studentInfo.fname}</td>
+				                                <td>${studentInfo.lname}</td>
+				                                <td>${studentInfo.uname}</td>
+				                                <td>
+				                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+				                                     </a>
+				                                </td>
+				                                <td>
+				                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+				                                     </a>
+				                                </td>
+					                            <td>
+					                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
+					                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+					                                 </a>
+					                            </td>
+				                            </tr>
+				                        </c:forEach>
+				                        </tbody>
+				                    </table>
+				                </div>
+                            </div>
                         </div>
                     </div>
-                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th rowspan="2"><%= rb.getString("student_id") %></th>
-                            <th rowspan="2"><%= rb.getString("first_name") %></th>
-                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
-                            <th rowspan="2"><%= rb.getString("username") %></th>
-                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
-                        </tr>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseDistance">
+                                   <%= rb.getString("distance_learning") %>
+		                		<p><%= rb.getString("distance_learning_instructions") %></p>
+                                </a>
+                                <button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseDistance" class="panel-collapse collapse">
+                            <div class="panel-body">
+					            <div id="distanceOption">
+				               		<div class="col-md-2"></div>
+					            	<div class="col-md-8">
+					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
+					            		<p><%= rb.getString("distance_learning_email_text")%></p>
+					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+									</div>
+					            	<div class="col-md-2"></div>	               		
+					            </div>
 
-                        <tr>
-                            <%--  <th>Clear All</th>--%>
-                            <th><%= rb.getString("delete_math_data") %></th>
-                            <%-- <th>Reset Practice Hut</th>
-                             <th>Clear Pretest</th>
-                             <th>Clear Posttest</th>--%>
-                            <th><%= rb.getString("delete_username_and_data") %></th>
-                            <th><%= rb.getString("change_password_and_username") %></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
-                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
-                            <tr>
-                                <td>${studentInfo.id}</td>
-                                <td>${studentInfo.fname}</td>
-                                <td>${studentInfo.lname}</td>
-                                <td>${studentInfo.uname}</td>
-                                <td>
-                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-                                     </a>
-                                </td>
-                                <td>
-                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-                                     </a>
-                                </td>
-	                            <td>
-	                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
-	                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-	                                 </a>
-	                            </td>
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
             </div>
             
             <div id="class_profile_out" style="display:none;width: 100%;">

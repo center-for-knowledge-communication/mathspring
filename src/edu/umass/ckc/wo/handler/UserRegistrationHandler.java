@@ -37,6 +37,7 @@ import java.util.ResourceBundle;
  * Handles all events for creating a user.
  * 
  * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+ * Frank	07-17-20	Issue #122 modified UserRegistration events for classId parameter
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -155,16 +156,17 @@ public class UserRegistrationHandler {
      * @return
      * @throws Exception
      */
-    private View generateStudPage(HttpServletRequest req, UserRegistrationEvent e, HttpServletResponse resp) throws Exception {
+    private View generateStudPage(HttpServletRequest req, UserRegistrationStartEvent e, HttpServletResponse resp) throws Exception {
         String url = ServletURI.getURI(req);
 
 
-
+        
         Variables v = new Variables(req.getServerName(),
                 req.getServletPath(),
                 req.getServerPort());
         String startPage = e.getStartPage();
         req.setAttribute("startPage",startPage);
+        req.setAttribute("classId", e.getClassId());
         RequestDispatcher disp = req.getRequestDispatcher(Settings.useNewGUI()
                 ? "login/userregistration_new.jsp"
                 : UserRegistrationHandler.REGISTER1);
@@ -359,14 +361,14 @@ public class UserRegistrationHandler {
     private View processClassInfo(HttpServletRequest req, HttpServletResponse resp, Connection conn, UserRegistrationClassSelectionEvent e) throws Exception {
 
 //        String uri = ServletURI.getURI(req);
-        DbUser.updateStudentClass(conn, e.getStudId(), e.getClassId());
+        DbUser.updateStudentClass(conn, e.getStudId(), e.getIntClassId());
         User stud = DbUser.getStudent(conn,e.getStudId());
-        ClassInfo classInfo = DbClass.getClass(conn,e.getClassId());
+        ClassInfo classInfo = DbClass.getClass(conn,e.getIntClassId());
         // Now that the student is in a class, he is assigned a strategy or a pedagogy from one
         // that the class uses.
-        TutorStrategy strat = StrategyAssigner.assignStrategy(conn,e.getStudId(),e.getClassId());
+        TutorStrategy strat = StrategyAssigner.assignStrategy(conn,e.getStudId(),e.getIntClassId());
         if (strat == null) {
-            int pedId = PedagogyAssigner.assignPedagogy(conn, e.getStudId(), e.getClassId());
+            int pedId = PedagogyAssigner.assignPedagogy(conn, e.getStudId(), e.getIntClassId());
             // store the pedagogy id in the student table row for this user.
             DbUser.setStudentPedagogy(conn, e.getStudId(), pedId);
         }
@@ -415,7 +417,7 @@ public class UserRegistrationHandler {
                 req.getServerPort());
         String url = ServletURI.getURI(req);
         int studId = e.getStudId();
-        int classId = e.getClassId();
+        int classId = e.getIntClassId();
 
         List propNames = getUserProperties(conn, classId);  // returns a list of tuples <id, internalPropName, externalPropName>
         Iterator iter = propNames.iterator();

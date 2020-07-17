@@ -8,6 +8,7 @@ import edu.umass.ckc.servlet.servbase.ServletParams;
  * Receives the fields that will be used to authenticate a user at login time.
  * 
  * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+ * Frank	07-17-20	Issue #122 modified UserRegistration events for classId parameter
  */
 public class UserRegistrationAuthenticationInfoEvent extends UserRegistrationEvent {
     public static final String FNAME = "fname";
@@ -19,7 +20,6 @@ public class UserRegistrationAuthenticationInfoEvent extends UserRegistrationEve
     public static final String EMAIL = "email";
     public static final String TEST_USER = "testUser";
     public static final String USERTYPE = "userType";
-    public static final String CLASSID = "classId";
     
     private String fname;
     private String lname;
@@ -31,9 +31,8 @@ public class UserRegistrationAuthenticationInfoEvent extends UserRegistrationEve
     private String userType;
     private String age;
     private String gender;
-    private String classId;
 
-    public void init(String fname, String lname, String email, String password, String userName, String userType, String age,String gender, String classId) {
+    public void init(String fname, String lname, String email, String password, String userName, String userType, String age,String gender) {
         this.fname = fname;
         this.lname = lname;
         this.email = email;
@@ -42,13 +41,12 @@ public class UserRegistrationAuthenticationInfoEvent extends UserRegistrationEve
         this.userType = userType;
         this.age = age;
         this.gender=gender;
-        this.classId=classId;
     }
 
     public UserRegistrationAuthenticationInfoEvent(ServletParams p) throws Exception {
         super(p);
         this.init(p.getString(FNAME),p.getString(LNAME),p.getString(EMAIL),p.getString(PASSWORD),p.getString(UNAME),
-                p.getString(USERTYPE), p.getString("age"), p.getString("gender"), p.getString("classId"));
+                p.getString(USERTYPE), p.getString("age"), p.getString("gender"));
     }
 
     public String getFname() {
@@ -113,13 +111,6 @@ public class UserRegistrationAuthenticationInfoEvent extends UserRegistrationEve
 
     public String getGender() {
         return gender;
-    }
-    public void setClassId(String classId) {
-        this.classId = classId;
-    }
-
-    public String getClassId() {
-        return classId;
     }
 
 
