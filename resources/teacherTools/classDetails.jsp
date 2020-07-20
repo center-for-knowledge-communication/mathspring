@@ -13,6 +13,7 @@
 <!-- Frank	07-13-20	Issue #156 added continue? modal for deletes -->
 <!-- Frank	07-13-20	Issue #170 removed profile option -->
 <!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
+<!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -959,10 +960,14 @@ function problemLevelDetails(JSONData,problems){
         }else{
             checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
         }
+        var tnickname = obj.nickName;
+        if (tnickname.length > 94) {
+        	tnickname = tnickname.substr(0,90) + "...";
+        }
         tableHeader +=  checkBox+
             "<td>"+obj.id+"</td>"+
             flash+
-            "<td>"+obj.nickName+"</td>"+
+            "<td>"+tnickname+"</td>"+
             "<td>"+obj.difficulty+"</td>"+
             "<td>"+html+"</td>"+
             "<td>"+obj.type+"</td></tr>";
