@@ -372,7 +372,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -415,9 +415,6 @@ function loadEffortMap (rows,flag) {
         $("#iconID" + rows).addClass('fa fa-th');
         var containerChartSelector = "#containerChart" + rows;
         var legendChart = "#legendChart" + rows;
-        var effortChartIdSelector = "#effortChart" + rows;
-        const context = $(effortChartIdSelector)[0].getContext('2d');
-        context.clearRect(0, 0, $(effortChartIdSelector)[0].width, $(effortChartIdSelector)[0].height);
         $(containerChartSelector).hide();
         $(legendChart).empty();
     } 
