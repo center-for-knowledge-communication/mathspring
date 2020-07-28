@@ -32,7 +32,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank 	02-24-20	Issue #28
  * Frank	05-12-20    Test for empty username and password
  * Frank    05-29-2020  issue #28 re-work password reset
- * Frank	06-18-2020	issue #135 added method loginHelp() 
+ * Frank	06-18-2020	issue #135 added method loginHelp()
+ * Frank	07-28-20	issue #74 get teacherID from session attribute 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -84,8 +85,11 @@ public class TeacherToolsMainLoginController {
 
 
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.GET)
-    public String homePage(@RequestParam("teacherId") String teacherId,ModelMap model) throws TTCustomException {
-        return loginService.populateClassInfoForTeacher(model,Integer.valueOf(teacherId));
+    public String homePage(ModelMap model, HttpServletRequest request) throws TTCustomException {
+    	HttpSession session = request.getSession();
+    	int sTeacherId = (int) session.getAttribute("teacherId");
+    	session.removeAttribute("classId");
+        return loginService.populateClassInfoForTeacher(model,sTeacherId);
     }
 
     @RequestMapping(value = "/tt/logout", method = RequestMethod.GET)

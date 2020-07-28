@@ -14,6 +14,8 @@
  *  Frank	02-26-2020	Issue #28 teacher password and profile self-maintenance
  *  Frank   06-17-20    Issue #149
  *  Frank	07-08-20	Issue #134 153 156 162
+ *  Frank	07-28-20	Issue #74 Protect from URL editting of teacherId and classId
+ *  Frank   07-28-20    Remove Replicate Class from menu
  */
 
 Locale loc = request.getLocale();
@@ -785,7 +787,7 @@ function registerAllEvents(){
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
                                   <div> 
                                   	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %></span>
@@ -845,7 +847,7 @@ function registerAllEvents(){
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?teacherId=${teacherId}&classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
                                   <div> 
                                   	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %>&nbsp;&nbsp;&nbsp;</span>

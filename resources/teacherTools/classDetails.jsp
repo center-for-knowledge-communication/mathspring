@@ -14,6 +14,7 @@
 <!-- Frank	07-13-20	Issue #170 removed profile option -->
 <!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
 <!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
+<!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -2182,11 +2183,11 @@ else {
 
 
     $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
         $(location).attr('href', newlocation);
     });
     $("#successMsgModelPopupForProblemSets").find("[class*='close']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
         $(location).attr('href', newlocation);
     });
 	
@@ -4076,7 +4077,7 @@ var completeDataChart;
     <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
         <ul class="nav sidebar-nav">
             <li>
-                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain?teacherId=${teacherId}"><i
+                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i
                         class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
 
@@ -4089,9 +4090,6 @@ var completeDataChart;
             <li><a id="reconfigure_student_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_students") %></a></li>
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class") %></a></li>
-            <li>
-                <a href="#" id="copyClass_handler"><i class="fa fa-files-o"></i> <%= rb.getString("replicate_class") %></a>
-            </li>
 
             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
