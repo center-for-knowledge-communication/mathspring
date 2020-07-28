@@ -28,6 +28,7 @@ import java.util.List;
  * Frank	02-16-20	Issue #48 Fixed assignment of additional ids - wasn't working properly
  * Frank    04-27-2020  fix createStudentRoster() - was not formatting new ids correctly
  * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
+ * Frank	07-28-20	issue #74 add test for classId valid with teacherID 
  */
 public class DbClass {
 
@@ -280,7 +281,38 @@ public class DbClass {
         }
     }
 
+    public static boolean validateClassTeacher(Connection conn, int classId, int teacherId) throws SQLException {
+    	boolean result = false;
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            String q = "select teacherId from class where id=? and teacherId=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, classId);
+            ps.setInt(2, teacherId);
+            rs = ps.executeQuery();
+            if (rs == null) {
+            	System.out.println("result set is null");
+            }
+            else {
+                if (rs.next()) {
+                	result = true;
+                }
+            }
+        }
+        catch (SQLException e) {
+        	System.out.println(e.getMessage());
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+        return result;
+    }
 
+    
+    
     public static int updateClass(Connection conn, int classId, String className,
                                   String school, String schoolYear,
                                   String town, String section, String grade) throws Exception {
