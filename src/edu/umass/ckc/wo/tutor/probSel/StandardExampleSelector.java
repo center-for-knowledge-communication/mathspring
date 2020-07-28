@@ -81,8 +81,8 @@ public class StandardExampleSelector implements ExampleSelector {
             List<Problem> probs = ProblemMgr.getStandardProblems(conn, s.getCode());
             for (Problem p2: probs) {
                 // Frank S. - Added test for same language 
-            	//if (p2.getId() != targetProbId && p2.isUsableAsExample() )                
-                if (p2.getId() != targetProbId && p2.isUsableAsExample() && (p2.getProblemLanguage() == p.getProblemLanguage()) )
+            	//if (p2.getId() != targetProbId && p2.isUsableAsExample() )
+                if (p2.getId() != targetProbId && p2.isUsableAsExample() && p2.getProblemLanguage().equalsIgnoreCase(p.getProblemLanguage()))
                     relatedProbs.add(p2);
             }
         }
