@@ -395,7 +395,7 @@ label {
 					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> <a
 						class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> <a
 						class="huytran-practice__navitem" href="#"><%= rb.getString("practice_area") %></a>
-				<a class="huytran-practice__navitem huytran-practice__navitem--last"
+				<a class="huytran-practice__navitem huytran-practice__navitem--last" id="logout_"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
 					<%= rb.getString("log_out") %> &nbsp; 
 					<span class="fa fa-sign-out"></span>
