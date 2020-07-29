@@ -25,6 +25,8 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank 	10-15-19	Issue #7 perStudentperProblemReport report
  * Frank 	01-14-20	Issue #45 & #21 add sql query for log report
  * Frank    03-02-2020  Added teacherlist query string 
+ * Frank 	06-13-2020 	issue #106 replace use of probstdmap
+ * Frank 	06-17-20	Issue #149
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -45,6 +47,9 @@ public class TTUtil {
     public static final String VALIDATE_STUDENT_PASSWORD_TO_DOWNLOAD = "select s.password from student s,class c where s.classId=c.id and s.classId=(:classId) order by s.id limit 1";
     public static final String PASSWORD_TOKEN = "M8$tek@12";
 
+    /** SQL Queries for Class Config **/
+    public static final String UPDATE_MAX_TIMEIN_TOPIC_FOR_CLASS = "UPDATE classconfig SET maxTimeInTopic=(:maxTimeInTopic) where classId=(:classId)";
+    
     /** SQL Queries for Survey Settings **/
     public static final String UPDATE_SURVEY_SETTING_FOR_CLASS_ALL = "UPDATE classconfig SET pretest=(:pretest), posttest=(:posttest), showPostSurvey=(:showPostSurvey) where classId=(:classId)";
     public static final String UPDATE_SURVEY_SETTING_FOR_CLASS_PRE = "UPDATE classconfig SET pretest=(:pretest) where classId=(:classId)";
@@ -67,11 +72,12 @@ public class TTUtil {
     public static final String PER_PROBLEM_QUERY_THIRD = "select sh.effort from studentproblemhistory sh where sh.studid in (select id from student where classId=(:classId)) and sh.problemId =(:problemId) and sh.effort != 'null' and sh.effort != '' ";
     public static final String PER_PROBLEM_QUERY_FOURTH = "select h.* from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and h.effort != 'null' and h.effort != '' and student.id = h.studId order by student.id, h.id";
     public static final String PER_PROBLEM_QUERY_FIFTH = "select count(distinct h.studId) as noOfStudents from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and student.id = h.studId;";
-    		
-    public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster from studentproblemhistory h, standard std, probstdmap map, cluster cc where studid in (select id from student where classId=(:classId)) and std.clusterID = cc.id and h.mode != 'demo' and std.id=map.stdId and map.probId=h.problemId group by std.clusterID";
-    public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, probstdmap map where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";
-    public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, probstdmap map,problem pr where studid in (select id from student where classId=(:classId)) and std.clusterID=(:clusterID) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and h.problemId = pr.id";
-    public static final String PER_STANDARD_QUERY_FOURTH = "SELECT * FROM (select std.clusterId,count(h.effort) as totalSOFLogged from studentproblemhistory h, standard std, probstdmap map where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and  h.effort = 'SOF' and h.effort != 'null' group by std.clusterID) as A join ( select std.clusterId,count(h.effort) as totoaleffortlogged from studentproblemhistory h, standard std, probstdmap map where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=map.stdId and map.probId=h.problemId and  h.effort != 'null' group by std.clusterID) as B on A.clusterId=B.clusterId";
+
+    public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster from studentproblemhistory h, standard std, problem p, cluster cc where studid in (select id from student where classId=(:classId)) and std.clusterID = cc.id and h.mode != 'demo' and std.id=p.standardID and p.id=h.problemId group by std.clusterID";
+    public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=p.standardID and p.id=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";
+    public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId=(:classId)) and std.clusterID=(:clusterID) and mode='practice' and std.id=pr.standardID and h.problemId = pr.id";
+    public static final String PER_STANDARD_QUERY_FOURTH = "SELECT * FROM (select std.clusterId,count(h.effort) as totalSOFLogged from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=p.standardID and p.id=h.problemId and  h.effort = 'SOF' and h.effort != 'null' group by std.clusterID) as A join ( select std.clusterId,count(h.effort) as totoaleffortlogged from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=pr.standardID and pr.id=h.problemId and  h.effort != 'null' group by std.clusterID) as B on A.clusterId=B.clusterId";
+
 
     public static final String EMOTION_REPORT = "select e.userInput from eventlog e where studId =(:studId) and action='InputResponse' and userInput != 'null' and userInput not like '%howDoYouFeel%' and userInput not like '%-1%'";
     public static final String EMOTION_REPORT_DOWNLOAD = "select e.studId,e.userInput,s.userName,e.problemId,e.time,pr.name,pr.nickname, pr.standardID, round(od.diff_level,2)as diff_level,e.curTopicId,pg.description from eventlog e, problem pr,overallprobdifficulty od, student s, problemgroup pg   where studId =(:studId) and action='InputResponse' and  userInput != 'null' and userInput not like '%howDoYouFeel%' and e.problemId = od.problemId and e.problemId = pr.id  and e.curTopicId=pg.id and s.id=e.studId and userInput not like '%-1%'";
@@ -97,8 +103,11 @@ public class TTUtil {
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
   
     
-    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
+
+    
+    public static final String COUNT_STUDENTS_USING_CLASS = "select count(distinct h.studId), s.userName, s.classId from studentproblemhistory h, student s where h.studId = s.id and s.classId = ?";
 
     /* A private Constructor prevents any other
     * class from instantiating.

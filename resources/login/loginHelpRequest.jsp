@@ -15,8 +15,9 @@ catch (Exception e) {
 	//logger.error(e.getMessage());
 }
 
+
 /**
- * Frank 06-18-2020 issue #135 link to login help message page
+ * Frank 06-18-2020 issue #135 new jsp for login help request
 */
 
 %>
@@ -24,7 +25,7 @@ catch (Exception e) {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>MathSpring | <%= rb.getString("forgot_password")%></title>
+    <title>MathSpring | <%= rb.getString("login_help_request")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -33,7 +34,6 @@ catch (Exception e) {
     <%--<link href="css/bootstrap.min.css" rel="stylesheet">--%>
     <%--<link href="css/common_new.css" rel="stylesheet">--%>
     <link href="../sass_compiled/teacher_register.css" rel="stylesheet">
-    <link href="../login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
     <link href="../login/css/forgotPassword.css" rel="stylesheet" type="text/css" />
       <script type="text/javascript" src="../js/jquery-1.10.2.js"></script>
     <script type="text/javascript">
@@ -56,28 +56,25 @@ catch (Exception e) {
             <c:if test="${message != null && not empty message}">
                 <div class="alert alert-danger msg-bar" role="alert">${message}</div>
             </c:if>
-            <h3 class="text-center form-label form-title"><%= rb.getString("forgot_password")%></h3>
+            <h3 class="text-center form-label form-title"><%= rb.getString("login_help_request")%></h3>
             <hr>
             <form
                     class="form-horizontal"
                     method="post"
-                    action="${pageContext.request.contextPath}/tt/tt/ttPassword"
+                    action="${pageContext.request.contextPath}/tt/tt/ttLoginHelp"
             >
-                <div class="form-group">
-                    <label id="usernameLabel" class="control-label col-sm-4" for="username"><%= rb.getString("username")%>:</label>
-                    <div class="col-sm-6">
-                        <input type="text" name="userName" class="form-control" id="username" placeholder="">
-                    </div>
-                </div><!-- form-group -->
-
-                <div class="form-group">
-                    <label id="orText" class="control-label col-sm-4" >  ----- <%= rb.getString("or")%> -----  </label>
-                </div><!-- form-group -->
-
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="email"><%= rb.getString("email")%>:</label>
                     <div class="col-sm-6">
                         <input type="email" name="email" class="form-control" id="email" placeholder="">
+                    </div>
+                </div><!-- form-group -->
+
+                <div class="form-group">
+                    <label id="helpmsgLabel" class="control-label col-sm-4" for="helpmsg"><%= rb.getString("type_your_message_here")%>:</label>
+                    <div class="col-sm-6">
+                    	<textarea id="helpmsg" name="helpmsg" class="form-control" rows="6" cols="50">
+                    	</textarea>
                     </div>
                 </div><!-- form-group -->
 
@@ -86,10 +83,6 @@ catch (Exception e) {
                         <button type="submit" class="btn btn-default pull-right btn-block teacher-submit-button"><%= rb.getString("submit")%></button>
                     </div>
                 </div><!-- form-group -->
-				<div class="row information-box">
-				     <p class="text-center">
-				     <a href='${pageContext.request.contextPath}/login/loginHelpRequest.jsp' class="text-center"><%= rb.getString("login_help_request") %>: <%= rb.getString("send_help_email") %></p></a>
-			 	</div>
             </form>
         </div>
     </div>

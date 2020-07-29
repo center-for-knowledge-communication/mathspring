@@ -8,6 +8,13 @@
 <!-- Frank  04-30-20    Issue #96 download not using filter -->
 <!-- Frank  05-07-20    Issue #73 restrict thumbnail sizes in reports Max-width 400 max-height 400 -->
 <!-- Frank  05-07-20    Issue #73 change thumbnail locations to 'top' for some reports. Fixes thumbnails off-screen.  -->
+<!-- Frank  06-17-20    Issue #149 -->
+<!-- Frank	07-08-20	Issue #134 156 162 -->
+<!-- Frank	07-13-20	Issue #156 added continue? modal for deletes -->
+<!-- Frank	07-13-20	Issue #170 removed profile option -->
+<!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
+<!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
+<!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -38,7 +45,11 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
-
+String msContext = request.getContextPath();
+String msURL = request.getRequestURL().toString();
+int index = msURL.indexOf(msContext);
+String msHost = msURL.substring(0,index);
+System.out.println("msHost = " + msHost + msContext);
 %>
 
 <!DOCTYPE HTML>
@@ -125,6 +136,7 @@ catch (Exception e) {
  * Frank    02-17-20    ttfixesR3
  */
  
+ 
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -176,7 +188,6 @@ if (languagePreference.includes("en")) {
 	loc = "es-Ar";
 }
 
-
 <% 
 /**
 try {
@@ -218,7 +229,7 @@ else {
           "ATT" : "The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help request.",
           "GUESS" : "The student apparently GUESSED, clicked through 3-5 answers until getting the right one, and did not ask for hints/videos etc.",
           "SHINT" : "Student SOLVED problem correctly after seeing HINTS.",
-          "SHELP" : "Got the problem correct but saw atleast one video.",
+          "SHELP" : "Got the problem correct but saw at least one video.",
           "NO DATA" : "No data could be gathered."
     }
 }
@@ -642,14 +653,33 @@ function loadEmotionMap (rows) {
     }
 }
 
+var resetStudentDataTitle = "";
+var resetStudentDataId = "";
 
-function resetStudentData( title,studentId) {
-    $.ajax({
+function resetStudentDataModal( title,studentId,username) {
+		resetStudentDataTitle = title;
+		resetStudentDataId = studentId;
+		var temp4 = "<%= rb.getString("delete_math_data")%>" + ": " + username;
+		var temp9 = "<%= rb.getString("delete_username_and_data")%>" + ": " + username;
+		
+		if (title == "4") {
+        	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp4);        	
+        	$('#resetStudentDataModalPopup').modal('show');
+		}
+		else if (title == "9") {
+        	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp9);
+        	$('#resetStudentDataModalPopup').modal('show');
+		}	
+}
+
+function resetStudentData() {
+
+    	$.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/resetStudentdata",
         data : {
-            studentId: studentId,
-            action: title,
+            studentId: resetStudentDataId,
+            action: resetStudentDataTitle,
             lang: loc
         },
         success : function(response) {
@@ -692,7 +722,6 @@ function resetPassWordForThisStudent(id,uname){
 
 function cnfirmStudentPasswordForTagDownload() {
     window.location.href = pgContext + "/tt/tt/printStudentTags" + "?classId=" + classID + "&formdata=" + classID;
-    cnfirmPasswordToDownLoadTag
 }
 
 
@@ -932,10 +961,14 @@ function problemLevelDetails(JSONData,problems){
         }else{
             checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
         }
+        var tnickname = obj.nickName;
+        if (tnickname.length > 94) {
+        	tnickname = tnickname.substr(0,90) + "...";
+        }
         tableHeader +=  checkBox+
             "<td>"+obj.id+"</td>"+
             flash+
-            "<td>"+obj.nickName+"</td>"+
+            "<td>"+tnickname+"</td>"+
             "<td>"+obj.difficulty+"</td>"+
             "<td>"+html+"</td>"+
             "<td>"+obj.type+"</td></tr>";
@@ -976,7 +1009,6 @@ function handleclickHandlers() {
         $("#reset_survey_setting_out").show();
     });
 
-
     $("#addMoreStudentsToClass").click(function () {
         $("#addMoreStudents").show();
         $("#addMoreStudentsToClass").prop('disabled', true);
@@ -988,12 +1020,43 @@ function handleclickHandlers() {
     });
 
     $("#reconfigure_student_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
+    	$('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
     });
+    
+    $("#manage_class_handler").click(function () {  
+        $('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+/**
+        $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/isClassInUse",
+            data : {
+                classId: classID
+            },
+            success : function(response) {
+                if (response == "Y") {
+                	$("#archiveClassBtn").show();
+                	$("#deleteClassBtn").hide();
+                }else{
+                	$("#archiveClassBtn").hide();
+                	$("#deleteClassBtn").show();
+                }
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+*/
+        $("#class_profile_out").show();
+       
+    });
+
 
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
@@ -1167,7 +1230,7 @@ function registerAllEvents(){
     });
 
 if (languageSet == 'es') {
-    perProblemSetReport = $('#perTopicStudentReport').DataTable({
+    perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
         data: [],
         destroy: true,
         columns: [
@@ -1210,7 +1273,7 @@ if (languageSet == 'es') {
     } );
 }
 else {
-    perProblemSetReport = $('#perTopicStudentReport').DataTable({
+    perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
         data: [],
         destroy: true,
         columns: [
@@ -2120,11 +2183,11 @@ else {
 
 
     $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
         $(location).attr('href', newlocation);
     });
     $("#successMsgModelPopupForProblemSets").find("[class*='close']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?teacherId='+teacherID+'&classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
         $(location).attr('href', newlocation);
     });
 	
@@ -2668,11 +2731,11 @@ var completeDataChart;
 
                 if (perProblemSetReport) {
                     perProblemSetReport.destroy();
-                    $('#perTopicStudentReport').empty();
+                    $('#perStudentPerProblemSetReport').empty();
                 }
 
                 if (languageSet == "es") {
-                perProblemSetReport = $('#perTopicStudentReport').DataTable({
+                perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
 
@@ -2723,7 +2786,7 @@ var completeDataChart;
                 });
                 }
                 else {
-                perProblemSetReport = $('#perTopicStudentReport').DataTable({
+                perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
                    
@@ -3207,32 +3270,32 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-danger-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-warning-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-danger-layer-one');
                         }
                     }},
                     { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
@@ -3655,9 +3718,9 @@ var completeDataChart;
                                 if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
                                     $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
                                 }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-danger-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
                                     $(td).addClass('span-warning-layer-one');
+                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
+                                    $(td).addClass('span-danger-layer-one');
                                 }
                             },"render": function ( data, type, full, meta ) {
                             return data+" %";
@@ -3818,6 +3881,14 @@ var completeDataChart;
             registerAllEvents();
             handleclickHandlers();
             getFilter();
+            
+            $('#grade').val("${classInfo.grade}").change();
+            $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
+            $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
+            $('#classLanguage').val("${classInfo.classLanguageCode}").change();
+
+            
+            
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
                 "bFilter": false,
@@ -3996,10 +4067,6 @@ var completeDataChart;
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#"><i class="fa fa-fw fa-user"></i> <%= rb.getString("profile") %></a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
                         <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
                     </li>
@@ -4010,7 +4077,7 @@ var completeDataChart;
     <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
         <ul class="nav sidebar-nav">
             <li>
-                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain?teacherId=${teacherId}"><i
+                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i
                         class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
 
@@ -4021,9 +4088,8 @@ var completeDataChart;
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-book"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
             <li><a id="reconfigure_student_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_students") %></a></li>
-            <li>
-                <a href="#" id="copyClass_handler"><i class="fa fa-files-o"></i> <%= rb.getString("replicate_class") %></a>
-            </li>
+
+            <li><a id="manage_class_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class") %></a></li>
 
             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
@@ -4229,7 +4295,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_three" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
-                                    <%= rb.getString("class_summary_per_student") %>
+                                    <%= rb.getString("perStudentReport") %>
                                 </a>
                                 <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4269,7 +4335,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_four" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
-                                    <%= rb.getString("class_summary_common_core_cluster") %>
+                                    <%= rb.getString("commonCoreClusterReport") %>
                                 </a>
                                 <button id="fourButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4366,7 +4432,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    <%= rb.getString("class_summary_per_student_per_problem_set") %>
+                                    <%= rb.getString("perStudentPerProblemSetReport") %>
                                 </a>
                                 <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4423,7 +4489,7 @@ var completeDataChart;
                             </div>
 
                             <div class="panel-body">
-                                <table id="perTopicStudentReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
                             </div>
 
                         </div>
@@ -4435,7 +4501,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
-                                    <%= rb.getString("class_summary_per_student_per_problem") %>
+                                    <%= rb.getString("perStudentPerProblemReport") %>
                                 </a>
                                	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4495,7 +4561,7 @@ var completeDataChart;
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
-                                    <%= rb.getString("summary_surveys_test_report") %>
+                                    <%= rb.getString("summarySurveyReport") %>
                                 </a>
                                 <button id="fiveButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4640,126 +4706,292 @@ var completeDataChart;
 
             <div id="student_roster_out" style="display:none;width: 100%;">
 
-                <div>
-                    <h3 class="page-header">
-                        <small><%= rb.getString("reconfigure_student_info") %></small>
-                    </h3>
-
-                    <div class="panel panel-default"  style="width: 80%;">
-                        <div class="panel-header text-center"><h3><%= rb.getString("create_more_ids_instructions_heading") %></h3></div>
-                        <div class="panel-body">
-                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_left") %></div>
-                        	<div class="col-md-6"><%= rb.getString("create_more_ids_instructions_right") %></div>
-                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
-                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="page-header">
+	                        <small><%= rb.getString("reconfigure_student_info") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                 <div class="panel-group" id="accordion2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseClassroom">
+                                    <%= rb.getString("in_the_classroom") %>
+                                </a>
+                                <button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
                         </div>
-					</div>
-                    <div class="panel panel-default"  style="width: 100%;">
-                        <div class="panel-body" id="addMoreStudents" style="display: none;">
-                            <springForm:form id="create_Student_id" method="post"
-                                             action="${pageContext.request.contextPath}/tt/tt/createStudentId"
-                                             modelAttribute="createClassForm" onsubmit="event.preventDefault();">
-
-                                <div class="form-group">
-                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
-                                    <div class="input-group">
-                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
-                                                          placeholder="Math" class="form-control" type="text"/>
-                                    </div>
-                                </div>
-                                <div class="form-group hidden">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
-                                                          placeholder="" class="form-control" type="password"/>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
-                                    <div class="input-group">
-                                        <springForm:input path="noOfStudentAccountsForClass" id="noOfStudentAccountsForClass" name="noOfStudentAccountsForClass"
-                                                          placeholder="" class="form-control" type="text"/>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-                                <input type="hidden" name="classId" id="classId" value="${classInfo.classid}">
-                                <div class="form-group">
-                                    <button role="button" type="submit" id="createMoreStudentId" class="btn btn-primary"><%= rb.getString("add_student_ids") %></button>
-                                    <button role="button" type="button" id="cancelForm" class="btn btn-default"><%= rb.getString("cancel") %></button>
-                                </div>
-                            </springForm:form>
-
+                        <div id="collapseClassroom" class="panel-collapse collapse">
+                            <div class="panel-body">
+			                	<div id="inClassOption">
+				                    <div class="panel panel-default"  style="width: 80%;">
+				                        <div class="panel-body">
+				                        	<div class="col-md-12"><%= rb.getString("create_more_ids_instructions_heading") %></div>
+				                        	<br>
+				                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
+				                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+				                        </div>
+									</div>
+				                    <div class="panel panel-default"  style="width: 100%;">
+				                        <div class="panel-body" id="addMoreStudents" style="display: none;">
+				                            <springForm:form id="create_Student_id" method="post"
+				                                             action="${pageContext.request.contextPath}/tt/tt/createStudentId"
+				                                             modelAttribute="createClassForm" onsubmit="event.preventDefault();">
+				
+				                                <div class="form-group">
+				                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
+				                                    <div class="input-group">
+				                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
+				                                                          placeholder="Math" class="form-control" type="text"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group hidden">
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+				                                        <springForm:input path="passwordToken" id="passwordToken" name="passwordToken" value="useClass"
+				                                                          placeholder="" class="form-control" type="password"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="noOfStudentAccountsForClass"><%= rb.getString("number_IDs_to_create") %></label>
+				                                    <div class="input-group">
+				                                        <springForm:input path="noOfStudentAccountsForClass" id="noOfStudentAccountsForClass" name="noOfStudentAccountsForClass"
+				                                                          placeholder="" class="form-control" type="text"/>
+				                                    </div>
+				                                </div>
+				                                <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                                <input type="hidden" name="classId" id="classId" value="${classInfo.classid}">
+				                                <div class="form-group">
+				                                    <button role="button" type="submit" id="createMoreStudentId" class="btn btn-primary"><%= rb.getString("add_student_ids") %></button>
+				                                    <button role="button" type="button" id="cancelForm" class="btn btn-danger"><%= rb.getString("cancel") %></button>
+				                                </div>
+				                            </springForm:form>
+				
+				                        </div>
+				                    </div>
+				                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
+				                        <thead>
+				                        <tr>
+				                            <th rowspan="2"><%= rb.getString("student_id") %></th>
+				                            <th rowspan="2"><%= rb.getString("first_name") %></th>
+				                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
+				                            <th rowspan="2"><%= rb.getString("username") %></th>
+				                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
+				                        </tr>
+				
+				                        <tr>
+				                            <%--  <th>Clear All</th>--%>
+				                            <th><%= rb.getString("delete_math_data") %></th>
+				                            <%-- <th>Reset Practice Hut</th>
+				                             <th>Clear Pretest</th>
+				                             <th>Clear Posttest</th>--%>
+				                            <th><%= rb.getString("delete_username_and_data") %></th>
+				                            <th><%= rb.getString("change_password_and_username") %></th>
+				                        </tr>
+				                        </thead>
+				                        <tbody>
+				                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
+				                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
+				                            <tr>
+				                                <td>${studentInfo.id}</td>
+				                                <td>${studentInfo.fname}</td>
+				                                <td>${studentInfo.lname}</td>
+				                                <td>${studentInfo.uname}</td>
+				                                <td>
+				                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+				                                     </a>
+				                                </td>
+				                                <td>
+				                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+				                                     </a>
+				                                </td>
+					                            <td>
+					                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
+					                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+					                                 </a>
+					                            </td>
+				                            </tr>
+				                        </c:forEach>
+				                        </tbody>
+				                    </table>
+				                </div>
+                            </div>
                         </div>
                     </div>
-                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th rowspan="2"><%= rb.getString("student_id") %></th>
-                            <th rowspan="2"><%= rb.getString("first_name") %></th>
-                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
-                            <th rowspan="2"><%= rb.getString("username") %></th>
-                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
-                        </tr>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseDistance">
+                                   <%= rb.getString("distance_learning") %>
+		                		<p><%= rb.getString("distance_learning_instructions") %></p>
+                                </a>
+                                <button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseDistance" class="panel-collapse collapse">
+                            <div class="panel-body">
+					            <div id="distanceOption">
+				               		<div class="col-md-2"></div>
+					            	<div class="col-md-8">
+					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
+					            		<p><%= rb.getString("distance_learning_email_text")%></p>
+					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+									</div>
+					            	<div class="col-md-2"></div>	               		
+					            </div>
 
-                        <tr>
-                            <%--  <th>Clear All</th>--%>
-                            <th><%= rb.getString("delete_math_data") %></th>
-                            <%-- <th>Reset Practice Hut</th>
-                             <th>Clear Pretest</th>
-                             <th>Clear Posttest</th>--%>
-                            <th><%= rb.getString("delete_username_and_data") %></th>
-                            <th><%= rb.getString("change_password_and_username") %></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
-                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
-                            <tr>
-                                <td>${studentInfo.id}</td>
-                                <td>${studentInfo.fname}</td>
-                                <td>${studentInfo.lname}</td>
-                                <td>${studentInfo.uname}</td>
-                                    <%-- <td>
-                                         <a  onclick="resetStudentData(4,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>--%>
-                                <td>
-                                    <a  onclick="resetStudentData(5,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-window-close" aria-hidden="true"></i>
-                                    </a>
-                                </td>
-                                    <%-- <td>
-                                         <a  onclick="resetStudentData(6,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>
-                                     <td>
-                                         <a  onclick="resetStudentData(7,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>
-                                     <td>
-                                         <a  onclick="resetStudentData(8,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                             <i class="fa fa-window-close" aria-hidden="true"></i>
-                                         </a>
-                                     </td>--%>
-                                <td>
-                                    <a  onclick="resetStudentData(9,${studentInfo.id})" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-window-close" aria-hidden="true"></i>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
+                            </div>
+                        </div>
+                    </div>
+				</div>
             </div>
+            
+            <div id="class_profile_out" style="display:none;width: 100%;">
+
+                <div>
+                    <h3 class="page-header">
+                        <%= rb.getString("class_configuration") %>
+                    </h3>
+
+                        <div class="panel-body" id="editClassProfile">
+				            <springForm:form id="edit_class_form" method="post"
+				                             action="${pageContext.request.contextPath}/tt/tt/ttEditClass"
+				                             modelAttribute="createClassForm">
+				                <div class="row">
+				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
+				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                    <div id="create_class_out" class="col-md-6 col-sm-6">
+				                        <div class="panel panel-default">
+				                             <div class="panel-body">
+				                               <div class="form-group hidden">
+				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
+				                                                           name="classLanguage">
+				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
+				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="className"><%= rb.getString("class_name") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-blackboard"></i></span>
+				                                        <springForm:input path="className" id="className" name="className"
+				                                                          class="form-control" type="text" value="${classInfo.name}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="town"><%= rb.getString("town") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-tree-deciduous"></i></span>
+				                                        <springForm:input path="town" id="town" name="town"
+				                                                          class="form-control"
+				                                                          type="text" value="${classInfo.town}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="schoolName"><%= rb.getString("school") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i class="fa fa-university"></i></span>
+				                                        <springForm:input path="schoolName" id="schoolName" name="schoolName"
+				                                                          class="form-control" type="text" value="${classInfo.school}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-hourglass"></i></span>
+				                                        <springForm:input path="schoolYear" id="schoolYear" name="schoolYear"
+				                                                          class="form-control" type="text" value="${classInfo.schoolYear}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="gradeSection"><%= rb.getString("section") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+				                                        <springForm:input path="gradeSection" id="gradeSection" name="gradeSection"
+				                                                          class="form-control" type="text" value="${classInfo.section}"/>
+				                                    </div>
+				                                </div>
+				                                <div class="form-group">
+				                                    <label for="classGrade"><%= rb.getString("class_grade") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classGrade" class="form-control" id="grade"
+				                                                           name="classGrade" value="${classInfo.grade}">
+				                                            <springForm:option value=""><%= rb.getString("select_grade") %></springForm:option>
+				                                            <springForm:option value="5"><%= rb.getString("grade") %> 5</springForm:option>
+				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
+				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
+				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
+				                                            <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
+				                                            <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+				                                            <springForm:option value="adult"><%= rb.getString("adult") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				
+				                                <div class="form-group">
+				                                    <label for="lowEndDiff"><%= rb.getString("problem_complexity_lower") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="lowEndDiff" class="form-control" id="lowEndDiff"
+				                                                           name="lowEndDiff" value="${classInfo.simpleLowDiff}">
+				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+				                                            <springForm:option value="below3"><%= rb.getString("three_grades_below") %></springForm:option>
+				                                            <springForm:option value="below2"><%= rb.getString("two_grades_below") %></springForm:option>
+				                                            <springForm:option value="below1"><%= rb.getString("one_grades_below") %></springForm:option>
+				                                            <springForm:option value="below0"><%= rb.getString("no_grades_below") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				
+				                                <div class="form-group">
+				                                    <label for="highEndDiff"><%= rb.getString("problem_complexity_higher") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="highEndDiff" class="form-control" id="highEndDiff"
+				                                                           name="highEndDiff">
+				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
+				                                            <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
+				                                            <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
+				                                            <springForm:option value="above1"><%= rb.getString("one_grades_above") %></springForm:option>
+				                                            <springForm:option value="above0"><%= rb.getString("no_grades_above") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                            </div>
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="row">
+				                        <div class="panel-body class="col-md-6 col-sm-6">
+				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                        </div>
+				                </div>
+				            </springForm:form>
+                        </div>
+                                         
+                 </div>
+            </div>
+            
+ 
+            
              <div id="content_apply_handle" style="display:none;width: 100%;">
              <div>
                     <h3 class="page-header">
@@ -4821,6 +5053,26 @@ var completeDataChart;
     </div>
 </div>
 <!-- Modal -->
+
+<div id="resetStudentDataModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><%= rb.getString("are_you_sure_continue") %></h4>
+            </div>
+            <div class="modal-body alert alert-primary" role="alert">
+                <%= rb.getString("some_text_in_modal") %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="resetStudentData();" ><%= rb.getString("yes") %></button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 
 <!-- Modal Error-->
@@ -4939,6 +5191,8 @@ var completeDataChart;
         </div>
     </div>
 </div>
+
+
 <!-- Modal -->
 </body>
 </html>

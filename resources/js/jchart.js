@@ -201,6 +201,12 @@ renderCharts : function(problemList, c, containerId) {
                 effortFeedback = languageSet == "es" ? "No has visto este problema todavía" : "You have not tried this problem yet.";
                 break;
 
+            case "SKIP":
+                table.className ="warningCard";
+                cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "Te has saltado el problema (no hizo nada al respecto)." : "You SKIPPED the problem (didn't do anything on the problem).";
+                break;
+
             case "SOF":
                 table.className ="correctCard";
                 cell.innerHTML="★";
@@ -229,27 +235,29 @@ renderCharts : function(problemList, c, containerId) {
                 table.className ="correctWithHintsCard";
                 cell.innerHTML="H";
                 if (hints==1)   {
-                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ hints+ languageSet == "es" ? "ayudita" : "hint.";
-                }else
-                { effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ hints+ languageSet == "es" ? "ayuditas" : "hints.";  }
+                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ (hints+ languageSet == "es" ? "ayudita" : "hint.");
+                }else { 
+                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ (hints+ languageSet == "es" ? "ayuditas" : "hints."); 
+				}
 
                 break;
 
             case "ATT":
                 table.className ="correctOnAttemptsCard";
                 cell.innerHTML="_";
-                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ languageSet == "es" ? "intento" : "attempts.";
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ (languageSet == "es" ? "intento" : "attempts.");
                 break;
 
             case "GUESS":
                 table.className ="correctOnAttemptsCard";
                 cell.innerHTML="_";
-                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ languageSet == "es" ? "intento" : "attempts.";
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ (languageSet == "es" ? "intento" : "attempts.");
                 break;
 
             default:
                 table.className ="emptyCard";
                 cell.innerHTML="_";
+                effortFeedback = languageSet == "es" ? "No has visto este problema todavía" : "You have not tried this problem yet.";
                 break;
 
 

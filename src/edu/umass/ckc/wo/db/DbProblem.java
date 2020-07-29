@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
  * Written by: David Marshall
  * Date: Jun 25, 2007
  * Time: 12:02:49 PM
+ * 
+ * Frank 	06-13-2020 	issue #106 replace use of probstdmap
  */
 public class DbProblem extends BaseMgr {
     private static final Logger logger = Logger.getLogger(DbProblem.class);
@@ -758,7 +760,7 @@ public class DbProblem extends BaseMgr {
         PreparedStatement stmt=null;
         try {
             // the type indicates we want problems that relate to the standard (P means prereq)
-            String q = "select s.id,s.description,s.category,s.grade,s.idABC from probstdmap m, standard s where m.probid=? and s.id=m.stdid";
+            String q = "select s.id,s.description,s.category,s.grade,s.idABC from problem p, standard s where p.id=? and s.id=p.standardID";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,id);
             rs = stmt.executeQuery();

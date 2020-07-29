@@ -1,5 +1,7 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
+import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
@@ -7,6 +9,8 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ProblemsView;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
+import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
@@ -22,18 +26,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 /**
  * Created by Neeraj on 3/31/2017.
+ * Frank	07-08-20	issue #134 & #156 added isClassInUse method
+ * Frank	07-28-20	issue #74 Force logout if url tampered with
  */
 
 @Controller
 public class TeacherToolsViewClassDetailsController {
+
+    @Autowired
+    private TTConfiguration connection;
 
     @Autowired
     private TTLoginService loginService;
@@ -44,15 +57,37 @@ public class TeacherToolsViewClassDetailsController {
     @Autowired
     private TTProblemsViewService pvService;
 
+    @Autowired
+    private TeacherLogger tLogger;
+    
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
-    public String viewClassDetails(ModelMap map,@RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId ) throws TTCustomException {
-    	System.out.println("/tt/viewClassDetails 1");
-        ccService.setTeacherInfo(map,teacherId,classId);
-    	System.out.println("/tt/viewClassDetails 2");
+    public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
+        HttpSession session = request.getSession();
+    	int sTeacherId = (int) session.getAttribute("teacherId");
+
+		try {
+    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+    			HttpSession MySession = request.getSession();
+    			int teacherId = (int) MySession.getAttribute("teacherId");
+    	 		tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+
+    	    	session.removeAttribute("tLogger");
+    	    	session.removeAttribute("teacherUsername");
+    	    	session.removeAttribute("teacherId");
+    			session.invalidate();
+
+    	        return "login/loginK12_teacher";
+    		}
+		}
+		catch(SQLException e) {
+			
+		}
+
+    	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
         ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
-    	System.out.println("/tt/viewClassDetails 3");
         map.addAttribute("createClassForm", new CreateClassForm());
-    	System.out.println("/tt/viewClassDetails 4");
+        map.addAttribute("teacherId", String.valueOf(sTeacherId));
+        session.setAttribute("classId",classId);
         return "teacherTools/classDetails";
     }
 
@@ -149,4 +184,11 @@ public class TeacherToolsViewClassDetailsController {
         return message;
     }
 
+    @RequestMapping(value = "/tt/isClassInUse", method = RequestMethod.POST)
+    public @ResponseBody
+    String isClassInUse(@RequestParam(value = "classId") String classId) {
+    	return pvService.isClassInUse(classId);
+    }
+
+   
 }

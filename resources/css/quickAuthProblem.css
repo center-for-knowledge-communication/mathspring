@@ -50,6 +50,9 @@ body {
     background-color: transparent;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    border-style:solid;
+    border-width: 1px;
+ 	border-color:#c0c0c0;
     cursor: pointer;
 }
 #HintContent{
@@ -68,6 +71,9 @@ body {
     background-color: rgba(255,255,255,0.5);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    border-style:solid;
+    border-width: 2px;
+ 	border-color:#808080;
     cursor: pointer;
 }
 .play-hint-button{

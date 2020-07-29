@@ -24,6 +24,8 @@ import java.util.*;
  *
  * Concerns:  Henderson/Henderson does not show any rows with red/yellow highlite because avgHintsPerProb are
  * always less than 1.    Can't be sure numbers are right.
+ * 
+ * Frank 06-13-2020 issue #106 replace use of probstdmap
  */
 public class PerStandardClassSummaryReport extends Report {
 
@@ -72,7 +74,7 @@ public class PerStandardClassSummaryReport extends Report {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
-            String q = "select h.problemId, h.numHints,h.numMistakes,h.numAttemptsToSolve,h.timeToFirstHint,h.timeToFirstAttempt,std.clusterId from studentproblemhistory h, standard std, probstdmap map where studid in (select id from student where classId = ?) and mode='practice' and std.id=map.stdId and map.probId=h.problemId";
+            String q = "select h.problemId, h.numHints,h.numMistakes,h.numAttemptsToSolve,h.timeToFirstHint,h.timeToFirstAttempt,std.clusterId from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId = ?) and mode='practice' and p.id=h.problemId and std.id=p.standardID";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,classId);
             rs = stmt.executeQuery();

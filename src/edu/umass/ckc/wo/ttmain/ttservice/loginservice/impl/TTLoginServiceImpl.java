@@ -48,6 +48,9 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank    05-12-2020  send password in email now working
  * Frank    05-24-2020  issue #130 Restore call to original emailer, now that it is working
  * Frank    05-29-2020  issue #28 re-work password reset
+ * Frank 	06-18-2020	issue #135 added method sendHelpMessage()
+ * Frank	07-08-20	issue #134 & #156 changed archive vs active class to include isClassActive test
+ * Frank    07-13-20	issue #29 Change error handling of loginAssist and resetPassword
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -57,7 +60,7 @@ public class TTLoginServiceImpl implements TTLoginService {
     private TTConfiguration connection;
 
     @Override
-    public int loginAssist(String uname, String password) throws TTCustomException {
+  public int loginAssist(String uname, String password) {
         try {
             int teacherId = DbTeacher.getTeacherId(connection.getConnection(), uname, password);
             if (teacherId == -1) {
@@ -68,7 +71,7 @@ public class TTLoginServiceImpl implements TTLoginService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURED_ON_AUTHENTICATE);
+            return -1;
         }
 
     }
@@ -85,7 +88,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             }
             ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), teacherId);
             List<ClassInfo> classInfoList = new  ArrayList<>(Arrays.asList(classes));
-            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> (c.getSchoolYear() == Year.now().getValue())));
+            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> ((c.getSchoolYear() == Year.now().getValue()) && (c.getIsActive() > 0))));                                           
             List<ClassInfo> classInfoListLatest = groups.get(true);
             List<ClassInfo> classInfoListArchived = groups.get(false);
             Collections.reverse(classInfoListLatest);
@@ -123,7 +126,7 @@ public class TTLoginServiceImpl implements TTLoginService {
     }
 
     @Override
-    public int resetPassword(String uname, String email) throws TTCustomException {
+    public int resetPassword(String uname, String email) {
         try {
         	int count = 0;
         	Teacher teacher = null;
@@ -159,7 +162,20 @@ public class TTLoginServiceImpl implements TTLoginService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURED_ON_AUTHENTICATE);
+            return -1;
+        }
+    }
+
+    @Override
+    public int sendHelpMessage(String subject, String email, String helpmsg) {
+        try {
+        	String helpDeskEmail = Settings.getString(connection.getConnection(), "teacher_login_help_email");
+            Emailer.sendHelpEmail(helpDeskEmail, subject, email, helpmsg);
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return 1;
         }
     }
 

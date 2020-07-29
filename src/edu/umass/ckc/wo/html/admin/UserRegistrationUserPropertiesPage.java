@@ -13,6 +13,7 @@ import java.util.List;
 
 /** Generate an html page which gathers each property that is in the UserProperties
  * table.
+ * Frank 07-17-2020 issue #122 classId tweak
  */
 public class UserRegistrationUserPropertiesPage implements View {
     String uri;
@@ -47,7 +48,7 @@ public class UserRegistrationUserPropertiesPage implements View {
     }
 
     public String getView () throws Exception {
-        List props = UserRegistrationHandler.getUserProperties(conn_,event_.getClassId());
+        List props = UserRegistrationHandler.getUserProperties(conn_,event_.getIntClassId());
         String fields = getAllFields(props);
         return
                 "<html>\n"+
@@ -65,7 +66,7 @@ public class UserRegistrationUserPropertiesPage implements View {
                         "  <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \n"+
                         "    <input type=\"submit\" name=\"Submit\" value=\"Submit\">\n"+
                         "    <input type=\"hidden\" name=\"action\" value=\"" + Actions.createUser4 + "\">\n"+
-                        "    <input type=\"hidden\" name=\"classId\" value=\"" + event_.getClassId() + "\">\n"+
+                        "    <input type=\"hidden\" name=\"classId\" value=\"" + event_.getIntClassId() + "\">\n"+
                         "    <input type=\"hidden\" name=\"studId\" value=\"" + event_.getStudId() + "\">\n"+
                         "    <input type=\"hidden\" name=\"startPage\" value=\"" + startPage + "\">\n"+
                         "    <br>\n"+

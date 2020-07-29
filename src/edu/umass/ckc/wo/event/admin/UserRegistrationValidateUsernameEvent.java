@@ -5,15 +5,14 @@ import edu.umass.ckc.servlet.servbase.ServletParams;
 /** The first in a series of events for registering a new student.
  *
  * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+ * Frank	07-17-20	Issue #122 modified UserRegistration events for classId parameter
  */
 public class UserRegistrationValidateUsernameEvent extends UserRegistrationEvent {
     private String userName;
-    private String classId;
 
     public UserRegistrationValidateUsernameEvent(ServletParams p)  throws Exception {
         super(p);
-        userName = p.getString("userName");
-        classId = p.getString("classId");
+        this.userName = p.getString("userName");
     }
 
     public String getUserName() {
@@ -22,13 +21,5 @@ public class UserRegistrationValidateUsernameEvent extends UserRegistrationEvent
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-    
-    public String getClassId() {
-        return classId;
-    }
-
-    public void setClassId(String classId) {
-        this.classId = classId;
     }
 }

@@ -2,6 +2,10 @@ package edu.umass.ckc.wo.beans;
 
 import edu.umass.ckc.wo.woreports.Report;
 
+/**
+ * Frank	07-08-20	issue #156 added isActive flag
+ */
+
 public class ClassInfo {
     private String school;
     private int schoolYear;
@@ -30,11 +34,12 @@ public class ClassInfo {
     private boolean showPreSurvey;
     private String classLanguageCode;
     private boolean isDefaultClass;
+    private int isActive;
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
                      int logType, int emailStatusInterval, int statusReportPeriodDays, int studentEmailIntervalDays,
-                     int studentReportPeriodDays, String grade) {
+                     int studentReportPeriodDays, String grade, int isActive) {
         this.school = school;
         this.schoolYear = schoolYear;
         this.name = name;
@@ -52,22 +57,23 @@ public class ClassInfo {
         this.studentEmailIntervalDays=studentEmailIntervalDays;
         this.studentEmailPeriodDays =studentReportPeriodDays;
         this.grade= grade;
+        this.isActive= isActive;
 
     }
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays) {
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive) {
         this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5");
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive);
     }
 
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
                      int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays,
-                     int studentReportPeriodDays, String flashClient, String grade) {
+                     int studentReportPeriodDays, String flashClient, String grade, int isActive) {
         this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade);
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive);
         this.flashClient = flashClient;
     }
 
@@ -255,5 +261,11 @@ public class ClassInfo {
 		this.isDefaultClass = isDefaultClass;
 	}
 	
+	public void setIsActive(int flag) {
+		isActive = flag;
+	}
+	public int getIsActive() {
+		return isActive;
+	}
     
 }

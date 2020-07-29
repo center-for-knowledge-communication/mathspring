@@ -31,7 +31,9 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
  * Frank 	02-24-20	Issue #28
  * Frank	05-12-20    Test for empty username and password
- * Frank    05-29-2020  issue #28 re-work password reset 
+ * Frank    05-29-2020  issue #28 re-work password reset
+ * Frank	06-18-2020	issue #135 added method loginHelp()
+ * Frank	07-28-20	issue #74 get teacherID from session attribute 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -83,8 +85,11 @@ public class TeacherToolsMainLoginController {
 
 
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.GET)
-    public String homePage(@RequestParam("teacherId") String teacherId,ModelMap model) throws TTCustomException {
-        return loginService.populateClassInfoForTeacher(model,Integer.valueOf(teacherId));
+    public String homePage(ModelMap model, HttpServletRequest request) throws TTCustomException {
+    	HttpSession session = request.getSession();
+    	int sTeacherId = (int) session.getAttribute("teacherId");
+    	session.removeAttribute("classId");
+        return loginService.populateClassInfoForTeacher(model,sTeacherId);
     }
 
     @RequestMapping(value = "/tt/logout", method = RequestMethod.GET)
@@ -143,7 +148,45 @@ public class TeacherToolsMainLoginController {
         }
         else {
         	request.setAttribute(LoginParams.MESSAGE,rb.getString("password_will_be_emailed"));
-            return "login/loginK12_teacher";            	}
-        }    
+            return "login/loginK12_teacher";            	
+        }
+    }   
+    
+    @RequestMapping(value = "/tt/ttLoginHelp", method = RequestMethod.POST)
+    public String loginHelp(@RequestParam("email") String email, @RequestParam("helpmsg") String helpmsg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
+
+    	Locale loc = request.getLocale();
+    	String lang = loc.getDisplayLanguage();
+
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+  	
+    	if (helpmsg.length() > 0) {
+    		if (email.length() > 0) {
+       	    	int result  = loginService.sendHelpMessage(rb.getString("login_help_request"),email, helpmsg);
+       	    	if (result == 0) {
+       	    		request.setAttribute(LoginParams.MESSAGE,rb.getString("help_request_sent"));
+       	    	}
+       	    	else {
+       	    		request.setAttribute(LoginParams.MESSAGE,rb.getString("email_send_error"));       	    		
+       	    	}
+                return "login/loginK12_teacher";            			
+    		}
+    		else {
+               	request.setAttribute(LoginParams.MESSAGE,rb.getString("enter_email"));
+            	return "login/loginHelpRequest_error";
+    		}
+    	}
+    	else {
+        	request.setAttribute(LoginParams.MESSAGE,rb.getString("enter_email_and_message"));
+        	return "login/loginHelpRequest_error";    		
+    	}
+    }    
+    
 }
 

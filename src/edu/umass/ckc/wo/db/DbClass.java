@@ -27,6 +27,8 @@ import java.util.List;
  * 
  * Frank	02-16-20	Issue #48 Fixed assignment of additional ids - wasn't working properly
  * Frank    04-27-2020  fix createStudentRoster() - was not formatting new ids correctly
+ * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
+ * Frank	07-28-20	issue #74 add test for classId valid with teacherID 
  */
 public class DbClass {
 
@@ -43,7 +45,7 @@ public class DbClass {
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language,isActive from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -85,11 +87,13 @@ public class DbClass {
                     	 getClassLanguage = rs2.getString("language_code")+":"+getClassLanguage;
                      }
                 }
+                
                 if(getPreSurvey == null || ("".equals(getPreSurvey)))
                     showPreSurvey = false;
+                int isActive = rs.getInt(25);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade);
+                        studentEmailPeriodDays,flashClient,grade, isActive);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -122,7 +126,7 @@ public class DbClass {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive from class c, classconfig f" +
                     " where f.classid=c.id order by " + ( orderByTeacher ? "c.teacher" : "c.id");
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -150,9 +154,10 @@ public class DbClass {
                 String simpleDiffRate = rs.getString(21);
                 boolean showPostSurvey = rs.getBoolean(22);
                 int classId = rs.getInt(23);
+                int isActive = rs.getInt(24);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade);
+                        studentEmailPeriodDays,flashClient,grade,isActive);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -178,7 +183,7 @@ public class DbClass {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive from class c, classconfig f" +
                     " where f.classid=c.id and c.createTimeStamp > date_add(now(), interval -2 year) order by c.id desc";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -206,9 +211,10 @@ public class DbClass {
                 String simpleDiffRate = rs.getString(21);
                 boolean showPostSurvey = rs.getBoolean(22);
                 int classId = rs.getInt(23);
+                int isActive = rs.getInt(24);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade);
+                        studentEmailPeriodDays,flashClient,grade, isActive);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -275,7 +281,38 @@ public class DbClass {
         }
     }
 
+    public static boolean validateClassTeacher(Connection conn, int classId, int teacherId) throws SQLException {
+    	boolean result = false;
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            String q = "select teacherId from class where id=? and teacherId=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, classId);
+            ps.setInt(2, teacherId);
+            rs = ps.executeQuery();
+            if (rs == null) {
+            	System.out.println("result set is null");
+            }
+            else {
+                if (rs.next()) {
+                	result = true;
+                }
+            }
+        }
+        catch (SQLException e) {
+        	System.out.println(e.getMessage());
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+        return result;
+    }
 
+    
+    
     public static int updateClass(Connection conn, int classId, String className,
                                   String school, String schoolYear,
                                   String town, String section, String grade) throws Exception {
@@ -298,6 +335,48 @@ public class DbClass {
         }
     }
 
+
+    
+    public static int editClass(Connection conn, int classId, String className,
+            String school, String schoolYear,
+            String town, String section, String grade, String language) throws Exception {
+		PreparedStatement s = null;
+		try {
+			String q = "update class set school=?, schoolYear=?, name=?, town=?, section=?, grade=? " +
+			"where id=?";
+			s = conn.prepareStatement(q);
+			s.setString(1, school);
+			s.setInt(2, Integer.parseInt(schoolYear.trim()));
+			s.setString(3, className);
+			s.setString(4, town);
+			s.setString(5, (section == null) ? "" : section);
+			s.setString(6, grade);
+			s.setInt(7, classId);
+			return s.executeUpdate();
+		} finally {
+			if (s != null)
+			s.close();
+		}
+}
+
+
+    public static int setIsActiveFlag(Connection conn, int classId, String flag) throws Exception {
+		PreparedStatement s = null;
+		try {
+			String q = "update class set isActive=? " +
+			"where id=?";
+			s = conn.prepareStatement(q);
+			s.setString(1, flag);
+			s.setInt(2, classId);
+			return s.executeUpdate();
+		} finally {
+			if (s != null)
+			s.close();
+		}
+}
+
+    
+    
     public static int insertClass(Connection conn, String className,
                                   String school, String schoolYear,
                                   String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId) throws Exception {
@@ -472,7 +551,7 @@ public class DbClass {
         PreparedStatement s = null;
         try {
             String q = "select c.id,teacher,school,schoolYear,name,town,section,propgroupid,pretestPoolId, pool.description, " +
-                    "logType,teacherId, c.flashClient from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
+                    "logType,teacherId, c.flashClient, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
             if (rs.next()) {
@@ -489,8 +568,9 @@ public class DbClass {
                 int logType = rs.getInt(11);
                 int teacherId = rs.getInt(12);
                 String cl = rs.getString(13);
+                int isActive = rs.getInt(14);
                 ClassInfo c = new ClassInfo(sch, yr, name, town, sec, id, teacherId, teacherName, propgroupid, pretestPoolId,
-                        pretestPoolDescr, logType, 0, 7, 0, 7, "5");
+                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive);
                 c.setFlashClient(cl);
                 return c;
             }
@@ -1469,5 +1549,35 @@ public class DbClass {
             results.add(ci);
         }
         return results;
+    }
+    
+    public static final boolean isClassInUse(Connection conn, int classId) {
+    	boolean result = true;
+    	
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+        	String q = "select count(distinct h.studId), s.userName, s.classId from studentproblemhistory h, student s where h.studId = s.id and s.classId = ?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                int count = rs.getInt(1);
+                if (count == 0) {
+                	result = false;
+                }
+                break;
+            }
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        catch(SQLException e) {
+        	System.out.println(e.getMessage());
+        }
+
+    	
+    	return result;
     }
 }

@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.db.DbProblem;
+import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
@@ -33,6 +35,8 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Created by nsmenon on 4/14/2017.
  * 
  * Frank	02-16-20	Issue #48
+ * Frank 	06-13-2020  issue #106 replace use of probstdmap
+ * Frank	07-08-20	issue #134 & #156 added setClassActive flag handling and editClass method 
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -58,7 +62,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
             List<SATProb> satProbs = new DbProblem().getTopicOmittedProblems(connection.getConnection(), classId, problems, problemId);
             view.setProblemLevelId(String.valueOf(problemSet.getId()));
             view.setTopicName(problemSet.getName());
-            view.setTopicStandars(problemSet.getCcStandards());
+            view.setTopicStandars(DbTopics.getRptTopicStandards(connection.getConnection(), problemSet.getId()));
             view.setTopicSummary(problemSet.getSummary());
             view.setUri(Settings.probPreviewerPath);
             view.setHtml5ProblemURI(Settings.html5ProblemURI);
@@ -220,4 +224,24 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         return true;
     }
 
+    @Override
+    public String isClassInUse(String classId) {
+    	
+    	boolean result = true;
+  		
+        try {
+        	result = DbClass.isClassInUse(connection.getConnection(), Integer.valueOf(classId.trim()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        if (result) {
+        	return "Y";
+        }
+        else {
+        	return "N";
+        }
+    }
+
+    
 }

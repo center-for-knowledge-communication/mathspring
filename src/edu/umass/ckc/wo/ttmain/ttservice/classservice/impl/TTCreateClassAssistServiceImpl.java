@@ -35,7 +35,9 @@ import java.util.Map;
 
 /**
  * Created by Neeraj on 3/26/2017.
- * Frank	02-16-2020	Issue #48 
+ * Frank	02-16-2020	Issue #48
+ * Frank	07-08-20	issue #134 & #156 added editClass method
+ 
  */
 
 @Service
@@ -93,6 +95,39 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     }
 
+    @Override
+    public void editClass(CreateClassForm createForm, String tid, int classId) throws TTCustomException {
+        try {
+        	
+        	String strClassId = String.valueOf(classId);
+        	
+            // Make sure to check initial fields of create class are validated before proceeding ahead
+            int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
+            DbClass.editClass(connection.getConnection(),
+            		classId,
+            		createForm.getClassName(), 
+            		createForm.getSchoolName(), 
+            		createForm.getSchoolYear(), 
+            		createForm.getTown(), 
+            		createForm.getGradeSection(), 
+//            		  tid,
+//                    defaultPropGroup, 
+//                    0, 
+                    createForm.getClassGrade(),
+                    createForm.getClassLanguage());
+           
+            DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
+            ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
+            info.setSimpleConfigDefaults();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+//            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
+        }
+
+    }
+    
+    
     @Override
     public Integer cloneExistingClass(Integer classId, CreateClassForm createForm) throws TTCustomException {
         try {
@@ -209,7 +244,10 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     @Override
     public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder, String activateFlag) throws TTCustomException {
-        try {
+    	int updated_topic_count = 0;
+    	long maxTimeInTopic = 10 * 60 * 1000;
+    	Map<String, Integer> insertParams = null;
+    	try {
             if ("deactivate".equals(activateFlag)) {
                 //Deactivate ProblemSets
                 List<Topic> topics = DbTopics.getClassActiveTopics(connection.getConnection(), classId);
@@ -218,7 +256,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                 int seqPos = 1;
                 for (Topic problemSet : activeproblemSetModified) {
                     if (problemSetsToReorder.contains(problemSet.getId())) {
-                        Map<String, Integer> insertParams = new HashMap<String, Integer>();
+                        insertParams = new HashMap<String, Integer>();
                         insertParams.put("classId", classId);
                         insertParams.put("seqPos", seqPos++);
                         insertParams.put("probGroupId", problemSet.getId());
@@ -226,6 +264,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                         namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
                     }
                 }
+                updated_topic_count = problemSetsToReorder.size();
 
             } else {
                 //Activate ProblemSets
@@ -236,15 +275,25 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                 while (sequenceNoToBeadded.next())
                     SequenceEntryIndex = Math.max(1, sequenceNoToBeadded.getInt(1));
                 for (Integer probSetsForReorder : problemSetsToReorder) {
-                    Map<String, Integer> insertParams = new HashMap<String, Integer>();
+                    insertParams = new HashMap<String, Integer>();
                     insertParams.put("classId", classId);
                     insertParams.put("seqPos", SequenceEntryIndex++);
                     insertParams.put("probGroupId", probSetsForReorder);
                     insertParams.put("isDefault", 0);
                     namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
-
                 }
+                updated_topic_count = SequenceEntryIndex - 1;
             }
+            
+            if (updated_topic_count < 5) {
+            	maxTimeInTopic = Math.round(45.0 / updated_topic_count) * 60 * 1000;
+            }
+            insertParams = new HashMap<String, Integer>();
+            insertParams.put("maxTimeInTopic", (int)maxTimeInTopic);
+            insertParams.put("classId", classId);
+            namedParameterJdbcTemplate.update(TTUtil.UPDATE_MAX_TIMEIN_TOPIC_FOR_CLASS, insertParams);
+            
+            
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -326,4 +375,22 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 		}
 		return "success";
 	}
+	
+    @Override
+    public String setClassActiveFlag(Integer teacherId, Integer classId, String activeFlag) {
+        try {
+        	if (activeFlag.equals("-1")) {
+        		DbClass.deleteClass(connection.getConnection(), classId);
+        	}
+        	else {
+                DbClass.setIsActiveFlag(connection.getConnection(), classId, activeFlag);
+        	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        return "success";
+    }
+
+
 }

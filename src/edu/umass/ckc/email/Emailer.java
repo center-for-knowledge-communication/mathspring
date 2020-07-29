@@ -2,6 +2,9 @@ package edu.umass.ckc.email;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+
+import edu.umass.ckc.wo.tutor.Settings;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,6 +22,8 @@ import java.util.GregorianCalendar;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
+ * 
+ * Frank	06-18-2020	issue #135 added method sendHelpEmail
  */
 
 public class Emailer {
@@ -48,7 +53,24 @@ public class Emailer {
   return mailSent;
  }
 
-    public static boolean sendEmail(String toAddress, String fromAddress, String emailHost, String subject, String msg) throws IOException {
+ 
+ public static boolean sendHelpEmail(String helpDeskEmail, String subject, String userEmail, String message)
+ {
+	boolean mailSent = false;
+	String body="My email is: "+userEmail+'\n'+ "My message is: "+message;;
+  
+	String toAddrs[] = helpDeskEmail.split(",");
+	for(int i=0;i<toAddrs.length;i++) {
+		// String to, String from, String subj, String body, String host
+		mailSent = Mailer.send(toAddrs[i], "Mathspring@cs.umass.edu", subject, body, Settings.mailServer);
+  	}
+  
+	return mailSent;
+ }
+ 
+ 
+ 
+    public static boolean sendEmail(String toAddress, String fromAddress, String emailHost, String subject, String body) throws IOException {
        Date date = new Date(System.currentTimeMillis());
        Calendar calendar = new GregorianCalendar();
        StringBuffer errorMsg = new StringBuffer();
@@ -57,7 +79,7 @@ public class Emailer {
        errorMsg.append(calendar.get(Calendar.MINUTE)).append(":");
        errorMsg.append(calendar.get(Calendar.SECOND)).append('\n');
        errorMsg.append("message: ");
-       errorMsg.append(msg).append('\n');
+       errorMsg.append(body).append('\n');
 
        boolean mailSent = Mailer.send(toAddress, fromAddress,
                subject, errorMsg.toString(), emailHost);
