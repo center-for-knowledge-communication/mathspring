@@ -1,0 +1,7 @@
+# test comment
+ALTER TABLE teacherlog ADD classId int;
+ALTER TABLE globalsettings ADD teacher_login_help_email varchar(255);
+update globalsettings set teacher_login_help_email = "fsylvia13@gmail.com,pals@wested.org" where id_shouldBe1 = "1";
+ALTER TABLE globalsettings ADD Administrator varchar(255);
+update globalsettings set Administrator = "SuperFly" where id_shouldBe1 = "1";
+end
