@@ -321,7 +321,6 @@ function instructions () {
 // click handlers)
 function myprogress() {
     debugAlert("in myprogress");
-    sendEndEvent(globals);
     globals.lastProbType = globals.probType;
     globals.lastProbId = globals.probId;
     document.location.href = "/"+sysGlobals.wayangServletContext + "/TutorBrain?action=navigation&sessionId=" + globals.sessionId + "&elapsedTime=" + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&from=sat_hut&to=my_progress&topicId="+ globals.topicId +"&probId="+globals.probId + "&eventCounter="+ sysGlobals.eventCounter++ + "&var=b";
@@ -1328,10 +1327,6 @@ function clickHandling () {
     $("#myProg").click(function () {
         myprogress(globals)
     });
-
-	$("#logout_").click(function() {
-		sendEndEvent(globals);
-	});
 }
 
 
