@@ -67,6 +67,8 @@ import java.io.IOException;
  c.  In a rare case it may return a follow-up intervention marked "top-level".  In this situation we just forward to the intervention's JSP
  
  *	Frank	07-30-20	issue #189 Added modifyDB method for applying db changes for software releases
+ *	Frank	07-30-20	issue #189 Added modifyDB method for applying db changes for software releases
+ *	Frank	08-03-20	issue #189 Change logging to debug
  */
 
 public class WoLoginServlet extends BaseServlet {
@@ -175,9 +177,6 @@ public class WoLoginServlet extends BaseServlet {
         servletContext.setAttribute("flashClientURI", Settings.flashClientPath);
         Settings.getSurveys(connection); // loads the pre/post Survey URLS
         
-        // A way to pass in modification to the DB during new releases
-        modifyDB(servletContext, connection);
-        
         // Loads all content into a cache for faster access during runtime
         if (!ProblemMgr.isLoaded())  {
             ProblemMgr.loadProbs(connection);
@@ -185,6 +184,10 @@ public class WoLoginServlet extends BaseServlet {
             LessonMgr.getAllLessons(connection);  // only to check integrity of content so we see errors early
 
         }
+
+        // A way to pass in modification to the DB during new releases
+        modifyDB(servletContext, connection);
+                
         logger.debug("end setServletInfo of WOLoginServlet");
 
     }
@@ -198,7 +201,7 @@ public class WoLoginServlet extends BaseServlet {
         	return;
         }
         
-        logger.info("Apply DB changes");
+        logger.debug("Apply DB changes");
         BufferedReader reader = null;
         try {
 
@@ -209,12 +212,12 @@ public class WoLoginServlet extends BaseServlet {
                 	break;
                 }
                 if (line.startsWith("#")) {
-                    logger.info(line);
+                    logger.debug(line);
                 	continue;
                 }
                 else {
                 	try {
-                        logger.info(line);
+                        logger.debug(line);
                 		PreparedStatement ps = connection.prepareStatement(line);
                 		if (line.contains("update")) {
                 			int i = ps.executeUpdate();
@@ -225,7 +228,7 @@ public class WoLoginServlet extends BaseServlet {
                 		ps.close();
                 	}
                     catch (SQLException e) {
-                    	logger.info(e.getMessage());        
+                    	logger.debug(e.getMessage());        
                     } 
                 }
             }
