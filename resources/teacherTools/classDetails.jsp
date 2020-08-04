@@ -15,6 +15,8 @@
 <!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
 <!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
+<!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -4840,6 +4842,8 @@ var completeDataChart;
 					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
 					            		<p><%= rb.getString("distance_learning_email_text")%></p>
 					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+					            		<p><%= rb.getString("distance_learning_email_password_is")%>: ( ${classInfo.classid} ).</p>
+					            		<p><%= rb.getString("distance_learning_email_write_it_down")%></p>
 									</div>
 					            	<div class="col-md-2"></div>	               		
 					            </div>
