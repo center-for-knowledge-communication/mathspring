@@ -409,7 +409,7 @@ label {
 						<div id="problemTopicAndStandards" style="clear: both;"></div>
 					</div>
 					<iframe id="problemWindow" class="probWindow" name="iframe1"
-						width="600" height="600" src="${activityURL}" frameborder="no"
+						width="660" height="660" src="${activityURL}" frameborder="no"
 						scrolling="no"> </iframe>
 					<div id="flashContainer1">
 						<div id="flashContainer2"></div>
