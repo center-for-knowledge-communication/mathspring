@@ -47,6 +47,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 06-13-2020 issue #106 replace use of probstdmap
  * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
  * Frank 06-13-2020 issue #106R2 missed one - replace use of probstdmap
+ * Kartik 08-07-2020 issue #133 removed condition: where probStats.n =>10 and set default to 0.G5 (G- Grade)
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -210,7 +211,7 @@ public class ProblemMgr {
           Map<Integer,List<Double>> probStatsEntries = new HashMap<>();
           try {
               // issue #108 use problem.standardID instead of problem.gradeFromStandard
-              String q = "select stats.probId,stats.meanHints, stats.meanAttempts,stats.meanTime,ov.avghints ,ov.avgincorrect ,ov.avgsecsprob, prob.standardID from probstats stats join overallprobdifficulty ov on stats.probId = ov.problemId join problem prob on prob.id = ov.problemId where stats.n >=10  order by probId"; 
+              String q = "select stats.probId,stats.meanHints, stats.meanAttempts,stats.meanTime,ov.avghints ,ov.avgincorrect ,ov.avgsecsprob, prob.standardID, stats.n from probstats stats join overallprobdifficulty ov on stats.probId = ov.problemId join problem prob on prob.id = ov.problemId order by probId"; 
               ps = conn.prepareStatement(q);
               rs = ps.executeQuery();
               while (rs.next()) {
@@ -230,9 +231,13 @@ public class ProblemMgr {
                   try {
                 	  String standardID = rs.getString("standardID");
                 	  String gradeFromStandard = standardID.substring(0, 1);
-                	  if (gradeFromStandard.toLowerCase().equals("h")) {
+                	  if (gradeFromStandard.toLowerCase().equals("k")) {
+                		  gradeFromStandard = "0";
+                	  }
+                	  else if (Character.isLetter(gradeFromStandard.charAt(0))) {
                 		  gradeFromStandard = "9";
                 	  }
+
                 	  gradeFromStandard += ".0";
                 	  dblGrade = Double.parseDouble(gradeFromStandard);
                   }
@@ -240,6 +245,7 @@ public class ProblemMgr {
                 	  logger.error(e.getMessage() + " on " + rs.getInt("probId"));
                   }
                   probStats.add(dblGrade);
+                  probStats.add(rs.getDouble("n"));
               
                   probStatsEntries.put(rs.getInt("probId"), probStats);
               }
@@ -274,12 +280,18 @@ public class ProblemMgr {
 		try {
 			ps = conn.prepareStatement(q);
 			for (Map.Entry<Integer, List<Double>> statEntries : probStatsEntries.entrySet()) {
-
+				
 				double diff_hints = statEntries.getValue().get(0) / percentleHints;
 				double diff_incorr = statEntries.getValue().get(1) / percentileAvgIncorrect;
 				double diff_time = statEntries.getValue().get(2) / percentileAvgSecsProblem;
 				double diff_level_compute = (diff_hints + diff_incorr + diff_time) / 3;
-				diff_level_compute = (diff_level_compute < 1 ? diff_level_compute : 0.99)/10;
+
+				if (diff_level_compute == 0.0 || statEntries.getValue().get(7)< 10) {
+					diff_level_compute = 0.5;
+				}
+				else {
+					diff_level_compute = (diff_level_compute < 1 ? diff_level_compute : 0.99)/10;
+				}
 				double diff_level = statEntries.getValue().get(6) / 10 + diff_level_compute;
 				
 				diff_hints = diff_hints < 1 ? diff_hints : 0.99;
