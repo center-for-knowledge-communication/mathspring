@@ -16,6 +16,7 @@
  *  Frank	07-08-20	Issue #134 153 156 162
  *  Frank	07-28-20	Issue #74 Protect from URL editting of teacherId and classId
  *  Frank   07-28-20    Remove Replicate Class from menu
+ *  Frank	08-08-20	issue #51 fix year selection
  */
 
 Locale loc = request.getLocale();
@@ -1023,13 +1024,18 @@ function registerAllEvents(){
                                                           class="form-control" type="text"/>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                               <div class="form-group">
                                     <label for="schoolYear"><%= rb.getString("year") %></label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-hourglass"></i></span>
-                                        <springForm:input path="schoolYear" id="schoolYear" name="schoolYear"
-                                                          class="form-control" type="text"/>
+                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
+                                                           name="schoolYear">
+                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
+                                            <springForm:option value="2020">2020</springForm:option>
+                                            <springForm:option value="2021">2021</springForm:option>
+                                            <springForm:option value="2022">2022</springForm:option>
+                                        </springForm:select>
                                     </div>
                                 </div>
                                 <div class="form-group">
