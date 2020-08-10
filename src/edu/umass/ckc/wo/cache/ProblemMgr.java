@@ -285,9 +285,8 @@ public class ProblemMgr {
 				double diff_incorr = statEntries.getValue().get(1) / percentileAvgIncorrect;
 				double diff_time = statEntries.getValue().get(2) / percentileAvgSecsProblem;
 				double diff_level_compute = (diff_hints + diff_incorr + diff_time) / 3;
-
 				if (diff_level_compute == 0.0 || statEntries.getValue().get(7)< 10) {
-					diff_level_compute = 0.5;
+					diff_level_compute = 0.05;
 				}
 				else {
 					diff_level_compute = (diff_level_compute < 1 ? diff_level_compute : 0.99)/10;
