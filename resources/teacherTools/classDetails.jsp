@@ -17,6 +17,7 @@
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
 <!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
 <!-- Frank	08-08-20	Issue #51 fix year selection -->
+<!-- Kartik 08-10-20    Issue #75 fixed issue where bar chart increased every time it is clicked -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -523,7 +524,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -620,7 +621,7 @@ function loadEmotionMap (rows) {
                         }]
                     },
                     options: {
-                        responsive: false,
+                        responsive: true,
                         legend: {
                             display: false
                         },
@@ -1571,7 +1572,7 @@ else {
                     var effortChartId = "effortChart"+row[0];
                     var containerChart = "containerChart"+row[0];
                     var legendChart = "legendChart"+row[0];
-                    var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                    var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                     return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                 }
             }, {
@@ -1695,7 +1696,7 @@ else {
                         var effortChartId = "effortChart"+row[0];
                         var containerChart = "containerChart"+row[0];
                         var legendChart = "legendChart"+row[0];
-                        var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                        var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                         return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                     }
                 }, {
