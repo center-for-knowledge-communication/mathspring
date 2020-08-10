@@ -406,13 +406,9 @@ public class ProblemMgr {
         String type = rs.getString(Problem.TYPE) ;
         boolean isExternal = rs.getBoolean(Problem.IS_EXTERNAL_ACTIVITY);
         double diff = rs.getDouble("diff_level") ;
-        int video;
-        try {
-            video = rs.getInt("video");
-            // test value video = 111;
-            
-        } catch (Exception e) {
-            video = -1;
+        int video = rs.getInt("video");
+        if (rs.wasNull()) {
+        	video = -1;
         }
 
         int exampleId = rs.getInt("example");

@@ -5,6 +5,7 @@ import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbTeacher;
+import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
@@ -62,6 +63,7 @@ import java.text.SimpleDateFormat;
  * Frank    04-30-2020  Issue #96 missing locale 
  * Frank 	06-17-20	Issue #149
  * Frank	07-08-20	issue #153 added access code checker
+ * Frank	07-28-20	issue #74 valid classId is valid or this teacherId
 */
 
 
@@ -91,7 +93,22 @@ public class TTReportServiceImpl implements TTReportService {
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
+    		
+        	// Hack - using classId to hold 'Target teacher ID' for teacher activities reports so use URL param not session variable
+        	if ( (!reportType.equals("teacherList")) && (!reportType.equals("perTeacherReport")) ) {
+        		try {
+    	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),Integer.valueOf(teacherId))) {
+    	    			return ("FAIL - Invalid Request");
+    	    		}
+        		}
+        		catch(SQLException e) {
+        			
+        		}
+        	}
+        	// end Hack
 
+
+    		
         	switch (reportType) {
                 case "perStudentReport":
                 	try {
@@ -268,7 +285,7 @@ public class TTReportServiceImpl implements TTReportService {
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                    	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "", rb.getString("view_teacher_activities"), classId);
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), classId);
                 	}
                 	catch (Exception e) {
                 		System.out.println("TeacherLogger error " + e.getMessage());

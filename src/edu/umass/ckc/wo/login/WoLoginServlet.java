@@ -22,6 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +65,10 @@ import java.sql.Connection;
  b. If a follow-up activity (intervention) is returned by the original intervention's processInput, it then forwards to
  logink12Outer.jsp with an inner DIV (innerJSP) set to the JSP of the intervention (using LoginSequence.processAction)
  c.  In a rare case it may return a follow-up intervention marked "top-level".  In this situation we just forward to the intervention's JSP
+ 
+ *	Frank	07-30-20	issue #189 Added modifyDB method for applying db changes for software releases
+ *	Frank	07-30-20	issue #189 Added modifyDB method for applying db changes for software releases
+ *	Frank	08-03-20	issue #189 Change logging to debug
  */
 
 public class WoLoginServlet extends BaseServlet {
@@ -165,6 +176,7 @@ public class WoLoginServlet extends BaseServlet {
         Settings.formalityServletURI = servletConfig.getInitParameter(Names.FORMALITY_SERVLET_URI);
         servletContext.setAttribute("flashClientURI", Settings.flashClientPath);
         Settings.getSurveys(connection); // loads the pre/post Survey URLS
+        
         // Loads all content into a cache for faster access during runtime
         if (!ProblemMgr.isLoaded())  {
             ProblemMgr.loadProbs(connection);
@@ -172,9 +184,72 @@ public class WoLoginServlet extends BaseServlet {
             LessonMgr.getAllLessons(connection);  // only to check integrity of content so we see errors early
 
         }
+
+        // A way to pass in modification to the DB during new releases
+        modifyDB(servletContext, connection);
+                
         logger.debug("end setServletInfo of WOLoginServlet");
 
     }
 
+    protected void modifyDB(ServletContext servletContext, Connection connection) throws Exception {
+
+        String myPath = servletContext.getRealPath("/WEB-INF/dbSchemaUpdates.txt");
+        
+        File file = new File(myPath); 
+        if (!file.exists()) {
+        	return;
+        }
+        
+        logger.debug("Apply DB changes");
+        BufferedReader reader = null;
+        try {
+
+        	reader = new BufferedReader(new FileReader(myPath));
+            while (reader.ready()) {
+                String line = reader.readLine();
+                if (line.equals("end")) {
+                	break;
+                }
+                if (line.startsWith("#")) {
+                    logger.debug(line);
+                	continue;
+                }
+                else {
+                	try {
+                        logger.debug(line);
+                		PreparedStatement ps = connection.prepareStatement(line);
+                		if (line.contains("update")) {
+                			int i = ps.executeUpdate();
+                		}
+                		else {
+                			boolean b = ps.execute();                			
+                		}
+                		ps.close();
+                	}
+                    catch (SQLException e) {
+                    	logger.debug(e.getMessage());        
+                    } 
+                }
+            }
+            
+        	reader.close();
+            
+            if(file.delete()) 
+            { 
+                System.out.println(myPath + "deleted successfully"); 
+            } 
+
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+        }
+
+    }
     
 }

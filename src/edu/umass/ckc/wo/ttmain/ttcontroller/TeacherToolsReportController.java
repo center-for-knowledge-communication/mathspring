@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Created by nsmenon on 5/19/2017.
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
  * Frank 	12-10-19	Issue #21 add teacher logging by using the request object to get the TeacherLogger object
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
  * Frank 	06-17-20	Issue #149
+ * Frank	07-28-20	issue #74 use session for teacher id and hack for teacher report 
  */
 @Controller
 public class TeacherToolsReportController {
@@ -46,7 +48,22 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/getTeacherReports", method = RequestMethod.POST)
     public @ResponseBody String getTeacherReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("reportType") String reportType,  @RequestParam("lang") String lang,  @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
-    	return reportService.generateTeacherReport(teacherId, classId, reportType, lang, filter);
+
+    	HttpSession session = request.getSession();
+    	int intTeacherId = (int) session.getAttribute("teacherId");
+    	String sTeacherId = String.valueOf(intTeacherId);
+    	String sClassId = "";
+    	
+    	// Hack - using classId to hold 'Target teacher ID' for teacher activities reports so use URL param not session variable
+    	if ( (!reportType.equals("teacherList")) && (!reportType.equals("perTeacherReport")) ) {
+    		sClassId = (String) session.getAttribute("classId");
+    	}
+    	else {
+    		sClassId = classId;
+    	}
+    	// end Hack
+    	
+    	return reportService.generateTeacherReport(sTeacherId, sClassId, reportType, lang, filter);
 
     }
 

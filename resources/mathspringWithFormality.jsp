@@ -218,8 +218,8 @@
             <div id="frameContainer" class="problemDiv">
                 <iframe id="problemWindow" class="probWindow"
                         name="iframe1"
-                        width="600"
-                        height="600"
+                        width="660"
+                        height="660"
                         src="${activityURL}"
                         frameborder="no"
                         scrolling="no">
