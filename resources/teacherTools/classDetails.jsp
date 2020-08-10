@@ -17,6 +17,7 @@
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
 <!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
 <!-- Frank	08-08-20	Issue #51 fix year selection -->
+<!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -1048,12 +1049,20 @@ function handleclickHandlers() {
         $("#addMoreStudentsToClass").prop('disabled', false);
     });
 
-    $("#reconfigure_student_handler").click(function () {
+    $("#manage_roster_handler").click(function () {
     	$('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
+    });
+    
+    $("#manage_student_info_handler").click(function () {
+    	$('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        $("#student_info_out").show();
     });
     
     $("#manage_class_handler").click(function () {  
@@ -1224,8 +1233,8 @@ function changeReportFourHeaderAccordingToLanguage(){
 
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
-    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
-    $('#reorg_prob_sets_handler').css('color', '#ffffff');
+//    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
+//    $('#reorg_prob_sets_handler').css('color', '#ffffff');
 
 
    $('#perTopicReportLegendTable').DataTable({
@@ -3909,6 +3918,9 @@ var completeDataChart;
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
+            $("#content-conatiner").children().hide();
+            $("#splash_page").show();
+
             getFilter();
             
             $('#grade').val("${classInfo.grade}").change();
@@ -4116,7 +4128,9 @@ var completeDataChart;
 
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-book"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
-            <li><a id="reconfigure_student_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_students") %></a></li>
+            <li><a id="manage_roster_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class_roster") %></a></li>
+
+            <li><a id="manage_student_info_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_student_info") %></a></li>
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class") %></a></li>
 
@@ -4130,7 +4144,7 @@ var completeDataChart;
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            <strong>${classInfo.name}</strong>&nbsp;[<%= rb.getString("class_code") %>:${classInfo.classid}]
+            Home page for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -4152,7 +4166,7 @@ var completeDataChart;
 			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("active_problem_sets") %></small>
                     </h3>
 
@@ -4211,14 +4225,14 @@ var completeDataChart;
 				</c:if>
 				<c:if test="${activeproblemSet.size() == 0}">
 				 <div>
-                    <h5 class="page-header">
+                    <h5 class="tt-page-header">
                         <big><%= rb.getString("no_active_problem_sets_found") %></big>
                     </h5>
 					</div>
 				</c:if>
 				<c:if test="${inactiveproblemSets.size() != 0}">
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("inactive_problem_sets") %></small>
                     </h3>
 
@@ -4268,7 +4282,7 @@ var completeDataChart;
 				</c:if>
 				<c:if test="${inactiveproblemSets.size() == 0}">
 				 <div>
-                    <h5 class="page-header">
+                    <h5 class="tt-page-header">
                         <big><%= rb.getString("no_inactive_problem_sets_found") %></big>
                     </h5>
 					</div>
@@ -4277,7 +4291,7 @@ var completeDataChart;
             </div>
 
             <div id="clone_class_out" style="display:none; width: 75%;">
-                <h1 class="page-header">
+                <h1 class="tt-page-header">
                     <small><%= rb.getString("replicate_class") %></small>
                 </h1>
 
@@ -4631,7 +4645,7 @@ var completeDataChart;
                             <div class="panel panel-default">
 
                                 <div class="panel-body">
-                                    <h1 class="page-header">
+                                    <h1 class="tt-page-header">
                                         <small><%= rb.getString("turn_off_on_surveys") %></small>
                                     </h1>
                                 </div>
@@ -4680,7 +4694,7 @@ var completeDataChart;
                         <div class="col-md-8 col-sm-8">
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <h1 class="page-header">
+                                    <h1 class="tt-page-header">
                                         <small><%= rb.getString("available_surveys") %></small>
                                     </h1>
                                 </div>
@@ -4737,8 +4751,8 @@ var completeDataChart;
 
                 <div class="row">
 	                <div class="col-md-10">
-	                    <h3 class="page-header">
-	                        <small><%= rb.getString("reconfigure_student_info") %></small>
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("manage_class_roster") %></small>
 	                    </h3>
 	                </div>
                 </div>
@@ -4810,53 +4824,6 @@ var completeDataChart;
 				
 				                        </div>
 				                    </div>
-				                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-				                        <thead>
-				                        <tr>
-				                            <th rowspan="2"><%= rb.getString("student_id") %></th>
-				                            <th rowspan="2"><%= rb.getString("first_name") %></th>
-				                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
-				                            <th rowspan="2"><%= rb.getString("username") %></th>
-				                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
-				                        </tr>
-				
-				                        <tr>
-				                            <%--  <th>Clear All</th>--%>
-				                            <th><%= rb.getString("delete_math_data") %></th>
-				                            <%-- <th>Reset Practice Hut</th>
-				                             <th>Clear Pretest</th>
-				                             <th>Clear Posttest</th>--%>
-				                            <th><%= rb.getString("delete_username_and_data") %></th>
-				                            <th><%= rb.getString("change_password_and_username") %></th>
-				                        </tr>
-				                        </thead>
-				                        <tbody>
-				                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
-				                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
-				                            <tr>
-				                                <td>${studentInfo.id}</td>
-				                                <td>${studentInfo.fname}</td>
-				                                <td>${studentInfo.lname}</td>
-				                                <td>${studentInfo.uname}</td>
-				                                <td>
-				                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-				                                     </a>
-				                                </td>
-				                                <td>
-				                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-				                                     </a>
-				                                </td>
-					                            <td>
-					                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
-					                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-					                                 </a>
-					                            </td>
-				                            </tr>
-				                        </c:forEach>
-				                        </tbody>
-				                    </table>
 				                </div>
                             </div>
                         </div>
@@ -4891,10 +4858,80 @@ var completeDataChart;
 				</div>
             </div>
             
+
+
+            <div id="student_info_out" style="display:none;width: 100%;">
+
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("manage_student_info") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                 <div class="panel-group">
+                    <div class="panel panel-default">
+                    	<div class="panel-body">			                	
+		                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
+		                        <thead>
+		                        <tr>
+		                            <th rowspan="2"><%= rb.getString("student_id") %></th>
+		                            <th rowspan="2"><%= rb.getString("first_name") %></th>
+		                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
+		                            <th rowspan="2"><%= rb.getString("username") %></th>
+		                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
+		                        </tr>
+		
+		                        <tr>
+		                            <%--  <th>Clear All</th>--%>
+		                            <th><%= rb.getString("delete_math_data") %></th>
+		                            <%-- <th>Reset Practice Hut</th>
+		                             <th>Clear Pretest</th>
+		                             <th>Clear Posttest</th>--%>
+		                            <th><%= rb.getString("delete_username_and_data") %></th>
+		                            <th><%= rb.getString("change_password_and_username") %></th>
+		                        </tr>
+		                        </thead>
+		                        <tbody>
+		                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
+		                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
+		                            <tr>
+		                                <td>${studentInfo.id}</td>
+		                                <td>${studentInfo.fname}</td>
+		                                <td>${studentInfo.lname}</td>
+		                                <td>${studentInfo.uname}</td>
+		                                <td>
+		                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+		                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+		                                     </a>
+		                                </td>
+		                                <td>
+		                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+		                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+		                                     </a>
+		                                </td>
+			                            <td>
+			                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
+			                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+			                                 </a>
+			                            </td>
+		                            </tr>
+		                        </c:forEach>
+		                        </tbody>
+		                    </table>				                
+                    	</div>                        
+                    </div>
+				</div>
+            </div>
+
+
+
+
+
             <div id="class_profile_out" style="display:none;width: 100%;">
 
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <%= rb.getString("class_configuration") %>
                     </h3>
 
@@ -5040,7 +5077,7 @@ var completeDataChart;
             
              <div id="content_apply_handle" style="display:none;width: 100%;">
              <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("apply_content_to_all_classes") %></small>
                     </h3>
 					<input type="hidden" id="classListSize" name="classListSize" value=" ${fn:length(classList)}">
@@ -5073,6 +5110,15 @@ var completeDataChart;
                     </table>
                 </div>
              </div>
+
+             <div id="splash_page" style="display:none;width: 100%;">
+             <div>
+                    <h3 class="tt-page-header">
+                    Select activities from the menu on the left
+                    </h3>
+                </div>
+             </div>
+
             
         </div>
 </div>

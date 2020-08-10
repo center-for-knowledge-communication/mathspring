@@ -455,12 +455,12 @@ background-color: #FF4766;
 
 .modal-content {
   max-width: 1500px;
-  min-width: 1000px;
+  min-width: 800px;
   max-height: 2000px; //Sets the height to 80/100ths of the viewport.
 }
 .modal-body {
   max-width: 1400px;
-  min-width: 900px;
+  min-width: 700px;
   max-height: 1500px; //Sets the height to 80/100ths of the viewport.
 }
 
@@ -481,6 +481,11 @@ background-color: #FF4766;
     color:#FFF;
  }
 
+.tt-page-header {
+  padding-bottom: 9px;
+  margin: 20px 0 20px;
+  border-bottom: 1px solid #eee;
+}
 
 /* Tab Navigation */
 .nav-tabs {
