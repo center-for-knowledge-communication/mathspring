@@ -292,11 +292,11 @@ label {
 	</audio>
 
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
-	<div id="exampleContainer" width="600" height="600"
+	<div id="exampleContainer" width="660" height="660"
 		title="<%= rb.getString("watch_and_listen_instructions")%>">
 		<%-- This iframe gets replaced by swfobject.embed.   It replaces it with the Flash object/embed tags for showing a problem OR an the html
      of an HTML5 problem (perhaps in an iframe if we must)--%>
-		<iframe id="exampleFrame" name="iframe2" width="600" height="600"
+		<iframe id="exampleFrame" name="iframe2" width="660" height="660"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
 
@@ -395,7 +395,7 @@ label {
 					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> <a
 						class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> <a
 						class="huytran-practice__navitem" href="#"><%= rb.getString("practice_area") %></a>
-				<a class="huytran-practice__navitem huytran-practice__navitem--last" id="logout_"
+				<a class="huytran-practice__navitem huytran-practice__navitem--last"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
 					<%= rb.getString("log_out") %> &nbsp; 
 					<span class="fa fa-sign-out"></span>
@@ -409,7 +409,7 @@ label {
 						<div id="problemTopicAndStandards" style="clear: both;"></div>
 					</div>
 					<iframe id="problemWindow" class="probWindow" name="iframe1"
-						width="600" height="600" src="${activityURL}" frameborder="no"
+						width="660" height="660" src="${activityURL}" frameborder="no"
 						scrolling="no"> </iframe>
 					<div id="flashContainer1">
 						<div id="flashContainer2"></div>

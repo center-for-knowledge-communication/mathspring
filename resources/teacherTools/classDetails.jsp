@@ -15,6 +15,9 @@
 <!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
 <!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
+<!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
+<!-- Frank	08-08-20	Issue #51 fix year selection -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -695,6 +698,32 @@ function resetStudentData() {
     return false;
 
 }
+
+function listInactiveUsernames() {
+
+	$.ajax({
+    type : "POST",
+    url :pgContext+"/tt/tt/resetStudentdata",
+    data : {
+        studentId: resetStudentDataId,
+        action: resetStudentDataTitle,
+        lang: loc
+    },
+    success : function(response) {
+        if (response.includes("***")) {
+            $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+            $('#errorMsgModelPopup').modal('show');
+        }else{
+            $("#successMsgModelPopup").find("[class*='modal-body']").html( response );
+            $('#successMsgModelPopup').modal('show');
+        }
+    }
+});
+return false;
+
+}
+
+
 
 function resetPassWordForThisStudent(id,uname){
     var newPassWordToSet = $("#resetPasswordfor"+id).serializeArray()[0].value;
@@ -4726,12 +4755,22 @@ var completeDataChart;
                         <div id="collapseClassroom" class="panel-collapse collapse">
                             <div class="panel-body">
 			                	<div id="inClassOption">
-				                    <div class="panel panel-default"  style="width: 80%;">
+				                    <div class="panel panel-default"  style="width: 100%;">
 				                        <div class="panel-body">
-				                        	<div class="col-md-12"><%= rb.getString("create_more_ids_instructions_heading") %></div>
+				                        	<div class="col-md-8 border">
+				                        	<%= rb.getString("create_more_ids_instructions_heading") %>
 				                        	<br>
 				                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
 				                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+				                        	</div>
+				                        	<div class="col-md-2">
+				                        	<br>
+				                        	</div>				                        	
+				                        	<div class="col-md-2">
+				                        	<%= rb.getString("delete_inactive_usernames") %>
+				                        	<br><br><br>
+				                            <button id="deleteAllUnused" class="btn btn-danger btn-lg pull-right" aria-disabled="true" onclick="alert('feature under construction');"><%= rb.getString("delete") %></button>
+											</div>
 				                        </div>
 									</div>
 				                    <div class="panel panel-default"  style="width: 100%;">
@@ -4840,6 +4879,8 @@ var completeDataChart;
 					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
 					            		<p><%= rb.getString("distance_learning_email_text")%></p>
 					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+					            		<p><%= rb.getString("distance_learning_email_password_is")%>:  ${classInfo.classid}</p>
+					            		<p><%= rb.getString("distance_learning_email_write_it_down")%></p>
 									</div>
 					            	<div class="col-md-2"></div>	               		
 					            </div>
@@ -4907,13 +4948,18 @@ var completeDataChart;
 				                                                          class="form-control" type="text" value="${classInfo.school}"/>
 				                                    </div>
 				                                </div>
-				                                <div class="form-group">
+				                               <div class="form-group">
 				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
 				                                    <div class="input-group">
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-hourglass"></i></span>
-				                                        <springForm:input path="schoolYear" id="schoolYear" name="schoolYear"
-				                                                          class="form-control" type="text" value="${classInfo.schoolYear}"/>
+				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
+				                                                           name="schoolYear">
+				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
+				                                            <springForm:option value="2020">2020</springForm:option>
+				                                            <springForm:option value="2021">2021</springForm:option>
+				                                            <springForm:option value="2022">2022</springForm:option>
+				                                        </springForm:select>
 				                                    </div>
 				                                </div>
 				                                <div class="form-group">
@@ -5053,6 +5099,26 @@ var completeDataChart;
     </div>
 </div>
 <!-- Modal -->
+
+<div id="resetStudentDataModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><%= rb.getString("are_you_sure_continue") %></h4>
+            </div>
+            <div class="modal-body alert alert-primary" role="alert">
+                <%= rb.getString("some_text_in_modal") %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="resetStudentData();" ><%= rb.getString("yes") %></button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 <div id="resetStudentDataModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">

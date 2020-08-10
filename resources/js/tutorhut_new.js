@@ -321,7 +321,6 @@ function instructions () {
 // click handlers)
 function myprogress() {
     debugAlert("in myprogress");
-    sendEndEvent(globals);
     globals.lastProbType = globals.probType;
     globals.lastProbId = globals.probId;
     document.location.href = "/"+sysGlobals.wayangServletContext + "/TutorBrain?action=navigation&sessionId=" + globals.sessionId + "&elapsedTime=" + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&from=sat_hut&to=my_progress&topicId="+ globals.topicId +"&probId="+globals.probId + "&eventCounter="+ sysGlobals.eventCounter++ + "&var=b";
@@ -703,7 +702,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $(FLASH_CONTAINER_OUTERID).html('<div id="' +FLASH_CONTAINER_INNER+ '"></div>');
     $(PROBLEM_WINDOWID).attr("src","");
     // Replaceing the example div for the same reason as the above.
-    $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="600" height="600" src="" frameborder="no" scrolling="no"></iframe>');
+    $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="660" height="660" src="" frameborder="no" scrolling="no"></iframe>');
     var activity = JSON.parse(responseText);
     console.log(responseText);
     var mode = activity.mode;
@@ -1257,6 +1256,8 @@ function clickHandling () {
             }
 	        //showVideo(globals);
 			$("#exampleContainer").attr('title', watch_and_listen_instructions);
+			$("#exampleContainer").css('height','auto');
+			$("#exampleContainer").css('width','auto');
 			$("#pulsate_play_button").text(example_problem_play_hints);
 		    
         },
@@ -1328,10 +1329,6 @@ function clickHandling () {
     $("#myProg").click(function () {
         myprogress(globals)
     });
-
-	$("#logout_").click(function() {
-		sendEndEvent(globals);
-	});
 }
 
 
