@@ -781,57 +781,6 @@ function updateStudentInfo(formName){
 
     });
 }
-/** Moved back to classDetail.jsp
-function editStudentInformation(id,fname,lname,uname,context){
-    var tr = context.closest('tr')
-    var row = $('#student_roster').DataTable().row( tr );
-
-    if ( row.child.isShown() ) {
-        row.child( false ).remove();
-    }else{
-       // var editStudentInfoDiv = $($('#editStudentInfoDiv').html());
-        if(fname == ''){
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }else{
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" value='+fname+' id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }
-
-        if(lname == ''){
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentLname" class="form-control" name="studentLname" /></div></div>';
-
-        }   else{
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" value='+lname+' id="studentLname" class="form-control" name="studentLname" /></div></div>';
-        }
-
-        var tempStudentUserName =  '<div class="form-group"><div class="input-group"><label for="studentUsername">Username</label></div><div class="input-group">'+
-            '<input type="text" value='+uname+' id="studentUsername" class="form-control" name="studentUsername"/></div></div>';
-
-        var formHtml = '<div class="panel-body"><form id="edit_Student_Form'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="studentId">UserId</label></div><div class="input-group">'+
-            '<input type="text" value='+id+' id="studentId" class="form-control" name="studentId" disabled="disabled" /></div></div>'+tempStudentUserName
-            + tempStudentName + tempStudentLastName +
-            '<div class="input-group"><button role="button" onclick="updateStudentInfo('+id+')" class="btn btn-primary">Update Information</button></div></form></div>';
-
-        var formHtmlPassWord = '<div class="panel-body"><form id="resetPasswordfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newPassword">New Password</label></div><div class="input-group">'+
-            '<input type="password"  placeholder="New password to be set" id="newPassword" class="form-control" name="newPassword"/></div></div>' +
-            '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary">Reset Password</button></div></form></div>';
-
-
-
-        var tabPanel = '<div style="width: 40%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> Update Student Information </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> Reset Password for Student </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> </div> </div>';
-
-        row.child(tabPanel).show();
-
-    }
-
-}
-*/
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -1014,14 +963,6 @@ function handleclickHandlers() {
         $("#content-conatiner").children().hide();
         $("#report-wrapper").show();
         $("#report-wrapper2").show();
-    });
-
-    $("#copyClass_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
-        $("#content-conatiner").children().hide();
-        $("#clone_class_out").show();
     });
 
     $("#reorg_prob_sets_handler").click(function () {
@@ -4290,46 +4231,6 @@ var completeDataChart;
 
             </div>
 
-            <div id="clone_class_out" style="display:none; width: 75%;">
-                <h1 class="tt-page-header">
-                    <small><%= rb.getString("replicate_class") %></small>
-                </h1>
-
-                <springForm:form id="clone_class_form" method="post"
-                                 action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
-                                 modelAttribute="createClassForm">
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-blackboard"></i><%= rb.getString("class_name") %></span>
-                        <springForm:input path="className" id="className" name="className" placeholder=""
-                                          class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-menu-hamburger"></i><%= rb.getString("section") %></span>
-                        <springForm:input path="gradeSection" id="gradeSection" name="gradeSection"
-                                          placeholder="" class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
-
-
-                    <div class="form-group">
-                    <button role="button" type="submit" class="btn btn-primary"><%= rb.getString("clone_class") %></button>
-                    </div>
-
-                    <span class="input-group label label-warning">P.S</span>
-                    <label><span><%=rb.getString("you_are_about_to_clone_class")%>&nbsp</span><span><c:out value="${classInfo.name}"/></span><span>&nbsp<%= rb.getString("and_section")%>&nbsp</span><span><c:out
-                            value="${classInfo.section}"/>.</span><span>&nbsp&nbsp<%= rb.getString("you_must_change_name_and_section") %></span></label>
-
-
-                </springForm:form>
-            </div>
 
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
