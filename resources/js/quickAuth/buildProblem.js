@@ -2,6 +2,7 @@
 // Frank 10-22-19 issue #14 translation
 // Frank 11-25-19 issue #15 hide short answer box and buttons
 // Frank 04-24-20 fixed multi-lingual bug
+// Kartik 08-11-20 fixed #158 issue of displaying unit next to problems
 
 var quickAuthBuildProblem = (function() {
 
@@ -62,7 +63,7 @@ m.build = function(activity, previewMode) {
     }
     if(isNotEmpty(probUnits)) {
         //Why can't we just use probUnits directly?
-        document.getElementById("Units").innerHTML = parameterizeText(formatText(window.parent.getUnits(), resource, probContentPath, problemParams, previewMode), problemParams);
+        document.getElementById("Units").innerHTML = probUnits;
     }
 
 	var languagePreference = window.navigator.language;

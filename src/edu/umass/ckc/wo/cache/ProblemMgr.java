@@ -47,6 +47,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 06-13-2020 issue #106 replace use of probstdmap
  * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
  * Frank 06-13-2020 issue #106R2 missed one - replace use of probstdmap
+ * Kartik 08-11-2020 issue #158 added provision for units to be displayed next to problems
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -383,7 +384,7 @@ public class ProblemMgr {
         String s = "select p.id, answer, animationResource, p.name, nickname," +
                 " strategicHintExists, hasVars, screenShotURL, diff_level, form," +
                 " isExternalActivity, type, video, example, p.status, p.questType," +
-                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,language" +
+                " statementHTML, imageURL, audioResource, units, problemFormat, imageFileId, audioFileId, layoutID, usableAsExample,language, unitsChoice, unitsUse" +
                 " from Problem p, OverallProbDifficulty o" +
                 " where p.id=o.problemid" + problemFilter +
                 " and (status='Ready' or status='ready' or status='testable' or status='in-progress')" +
@@ -419,8 +420,8 @@ public class ProblemMgr {
         String statementHTML = rs.getString("statementHTML");
         String imgURL = rs.getString("imageURL");
         String audioRsc = rs.getString("audioResource");
-        String units = rs.getString("units");
         String problemFormat = rs.getString("problemFormat");
+        
         boolean isUsableAsExample = rs.getBoolean("usableAsExample");
         int imageFileId = rs.getInt(Problem.IMAGE_FILE_ID); // DM 1/23/18 added
         if (rs.wasNull())
@@ -429,7 +430,17 @@ public class ProblemMgr {
         if (rs.wasNull())
             audioFileId = -1;
 
+        
         Problem.QuestType questType = Problem.parseType(t);
+        
+        String units = null;
+        if (questType == Problem.QuestType.shortAnswer) {
+        	String unitsUse = rs.getString("unitsUse");
+        	if (unitsUse.equals("show_units")) {
+        		units = rs.getString("unitsChoice");
+        	}
+        }
+        
         HashMap<String, ArrayList<String>> vars = null;
         if (hasVars) {
             vars = getVarDomain(id, conn);
