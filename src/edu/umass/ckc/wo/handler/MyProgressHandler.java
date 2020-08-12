@@ -35,7 +35,9 @@ import java.util.List;
  * Date: 8/16/12
  * Time: 3:30 PM
  * To change this template use File | Settings | File Templates.
- * Frank 05-18-2020 issue #125 cast elapsedtime from (double) to (int) - fixes url parameter of 'Logou' selection. 
+ * Frank 05-18-2020 issue #125 cast elapsedtime from (double) to (int) - fixes url parameter of 'Logou' selection.
+ * Frank 08-12-2020 issue #194 Send along the first unsolved problem encountered for 'Practice Area' link
+ 
  */
 public class MyProgressHandler {
 
@@ -97,6 +99,14 @@ public class MyProgressHandler {
             request.setAttribute("mastery", mastery);
             request.setAttribute("elapsedTime", (int)elapsedTime);    // DAM causes compile error
             request.setAttribute("topicId", topicId);
+            
+            // Send along the first unsolved problem encountered for 'Practice Area' link
+            for (problemDetails pd : problemDetailsList) {
+            	request.setAttribute("probId", pd.getProblemId());
+            	if (!pd.isSolved()) {
+            		break;
+            	}
+            }
 
             request.setAttribute("topicName", topicName);
 
