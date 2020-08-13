@@ -1244,7 +1244,7 @@ function clickHandling () {
         autoOpen:false,
 
         modal:true,
-        width:650,
+        width:715,
         height:675,
         open: function (event, ui) {
             $(".ui-dialog-titlebar-close", this.parentNode).hide();
