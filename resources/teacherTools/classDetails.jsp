@@ -19,6 +19,7 @@
 <!-- Frank	08-08-20	Issue #51 fix year selection -->
 <!-- Kartik 08-10-20    Issue #75 fixed issue where bar chart increased every time it is clicked -->
 <!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
+<!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -3250,32 +3251,32 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
@@ -3698,9 +3699,9 @@ var completeDataChart;
                                 if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
                                     $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
                                 }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-warning-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
                                     $(td).addClass('span-danger-layer-one');
+                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
+                                    $(td).addClass('span-warning-layer-one');
                                 }
                             },"render": function ( data, type, full, meta ) {
                             return data+" %";
@@ -4315,11 +4316,11 @@ var completeDataChart;
                                     <tbody>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_less_than_20_percent") %></td>
-                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
+                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
                                     </tr>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_from_20_to_40_percent") %></td>
-                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
+                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
                                     </tr>
                                     </tbody>
                                 </table>
