@@ -17,7 +17,9 @@
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
 <!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
 <!-- Frank	08-08-20	Issue #51 fix year selection -->
+<!-- Kartik 08-10-20    Issue #75 fixed issue where bar chart increased every time it is clicked -->
 <!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
+<!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -377,7 +379,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -524,7 +526,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -621,7 +623,7 @@ function loadEmotionMap (rows) {
                         }]
                     },
                     options: {
-                        responsive: false,
+                        responsive: true,
                         legend: {
                             display: false
                         },
@@ -781,57 +783,6 @@ function updateStudentInfo(formName){
 
     });
 }
-/** Moved back to classDetail.jsp
-function editStudentInformation(id,fname,lname,uname,context){
-    var tr = context.closest('tr')
-    var row = $('#student_roster').DataTable().row( tr );
-
-    if ( row.child.isShown() ) {
-        row.child( false ).remove();
-    }else{
-       // var editStudentInfoDiv = $($('#editStudentInfoDiv').html());
-        if(fname == ''){
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }else{
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" value='+fname+' id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }
-
-        if(lname == ''){
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentLname" class="form-control" name="studentLname" /></div></div>';
-
-        }   else{
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" value='+lname+' id="studentLname" class="form-control" name="studentLname" /></div></div>';
-        }
-
-        var tempStudentUserName =  '<div class="form-group"><div class="input-group"><label for="studentUsername">Username</label></div><div class="input-group">'+
-            '<input type="text" value='+uname+' id="studentUsername" class="form-control" name="studentUsername"/></div></div>';
-
-        var formHtml = '<div class="panel-body"><form id="edit_Student_Form'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="studentId">UserId</label></div><div class="input-group">'+
-            '<input type="text" value='+id+' id="studentId" class="form-control" name="studentId" disabled="disabled" /></div></div>'+tempStudentUserName
-            + tempStudentName + tempStudentLastName +
-            '<div class="input-group"><button role="button" onclick="updateStudentInfo('+id+')" class="btn btn-primary">Update Information</button></div></form></div>';
-
-        var formHtmlPassWord = '<div class="panel-body"><form id="resetPasswordfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newPassword">New Password</label></div><div class="input-group">'+
-            '<input type="password"  placeholder="New password to be set" id="newPassword" class="form-control" name="newPassword"/></div></div>' +
-            '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary">Reset Password</button></div></form></div>';
-
-
-
-        var tabPanel = '<div style="width: 40%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> Update Student Information </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> Reset Password for Student </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> </div> </div>';
-
-        row.child(tabPanel).show();
-
-    }
-
-}
-*/
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -1014,14 +965,6 @@ function handleclickHandlers() {
         $("#content-conatiner").children().hide();
         $("#report-wrapper").show();
         $("#report-wrapper2").show();
-    });
-
-    $("#copyClass_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
-        $("#content-conatiner").children().hide();
-        $("#clone_class_out").show();
     });
 
     $("#reorg_prob_sets_handler").click(function () {
@@ -1580,7 +1523,7 @@ else {
                     var effortChartId = "effortChart"+row[0];
                     var containerChart = "containerChart"+row[0];
                     var legendChart = "legendChart"+row[0];
-                    var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                    var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                     return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                 }
             }, {
@@ -1704,7 +1647,7 @@ else {
                         var effortChartId = "effortChart"+row[0];
                         var containerChart = "containerChart"+row[0];
                         var legendChart = "legendChart"+row[0];
-                        var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                        var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                         return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                     }
                 }, {
@@ -3308,32 +3251,32 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
@@ -3756,9 +3699,9 @@ var completeDataChart;
                                 if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
                                     $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
                                 }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-warning-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
                                     $(td).addClass('span-danger-layer-one');
+                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
+                                    $(td).addClass('span-warning-layer-one');
                                 }
                             },"render": function ( data, type, full, meta ) {
                             return data+" %";
@@ -4290,46 +4233,6 @@ var completeDataChart;
 
             </div>
 
-            <div id="clone_class_out" style="display:none; width: 75%;">
-                <h1 class="tt-page-header">
-                    <small><%= rb.getString("replicate_class") %></small>
-                </h1>
-
-                <springForm:form id="clone_class_form" method="post"
-                                 action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
-                                 modelAttribute="createClassForm">
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-blackboard"></i><%= rb.getString("class_name") %></span>
-                        <springForm:input path="className" id="className" name="className" placeholder=""
-                                          class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-menu-hamburger"></i><%= rb.getString("section") %></span>
-                        <springForm:input path="gradeSection" id="gradeSection" name="gradeSection"
-                                          placeholder="" class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
-
-
-                    <div class="form-group">
-                    <button role="button" type="submit" class="btn btn-primary"><%= rb.getString("clone_class") %></button>
-                    </div>
-
-                    <span class="input-group label label-warning">P.S</span>
-                    <label><span><%=rb.getString("you_are_about_to_clone_class")%>&nbsp</span><span><c:out value="${classInfo.name}"/></span><span>&nbsp<%= rb.getString("and_section")%>&nbsp</span><span><c:out
-                            value="${classInfo.section}"/>.</span><span>&nbsp&nbsp<%= rb.getString("you_must_change_name_and_section") %></span></label>
-
-
-                </springForm:form>
-            </div>
 
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
@@ -4413,11 +4316,11 @@ var completeDataChart;
                                     <tbody>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_less_than_20_percent") %></td>
-                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
+                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
                                     </tr>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_from_20_to_40_percent") %></td>
-                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
+                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
                                     </tr>
                                     </tbody>
                                 </table>
