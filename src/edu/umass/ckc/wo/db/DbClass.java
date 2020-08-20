@@ -29,7 +29,8 @@ import java.util.List;
  * Frank    04-27-2020  fix createStudentRoster() - was not formatting new ids correctly
  * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
  * Frank	07-28-20	issue #74 add test for classId valid with teacherID 
- */
+ * Frank	07-28-20	issue #49 added method deleteClassInactiveStudents()
+*/
 public class DbClass {
 
     public static final String GUEST_USER_CLASS_NAME = "GuestUserClass";
@@ -616,6 +617,58 @@ public class DbClass {
                 rs.close();
         }
     }
+
+    // delete Students in this class who have no records in the eventlog table
+    public static String deleteClassInactiveStudents(Connection conn, int classId) throws SQLException {
+        ResultSet rs1 = null;
+        PreparedStatement stmt1 = null;
+        ResultSet rs2 = null;
+        PreparedStatement stmt2 = null;
+        String slist = "";
+        String message = "";
+        try {
+        	String q1 = "select distinct s.id from student s, eventlog e where s.classId = ? and e.studId = s.id";        	           
+            stmt1 = conn.prepareStatement(q1);
+            stmt1.setInt(1, classId);
+            rs1 = stmt1.executeQuery();
+            while (rs1.next()) {
+                int studId = rs1.getInt(1);
+                slist += String.valueOf(studId) + ",";
+                System.out.println(slist);
+            }
+
+            String q2 = "select distinct s.id from student s where s.classId = ?";        	           
+            stmt2 = conn.prepareStatement(q2);
+            stmt2.setInt(1, classId);
+            rs2 = stmt2.executeQuery();
+            while (rs2.next()) {
+                int studId = rs2.getInt(1);
+                String sid = String.valueOf(studId);
+                if (slist.contains(sid)) {
+                	continue;
+                }
+                else {
+                	System.out.println("Deleting " + sid);
+                    DbUser.deleteStudent(conn, Integer.valueOf(sid));
+                	message += sid + ", ";
+                }
+            }
+            if (message.length() == 0) {
+            	message = "No inactive Student Ids found.";
+            }
+            return message;
+        } finally {
+            if (stmt1 != null)
+                stmt1.close();
+            if (rs1 != null)
+                rs1.close();
+            if (stmt2 != null)
+                stmt2.close();
+            if (rs2 != null)
+                rs2.close();
+        }
+    }
+
 
     public static void deleteClass(Connection conn, int classId) throws SQLException {
         // must delete all child tables that relate to this through a foreign key.
