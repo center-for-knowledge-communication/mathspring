@@ -46,6 +46,7 @@ import javax.servlet.http.HttpSession;
  * Frank	07-08-20	issue #134 & #156 added isClassInUse method
  * Frank	07-28-20	issue #74 Force logout if url tampered with
  * Frank	08-10-20	issue #196 add error checking
+ * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  */
 
 @Controller
@@ -187,6 +188,13 @@ public class TeacherToolsViewClassDetailsController {
     String resetStudentdata(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
     	System.out.println("resetStudentdata");
     	return pvService.resetStudentData(studentId,action,lang);
+    }
+
+    @RequestMapping(value = "/tt/deleteInactiveStudents", method = RequestMethod.POST)
+    public @ResponseBody
+    String deleteInactiveStudents(@RequestParam(value = "classId") String classId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("resetStudentdata");
+    	return pvService.deleteInactiveStudents(classId,action,lang);
     }
 
 
