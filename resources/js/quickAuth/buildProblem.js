@@ -225,6 +225,11 @@ m.build = function(activity, previewMode) {
     MathJax.Hub.Typeset();
 
     problemUtils.initialize(questType && questType.match(/multichoice/i));
+
+	if (mode == "example") {
+		//stopAudio();	
+		document.getElementById("QuestionSound").play();
+	}
 }
 
 function buildAnswerRow(multiSelect, letter, answer_html) {
