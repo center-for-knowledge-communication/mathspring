@@ -183,11 +183,7 @@ renderCharts : function(problemList, c, containerId) {
 
             topicState=problemList[i][2];
             attempts=problemList[i][3];
-            hints=problemList[i][4];
-
-
-
-
+            hints= problemList[i][4];
 
             var row = document.createElement("tr");
             var cell = document.createElement("td");
@@ -222,7 +218,7 @@ renderCharts : function(problemList, c, containerId) {
             case "BOTTOMOUT":
                 table.className ="correctWithHintsCard";
                 cell.innerHTML="H";
-                effortFeedback = languageSet == "es" ? "Hints helped you solve this problem. Do you want to try without hints?" : "Hints helped you solve this problem. Do you want to try without hints?";
+                effortFeedback = languageSet == "es" ? "Las ayudas le ayudaron a resolver este problema. ¿Quieres probar sin ayudas?" : "Hints helped you solve this problem. Do you want to try without hints?";
                 break;
 
             case "GIVEUP":
@@ -235,9 +231,11 @@ renderCharts : function(problemList, c, containerId) {
                 table.className ="correctWithHintsCard";
                 cell.innerHTML="H";
                 if (hints==1)   {
-                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ (hints+ languageSet == "es" ? "ayudita" : "hint.");
+                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with " + hints;
+                	effortFeedback += languageSet == "es" ? " ayudita" : " hint.";
                 }else { 
-                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with "+ (hints+ languageSet == "es" ? "ayuditas" : "hints."); 
+                	effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem with " + hints;
+                	effortFeedback += languageSet == "es" ? " ayuditas" : " hints."; 
 				}
 
                 break;
@@ -245,13 +243,15 @@ renderCharts : function(problemList, c, containerId) {
             case "ATT":
                 table.className ="correctOnAttemptsCard";
                 cell.innerHTML="_";
-                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ (languageSet == "es" ? "intento" : "attempts.");
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+  attempts;
+                effortFeedback += languageSet == "es" ? " intento" : " attempts.";
                 break;
 
             case "GUESS":
                 table.className ="correctOnAttemptsCard";
                 cell.innerHTML="_";
-                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ (languageSet == "es" ? "intento" : "attempts.");
+                effortFeedback = languageSet == "es" ? "Resolviste este problema con" : "You solved this problem in "+ attempts;
+                effortFeedback += languageSet == "es" ? " intento" : " attempts.";
                 break;
 
             default:
