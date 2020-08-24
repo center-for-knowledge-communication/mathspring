@@ -37,6 +37,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank	02-16-20	Issue #48
  * Frank 	06-13-2020  issue #106 replace use of probstdmap
  * Frank	07-08-20	issue #134 & #156 added setClassActive flag handling and editClass method 
+ * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -138,7 +139,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
                     message = rb.getString("student_info_removed_from_class");
                     break;
 
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,6 +149,33 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         return message;
     }
 
+    @Override
+    public String deleteInactiveStudents(String classId, String action, String lang) throws TTCustomException {
+    	
+    	System.out.println("deleteInactiveStudents - lang=" + lang);
+		// Multi=lingual enhancement
+		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+		rb = ResourceBundle.getBundle("MathSpring",loc);        
+		String message = "";
+        try {
+            switch (action) {
+                case "0":
+                	message = rb.getString("deleted_student_ids") + ": ";
+                	message += DbClass.deleteClassInactiveStudents(connection.getConnection(), Integer.valueOf(classId.trim()));
+                    break;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA);
+        }
+    	System.out.println("deleteInactiveStudents - message=" + message);
+        return message;
+    }
+
+
+    
     @Override
     public String resetPassWordForStudent(String studentId, String userName, String newPassWordTobeSet) throws TTCustomException {
         String token = newPassWordTobeSet;

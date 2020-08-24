@@ -20,6 +20,7 @@
 <!-- Kartik 08-10-20    Issue #75 fixed issue where bar chart increased every time it is clicked -->
 <!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
 <!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
+<!-- Frank	08-15-20	Issue #49 added UI for deleting inactive students from current class -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -702,14 +703,24 @@ function resetStudentData() {
 
 }
 
-function listInactiveUsernames() {
+
+
+function deleteInactiveStudentsModal( title,studentId,username) {
+	var temp = "<%= rb.getString("delete_inactive_students")%>";
+	
+   	$("#deleteInactiveStudentsModalPopup").find("[class*='modal-body']").html(temp);        	
+   	$('#deleteInactiveStudentsModalPopup').modal('show');
+}
+
+
+function deleteInactiveStudents() {
 
 	$.ajax({
     type : "POST",
-    url :pgContext+"/tt/tt/resetStudentdata",
+    url :pgContext+"/tt/tt/ deleteInactiveStudents",
     data : {
-        studentId: resetStudentDataId,
-        action: resetStudentDataTitle,
+        classId: classID,
+        action: "0",
         lang: loc
     },
     success : function(response) {
@@ -4686,7 +4697,7 @@ var completeDataChart;
 				                        	<div class="col-md-2">
 				                        	<%= rb.getString("delete_inactive_usernames") %>
 				                        	<br><br><br>
-				                            <button id="deleteAllUnused" class="btn btn-danger btn-lg pull-right" aria-disabled="true" onclick="alert('feature under construction');"><%= rb.getString("delete") %></button>
+				                            <button id="deleteAllUnused" class="btn btn-danger btn-lg pull-right" aria-disabled="true" onclick="deleteInactiveStudentsModal()"><%= rb.getString("delete") %></button>
 											</div>
 				                        </div>
 									</div>
@@ -5069,7 +5080,7 @@ var completeDataChart;
     </div>
 </div>
 
-<div id="resetStudentDataModalPopup" class="modal fade" role="dialog" style="display: none;">
+<div id="deleteInactiveStudentsModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
@@ -5081,7 +5092,7 @@ var completeDataChart;
                 <%= rb.getString("some_text_in_modal") %>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="resetStudentData();" ><%= rb.getString("yes") %></button>
+                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="deleteInactiveStudents();" ><%= rb.getString("yes") %></button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
             </div>
         </div>

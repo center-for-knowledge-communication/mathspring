@@ -22,6 +22,8 @@ public interface TTProblemsViewService {
 
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException;
 
+    public String deleteInactiveStudents(String classId, String action, String lang) throws TTCustomException;
+
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException;
 
     public boolean saveSurveySettingsForClass(String[] prePostToActivate, Integer classId) throws TTCustomException;
