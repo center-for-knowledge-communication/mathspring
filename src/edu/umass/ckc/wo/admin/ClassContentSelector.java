@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
  * Date: 7/27/15
  * Time: 3:47 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	08-08-20	issue #51 don't show active topics which have ZERO problems 
+ * 
  */
 public class ClassContentSelector {
 
@@ -185,11 +188,16 @@ public class ClassContentSelector {
 //        TopicMgr topicMgr = new TopicMgr();
 
         for (Topic t: topics) {
-            if (ProblemMgr.getTopicProblemCount(t.getId()) <= 0)
-                continue;
             long tm = System.currentTimeMillis();
+            if (ProblemMgr.getTopicProblemCount(t.getId()) <= 0)
+            {
+                topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
+                double tms = (System.currentTimeMillis() - tm) / 1000.0;
+                System.out.println(tms + "seconds. Topic " + t.getId() + " " + t.getName() + " eliminated - has no problems");
+
+            }
             // if a topic has no standards, its probably empty and we should eliminate it.
-            if (t.getCcStandards() == null)
+            else if (t.getCcStandards() == null)
             {
                 topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
                 double tms = (System.currentTimeMillis() - tm) / 1000.0;

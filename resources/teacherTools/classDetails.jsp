@@ -15,6 +15,13 @@
 <!-- Frank	07-17-20	Issue #122 added distance learning option to 'manage students' -->
 <!-- Frank  07-20-20    Issue #180 Manage Topics - truncate problem nicknames to fit screen -->
 <!-- Frank  07-28-20    Issue #74 protect from URL editting of teacherId and classId-->
+<!-- Frank	08-03-20	Issue #122 change distance learning email text to reminder student to write down password -->
+<!-- Frank	08-08-20	Issue #51 fix year selection -->
+<!-- Kartik 08-10-20    Issue #75 fixed issue where bar chart increased every time it is clicked -->
+<!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
+<!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
+<!-- Frank	08-15-20	Issue #49 added UI for deleting inactive students from current class -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -373,7 +380,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -520,7 +527,7 @@ function loadEffortMap (rows,flag) {
             type: 'horizontalBar',
             data: effortData,
             options: {
-                responsive: false,
+                responsive: true,
                 legend: {
                     display: false
                 }, legendCallback: function(chart) {
@@ -617,7 +624,7 @@ function loadEmotionMap (rows) {
                         }]
                     },
                     options: {
-                        responsive: false,
+                        responsive: true,
                         legend: {
                             display: false
                         },
@@ -696,6 +703,42 @@ function resetStudentData() {
 
 }
 
+
+
+function deleteInactiveStudentsModal( title,studentId,username) {
+	var temp = "<%= rb.getString("delete_inactive_students")%>";
+	
+   	$("#deleteInactiveStudentsModalPopup").find("[class*='modal-body']").html(temp);        	
+   	$('#deleteInactiveStudentsModalPopup').modal('show');
+}
+
+
+function deleteInactiveStudents() {
+
+	$.ajax({
+    type : "POST",
+    url :pgContext+"/tt/tt/ deleteInactiveStudents",
+    data : {
+        classId: classID,
+        action: "0",
+        lang: loc
+    },
+    success : function(response) {
+        if (response.includes("***")) {
+            $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+            $('#errorMsgModelPopup').modal('show');
+        }else{
+            $("#successMsgModelPopup").find("[class*='modal-body']").html( response );
+            $('#successMsgModelPopup').modal('show');
+        }
+    }
+});
+return false;
+
+}
+
+
+
 function resetPassWordForThisStudent(id,uname){
     var newPassWordToSet = $("#resetPasswordfor"+id).serializeArray()[0].value;
      $.ajax({
@@ -751,57 +794,6 @@ function updateStudentInfo(formName){
 
     });
 }
-/** Moved back to classDetail.jsp
-function editStudentInformation(id,fname,lname,uname,context){
-    var tr = context.closest('tr')
-    var row = $('#student_roster').DataTable().row( tr );
-
-    if ( row.child.isShown() ) {
-        row.child( false ).remove();
-    }else{
-       // var editStudentInfoDiv = $($('#editStudentInfoDiv').html());
-        if(fname == ''){
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }else{
-            var tempStudentName =  '<div class="form-group"><div class="input-group"><label for="studentFname">First Name</label></div><div class="input-group">'+
-                '<input type="text" value='+fname+' id="studentFname" class="form-control" name="studentFname" /></div></div>';
-        }
-
-        if(lname == ''){
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" id="studentLname" class="form-control" name="studentLname" /></div></div>';
-
-        }   else{
-            var tempStudentLastName =  '<div class="form-group"><div class="input-group"><label for="studentLname">Last Name</label></div><div class="input-group">'+
-                '<input type="text" value='+lname+' id="studentLname" class="form-control" name="studentLname" /></div></div>';
-        }
-
-        var tempStudentUserName =  '<div class="form-group"><div class="input-group"><label for="studentUsername">Username</label></div><div class="input-group">'+
-            '<input type="text" value='+uname+' id="studentUsername" class="form-control" name="studentUsername"/></div></div>';
-
-        var formHtml = '<div class="panel-body"><form id="edit_Student_Form'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="studentId">UserId</label></div><div class="input-group">'+
-            '<input type="text" value='+id+' id="studentId" class="form-control" name="studentId" disabled="disabled" /></div></div>'+tempStudentUserName
-            + tempStudentName + tempStudentLastName +
-            '<div class="input-group"><button role="button" onclick="updateStudentInfo('+id+')" class="btn btn-primary">Update Information</button></div></form></div>';
-
-        var formHtmlPassWord = '<div class="panel-body"><form id="resetPasswordfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newPassword">New Password</label></div><div class="input-group">'+
-            '<input type="password"  placeholder="New password to be set" id="newPassword" class="form-control" name="newPassword"/></div></div>' +
-            '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary">Reset Password</button></div></form></div>';
-
-
-
-        var tabPanel = '<div style="width: 40%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> Update Student Information </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> Reset Password for Student </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> </div> </div>';
-
-        row.child(tabPanel).show();
-
-    }
-
-}
-*/
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -986,14 +978,6 @@ function handleclickHandlers() {
         $("#report-wrapper2").show();
     });
 
-    $("#copyClass_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
-        $("#content-conatiner").children().hide();
-        $("#clone_class_out").show();
-    });
-
     $("#reorg_prob_sets_handler").click(function () {
         $('#reorg_prob_sets_handler').css('color', '#ffffff');
 
@@ -1019,12 +1003,20 @@ function handleclickHandlers() {
         $("#addMoreStudentsToClass").prop('disabled', false);
     });
 
-    $("#reconfigure_student_handler").click(function () {
+    $("#manage_roster_handler").click(function () {
     	$('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
+    });
+    
+    $("#manage_student_info_handler").click(function () {
+    	$('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        $("#student_info_out").show();
     });
     
     $("#manage_class_handler").click(function () {  
@@ -1195,8 +1187,8 @@ function changeReportFourHeaderAccordingToLanguage(){
 
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
-    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
-    $('#reorg_prob_sets_handler').css('color', '#ffffff');
+//    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
+//    $('#reorg_prob_sets_handler').css('color', '#ffffff');
 
 
    $('#perTopicReportLegendTable').DataTable({
@@ -1542,7 +1534,7 @@ else {
                     var effortChartId = "effortChart"+row[0];
                     var containerChart = "containerChart"+row[0];
                     var legendChart = "legendChart"+row[0];
-                    var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                    var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                     return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                 }
             }, {
@@ -1666,7 +1658,7 @@ else {
                         var effortChartId = "effortChart"+row[0];
                         var containerChart = "containerChart"+row[0];
                         var legendChart = "legendChart"+row[0];
-                        var dataContent = "<div id="+containerChart+" style='width:900px;height:500px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                        var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                         return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                     }
                 }, {
@@ -3270,32 +3262,32 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverCluster' data-content='"+clusterCCName+"'>" + data + "</a>";
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['problems'], "name" : "noOfProblemsInCluster" , "targets" : [1],"render": function ( data, type, full, meta ) {
                         return '<label style="width: 50%;">'+data+'</label><a  class="getProblemDetailsPerCluster" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
                     },"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5 ) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5 )) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": cc_headers['fattempt'], "name" : "noOfProblemsonFirstAttempt","targets" : [2],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     } },
                     { "title": cc_headers['avgratio'], "name" : "totalHintsViewedPerCluster","targets" : [3],"createdCell": function (td, cellData, rowData, row, col) {
                         if (rowData['noOfProblemsonFirstAttempt'] < 20 && rowData['noOfProblemsInCluster'] >= 5) {
-                            $(td).addClass('span-warning-layer-one');
-                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
                             $(td).addClass('span-danger-layer-one');
+                        } else if ((rowData['noOfProblemsonFirstAttempt'] > 20) && (rowData['noOfProblemsonFirstAttempt'] <  40) && (rowData['noOfProblemsInCluster'] >= 5)) {
+                            $(td).addClass('span-warning-layer-one');
                         }
                     }},
                     { "title": "<%= rb.getString("cluster_id")%>", "name" : "clusterId","targets" : [4], visible : false},
@@ -3718,9 +3710,9 @@ var completeDataChart;
                                 if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
                                     $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
                                 }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-warning-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
                                     $(td).addClass('span-danger-layer-one');
+                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
+                                    $(td).addClass('span-warning-layer-one');
                                 }
                             },"render": function ( data, type, full, meta ) {
                             return data+" %";
@@ -3880,6 +3872,9 @@ var completeDataChart;
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
+            $("#content-conatiner").children().hide();
+            $("#splash_page").show();
+
             getFilter();
             
             $('#grade').val("${classInfo.grade}").change();
@@ -4087,7 +4082,9 @@ var completeDataChart;
 
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-book"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
-            <li><a id="reconfigure_student_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_students") %></a></li>
+            <li><a id="manage_roster_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class_roster") %></a></li>
+
+            <li><a id="manage_student_info_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_student_info") %></a></li>
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-id-badge"></i> <%= rb.getString("manage_class") %></a></li>
 
@@ -4101,7 +4098,7 @@ var completeDataChart;
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            <strong>${classInfo.name}</strong>&nbsp;[<%= rb.getString("class_code") %>:${classInfo.classid}]
+            Home page for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -4123,7 +4120,7 @@ var completeDataChart;
 			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("active_problem_sets") %></small>
                     </h3>
 
@@ -4182,14 +4179,14 @@ var completeDataChart;
 				</c:if>
 				<c:if test="${activeproblemSet.size() == 0}">
 				 <div>
-                    <h5 class="page-header">
+                    <h5 class="tt-page-header">
                         <big><%= rb.getString("no_active_problem_sets_found") %></big>
                     </h5>
 					</div>
 				</c:if>
 				<c:if test="${inactiveproblemSets.size() != 0}">
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("inactive_problem_sets") %></small>
                     </h3>
 
@@ -4239,7 +4236,7 @@ var completeDataChart;
 				</c:if>
 				<c:if test="${inactiveproblemSets.size() == 0}">
 				 <div>
-                    <h5 class="page-header">
+                    <h5 class="tt-page-header">
                         <big><%= rb.getString("no_inactive_problem_sets_found") %></big>
                     </h5>
 					</div>
@@ -4247,46 +4244,6 @@ var completeDataChart;
 
             </div>
 
-            <div id="clone_class_out" style="display:none; width: 75%;">
-                <h1 class="page-header">
-                    <small><%= rb.getString("replicate_class") %></small>
-                </h1>
-
-                <springForm:form id="clone_class_form" method="post"
-                                 action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
-                                 modelAttribute="createClassForm">
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-blackboard"></i><%= rb.getString("class_name") %></span>
-                        <springForm:input path="className" id="className" name="className" placeholder=""
-                                          class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-menu-hamburger"></i><%= rb.getString("section") %></span>
-                        <springForm:input path="gradeSection" id="gradeSection" name="gradeSection"
-                                          placeholder="" class="form-control" type="text"/>
-                    </div>
-                </div>
-
-                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
-
-
-                    <div class="form-group">
-                    <button role="button" type="submit" class="btn btn-primary"><%= rb.getString("clone_class") %></button>
-                    </div>
-
-                    <span class="input-group label label-warning">P.S</span>
-                    <label><span><%=rb.getString("you_are_about_to_clone_class")%>&nbsp</span><span><c:out value="${classInfo.name}"/></span><span>&nbsp<%= rb.getString("and_section")%>&nbsp</span><span><c:out
-                            value="${classInfo.section}"/>.</span><span>&nbsp&nbsp<%= rb.getString("you_must_change_name_and_section") %></span></label>
-
-
-                </springForm:form>
-            </div>
 
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
@@ -4370,11 +4327,11 @@ var completeDataChart;
                                     <tbody>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_less_than_20_percent") %></td>
-                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
+                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
                                     </tr>
                                     <tr>
                                         <td><%= rb.getString("for_more_than_5_problems_from_20_to_40_percent") %></td>
-                                        <td class="span-danger-layer-one"><%= rb.getString("clusters_found_hard") %></td>
+                                        <td class="span-warning-layer-one"><%= rb.getString("clusters_found_challenging") %></td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -4602,7 +4559,7 @@ var completeDataChart;
                             <div class="panel panel-default">
 
                                 <div class="panel-body">
-                                    <h1 class="page-header">
+                                    <h1 class="tt-page-header">
                                         <small><%= rb.getString("turn_off_on_surveys") %></small>
                                     </h1>
                                 </div>
@@ -4651,7 +4608,7 @@ var completeDataChart;
                         <div class="col-md-8 col-sm-8">
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <h1 class="page-header">
+                                    <h1 class="tt-page-header">
                                         <small><%= rb.getString("available_surveys") %></small>
                                     </h1>
                                 </div>
@@ -4708,8 +4665,8 @@ var completeDataChart;
 
                 <div class="row">
 	                <div class="col-md-10">
-	                    <h3 class="page-header">
-	                        <small><%= rb.getString("reconfigure_student_info") %></small>
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("manage_class_roster") %></small>
 	                    </h3>
 	                </div>
                 </div>
@@ -4726,12 +4683,22 @@ var completeDataChart;
                         <div id="collapseClassroom" class="panel-collapse collapse">
                             <div class="panel-body">
 			                	<div id="inClassOption">
-				                    <div class="panel panel-default"  style="width: 80%;">
+				                    <div class="panel panel-default"  style="width: 100%;">
 				                        <div class="panel-body">
-				                        	<div class="col-md-12"><%= rb.getString("create_more_ids_instructions_heading") %></div>
+				                        	<div class="col-md-8 border">
+				                        	<%= rb.getString("create_more_ids_instructions_heading") %>
 				                        	<br>
 				                            <button id="addMoreStudentsToClass" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("create_student_id") %></button>
 				                            <button id="download_student_tags" class="btn btn-primary btn-lg pull-right" aria-disabled="true" onclick="cnfirmStudentPasswordForTagDownload()"><%= rb.getString("download_student_tags") %></button>
+				                        	</div>
+				                        	<div class="col-md-2">
+				                        	<br>
+				                        	</div>				                        	
+				                        	<div class="col-md-2">
+				                        	<%= rb.getString("delete_inactive_usernames") %>
+				                        	<br><br><br>
+				                            <button id="deleteAllUnused" class="btn btn-danger btn-lg pull-right" aria-disabled="true" onclick="deleteInactiveStudentsModal()"><%= rb.getString("delete") %></button>
+											</div>
 				                        </div>
 									</div>
 				                    <div class="panel panel-default"  style="width: 100%;">
@@ -4771,53 +4738,6 @@ var completeDataChart;
 				
 				                        </div>
 				                    </div>
-				                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-				                        <thead>
-				                        <tr>
-				                            <th rowspan="2"><%= rb.getString("student_id") %></th>
-				                            <th rowspan="2"><%= rb.getString("first_name") %></th>
-				                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
-				                            <th rowspan="2"><%= rb.getString("username") %></th>
-				                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
-				                        </tr>
-				
-				                        <tr>
-				                            <%--  <th>Clear All</th>--%>
-				                            <th><%= rb.getString("delete_math_data") %></th>
-				                            <%-- <th>Reset Practice Hut</th>
-				                             <th>Clear Pretest</th>
-				                             <th>Clear Posttest</th>--%>
-				                            <th><%= rb.getString("delete_username_and_data") %></th>
-				                            <th><%= rb.getString("change_password_and_username") %></th>
-				                        </tr>
-				                        </thead>
-				                        <tbody>
-				                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
-				                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
-				                            <tr>
-				                                <td>${studentInfo.id}</td>
-				                                <td>${studentInfo.fname}</td>
-				                                <td>${studentInfo.lname}</td>
-				                                <td>${studentInfo.uname}</td>
-				                                <td>
-				                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-				                                     </a>
-				                                </td>
-				                                <td>
-				                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
-				                                         <i class="fa fa-window-close" aria-hidden="true"></i>
-				                                     </a>
-				                                </td>
-					                            <td>
-					                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
-					                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-					                                 </a>
-					                            </td>
-				                            </tr>
-				                        </c:forEach>
-				                        </tbody>
-				                    </table>
 				                </div>
                             </div>
                         </div>
@@ -4840,6 +4760,8 @@ var completeDataChart;
 					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
 					            		<p><%= rb.getString("distance_learning_email_text")%></p>
 					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+					            		<p><%= rb.getString("distance_learning_email_password_is")%>:  ${classInfo.classid}</p>
+					            		<p><%= rb.getString("distance_learning_email_write_it_down")%></p>
 									</div>
 					            	<div class="col-md-2"></div>	               		
 					            </div>
@@ -4850,10 +4772,80 @@ var completeDataChart;
 				</div>
             </div>
             
+
+
+            <div id="student_info_out" style="display:none;width: 100%;">
+
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("manage_student_info") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                 <div class="panel-group">
+                    <div class="panel panel-default">
+                    	<div class="panel-body">			                	
+		                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
+		                        <thead>
+		                        <tr>
+		                            <th rowspan="2"><%= rb.getString("student_id") %></th>
+		                            <th rowspan="2"><%= rb.getString("first_name") %></th>
+		                            <th rowspan="2"><%= rb.getString("last_name") %> </th>
+		                            <th rowspan="2"><%= rb.getString("username") %></th>
+		                            <th colspan="7" style="text-align: center;"> <%= rb.getString("student_data") %></th>
+		                        </tr>
+		
+		                        <tr>
+		                            <%--  <th>Clear All</th>--%>
+		                            <th><%= rb.getString("delete_math_data") %></th>
+		                            <%-- <th>Reset Practice Hut</th>
+		                             <th>Clear Pretest</th>
+		                             <th>Clear Posttest</th>--%>
+		                            <th><%= rb.getString("delete_username_and_data") %></th>
+		                            <th><%= rb.getString("change_password_and_username") %></th>
+		                        </tr>
+		                        </thead>
+		                        <tbody>
+		                        <input type="hidden" id="studentRosterSize" name="studentRosterSize" value="${students.size()}">
+		                        <c:forEach var="studentInfo" varStatus="i" items="${students}">
+		                            <tr>
+		                                <td>${studentInfo.id}</td>
+		                                <td>${studentInfo.fname}</td>
+		                                <td>${studentInfo.lname}</td>
+		                                <td>${studentInfo.uname}</td>
+		                                <td>
+		                                     <a  onclick="resetStudentDataModal(4,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+		                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+		                                     </a>
+		                                </td>
+		                                <td>
+		                                     <a  onclick="resetStudentDataModal(9,'${studentInfo.id}','${studentInfo.uname}')" class="success details-control" aria-expanded="true">
+		                                         <i class="fa fa-window-close" aria-hidden="true"></i>
+		                                     </a>
+		                                </td>
+			                            <td>
+			                                 <a onclick="editStudentInformation('${studentInfo.id}','${studentInfo.fname}','${studentInfo.lname}','${studentInfo.uname}',this)" class="success details-control" aria-expanded="true">
+			                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+			                                 </a>
+			                            </td>
+		                            </tr>
+		                        </c:forEach>
+		                        </tbody>
+		                    </table>				                
+                    	</div>                        
+                    </div>
+				</div>
+            </div>
+
+
+
+
+
             <div id="class_profile_out" style="display:none;width: 100%;">
 
                 <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <%= rb.getString("class_configuration") %>
                     </h3>
 
@@ -4907,13 +4899,18 @@ var completeDataChart;
 				                                                          class="form-control" type="text" value="${classInfo.school}"/>
 				                                    </div>
 				                                </div>
-				                                <div class="form-group">
+				                               <div class="form-group">
 				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
 				                                    <div class="input-group">
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-hourglass"></i></span>
-				                                        <springForm:input path="schoolYear" id="schoolYear" name="schoolYear"
-				                                                          class="form-control" type="text" value="${classInfo.schoolYear}"/>
+				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
+				                                                           name="schoolYear">
+				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
+				                                            <springForm:option value="2020">2020</springForm:option>
+				                                            <springForm:option value="2021">2021</springForm:option>
+				                                            <springForm:option value="2022">2022</springForm:option>
+				                                        </springForm:select>
 				                                    </div>
 				                                </div>
 				                                <div class="form-group">
@@ -4994,7 +4991,7 @@ var completeDataChart;
             
              <div id="content_apply_handle" style="display:none;width: 100%;">
              <div>
-                    <h3 class="page-header">
+                    <h3 class="tt-page-header">
                         <small><%= rb.getString("apply_content_to_all_classes") %></small>
                     </h3>
 					<input type="hidden" id="classListSize" name="classListSize" value=" ${fn:length(classList)}">
@@ -5027,6 +5024,15 @@ var completeDataChart;
                     </table>
                 </div>
              </div>
+
+             <div id="splash_page" style="display:none;width: 100%;">
+             <div>
+                    <h3 class="tt-page-header">
+                    Select activities from the menu on the left
+                    </h3>
+                </div>
+             </div>
+
             
         </div>
 </div>
@@ -5067,6 +5073,26 @@ var completeDataChart;
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" data-dismiss="modal" onclick="resetStudentData();" ><%= rb.getString("yes") %></button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="deleteInactiveStudentsModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><%= rb.getString("are_you_sure_continue") %></h4>
+            </div>
+            <div class="modal-body alert alert-primary" role="alert">
+                <%= rb.getString("some_text_in_modal") %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" onclick="deleteInactiveStudents();" ><%= rb.getString("yes") %></button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal"><%= rb.getString("no") %></button>
             </div>
         </div>

@@ -54,7 +54,7 @@ public class StandardVideoSelector implements VideoSelector {
         for (CCStandard s : standards) {
             List<Problem> probs = ProblemMgr.getStandardProblems(conn, s.getCode());
             for (Problem p2: probs) {
-                if (p2.hasVideo())
+                if (p2!=null && p2.hasVideo())
                     relatedProbs.add(p2);
             }
         }

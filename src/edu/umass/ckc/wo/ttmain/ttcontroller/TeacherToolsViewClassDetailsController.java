@@ -1,6 +1,7 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
@@ -9,9 +10,11 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ProblemsView;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
+import edu.umass.ckc.wo.ttmain.ttservice.loginservice.impl.TTLoginServiceImpl;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -30,7 +33,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,10 +45,14 @@ import javax.servlet.http.HttpSession;
  * Created by Neeraj on 3/31/2017.
  * Frank	07-08-20	issue #134 & #156 added isClassInUse method
  * Frank	07-28-20	issue #74 Force logout if url tampered with
+ * Frank	08-10-20	issue #196 add error checking
+ * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  */
 
 @Controller
 public class TeacherToolsViewClassDetailsController {
+
+    private static Logger logger = Logger.getLogger(TTLoginServiceImpl.class);
 
     @Autowired
     private TTConfiguration connection;
@@ -62,7 +71,18 @@ public class TeacherToolsViewClassDetailsController {
     
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
-        HttpSession session = request.getSession();
+
+    	Locale loc = request.getLocale();
+
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+    	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
 
 		try {
@@ -75,12 +95,22 @@ public class TeacherToolsViewClassDetailsController {
     	    	session.removeAttribute("teacherUsername");
     	    	session.removeAttribute("teacherId");
     			session.invalidate();
-
+    			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+                request.setAttribute("message",msg);
     	        return "login/loginK12_teacher";
     		}
 		}
 		catch(SQLException e) {
-			
+			logger.debug(e.getMessage());
+			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+            request.setAttribute("message",msg);
+	        return "login/loginK12_teacher";			
+		}
+		catch(java.lang.NullPointerException ne) {
+			logger.debug(ne.getMessage());
+			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+            request.setAttribute("message",msg);
+	        return "login/loginK12_teacher";			
 		}
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
@@ -126,8 +156,9 @@ public class TeacherToolsViewClassDetailsController {
         	System.out.println("getProblemForProblemSets = success");
             return objectMapp.writeValueAsString(pView);
         }catch (IOException e){
-        	System.out.println("getProblemForProblemSets" + e.getMessage());
+			logger.debug(e.getMessage());
             e.printStackTrace();
+            
         }
     	System.out.println("getProblemForProblemSets = Failed");
         return "failed";
@@ -157,6 +188,13 @@ public class TeacherToolsViewClassDetailsController {
     String resetStudentdata(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
     	System.out.println("resetStudentdata");
     	return pvService.resetStudentData(studentId,action,lang);
+    }
+
+    @RequestMapping(value = "/tt/deleteInactiveStudents", method = RequestMethod.POST)
+    public @ResponseBody
+    String deleteInactiveStudents(@RequestParam(value = "classId") String classId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("resetStudentdata");
+    	return pvService.deleteInactiveStudents(classId,action,lang);
     }
 
 

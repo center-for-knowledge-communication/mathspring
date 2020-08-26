@@ -5,6 +5,7 @@
 <% 
 /**
  * Frank 05-18-2020 issue #117 restrict thumbnail sixe to 500px x 500px
+ * Frank 08-20-2020 issue $194 fix link to Practice Area
 */
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -53,7 +54,7 @@ catch (Exception e) {
         var useHybridTutor=${useHybridTutor};
         var selectedCard = null;
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
-        
+   
         var globals = {
             mouseSaveInterval: ${mouseSaveInterval},
             mouseHistory: [],
@@ -239,7 +240,7 @@ catch (Exception e) {
                     <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area") %></a>
                 </c:when>
                 <c:otherwise>
-                    <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'">Practice Area</a>
+                 	<a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'"><%= rb.getString("practice_area") %></a>
                 </c:otherwise>
             </c:choose>
         </li>
