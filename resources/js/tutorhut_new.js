@@ -1,6 +1,7 @@
 // Frank 04-24-2020 issue #16 removed done button from example dialog
 // Frank 05-06-2020 issue #87 call showVideo() at start of example problem
 // Frank 05-12-2020 issue #87 commented out this feature for now
+// Kartik 08-28-2020 issue #202 positioning of example dialog box
 
 var globals;
 var sysGlobals;
@@ -446,7 +447,6 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 }
 
 
-
 function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     checkError(responseText);
     var activity = JSON.parse(responseText);
@@ -588,6 +588,7 @@ function showQuickAuthProblem (pid, solution, resource, mode, questType) {
 //            "&resource=" + encodeURIComponent(resource) +
 //            "&probContentPath=" + encodeURIComponent(sysGlobals.problemContentPath ) +
 //            "&problemParams="+ encodeURIComponent(probParams));
+
 }
 
 function showTopicIntroHTML (htmlResource) {
@@ -1246,6 +1247,7 @@ function clickHandling () {
         modal:true,
         width:715,
         height:675,
+		position: ['center',0],
         open: function (event, ui) {
             $(".ui-dialog-titlebar-close", this.parentNode).hide();
             sysGlobals.exampleWindowActive = true;

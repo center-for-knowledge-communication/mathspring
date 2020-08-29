@@ -226,7 +226,7 @@ m.build = function(activity, previewMode) {
 
     problemUtils.initialize(questType && questType.match(/multichoice/i));
 
-	if (mode == "example") {
+	if (mode == "example" || mode == "demo") {
 		//stopAudio();	
 		document.getElementById("QuestionSound").play();
 	}
