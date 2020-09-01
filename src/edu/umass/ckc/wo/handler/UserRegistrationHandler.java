@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
  * 
  * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
  * Frank	07-17-20	Issue #122 modified UserRegistration events for classId parameter
+ * Frank	09-01-20	Issue #221 change email param handling
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -198,7 +199,7 @@ public class UserRegistrationHandler {
             studId = DbUser.createUser(conn,e.getFname(),e.getLname(),e.getUserName(),e.getPassword(),e.getEmail(),e.getAge(), e.getGender(), User.UserType.testStudent);
         else
             studId = DbUser.createUser(conn,e.getFname(),e.getLname(),e.getUserName(),e.getPassword(),e.getEmail(), e.getAge(), e.getGender(), User.UserType.student);
-        if (e.getEmail()!= null && e.getEmail().length()>0)
+        if (e.getEmail()!= null && !e.getEmail().equals("no"))
             Emailer.sendPassword("DoNotReply@mathspring.org", Settings.mailServer,e.getUserName(),e.getPassword(),e.getEmail());
         
         ClassInfo[] singleClass = {null};

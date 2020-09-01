@@ -6,6 +6,7 @@
 /**
 * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
 * Frank	07-17-20	Issue #122 modified for distance learning option
+* Frank	09-10-20	Issue #221 Gender and email changes
 */
 
 Locale loc = request.getLocale();
@@ -53,6 +54,9 @@ catch (Exception e) {
                     <input type="hidden" name="action" value="LoginK12_2"/>
                     <input type="hidden" name="skin" value="k12"/>
                     <input type="hidden" name="var" value="b"/>
+                    
+                    <input type="hidden" name="email" value="no"/>
+                    
                     <div class="form-group">
                         <label class="control-label col-sm-4" for="first_name"><%= rb.getString("first_name") %>:</label>
                         <div class="col-sm-6">
@@ -78,14 +82,8 @@ catch (Exception e) {
                             <select class="form-control" id="gender" name="gender">
                                 <option value="male"><%= rb.getString("male") %></option>
                                 <option value="female"><%= rb.getString("female") %></option>
+                                <option value="unknown"><%= rb.getString("gender_other") %></option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div id="emailRow" class="form-group">
-                        <label class="control-label col-sm-4" for="email"><%= rb.getString("email") %>:</label>
-                        <div class="col-sm-6">
-                            <input type="email" class="form-control" id="email" placeholder="" name="email">
                         </div>
                     </div>
 
