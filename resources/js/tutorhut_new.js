@@ -1258,7 +1258,7 @@ function clickHandling () {
             }
 	        //showVideo(globals);
 			$("#exampleContainer").attr('title', watch_and_listen_instructions);
-			$("#exampleContainer").css('height','auto');
+			$("#exampleContainer").css('height','600px');
 			$("#exampleContainer").css('width','auto');
 			$("#pulsate_play_button").text(example_problem_play_hints);
 		    
