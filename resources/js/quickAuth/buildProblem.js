@@ -3,7 +3,7 @@
 // Frank 11-25-19 issue #15 hide short answer box and buttons
 // Frank 04-24-20 fixed multi-lingual bug
 // Kartik 08-11-20 fixed #158 issue of displaying unit next to problems
-
+// Frank 09-08-20 Touch this file to force build error
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
