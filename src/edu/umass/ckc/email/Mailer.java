@@ -183,7 +183,7 @@ public class Mailer extends Object
 
                                 // Send the message
                                 SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
-                                t.connect(host, "mathspring@cs.umass.edu", "m4thspr1ng!");
+                                t.connect(host, "mathspring@cs.umass.edu", "dummy");
                                 t.sendMessage(message, message.getAllRecipients());
                                 t.close();
                                 
