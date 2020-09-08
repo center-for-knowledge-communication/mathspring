@@ -1,3 +1,7 @@
+<%--
+  Frank	09-01-20	Issue #230 and IDs to form fields to allow initialization
+--%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.Locale"%>
@@ -41,8 +45,10 @@ catch (Exception e) {
         // Unfortunately the back button will run this function too which means that it can generate a BeginExternalActivity
         $(document).ready(function() {
             surveyButton('${servletContext}', '${servletName}', '${URL}', '${skin}', ${sessionId}, '${interventionClass}');
+
         });
-    </script>
+
+        </script>
 </head>
 <body>
 
@@ -63,6 +69,26 @@ catch (Exception e) {
         <jsp:include page="${innerjsp}" />
     </div>
 </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+        	var inner = "${innerjsp}";
+        	if (inner.indexOf('studentName_new.jsp?') >= 0) {
+        		var urlSplitter = inner.split("?");
+        		if (urlSplitter[1].indexOf("&") >= 0) {
+	        		var paramListArr = urlSplitter[1].split("&");
+        			var fnameArr = paramListArr[0].split("=");
+		           	if (!(fnameArr[1] == "none")) {
+    		       		document.getElementById("fname").value = fnameArr[1];
+        		   	}
+        			var lnameArr = paramListArr[1].split("=");
+		           	if (!(lnameArr[1] == "none")) {
+    		       		document.getElementById("lini").value = lnameArr[1];
+        		   	}
+        		}
+        	}
+        });
+    </script>        	
 
 <%--<footer class="bottom-sticky-footer">--%>
     <%--&copy; 2016 University of Massachusetts Amherst and Worcester Polytechnic Institute ~ All Rights Reserved.--%>
