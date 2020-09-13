@@ -13,6 +13,7 @@ import edu.umass.ckc.wo.state.StudentState;
 import edu.umass.ckc.wo.strat.ClassStrategyComponent;
 import edu.umass.ckc.wo.strat.SCParam;
 import edu.umass.ckc.wo.strat.TutorStrategy;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.intervSel2.*;
@@ -41,6 +42,7 @@ import java.util.List;
  * Date: Dec 3, 2008
  * Time: 9:56:34 AM
  * To change this template use File | Settings | File Templates.
+ * Frank 09-13-20 issue #242 
  */
 public abstract class PedagogicalModel implements TutorEventProcessor { // extends PedagogicalModelOld {
 
@@ -279,12 +281,14 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
             r = disableProblemForStudent(ee,state);
             String errorMsg = "User reported error on problem:  " + state.getCurProblem() + "  problem-broken:  "
                     + ((ReportErrorEvent) e).isProbBroken() + ".  User message: " +  ((ReportErrorEvent) e).getMessage();
+             
             new Thread(new Runnable() {
 
                 @Override
                 public void run() {
                     try {
-                        Emailer.sendEmail("contact_mathspring@cs.umass.edu",
+                        SendEM sender = new SendEM();
+                        sender.sendEmail(smgr.getConnection(),"contact_mathspring@cs.umass.edu",
                                 "no-reply@wayangoutpost.net", Settings.mailServer,"Mathspring User Reported Error",errorMsg);
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -292,6 +296,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
                 }
             }).start();
+
 //            Emailer.sendErrorEmail(BaseServlet.adminEmail, BaseServlet.emailServer, "wayang error for session: " + sessId, ((ReportErrorEvent) e).getMessage(), null);
             studentModel.save();
             return r;
