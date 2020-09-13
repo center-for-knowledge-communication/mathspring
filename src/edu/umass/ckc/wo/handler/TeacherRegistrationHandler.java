@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.handler;
 import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.event.admin.AdminTeacherRegistrationEvent;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.email.Emailer;
 
@@ -21,6 +22,7 @@ import java.util.ResourceBundle;
  * Written by: David Marshall
  * Date: Jan 31, 2006
  * Time: 4:13:23 PM
+ * Frank 09-13-20 issue #242
  */
 public class TeacherRegistrationHandler {
 
@@ -66,8 +68,8 @@ public class TeacherRegistrationHandler {
 
                 @Override
                 public void run() {
-                    Emailer.sendPassword("mathspring@mathspring.org", Settings.mailServer,userName,event.getPw1(),event.getEmail());
-
+                    SendEM sender = new SendEM();
+                    sender.sendPassword(conn,"mathspring@mathspring.org", Settings.mailServer,userName,event.getPw1(),event.getEmail());
                     }
                 }).start();
 

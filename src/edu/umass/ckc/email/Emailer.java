@@ -23,7 +23,7 @@ import java.util.GregorianCalendar;
  * @author not attributable
  * @version 1.0
  * 
- * Frank	06-18-2020	issue #135 added method sendHelpEmail
+ * Frank	09-13-2020	issue #242 remove obsolete code
  */
 
 public class Emailer {
@@ -31,121 +31,6 @@ public class Emailer {
     private static File mailLog=null;
 
   public Emailer() {
-  }
-
-    public Emailer(File mailLog) {
-        this.mailLog = mailLog;
-    }
-
-    /**
- * send an email to user with password info
- * @param userName
- * @param password
- * @param email
- * @return boolean
- */
- public static boolean sendPassword(String techEmail, String emailHost,String userName, String password, String email)
- {
-  String body="Your login is: "+userName+'\n'+
-              "Your password is: "+password;
-  boolean mailSent = Mailer.send(email, techEmail,
-          "Mathspring message ", body, emailHost);
-  return mailSent;
- }
-
- 
- public static boolean sendHelpEmail(String helpDeskEmail, String subject, String userEmail, String message)
- {
-	boolean mailSent = false;
-	String body="My email is: "+userEmail+'\n'+ "My message is: "+message;;
-  
-	String toAddrs[] = helpDeskEmail.split(",");
-	for(int i=0;i<toAddrs.length;i++) {
-		// String to, String from, String subj, String body, String host
-		mailSent = Mailer.send(toAddrs[i], "Mathspring@cs.umass.edu", subject, body, Settings.mailServer);
-  	}
-  
-	return mailSent;
- }
- 
- 
- 
-    public static boolean sendEmail(String toAddress, String fromAddress, String emailHost, String subject, String body) throws IOException {
-       Date date = new Date(System.currentTimeMillis());
-       Calendar calendar = new GregorianCalendar();
-       StringBuffer errorMsg = new StringBuffer();
-       errorMsg.append("Error occurred on: ").append(date.toString()).append(" at: ");
-       errorMsg.append(calendar.get(Calendar.HOUR_OF_DAY)).append(":");
-       errorMsg.append(calendar.get(Calendar.MINUTE)).append(":");
-       errorMsg.append(calendar.get(Calendar.SECOND)).append('\n');
-       errorMsg.append("message: ");
-       errorMsg.append(body).append('\n');
-
-       boolean mailSent = Mailer.send(toAddress, fromAddress,
-               subject, errorMsg.toString(), emailHost);
-       writeSuccess(toAddress, errorMsg.toString());
-       return mailSent;
-     }
-
-    private static void writeException (String to, Exception e) throws IOException {
-        if (mailLog != null) {
-        PrintWriter fw = new PrintWriter(new FileWriter(mailLog,true));
-        fw.printf("Error sending email to %s",to);
-        e.printStackTrace(fw);
-        fw.close();
-        }
-    }
-
-    private static void writeSuccess(String to, String subj) throws IOException {
-        if (mailLog != null) {
-        PrintWriter fw = new PrintWriter(new FileWriter(mailLog,true));
-        Date d = new Date(System.currentTimeMillis());
-        fw.printf("Sent Email to %s subj=%s at %s",to,subj, d.toString());
-        fw.close();
-        }
-    }
-
-  /**
-  * send an email to tech support with error info
-  *
-   * @param subject
-   * @param exception
-   * @return boolean
-  */
-  public static boolean sendErrorEmail(String techEmail, String emailHost, String subject, String msg, Throwable exception)
-  {
-    Date date = new Date(System.currentTimeMillis());
-    Calendar calendar = new GregorianCalendar();
-    StringBuffer errorMsg = new StringBuffer();
-    errorMsg.append("Error occurred on: ").append(date.toString()).append(" at: ");
-    errorMsg.append(calendar.get(Calendar.HOUR_OF_DAY)).append(":");
-    errorMsg.append(calendar.get(Calendar.MINUTE)).append(":");
-    errorMsg.append(calendar.get(Calendar.SECOND)).append('\n');
-    errorMsg.append("message: ");
-    errorMsg.append(msg).append('\n');
-    if(exception!=null){
-      errorMsg.append(exception.getMessage()).append('\n');
-      errorMsg.append(getErrorMsg(exception));
-    }
-    boolean mailSent = Mailer.send(techEmail, techEmail,
-            subject, errorMsg.toString(), emailHost);
-    return mailSent;
-  }
-
-  /**
-  * get the error info out of the exception
-  * @param exception
-  * @return boolean
-  */
-  public static String getErrorMsg(Throwable exception)
-  {
-    StringBuffer errorMsg=new StringBuffer();
-     StackTraceElement[] elems = exception.getStackTrace();
-     for(int i=0;i<elems.length;i++)
-     {
-       errorMsg.append(elems[i]).append('\n');
-     }
-    return errorMsg.toString();
   }
 
     public static boolean isValidEmailAddress(String aEmailAddress){

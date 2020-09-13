@@ -7,6 +7,7 @@ import edu.umass.ckc.wo.db.DbUtil;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.smgr.Session;
 import edu.umass.ckc.wo.smgr.User;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
@@ -23,6 +24,7 @@ import java.io.IOException;
  * Time: 12:11 PM
  * Sends an email to a teacher every N days (configured by teacher in admin tool).
  * Gives them information about how their class is doing and some links to reports for more info
+ * Frank 09-13-20 issue #242
  */
 
 public class ClassStatusEmail {
@@ -47,8 +49,8 @@ public class ClassStatusEmail {
                 " alter your class settings.\n\n -   The Wayang Outpost Team\n\n");
         getReport(conn,sb);
         User teacher = DbUser.getTeacherEmail(conn,classId);
-        Emailer em = new Emailer();
-        em.sendEmail(teacher.getEmail(),"noreply@wayangoutpost.com", mailServer,  "Wayang Outpost Class Status Update for teacher "+teacher.getUname(),sb.toString());
+        SendEM sender = new SendEM();
+        sender.sendEmail(conn, teacher.getEmail(),"noreply@wayangoutpost.com", mailServer,  "Wayang Outpost Class Status Update for teacher "+teacher.getUname(),sb.toString());
         
     }
 
