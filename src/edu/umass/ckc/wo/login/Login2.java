@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
  * 
  * Frank 	04-24-20	Issue #28
  * Frank    05-29-2020  issue #28 remove password reset for students
+ * Frank	09-14-20	issue #237 added pauseStudentUse
  */
 public class Login2 implements LoginServletAction {
     public static String login1_jsp;
@@ -66,7 +67,7 @@ public class Login2 implements LoginServletAction {
         }
         // Some other error happened during login, so reprompt and show a message about what went wrong
         else {
-        	 String msg = lr.getMessage() + "  " + rb.getString("ask_teacher_for_password");
+        	 String msg = lr.getMessage();
      		req.setAttribute(LoginParams.MESSAGE,msg);
             lr.setForwardedToJSP(true);
             req.getRequestDispatcher(login1_jsp).forward(req, servletInfo.getResponse());

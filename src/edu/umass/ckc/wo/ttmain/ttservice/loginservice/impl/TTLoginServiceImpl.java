@@ -52,6 +52,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank 	06-18-2020	issue #135 added method sendHelpMessage()
  * Frank	07-08-20	issue #134 & #156 changed archive vs active class to include isClassActive test
  * Frank    07-13-20	issue #29 Change error handling of loginAssist and resetPassword
+ * Frank    09-14-20	issue #237 added teacherPauseStudentUse to model
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -103,7 +104,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("teacherEmail", teacher.getEmail());
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
-//            model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
+            model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
             
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
