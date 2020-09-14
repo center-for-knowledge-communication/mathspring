@@ -11,6 +11,7 @@ import java.util.List;
  * Date: 5/28/14
  * Time: 10:07 AM
  * To change this template use File | Settings | File Templates.
+ * Frank	09-14-20	issue #237 added pauseStudentUse
  */
 
 public class Teacher implements Serializable {
@@ -20,18 +21,20 @@ public class Teacher implements Serializable {
     private String lname;
     private String userName;
     private String password;
+    private int pauseStudentUse;
     private List<ClassInfo> classes;
 
     public Teacher() {
     }
 
-    public Teacher(String email, int id, String fname, String lname, String userName, String password) {
+    public Teacher(String email, int id, String fname, String lname, String userName, String password, int pauseStudentUse) {
         this.email = email;
         this.id = id;
         this.fname = fname;
         this.lname = lname;
         this.userName = userName;
         this.password = password;
+        this.pauseStudentUse = pauseStudentUse;
     }
 
     public String getEmail() {
@@ -80,12 +83,12 @@ public class Teacher implements Serializable {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public int getPauseStudentUse() {
+        return pauseStudentUse;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPauseStudentUse(int pauseStudentUse) {
+        this.pauseStudentUse = pauseStudentUse;
     }
 
     public void setClasses (List<ClassInfo> classes) {
@@ -94,5 +97,13 @@ public class Teacher implements Serializable {
 
     public List<ClassInfo> getClasses () {
         return this.classes;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

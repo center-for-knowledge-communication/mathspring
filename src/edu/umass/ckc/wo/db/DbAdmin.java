@@ -50,9 +50,10 @@ public class DbAdmin {
      * @param pw
      * @return
      * @throws SQLException
+     * Frank	09-14-20	issue #237 added pauseStudentUse coding
      */
     public static Teacher getAdminSession (Connection conn, String username, String pw) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select ID,fname,lname,password from administrator where userName=?");
+        PreparedStatement ps = conn.prepareStatement("select ID,fname,lname,password,pauseStudentUse from administrator where userName=?");
         ps.setString(1,username);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
@@ -60,8 +61,9 @@ public class DbAdmin {
             String fname = rs.getString(2);
             String lname = rs.getString(3);
             String token = rs.getString(4);
+            int    pause = rs.getInt(5);
             if (PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token))
-                return new Teacher(null,uid,fname,lname,username,token);
+                return new Teacher(null,uid,fname,lname,username,token,pause);
             else return null;
 
         }
@@ -69,14 +71,15 @@ public class DbAdmin {
     }
 
     public static Teacher getAdmin (Connection conn, int adminId) throws SQLException {
-        PreparedStatement ps = conn.prepareStatement("select fname,lname,username from administrator where id=?");
+        PreparedStatement ps = conn.prepareStatement("select fname,lname,username,pauseStudentUse from administrator where id=?");
         ps.setInt(1, adminId);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             String fname = rs.getString(1);
             String lname = rs.getString(2);
             String uname = rs.getString(3);
-            return new Teacher(null,adminId,fname,lname,uname,null);
+            int    pause = rs.getInt(4);
+            return new Teacher(null,adminId,fname,lname,uname,null,pause);
 
         }
         else return null;
