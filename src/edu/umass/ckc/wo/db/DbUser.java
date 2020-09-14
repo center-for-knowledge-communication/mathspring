@@ -14,7 +14,6 @@ import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.smgr.User;
 
-
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -1180,4 +1179,28 @@ public class DbUser {
         }
 
     }
+	    public static int isTrialUser(Connection conn, int studId) throws SQLException {
+	    	int flag = 0;
+	    	ResultSet rs = null;
+	        PreparedStatement stmt = null;
+	        try {
+	            String q = "select trialUser from student where id=?";
+	            stmt = conn.prepareStatement(q);
+	            stmt.setInt(1, studId);
+	            rs = stmt.executeQuery();
+	            while (rs.next()) {
+	                flag = rs.getInt("trialUser");
+	                return flag;
+	            }
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+	        return flag;
+	    }
+	   
+    
+
 }
