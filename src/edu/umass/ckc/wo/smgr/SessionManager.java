@@ -540,8 +540,10 @@ public class SessionManager {
                     DbUser.deleteStudent(connection, studId);
                     return new LoginResult(-1, rb.getString("user_invalid_not_in_class"), LoginResult.ERROR);
                 }
+
                 int trialFlag = DbUser.isTrialUser(this.getConnection(), studId);
                 if (trialFlag == 0) {
+
 	                if (DbUser.isLoginPaused(connection, classId)) {
 	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
 	                }
