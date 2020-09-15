@@ -3,7 +3,9 @@
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
 <% 
-
+/**
+ * Frank 09-15-2020 fix fname and lname typos
+*/
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -41,8 +43,8 @@ catch (Exception e) {
         <div class="row account-creation-announcement-wrapper">
             <div class="col-sm-6 col-sm-offset-3 account-creation-announcement">
                 <h1><%= rb.getString("ms_user_created")%></h1>
-                <p><%= rb.getString("first_name")%>: ${fName}</p>
-                <p><%= rb.getString("last_name")%>: ${lName}</p>
+                <p><%= rb.getString("first_name")%>: ${fname}</p>
+                <p><%= rb.getString("last_name")%>: ${lname}</p>
                 <p><%= rb.getString("teacher")%>: ${teacher}</p>
                 <p><%= rb.getString("class")%>: ${className}</p>
                 <p><%= rb.getString("username")%>: ${userName}</p>
