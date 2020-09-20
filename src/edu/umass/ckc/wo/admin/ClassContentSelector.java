@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  * To change this template use File | Settings | File Templates.
  * 
  * Frank	08-08-20	issue #51 don't show active topics which have ZERO problems 
+ * Kartik   09-20-20    issue #232 setting only one topic to be activated on class creation 
  * 
  */
 public class ClassContentSelector {
@@ -181,53 +182,21 @@ public class ClassContentSelector {
     private void removeTopicsAndProblems (int classId, String grade, String lowDiff, String highDiff) throws SQLException {
         DbTopics.clearClassLessonPlan(conn,classId); // gets rid of any previous class lesson plan
         List<Topic> topics =  ProblemMgr.getAllTopics();
-        TopicMgr topicMgr = new TopicMgr();
-        DbTopics.insertTopics(conn,classId,topics); // insert ALL topics as a lesson plan
         // remove all the omitted problems
         new DbProblem().clearClassOmittedProblems(conn,classId);
-//        TopicMgr topicMgr = new TopicMgr();
-
+        TopicMgr topicMgr = new TopicMgr();
+    	int i=1;
         for (Topic t: topics) {
-            long tm = System.currentTimeMillis();
-            if (ProblemMgr.getTopicProblemCount(t.getId()) <= 0)
-            {
-                topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
-                double tms = (System.currentTimeMillis() - tm) / 1000.0;
-                System.out.println(tms + "seconds. Topic " + t.getId() + " " + t.getName() + " eliminated - has no problems");
-
-            }
-            // if a topic has no standards, its probably empty and we should eliminate it.
-            else if (t.getCcStandards() == null)
-            {
-                topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
-                double tms = (System.currentTimeMillis() - tm) / 1000.0;
-                System.out.println(tms + "seconds. Topic " + t.getId() + " " + t.getName() + " eliminated - no standards");
-
-            }
-            // If the topic is mapped to a standard that is within the boundary range, we consider the topic
-            else if (hasStandardWithinBounds(t.getCcStandards().iterator(),grade,lowDiff,highDiff))  {
-                int numRemaining = removeProblemsFromTopic(classId,t,grade,lowDiff,highDiff);
-                double tms = (System.currentTimeMillis() - tm) / 1000.0;
-                System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " has " + numRemaining + " problems");
-                // Hmm.. Removing a topic after problems have been deactivated is different than
-                // just removing a topic.  Need to verify that teacher can easily turn on topic and its problem by hand
-                if (numRemaining <= 1)  {
-                    topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
-                    tms = (System.currentTimeMillis() - tm) / 1000.0;
-                    System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " eliminated because <= 1 problems remain");
-
-                }
-
-            }
-            // none of the topic's standards are within the boundary range, so we eliminate the topic
-            else {
-                topicMgr.removeTopicFromLessonPlan(conn,classId,t.getId());
-                double tms = (System.currentTimeMillis() - tm) / 1000.0;
-                System.out.println(tms + "seconds.  Topic " + t.getId() + " " + t.getName() + " eliminated because it has no matching standards");
-
-            }
+        	if ((ProblemMgr.getTopicProblemCount(t.getId()) > 0) && t.getCcStandards() != null
+        			&& (hasStandardWithinBounds(t.getCcStandards().iterator(),grade,lowDiff,highDiff))) {          
+        		int numRemaining = removeProblemsFromTopic(classId,t,grade,lowDiff,highDiff);
+        		if (numRemaining > 1 && i==1 
+            			&& (hasStandardWithinBounds(t.getCcStandards().iterator(),grade,"below0","above0"))) {
+        			DbTopics.insertTopic(conn, classId, i, t.getId());
+        			i++;
+        		}
+        	}
         }
-
     }
 
     // returns the number of problems remaining the topic after we've deleted ones that are out of range.

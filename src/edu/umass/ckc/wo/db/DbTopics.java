@@ -280,7 +280,7 @@ public class DbTopics {
         }
     }
 
-    private static void insertTopic(Connection conn, int newClassId, int pos, int topicId) throws SQLException {
+    public static void insertTopic(Connection conn, int newClassId, int pos, int topicId) throws SQLException {
         PreparedStatement stmt=null;
         try {
             String q = "insert into classlessonplan (classId,seqPos,probGroupId) values (?,?,?)";
