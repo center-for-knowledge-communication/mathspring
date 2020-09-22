@@ -4154,23 +4154,25 @@ var completeDataChart;
                         </thead>
                         <tbody>
                         <c:forEach var="problemSet" varStatus="i" items="${activeproblemSet}">
-                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
-                            <tr>
-                                <td>${i.index + 1}</td>
-                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-                                <td>
-                                    <label style="width: 50%;">${problemSet.numProbs}</label>
-                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
-                                        <i class="glyphicon glyphicon-menu-down"></i>
-                                    </a>
-                                </td>
-                                <td>${problemSet.id}</td>
-                                <c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
-                                    <td><c:out value="${gradeWiseProbNos[problemSetHeaders.key]}"/></td>
-                                </c:forEach>
-                                <td></td>
-                            </tr>
-                        </c:forEach>
+                        	<c:if test="${problemSet.numProbs > 0}">
+								<c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
+								<tr>
+									<td>${i.index + 1}</td>
+									<td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+									<td>
+										<label style="width: 50%;">${problemSet.numProbs}</label>
+										<a  class="active" aria-expanded="true" aria-controls="collapseOne">
+											<i class="glyphicon glyphicon-menu-down"></i>
+										</a>
+									</td>
+									<td>${problemSet.id}</td>
+									<c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
+										<td><c:out value="${gradeWiseProbNos[problemSetHeaders.key]}"/></td>
+									</c:forEach>
+									<td></td>
+								</tr>
+                            </c:if>
+							</c:forEach>
                         </tbody>
                        
                     </table>
@@ -4216,19 +4218,21 @@ var completeDataChart;
                         </thead>
                         <tbody>
                         <c:forEach var="problemSet" varStatus="i" items="${inactiveproblemSets}">
-                            <c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
-                            <tr>
-                                <td>${i.index + 1}</td>
-                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-                               <td>
-                                   ${problemSet.numProbs}
-                                </td>
-                                <td>${problemSet.id}</td>
-                                <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
-                                    <td><c:out value="${gradeWiseProbNo[problemSetHeaders.key]}"/></td>
-                                </c:forEach>
-                                <td></td>
-                            </tr>
+                        	<c:if test="${problemSet.numProbs > 0}">
+								<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
+								<tr>
+									<td>${i.index + 1}</td>
+									<td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+								   <td>
+									   ${problemSet.numProbs}
+									</td>
+									<td>${problemSet.id}</td>
+									<c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
+										<td><c:out value="${gradeWiseProbNo[problemSetHeaders.key]}"/></td>
+									</c:forEach>
+									<td></td>
+								</tr>
+							</c:if>
                         </c:forEach>
                         </tbody>
                     </table>
