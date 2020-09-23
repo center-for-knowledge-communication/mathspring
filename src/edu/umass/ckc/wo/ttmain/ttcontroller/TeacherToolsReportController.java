@@ -35,6 +35,7 @@ import javax.servlet.http.HttpSession;
  * Frank 	02-24-20	Issue #21 convert to autowired implementation
  * Frank 	06-17-20	Issue #149
  * Frank	07-28-20	issue #74 use session for teacher id and hack for teacher report 
+ * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
  */
 @Controller
 public class TeacherToolsReportController {
@@ -81,14 +82,14 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/getMasterProjectionsForCurrentTopic", method = RequestMethod.POST)
     public @ResponseBody
-    String getMasterProjectionsForCurrentTopic(ModelMap map,@RequestParam("classId") String classId, @RequestParam("topicID") String topicID, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
+    String getMasterProjectionsForCurrentTopic(ModelMap map,@RequestParam("classId") String classId, @RequestParam("topicID") String topicID, @RequestParam("filter") String filter, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
     	try {
         	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "MasterProjectionsForCurrentTopic", "Topic: " + topicID);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
     	}
-        return reportService.getMasterProjectionsForCurrentTopic(classId,studentId,topicID);
+        return reportService.getMasterProjectionsForCurrentTopic(classId,studentId,topicID,filter);
     }
 
 
@@ -123,14 +124,14 @@ public class TeacherToolsReportController {
     }
 
     @RequestMapping(value = "/tt/downLoadPerProblemSetReport", method = RequestMethod.GET)
-    public ModelAndView downLoadPerProblemSetReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
+    public ModelAndView downLoadPerProblemSetReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
     	try {
         	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemSetReport", "");
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
     	}
-        Map<String, Object> dataPerProblemSet =  reportService.generateClassReportPerStudentPerProblemSet(teacherId,classId);
+        Map<String, Object> dataPerProblemSet =  reportService.generateClassReportPerStudentPerProblemSet(teacherId,classId, filter);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForProblemSet",dataPerProblemSet );

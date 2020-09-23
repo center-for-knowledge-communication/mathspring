@@ -64,6 +64,7 @@ import java.text.SimpleDateFormat;
  * Frank 	06-17-20	Issue #149
  * Frank	07-08-20	issue #153 added access code checker
  * Frank	07-28-20	issue #74 valid classId is valid or this teacherId
+ * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
 */
 
 
@@ -256,7 +257,7 @@ public class TTReportServiceImpl implements TTReportService {
                 	catch (Exception e) {
                 		System.out.println("TeacherLogger error " + e.getMessage());
                 	}
-                    Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId);
+                    Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId, filter);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
                     
@@ -695,9 +696,54 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException {
-    	
-        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+    public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter) throws TTCustomException {
+    
+
+    	System.out.println("generateClassReportPerStudentPerProblemSet for class " + classId + "filter= " + filter);
+    	Timestamp ts = null;
+    	int xDays = 0;
+    	//filter = "6~0~Y";
+    	String filters[] = filter.split("~");
+    	String modFilter = "%";
+    	if (filter.length() > 0) {
+    		modFilter = filters[0].trim() + "%";
+    	}
+    	if (filter.length() > 1) {
+    		try {
+    			xDays = Integer.parseInt(filters[1].trim());
+    		}
+    		catch (Exception e) {
+    			logger.error(e.getMessage());
+    		}
+    		if (xDays == 0) {
+    			xDays = 365;
+    		}
+    		Date currentDate = new Date();
+    		// convert date to calendar
+    		Calendar c = Calendar.getInstance();
+    		c.setTime(currentDate);
+    		c.add(Calendar.DAY_OF_MONTH, (xDays * -1)); 
+
+    		// convert calendar to date
+    		Date xDate = c.getTime();
+    		ts = new Timestamp(xDate.getTime());
+    	}
+    	if (filter.length() >= 2) {
+    		if (filters[2].trim().equals("N")) {
+    			showNames = "N";
+    		}
+    		else {
+    			showNames = "Y";   			
+    		}
+    	}
+    		
+    	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("filter", modFilter);
+        params.put("classId", classId);
+        params.put("ts", ts);
+        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+//        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
         Map<String, String> columnNamesMap = new LinkedHashMap<>();
@@ -938,18 +984,57 @@ public class TTReportServiceImpl implements TTReportService {
     
 
     @Override
-    public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID) throws TTCustomException {
-        try {
-            Map<String, String> selectParams = new LinkedHashMap<String, String>();
+    public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID, String filter) throws TTCustomException {
+
+    	Timestamp ts = null;
+    	int xDays = 0;
+    	String filters[] = filter.split("~");
+
+    	if (filter.length() > 1) {
+    		try {
+    			xDays = Integer.parseInt(filters[1].trim());
+    		}
+    		catch (Exception e) {
+    			logger.error(e.getMessage());
+    		}
+    		if (xDays == 0) {
+    			xDays = 365;
+    		}
+    		Date currentDate = new Date();
+    		// convert date to calendar
+    		Calendar c = Calendar.getInstance();
+    		c.setTime(currentDate);
+    		c.add(Calendar.DAY_OF_MONTH, (xDays * -1)); 
+
+    		// convert calendar to date
+    		Date xDate = c.getTime();
+    		ts = new Timestamp(xDate.getTime());
+    	}
+    	
+    	try {
             ObjectMapper objMapper = new ObjectMapper();
+/*
+            Map<String, Object> selectParams = new LinkedHashMap<String, Object>();
             selectParams.put("classId", classId);
             selectParams.put("studId", studentId);
             selectParams.put("topicId", topicID);
-            List<String[]> eachMasteryStudentPerTopicResults = namedParameterJdbcTemplate.query(TTUtil.PER_TOPIC_QUERY_SECOND, selectParams, (ResultSet mappedrow) -> {
+            selectParams.put("ts", ts);
+            SqlParameterSource namedParameters = new MapSqlParameterSource(selectParams);
+*/
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("classId", classId);
+            params.put("studId", studentId);
+            params.put("topicId", topicID);
+            params.put("ts", ts);
+            SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+
+
+            
+            List<String[]> eachMasteryStudentPerTopicResults = namedParameterJdbcTemplate.query(TTUtil.PER_TOPIC_QUERY_SECOND, namedParameters, (ResultSet mappedrow) -> {
                 List<String[]> arrayRecords = new ArrayList<>();
                 while (mappedrow.next()) {
-                    Map<String, List<String[]>> studentValuesList = null;
                     String[] problemDetails = new String[10];
+                    String beginTime = mappedrow.getString("problemBeginTime");
                     problemDetails[0] = mappedrow.getString("problemId");
                     problemDetails[1] = mappedrow.getString("name");
                     problemDetails[2] = mappedrow.getString("nickname");
