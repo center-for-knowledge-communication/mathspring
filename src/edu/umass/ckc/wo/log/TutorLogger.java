@@ -21,6 +21,8 @@ import java.util.List;
  * User: david
  * Date: Jan 29, 2009
  * Time: 1:56:20 PM
+ * 
+ * Frank	09-23-20	issue #237 added logStudentAccess() 
  */
 public class TutorLogger {
     private SessionManager smgr;
@@ -226,7 +228,18 @@ public class TutorLogger {
     public void logMPP (NavigationEvent e) throws Exception {
         insertLogEntry(RequestActions.MPP,null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),e.getProbElapsedTime(),null,-1,null,"mpp", getTopic(), e.getClickTime());
     }
-
+    
+    // Log Student Access attempts - login, paused, ...
+    public void logStudentAccess (int userId, String activityName) throws Exception {
+    	try {
+    		int sessNum = smgr.getSessionNum();
+            insertLogEntryWorker(userId, sessNum, "Student Access", null, false, 0, 0, 0, null, 0, null, activityName, -1, null, 0, 0);
+    	}
+    	catch(Exception e) {
+    		System.out.println("No Session Number");
+    	}
+    }
+    
     public void logHintRequest(IntraProblemEvent e, HintResponse hr) throws Exception {
         insertLogEntry(RequestActions.HINT,null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),e.getProbElapsedTime(),
                 hr.getHint()!=null ? hr.getHint().getLabel() :  null,hr.getHint()!=null ? hr.getHint().getId() : -1,hr.getCharacterControl(),null,getTopic(), e.getClickTime());
@@ -464,7 +477,7 @@ public class TutorLogger {
                 probId,null,-1,null,null, -1, null, e.getTopicId(), e.getClickTime());
 
     }
-
+    
     public void logReportedError(ReportErrorEvent e) throws Exception {
         String action = e.getAction();
         insertLogEntry(action,e.getMessage(),false,e.getElapsedTime(),0,null,-1,null,null,getTopic(), 0);

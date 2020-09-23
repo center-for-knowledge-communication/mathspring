@@ -27,6 +27,7 @@ import java.util.ArrayList;
  * 
  * Frank 01-20-2020 Issue #39 use classId as alternative password - test for class id
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
+ * Frank 09-14-2020	issue #237 added 'exclude test users from pause'
  */
 public class DbUser {
 
@@ -580,7 +581,7 @@ public class DbUser {
         }
     }
 
-    public static boolean isLoginPaused(Connection conn, int classId) throws SQLException {
+    public static boolean isLoginPaused(Connection conn, int studId) throws SQLException {
     	
     	boolean result = false;
     	ResultSet rs = null;
@@ -600,13 +601,14 @@ public class DbUser {
 */
       	// if global flag is false, check if teacher paused
         try {
-            String q = "select t.pauseStudentUse as pause, t.id as teacherId,c.id as classId from teacher t, class c where c.id=? and c.teacherId=t.id";
+            String q = "select t.pauseStudentUse as pause, t.id, c.id, s.classId, s.trialUser as trialUser from teacher t, class c, student s where s.id=? and s.classId = c.id and c.teacherId=t.id";
             stmt = conn.prepareStatement(q);
-            stmt.setInt(1, classId);
+            stmt.setInt(1, studId);
             rs = stmt.executeQuery();
             if (rs.next()) {
+            	int trialUser = rs.getInt("trialuser");
                 int pause = rs.getInt("pause");
-                if (pause == 1) {
+                if ((pause == 1) && (trialUser == 0)) {
                 	result = true;
                 }
             } else result = false;
