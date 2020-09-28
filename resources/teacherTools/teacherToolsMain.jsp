@@ -17,6 +17,7 @@
  *  Frank	07-28-20	Issue #74 Protect from URL editting of teacherId and classId
  *  Frank   07-28-20    Remove Replicate Class from menu
  *  Frank	08-08-20	issue #51 fix year selection
+ *  Frank	0914-20		issue #237 add pauseStudentUse logic
  */
 
 Locale loc = request.getLocale();
@@ -229,10 +230,15 @@ catch (Exception e) {
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
             $("#edit-teacher-wrapper").hide();
+            var pause = ${teacherPauseStudentUse};
+            if (pause == "1")
+            	$("#pause-status").show();            
+            else 
+            	$("#pause-status").hide();
             registerAllEvents();
             handleclickHandlers();
         });
-
+        
         function displayCreateRosterInstructions() {
         	
     		document.getElementById("passwordToken").value = "useClass";
@@ -380,21 +386,21 @@ catch (Exception e) {
                 $("#dropdownDiv").hide();
                                
                 });
-
+            		 
              $("#pwdBtn").click(function () {                    
-                   var pwd = document.getElementById("pwd").value; 
-                   $.ajax({
-                       type : "POST",
-                       url : pgContext+"/tt/tt/getTeacherReports",
-                       data : {
-                           classId: targetTeacherID,
-                           teacherId: teacherID,
-                           reportType: 'teacherList',
-                           lang: loc,
-                           filter: pwd
-                       },
-                       success : function(data) {
-                       	    if (data) {
+                 var pwd = document.getElementById("pwd").value; 
+                 $.ajax({
+                     type : "POST",
+                     url : pgContext+"/tt/tt/getTeacherReports",
+                     data : {
+                         classId: targetTeacherID,
+                         teacherId: teacherID,
+                         reportType: 'teacherList',
+                         lang: loc,
+                         filter: pwd
+                     },
+                     success : function(data) {
+                     	    if (data) {
 	                       		var msg = "" + data;
 	                       		if (msg == "InvalidAccessCode") {
 	                           		alert("<%= rb.getString("invalid_access_code") %>");
@@ -411,19 +417,19 @@ catch (Exception e) {
 	                       	else {
 	                       		alert("response data is null");
 	                       	}
-                       },
-                       error : function(e) {
-                       	alert("error");
-                           console.log(e);
-                       }
-                   });
+                     },
+                     error : function(e) {
+                     	alert("error");
+                         console.log(e);
+                     }
+                 });
 
-                
-                //document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
+              
+              //document.getElementById("teacherList").innerHTML = "<li class='dropdown-content' onClick=selectTeacher(this);>maestrcordoba:840</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester1:866</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester2:867</li><li class='dropdown-content' onClick=selectTeacher(this);>fstester3:868</li>";
 
-            	
-            });
-
+          	
+          });
+                         
             $('#PageRefresh').click(function () {
                 location.reload();
             });
@@ -727,25 +733,61 @@ function registerAllEvents(){
     <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
         <ul class="nav sidebar-nav">
             <li>
-                <a id="PageRefresh" href="#"><i
-                        class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
+                <a id="PageRefresh" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
             <li>
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
             </li>
             <li>
-                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i><%= rb.getString("create_surveys_and_math_problems") %></a>
+                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_surveys_and_math_problems") %></a>
             </li>
             <li>
-                <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("view_teacher_activities") %></a>
+                <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("view_teacher_activities") %></a>
             </li>
-        </ul>
+<!--
+            <li id="pause_logins_handler">
+                <a href="#" id="pause_logins_handler"><i class="fa fa-fw fa-ban"></i> Pause student logins</a>
+            </li>
+            <li id="resume_logins_handler">
+                <a href="#"><i class="fa fa-fw fa-play-circle-o"></i> Resume student logins</a>
+            </li>
+ -->
+         </ul>
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
         <div id="content-conatiner" class="container-fluid">
-
-            <div id="report-wrapper" class="row">
+            <div id="pause-status">
+            	<div class="row">
+                 <h1 class="tt-paused-logins-message">
+                 	<%= rb.getString("student_logins_are_paused") %>
+                 </h1>
+                 </div>
+            </div>
+        
+        <div id="pause-wrapper" style="display: none;">
+    		<div vertical-center">
+		        <div class="col-sm-6 col-sm-offset-3 registration-box">
+		            <form
+		                    class="form-horizontal"
+		                    method="post"
+		                    action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherEdit"
+		            >
+		                <div class="form-group">
+		                    <label class="control-label col-sm-6" for="first_name">Student Logins are: </label>
+		                    <div class="col-sm-3">
+		                        <input type="text" name="fname" class="form-control" id="first_name" value="paused">
+		                    </div>
+		                    <div class="col-sm-3">
+		                        <button type="submit" class="btn btn-default pull-right btn-block teacher-button">resume</button>
+		                    </div>
+		                </div><!-- form-group -->
+		            </form>
+		            <hr>
+		        </div>
+	        </div>
+        </div>            
+        <div id="report-wrapper" class="row">
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">

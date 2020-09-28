@@ -481,6 +481,14 @@ background-color: #FF4766;
     color:#FFF;
  }
 
+.tt-paused-logins-message {
+  text-align: center;
+  color:red;	
+  padding-bottom: 9px;
+  margin: 20px 0 20px;
+  border-bottom: 1px solid #eee;
+}
+
 .tt-page-header {
   padding-bottom: 9px;
   margin: 20px 0 20px;

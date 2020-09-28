@@ -11,6 +11,7 @@ import edu.umass.ckc.servlet.servbase.ServletEvent;
 import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.strat.TutorStrategy;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.email.Emailer;
 import edu.umass.ckc.wo.util.ServletURI;
@@ -39,6 +40,8 @@ import java.util.ResourceBundle;
  * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
  * Frank	07-17-20	Issue #122 modified UserRegistration events for classId parameter
  * Frank	09-01-20	Issue #221 change email param handling
+ * Frank	09-13-20 	issue #242
+ * Frank    09-15-20    issue #242 fix test for valid email address 
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -199,9 +202,10 @@ public class UserRegistrationHandler {
             studId = DbUser.createUser(conn,e.getFname(),e.getLname(),e.getUserName(),e.getPassword(),e.getEmail(),e.getAge(), e.getGender(), User.UserType.testStudent);
         else
             studId = DbUser.createUser(conn,e.getFname(),e.getLname(),e.getUserName(),e.getPassword(),e.getEmail(), e.getAge(), e.getGender(), User.UserType.student);
-        if (e.getEmail()!= null && !e.getEmail().equals("no"))
-            Emailer.sendPassword("DoNotReply@mathspring.org", Settings.mailServer,e.getUserName(),e.getPassword(),e.getEmail());
-        
+        if (e.getEmail()!= null && e.getEmail().contains("@")) {  	
+            SendEM sender = new SendEM();
+            sender.sendPassword(conn,"DoNotReply@mathspring.org", Settings.mailServer,e.getUserName(),e.getPassword(),e.getEmail());
+        }
         ClassInfo[] singleClass = {null};
         
         String classId = e.getClassId();

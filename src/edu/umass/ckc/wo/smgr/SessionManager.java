@@ -37,6 +37,9 @@ import java.util.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/*
+ * Frank	09-14-20	issue #237 added isTrialUser method changed text message
+ */
 
 public class SessionManager {
 
@@ -525,7 +528,8 @@ public class SessionManager {
             studId = DbUser.getStudent(this.getConnection(), uname, password);
 
             if (studId == -1) {
-                return new LoginResult(-1, rb.getString("invalid_username_password_combination"), LoginResult.ERROR);
+            	String msg = rb.getString("invalid_username_password_combination") + "  " + rb.getString("ask_teacher_for_password");
+                return new LoginResult(-1, msg, LoginResult.ERROR);
             } else {
                 this.user = DbUser.getStudent(this.getConnection(), studId);
                 int classId = DbUser.getStudentClass(this.getConnection(), studId);
@@ -535,6 +539,14 @@ public class SessionManager {
                 if (classId == -1) {
                     DbUser.deleteStudent(connection, studId);
                     return new LoginResult(-1, rb.getString("user_invalid_not_in_class"), LoginResult.ERROR);
+                }
+
+                int trialFlag = DbUser.isTrialUser(this.getConnection(), studId);
+                if (trialFlag == 0) {
+
+	                if (DbUser.isLoginPaused(connection, classId)) {
+	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
+	                }
                 }
                 //Remove collaboration requests and pairings for students who have just logged in, as any such data is erroneous.
                 CollaborationManager.clearOldData(studId);

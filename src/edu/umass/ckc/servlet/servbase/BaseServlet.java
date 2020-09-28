@@ -31,7 +31,8 @@ import java.util.regex.Pattern;
  * Date: Jul 12, 2004
  * Time: 11:32:51 AM
  * To change this template use File | Settings | File Templates.
- */
+ * Frank	09-13-2020	issue #242 comment out email for now
+  */
 
 public class BaseServlet extends HttpServlet {
     protected String dbDriver = "com.mysql.jdbc.driver" ;
@@ -216,7 +217,7 @@ public class BaseServlet extends HttpServlet {
                 String errorMessage = msgBuffer.toString();
                 Emailer em = new Emailer();
                 String server = req.getServerName();
-                em.sendEmail(adminEmail, adminEmail,emailServer, "Wayang error message from server: " + server, msgBuffer.toString());
+//                em.sendEmail(adminEmail, adminEmail,emailServer, "Wayang error message from server: " + server, msgBuffer.toString());
             }
             Element errElt = new Element("error");
             errElt.addContent(e.getMessage());

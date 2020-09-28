@@ -1,2 +1,5 @@
 # enter queries here
+ALTER TABLE globalsettings ADD COLUMN misc_code varchar(255) AFTER Administrator;
+update globalsettings set misc_code = "WestEdStudy" where id_shouldBe1 = "1";
+ALTER TABLE globalsettings ADD COLUMN pauseStudentUse varchar(255) AFTER Administrator;
 end

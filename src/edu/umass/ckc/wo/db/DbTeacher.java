@@ -20,6 +20,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  * Frank 04-23-2020 Added function to support user profile self-maintenance
  * Frank 05-29-2020 issue #28 new functions for password reset
+ * Frank 09-14-2020	issue #237 added pauseStudentUse coding
  */
 public class DbTeacher {
 
@@ -91,7 +92,7 @@ public class DbTeacher {
                 String l = rs.getString(2);
                 int i    = rs.getInt(3);
                 String e = rs.getString(4);
-                return new Teacher(e,i,f,l,username,null);
+                return new Teacher(e,i,f,l,username,null,0);
             }
             return null;
         }
@@ -116,7 +117,7 @@ public class DbTeacher {
                 String l = rs.getString(2);
                 int i    = rs.getInt(3);
                 String u = rs.getString(4);
-                return new Teacher(email,i,f,l,u,null);
+                return new Teacher(email,i,f,l,u,null,0);
             }
             return null;
         }
@@ -165,7 +166,7 @@ public class DbTeacher {
                 String fname = rs.getString("fname");
                 String lname = rs.getString("lname");
                 String uname = rs.getString("username");
-                Teacher t = new Teacher(null,id,fname,lname,uname,null);
+                Teacher t = new Teacher(null,id,fname,lname,uname,null,0);
                 if (includeClasses) {
                     List<ClassInfo> classes = DbClass.getTeacherClasses(conn,t.getId());
                     t.setClasses(classes);
@@ -186,7 +187,7 @@ public class DbTeacher {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
-            String q = "select fname,lname,username, email from teacher where id=?";
+            String q = "select fname,lname,username, email, pauseStudentUse from teacher where id=?";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,teacherId);
             rs = stmt.executeQuery();
@@ -195,7 +196,8 @@ public class DbTeacher {
                 String l = rs.getString(2);
                 String u = rs.getString(3);
                 String e = rs.getString(4);
-                return new Teacher(e,teacherId,f,l,u,null);
+                int p = rs.getInt(5);
+                return new Teacher(e,teacherId,f,l,u,null,p);
             }
             return null;
         }

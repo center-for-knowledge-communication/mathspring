@@ -24,7 +24,7 @@ import java.util.Set;
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank	02-16-2019  Issue #45 Teacher Log report
  * Frank    03-02-2020  Added generateTeacherList
-
+ * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
  */
 
 public interface TTReportService {
@@ -40,11 +40,11 @@ public interface TTReportService {
 
     public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId);
 
-    public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId) throws TTCustomException;
+    public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter) throws TTCustomException;
 
     public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException;
 
-    public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID) throws TTCustomException;
+    public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID, String filter) throws TTCustomException;
 
     public String getCompleteMasteryProjectionForStudent(String classId, String studentId, String chartType) throws TTCustomException;
 

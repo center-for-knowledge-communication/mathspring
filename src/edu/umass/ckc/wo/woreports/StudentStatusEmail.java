@@ -9,6 +9,7 @@ import edu.umass.ckc.wo.db.*;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.tutormeta.TopicMastery;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 
 import java.sql.*;
 import java.util.*;
@@ -34,6 +35,7 @@ import java.io.IOException;
  * <p/>
  * option: augment student model with a list of problem ids  (say the hardest 3)kept in sorted order of difficulty.
  * We'd track 5 features of the problems <timeOnProblem, numHints, solutionGiven, isSolved, difficultyRating>
+ * Frank 09-13-20 issue #242
  */
 public class StudentStatusEmail {
 
@@ -119,8 +121,8 @@ public class StudentStatusEmail {
                 if (Emailer.isValidEmailAddress(email)) {
                     String body = getStudentEmailContent(conn, id, fname, lname, uname);
                     if (!debug) {
-                        Emailer em = new Emailer();
-                        em.sendEmail(email,"noreply@wayangoutpost.com", mailServer,  "Wayang Outpost Performance Update for "+ uname, body);
+                        SendEM em = new SendEM();
+                        em.send(conn,email,"noreply@wayangoutpost.com",  "Wayang Outpost Performance Update for "+ uname, body, Settings.mailServer);
                     }
                     else {
                         System.out.println("User Id:" + id + "\n");

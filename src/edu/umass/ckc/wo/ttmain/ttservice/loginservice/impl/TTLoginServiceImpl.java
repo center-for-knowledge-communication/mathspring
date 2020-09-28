@@ -40,6 +40,7 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 import edu.umass.ckc.wo.tutor.Settings;
+import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 
 /**
  * Created by Neeraj on 3/25/2017.
@@ -51,6 +52,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank 	06-18-2020	issue #135 added method sendHelpMessage()
  * Frank	07-08-20	issue #134 & #156 changed archive vs active class to include isClassActive test
  * Frank    07-13-20	issue #29 Change error handling of loginAssist and resetPassword
+ * Frank    09-14-20	issue #237 added teacherPauseStudentUse to model
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -102,6 +104,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("teacherEmail", teacher.getEmail());
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
+            model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
             
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
@@ -155,8 +158,9 @@ public class TTLoginServiceImpl implements TTLoginService {
                 int mod = x % 3;
                 String pw = uname.substring(0,2) + Integer.toString(x) + symbols.substring(mod,mod+1);
                 logger.info(uname + pw);
-                DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);                   
-                Emailer.sendPassword("DoNotReply@mathspring.org", Settings.mailServer,uname,pw,teacher.getEmail());
+                DbTeacher.modifyTeacherPassword(connection.getConnection(),uname,pw);       
+                SendEM sender = new SendEM();
+                sender.sendPassword(connection.getConnection(),"DoNotReply@mathspring.org", Settings.mailServer,uname,pw,teacher.getEmail());
                 return 0;
             }
         } catch (Exception e) {
@@ -170,7 +174,8 @@ public class TTLoginServiceImpl implements TTLoginService {
     public int sendHelpMessage(String subject, String email, String helpmsg) {
         try {
         	String helpDeskEmail = Settings.getString(connection.getConnection(), "teacher_login_help_email");
-            Emailer.sendHelpEmail(helpDeskEmail, subject, email, helpmsg);
+            SendEM sender = new SendEM();
+        	sender.sendHelpEmail(connection.getConnection(),helpDeskEmail, subject, email, helpmsg);
             return 0;
         } catch (Exception e) {
             e.printStackTrace();

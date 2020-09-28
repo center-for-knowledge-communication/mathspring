@@ -21,6 +21,7 @@
 <!-- Frank	08-10-20	Issue #196 splash page, split 'Manage Students' into 2 menu items -->
 <!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
 <!-- Frank	08-15-20	Issue #49 added UI for deleting inactive students from current class -->
+<!-- Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -157,7 +158,8 @@ var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
-var psppFilter = "~~Y";
+var filterSix = "~~Y";
+var filterOne = "~~Y";
 //var urlColumnNames;
 
 //Report2 Varriables
@@ -241,12 +243,12 @@ else {
     }
 }
 
-function getFilter() {
+function getFilterSix() {
 	var showNamesState = "N";
 	if (document.getElementById("showNames").checked == true) {
 		showNamesState = "Y";
 	}
-	var psppFilter = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
+	filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
 	
 	var a_href = '${pageContext.request.contextPath}';
 	a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
@@ -254,8 +256,26 @@ function getFilter() {
 	a_href = a_href + "&classId=";
 	a_href = a_href + ${classInfo.classid};
 	a_href = a_href + "&filter=";
-	a_href = a_href + psppFilter;
+	a_href = a_href + filterSix;
 	document.getElementById("downloadReportSixBtn").href = a_href;
+}
+
+function getFilterOne() {
+	var showNamesState = "N";
+	if (document.getElementById("showNamesOne").checked == true) {
+		showNamesState = "Y";
+	}
+//	filterOne = document.getElementById("standardsFilterOne").value + "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
+	filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
+	
+	var a_href = '${pageContext.request.contextPath}';
+	a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
+	a_href = a_href + teacherID;
+	a_href = a_href + "&classId=";
+	a_href = a_href + ${classInfo.classid};
+	a_href = a_href + "&filter=";
+	a_href = a_href + filterOne;
+	document.getElementById("downloadReportOneBtn").href = a_href;
 }
 
 
@@ -2220,7 +2240,8 @@ else {
             data: {
                 classId: classID,
                 topicID: topicId,
-                studentId: studentId
+                studentId: studentId,
+                filter: filterOne
             },
             success: function (response) {
                 var masteryProjectionsForThisTopic = $.parseJSON(response);
@@ -2635,8 +2656,14 @@ var completeDataChart;
 
     /** Report Handler Starts **/
 
-    $('#collapseOne').on('show.bs.collapse', function ()  {
+    $('#showReportOneBtn').on('click', function ()  {    	
         $('#collapseOne').find('.loader').show();
+        var showNamesState = "N";
+        if (document.getElementById("showNamesOne").checked == true) {
+        	showNamesState = "Y";
+        }
+        filterOne=document.getElementById("standardsFilterOne").value + "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
+
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2645,7 +2672,7 @@ var completeDataChart;
                 teacherId: teacherID,
                 reportType: 'perStudentPerProblemSetReport',
                 lang: loc,
-                filter: ''
+                filter: filterOne
             },
             success : function(data) {
                 $('#collapseOne').find('.loader').hide();
@@ -2812,24 +2839,14 @@ var completeDataChart;
 
 
     });
-/**
-    var urlColumnNamesMap = new Map();
-
-    function urlColumnNames(key, v) {
-        v = v.replace(/\s/g, '');
-        var splitter = v.split("^");
-        var problemName = splitter[0];
-        var urlWindow = splitter[1]; 
-
-    	}
-*/    
+   
     $('#showReportSixBtn').on('click', function ()  {
         $('#collapseSix').find('.loader').show();
         var showNamesState = "N";
         if (document.getElementById("showNames").checked == true) {
         	showNamesState = "Y";
         }
-        var filter=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
+        filterSix=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
         
         $.ajax({
             type : "POST",
@@ -2839,7 +2856,7 @@ var completeDataChart;
                 teacherId: teacherID,
                 reportType: 'perStudentPerProblemReport',
                 lang: loc,
-                filter: filter
+                filter: filterSix
             },
             success : function(data) {
                 $('#collapseSix').find('.loader').hide();
@@ -3875,7 +3892,8 @@ var completeDataChart;
             $("#content-conatiner").children().hide();
             $("#splash_page").show();
 
-            getFilter();
+            getFilterOne();
+            getFilterSix();
             
             $('#grade').val("${classInfo.grade}").change();
             $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
@@ -4098,7 +4116,7 @@ var completeDataChart;
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            Home page for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -4154,22 +4172,24 @@ var completeDataChart;
                         </thead>
                         <tbody>
                         <c:forEach var="problemSet" varStatus="i" items="${activeproblemSet}">
-                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
-                            <tr>
-                                <td>${i.index + 1}</td>
-                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-                                <td>
-                                    <label style="width: 50%;">${problemSet.numProbs}</label>
-                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
-                                        <i class="glyphicon glyphicon-menu-down"></i>
-                                    </a>
-                                </td>
-                                <td>${problemSet.id}</td>
-                                <c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
-                                    <td><c:out value="${gradeWiseProbNos[problemSetHeaders.key]}"/></td>
-                                </c:forEach>
-                                <td></td>
-                            </tr>
+                        	<c:if test="${problemSet.numProbs > 0}">
+	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
+	                            <tr>
+	                                <td>${i.index + 1}</td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>
+	                                    <label style="width: 50%;">${problemSet.numProbs}</label>
+	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
+	                                        <i class="glyphicon glyphicon-menu-down"></i>
+	                                    </a>
+	                                </td>
+	                                <td>${problemSet.id}</td>
+	                                <c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
+	                                    <td><c:out value="${gradeWiseProbNos[problemSetHeaders.key]}"/></td>
+	                                </c:forEach>
+	                                <td></td>
+	                            </tr>
+                            </c:if>
                         </c:forEach>
                         </tbody>
                        
@@ -4216,19 +4236,21 @@ var completeDataChart;
                         </thead>
                         <tbody>
                         <c:forEach var="problemSet" varStatus="i" items="${inactiveproblemSets}">
-                            <c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
-                            <tr>
-                                <td>${i.index + 1}</td>
-                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-                               <td>
-                                   ${problemSet.numProbs}
-                                </td>
-                                <td>${problemSet.id}</td>
-                                <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
-                                    <td><c:out value="${gradeWiseProbNo[problemSetHeaders.key]}"/></td>
-                                </c:forEach>
-                                <td></td>
-                            </tr>
+                        	<c:if test="${problemSet.numProbs > 0}">
+                            	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
+	                            <tr>
+	                                <td>${i.index + 1}</td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                               <td>
+	                                   ${problemSet.numProbs}
+	                                </td>
+	                                <td>${problemSet.id}</td>
+	                                <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
+	                                    <td><c:out value="${gradeWiseProbNo[problemSetHeaders.key]}"/></td>
+	                                </c:forEach>
+	                                <td></td>
+	                            </tr>
+                            </c:if>
                         </c:forEach>
                         </tbody>
                     </table>
@@ -4396,11 +4418,22 @@ var completeDataChart;
                         </div>
 
                         <div id="collapseOne" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <label><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></label>
-                                <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerProblemSetReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
-                                    <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                </a>
+                            <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
+                            <div class="panel-body report_filters hidden">                           
+								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
+								  <input id="standardsFilterOne" style="width:48px" type="text" name="" value="" onblur="getFilterOne();">
+							</div>
+                            <div class="panel-body report_filters">                           
+								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
+								  <input id="daysFilterOne" style="width:32px" type="text" name="" value="" onblur="getFilterOne();">   
+								  <label class="report_filters"><%= rb.getString("days") %></label>
+							</div>
+                            <div class="panel-body report_filters hidden">
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+                            </div>
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
                             </div>
                             <div class="panel-body">
                                 <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
@@ -4467,15 +4500,15 @@ var completeDataChart;
                         <div id="collapseSix" class="panel-collapse collapse">                
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilter();">
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
 							</div>
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-								  <input id="daysFilter" style="width:32px" type="text" name="" value="" onblur="getFilter();">   
+								  <input id="daysFilter" style="width:32px" type="text" name="" value="" onblur="getFilterSix();">   
 								  <label class="report_filters"><%= rb.getString("days") %></label>
 							</div>
                             <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNames" name="" value="Y"  onblur="getFilter();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNames" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
 								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
