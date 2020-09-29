@@ -11,6 +11,7 @@ import edu.umass.ckc.wo.event.tutorhut.LogoutEvent;
 import edu.umass.ckc.wo.exc.DeveloperException;
 import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.wo.handler.NavigationHandler;
+import edu.umass.ckc.wo.log.TutorLogger;
 import edu.umass.ckc.wo.login.LoginResult;
 import edu.umass.ckc.wo.mrcommon.Names;
 import edu.umass.ckc.wo.state.ExtendedStudentState;
@@ -39,6 +40,8 @@ import java.util.ResourceBundle;
 
 /*
  * Frank	09-14-20	issue #237 added isTrialUser method changed text message
+ * Frank	09-23-20	issue #237 added event logging
+ * Frank	09-29-20	issue #237R3 added event logging
  */
 
 public class SessionManager {
@@ -52,7 +55,10 @@ public class SessionManager {
     private static final String LOGIN_USER_MOM = "uname_momname_login_check";
     private static final String MESSAGE = "message";
     private static int guestIDCounter = 0; // used for generating guest user IDS
-
+    
+    private static final String ACCESS_PAUSED = "Access paused";
+    private static final String LOGIN_SUCCESSFUL = "Login successful";
+    
     private Connection connection;
 
 
@@ -541,36 +547,43 @@ public class SessionManager {
                     return new LoginResult(-1, rb.getString("user_invalid_not_in_class"), LoginResult.ERROR);
                 }
 
-                int trialFlag = DbUser.isTrialUser(this.getConnection(), studId);
-                if (trialFlag == 0) {
-
-	                if (DbUser.isLoginPaused(connection, classId)) {
-	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
-	                }
-                }
-                //Remove collaboration requests and pairings for students who have just logged in, as any such data is erroneous.
+                  //Remove collaboration requests and pairings for students who have just logged in, as any such data is erroneous.
                 CollaborationManager.clearOldData(studId);
                 int oldSessId = DbSession.findActiveSession(getConnection(), studId);
                 Pedagogy ped;
                 if (oldSessId != -1) {
                     String msg = String.format("%s <b>%s</b> %s <b>%s %s</b> %s", rb.getString("the_user_name"),user.getUname(), rb.getString("whose_name_is"), user.getFname(), user.getLname(),rb.getString("is_already_logged_in_instructions"));
-                    if (!logoutExistingSession)
-                        return new LoginResult(-1, msg, LoginResult.ALREADY_LOGGED_IN);
+                    if (!logoutExistingSession) {
+                        if (DbUser.isLoginPaused(connection, studId)) {
+                            new TutorLogger(this).logStudentAccess(studId, ACCESS_PAUSED);
+       	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
+                        }
+                        else {
+                            return new LoginResult(-1, msg, LoginResult.ALREADY_LOGGED_IN);
+                        }
+                    }
                     else {
                         inactivateAllUserSessions();
                         this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false);
-                        ped = getPedagogyOrStrategyForStudent(getConnection(),studId, classId);
-                        woProps = new WoProps(connection);
-                        woProps.load(studId);   // get all properties for studId
-                        Timestamp lastLoginTime = DbSession.getLastLogin(connection, studId);
-                        if (lastLoginTime != null)
-                            this.timeInSession = System.currentTimeMillis() - lastLoginTime.getTime();
-                        setStudentState(woProps);   // pull out student state props from all properties
-                        studState.getSessionState().initializeState();
-
-                        instantiatePedagogicalModel(ped);
-                        pedagogicalModel.newSession(sessionId); // tells the pedagogical that its a new session so it can initialize.
-                        return new LoginResult(sessionId, null, LoginResult.NEW_SESSION);
+                        if (DbUser.isLoginPaused(connection, studId)) {
+                            new TutorLogger(this).logStudentAccess(studId, ACCESS_PAUSED);
+    	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
+                        }
+                        else {
+	                        ped = getPedagogyOrStrategyForStudent(getConnection(),studId, classId);
+	                        woProps = new WoProps(connection);
+	                        woProps.load(studId);   // get all properties for studId
+	                        Timestamp lastLoginTime = DbSession.getLastLogin(connection, studId);
+	                        if (lastLoginTime != null)
+	                            this.timeInSession = System.currentTimeMillis() - lastLoginTime.getTime();
+	                        setStudentState(woProps);   // pull out student state props from all properties
+	                        studState.getSessionState().initializeState();
+	
+	                        instantiatePedagogicalModel(ped);
+	                        pedagogicalModel.newSession(sessionId); // tells the pedagogical that its a new session so it can initialize.
+	                        new TutorLogger(this).logStudentAccess(studId, LOGIN_SUCCESSFUL);
+    	                	return new LoginResult(sessionId, null, LoginResult.NEW_SESSION);                        	
+                        }
                     }
                 } else {
                     ped = getPedagogyOrStrategyForStudent(getConnection(),studId, classId);
@@ -584,7 +597,14 @@ public class SessionManager {
                     this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false);
                     studState.getSessionState().initializeState();
                     instantiatePedagogicalModel(ped);
-                    return new LoginResult(sessionId, null);
+                    if (DbUser.isLoginPaused(connection, studId)) {
+                        new TutorLogger(this).logStudentAccess(studId, ACCESS_PAUSED);
+	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
+                    }
+                    else {
+                        new TutorLogger(this).logStudentAccess(studId, LOGIN_SUCCESSFUL);
+	                	return new LoginResult(sessionId, null);                    	
+                    } 
                 }
 
             }
