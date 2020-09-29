@@ -23,6 +23,7 @@ import java.util.List;
  * Time: 1:56:20 PM
  * 
  * Frank	09-23-20	issue #237 added logStudentAccess() 
+ * Frank	09-29-20	issue #237R3 added logStudentAccess() 
  */
 public class TutorLogger {
     private SessionManager smgr;

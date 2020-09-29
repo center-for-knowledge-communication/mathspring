@@ -41,6 +41,7 @@ import java.util.ResourceBundle;
 /*
  * Frank	09-14-20	issue #237 added isTrialUser method changed text message
  * Frank	09-23-20	issue #237 added event logging
+ * Frank	09-29-20	issue #237R3 added event logging
  */
 
 public class SessionManager {

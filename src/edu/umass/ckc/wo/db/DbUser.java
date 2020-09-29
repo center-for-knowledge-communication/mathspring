@@ -28,6 +28,7 @@ import java.util.ArrayList;
  * Frank 01-20-2020 Issue #39 use classId as alternative password - test for class id
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
  * Frank 09-14-2020	issue #237 added 'exclude test users from pause'
+ * Frank 09-29-2020	issue #237R3 added 'exclude test users from pause'
  */
 public class DbUser {
 
