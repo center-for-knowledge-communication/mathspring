@@ -47,6 +47,9 @@ m.build = function(activity, previewMode) {
     // DM 1/23/18 Note problemFigure may be loaded with something like {[filename.jpg]} if the Problem has imageFileId and corresponding filename in ProblemMediafile table
     if(isNotEmpty(probFigure)){
         document.getElementById("ProblemFigure").innerHTML = parameterizeText(formatText(probFigure, resource, probContentPath, problemParams, previewMode), problemParams);
+		var problemFigure = document.getElementById("ProblemFigure");
+		problemFigure.style.width = "45%";
+		
     }
     if(isNotEmpty(probSound)) {
         sound_elt = document.createElement("audio");
