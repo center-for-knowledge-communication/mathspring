@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.CCStandard;
 import edu.umass.ckc.wo.content.Problem;
+import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.db.DbProblem;
 
 /**
@@ -28,6 +31,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank 	06-13-2020 	issue #106 replace use of probstdmap
  * Frank 	06-17-20	Issue #149
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
+ * Frank	10-01-20	Issue #254R2 restrict inactive topic list columns to selected 'grade', 'above' and 'below' selections
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -121,6 +125,7 @@ public class TTUtil {
         return util;
     }
 
+    private ClassInfo cc = null;
 
     public void setNumProblemsForProblemSet(DbProblem probMgr,Integer classId ,Connection conn,List<Topic> problemSets) throws SQLException {
         for (Topic t : problemSets) {
@@ -202,6 +207,12 @@ public class TTUtil {
 			return activeListTopics;
 
 		} else {
+			try {
+				cc = DbClass.getClass(connection, classId);
+			}
+			catch(Exception e) {
+				System.out.println(e.getMessage());
+			}
 			List<Integer> activeProblemSetIds = activeproblemSet.stream().map(x -> x.getId())
 					.collect(Collectors.toList());
 			List<Topic> inactiveTopicList = new ArrayList<>();
@@ -219,7 +230,18 @@ public class TTUtil {
 			                // We get the set of CCStandards for this topic from the ProblemMgr
 			                Set<CCStandard> stds = ProblemMgr.getTopicStandards(tp.getId());
 			                tp.setCcStandards(stds);
-							inactiveTopicList.add(tp);
+			                try {
+			                	if (hasStandardWithinBounds(tp.getCcStandards().iterator(),cc.getGrade(),cc.getSimpleLowDiff(),cc.getSimpleHighDiff())) {
+			                		inactiveTopicList.add(tp);
+			                		System.out.println("Added " + tp.getName());
+			                	}
+			                	else {
+			                		System.out.println("Not added " + tp.getName());
+			                	}
+			                }
+			                catch (Exception tpe) {
+			                	System.out.println(tpe.getMessage());
+			                }
 						}
 						return inactiveTopicList;
 					});
@@ -228,5 +250,55 @@ public class TTUtil {
 			return inactiveTopicList;
 		}
 	}
+	  private boolean hasStandardWithinBounds(Iterator ccstds, String grade, String lowDiff, String highDiff) {
 
+	        while (ccstds.hasNext()) {
+	            CCStandard c = (CCStandard) ccstds.next();
+	            if (withinDifficultyRange(c,grade,lowDiff,highDiff))
+	                return true;
+	        }
+	        return false;
+	    }
+
+	    private int gradeToNum (String grade) {
+	        try {
+	            int i = Integer.parseInt(grade);
+	            return i;
+	        } catch (NumberFormatException e) {
+	            if (grade.toUpperCase().equals("K"))
+	                return 0;
+	            else if (grade.toUpperCase().equals("H"))
+	                return 9;
+	            else if (grade.toUpperCase().equals("ADULT")) // a value given by teacher tools simple class config.
+	                return 9;
+	            return 9;
+	        }
+
+	    }
+
+	    // Given something like above3,above2,above1, above0
+	    private int getLevelAbove (String highDiff) {
+	        if (highDiff.startsWith("above")) {
+	            return Integer.parseInt(highDiff.substring(5));
+	        }
+	        else return 0;
+	    }
+
+	    // Given something like below3,below2,below1, below0
+	    private int getLevelBelow (String lowDiff) {
+	        if (lowDiff.startsWith("below")) {
+	            return Integer.parseInt(lowDiff.substring(5));
+	        }
+	        else return 0;
+	    }
+
+	  
+	    private boolean withinDifficultyRange (CCStandard std, String grade, String lowDiff, String highDiff) {
+	        String ccstdGrade = std.getGrade();
+	        int stdGrade = gradeToNum(ccstdGrade);
+	        int myGrade = gradeToNum(grade);
+	        int lowDecr = getLevelBelow(lowDiff);
+	        int highIncr = getLevelAbove(highDiff);
+	        return (stdGrade >= (myGrade-lowDecr)) && (stdGrade <= (myGrade+highIncr));
+	    }
 }

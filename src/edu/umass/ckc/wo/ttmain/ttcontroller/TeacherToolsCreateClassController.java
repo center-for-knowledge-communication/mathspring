@@ -20,6 +20,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
  * 
  * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
  * Frank	08-08-20	issue #51 return to home page after class creation
+ * Frank	10-02-20	issue #254R2 change to return to home page after modifying class info
  */
 
 
@@ -71,7 +72,7 @@ public class TeacherToolsCreateClassController {
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
         model.addAttribute("createClassForm", new CreateClassForm());
-        return "teacherTools/classDetails";
+        return "teacherTools/teacherToolsMain";
 
     }
 

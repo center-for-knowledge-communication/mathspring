@@ -22,6 +22,7 @@
 <!-- Frank	08-15-20	Issue #200 reverse danger and warning colors, text in common cluster report -->
 <!-- Frank	08-15-20	Issue #49 added UI for deleting inactive students from current class -->
 <!-- Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report -->
+<!-- Frank	10-01-20	Issue #254R2 fix edit class form - language and schoolYear -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -989,6 +990,7 @@ function problemLevelDetails(JSONData,problems){
 }
 
 function handleclickHandlers() {
+	
     $('#reports_handler').click(function () {
         $('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
@@ -996,6 +998,7 @@ function handleclickHandlers() {
         $("#content-conatiner").children().hide();
         $("#report-wrapper").show();
         $("#report-wrapper2").show();
+        $("#perStudentPerProblemSetReport").hide();
     });
 
     $("#reorg_prob_sets_handler").click(function () {
@@ -2676,6 +2679,7 @@ var completeDataChart;
             },
             success : function(data) {
                 $('#collapseOne').find('.loader').hide();
+                $("#perStudentPerProblemSetReport").show();
                 var jsonData = $.parseJSON(data);
                 perProblemSetLevelOne = jsonData.levelOneData;
                 perProblemSetColumnNamesMap = jsonData.columns;
@@ -3696,7 +3700,8 @@ var completeDataChart;
                         perProblemSetLevelOneFullTemp.push(perProblemSetLevelOneTemp);
                     });
                     var columNvalues = [
-                        {"title": "<%= rb.getString("problem_id")%>", "name": "problemId", "targets": [0]},
+
+                    	{"title": "<%= rb.getString("problem_id")%>", "name": "problemId", "targets": [0]},
                         {
                             "title": "<%= rb.getString("problem_name")%>",
                             "name": "problemName",
@@ -3790,7 +3795,7 @@ var completeDataChart;
                                 //var dataContent = "<div id="+containerChart+" style='width:900px;height:300px;display:none'><div class='panel panel-default'><div class='panel-heading'>Effort Chart</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                                 return "<i id='iconID"+row['problemId']+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row['problemId']+",false);'></i>";
                             }
-                        }
+                        }                    
                     ];
 
                     var columDvalues = [
@@ -4892,7 +4897,7 @@ var completeDataChart;
 				                    <div id="create_class_out" class="col-md-6 col-sm-6">
 				                        <div class="panel panel-default">
 				                             <div class="panel-body">
-				                               <div class="form-group hidden">
+				                               <div class="form-group">
 				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
 				                                    <div class="input-group">
 				                                        <span class="input-group-addon"><i
@@ -4900,7 +4905,7 @@ var completeDataChart;
 				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
 				                                                           name="classLanguage">
 				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
-				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="en:English" selected="selected"><%= rb.getString("english") %></springForm:option>
 				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
 				                                        </springForm:select>
 				                                    </div>
@@ -4938,9 +4943,9 @@ var completeDataChart;
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-hourglass"></i></span>
 				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
-				                                                           name="schoolYear">
+				                                                           name="schoolYear" value="${classInfo.schoolYear}">
 				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-				                                            <springForm:option value="2020">2020</springForm:option>
+				                                            <springForm:option selected="selected" value="2020">2020</springForm:option>
 				                                            <springForm:option value="2021">2021</springForm:option>
 				                                            <springForm:option value="2022">2022</springForm:option>
 				                                        </springForm:select>
