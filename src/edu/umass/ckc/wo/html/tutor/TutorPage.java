@@ -21,6 +21,7 @@ import javax.servlet.RequestDispatcher;
  * Date: 6/17/13
  * Time: 1:43 PM
  * To change this template use File | Settings | File Templates.
+ * Frank	10-07-20  Issue #261 change problem header
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)
@@ -118,6 +119,8 @@ public class TutorPage {
         info.getRequest().setAttribute("eventCounter",smgr.getEventCounter());
         info.getRequest().setAttribute("soundSync",smgr.isSoundSync());
         info.getRequest().setAttribute("mouseSaveInterval",smgr.getMouseSaveInterval());
+        info.getRequest().setAttribute("className",smgr.getClassName());
+        info.getRequest().setAttribute("teacherName",smgr.getTeacherName());
 
         if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId()))
             info.getRequest().setAttribute("showAnswer", true);
