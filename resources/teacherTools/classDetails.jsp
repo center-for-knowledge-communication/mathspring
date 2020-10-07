@@ -207,7 +207,7 @@ var emsg_gradeSection    = 'Section name is a mandatory field';
 var languagePreference = window.navigator.language;
 var languageSet = "en";
 var loc = "en-US";
-
+/*
 if (languagePreference.includes("en")) {
 	languageSet = "en"
 	loc = "en-US";
@@ -225,7 +225,7 @@ if (languagePreference.includes("en")) {
 	emsg_schoolYear      = 'El año escolar es obligatorio';
 	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
 }
-
+*/
 
 <% 
 /**
@@ -259,7 +259,9 @@ if (languageSet == 'es') {
             "NO DATA" : "No se pudieron recopilar datos."
     }
 }
+/* 
 else {
+	
 	effortLabelMap = {
 		  "SKIP" : "The student SKIPPED the problem (didn't do anything on the problem)",
           "NOTR" : "NOT even READING the problem --The student answered too fast, in less than 4 seconds",
@@ -272,7 +274,7 @@ else {
           "NO DATA" : "No data could be gathered."
     }
 }
-
+*/
 function getFilterSix() {
 	var showNamesState = "N";
 	if (document.getElementById("showNames").checked == true) {
@@ -4015,7 +4017,6 @@ var completeDataChart;
             $('#grade').val("${classInfo.grade}").change();
             $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
             $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
-            $('#classLanguage').val("${classInfo.classLanguageCode}").change();
             $("#schoolYear").val("${classInfo.schoolYear}").change();
                      
             $('#activeSurveyList').DataTable({
@@ -5005,22 +5006,10 @@ var completeDataChart;
 				                <div class="row">
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
 				                    <div id="create_class_out" class="col-md-6 col-sm-6">
 				                        <div class="panel panel-default">
 				                             <div class="panel-body">
-				                               <div class="form-group hidden">
-				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
-				                                    <div class="input-group">
-				                                        <span class="input-group-addon"><i
-				                                                class="glyphicon glyphicon-education"></i></span>
-				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
-				                                                           name="classLanguage">
-				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
-				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
-				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
-				                                        </springForm:select>
-				                                    </div>
-				                                </div>
 				                                <div class="form-group">
 				                                    <label for="className"><%= rb.getString("class_name") %></label>
 				                                    <div class="input-group">
