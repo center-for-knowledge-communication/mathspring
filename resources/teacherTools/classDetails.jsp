@@ -1030,13 +1030,6 @@ function handleclickHandlers() {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-        	classLanguage: {
-                validators: {
-                    notEmpty: {
-                        message: emsg_classLanguage
-                    }
-                }
-            },                    
             className: {
                 validators: {
                     notEmpty: {
