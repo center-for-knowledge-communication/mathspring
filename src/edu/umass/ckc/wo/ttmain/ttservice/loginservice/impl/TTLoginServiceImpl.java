@@ -53,6 +53,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank	07-08-20	issue #134 & #156 changed archive vs active class to include isClassActive test
  * Frank    07-13-20	issue #29 Change error handling of loginAssist and resetPassword
  * Frank    09-14-20	issue #237 added teacherPauseStudentUse to model
+ * Frank	10-07-20	issue #267 removed School year as a determining factor for 'active' vs. 'archived' list entries
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -90,7 +91,8 @@ public class TTLoginServiceImpl implements TTLoginService {
             }
             ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), teacherId);
             List<ClassInfo> classInfoList = new  ArrayList<>(Arrays.asList(classes));
-            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> ((c.getSchoolYear() == Year.now().getValue()) && (c.getIsActive() > 0))));                                           
+//            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> ((c.getSchoolYear() == Year.now().getValue()) && (c.getIsActive() > 0))));                                           
+            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> (c.getIsActive() > 0)));                                           
             List<ClassInfo> classInfoListLatest = groups.get(true);
             List<ClassInfo> classInfoListArchived = groups.get(false);
             Collections.reverse(classInfoListLatest);

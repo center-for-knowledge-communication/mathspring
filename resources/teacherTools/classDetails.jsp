@@ -23,6 +23,8 @@
 <!-- Frank	08-15-20	Issue #49 added UI for deleting inactive students from current class -->
 <!-- Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report -->
 <!-- Frank	10-01-20	Issue #254R2 fix edit class form - language and schoolYear -->
+<!-- Frank	10-06-20	Issue #267 fix edit class form vaildation -->
+<!-- Frank	10-06-20	Issue #267 hide language selection on edit class form -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -82,6 +84,8 @@ System.out.println("msHost = " + msHost + msContext);
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.datatables.net/rowreorder/1.2.0/css/rowReorder.dataTables.min.css" rel="stylesheet"
           type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.0/css/bootstrapValidator.min.css"
+          rel="stylesheet"/>
     <link href="https://cdn.datatables.net/select/1.2.1/css/select.dataTables.min.css" rel="stylesheet"
           type="text/css">
           
@@ -118,6 +122,9 @@ System.out.println("msHost = " + msHost + msContext);
 
     <script type="text/javascript"            
 			src="<c:url value="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js" />"></script>
+
+    <script type="text/javascript"
+            src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js" />"></script>
 
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js" />"></script>
@@ -186,6 +193,17 @@ var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
 
+var emsg_classLanguage   = 'Class language is mandatory field';
+var emsg_className       = 'Class name is mandatory field';
+var emsg_classGrade      = 'Class grade is mandatory field';
+var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
+var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
+var emsg_town            = 'Town name is mandatory field';
+var emsg_schoolName      = 'School name is mandatory field';
+var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
+var emsg_schoolYear      = 'School year is a mandatory field';
+var emsg_gradeSection    = 'Section name is a mandatory field';
+
 var languagePreference = window.navigator.language;
 var languageSet = "en";
 var loc = "en-US";
@@ -196,7 +214,18 @@ if (languagePreference.includes("en")) {
 } else if (languagePreference.includes("es")) {
 	languageSet = "es"
 	loc = "es-Ar";
+	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
+	emsg_className       = 'El nombre de la clase es obligatorio';
+	emsg_classGrade      = 'El grado de la clase es obligatorio';
+	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
+	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
+	emsg_town            = 'El nombre de la ciudad es obligatorio';
+	emsg_schoolName      = 'El nombre de la escuela es obligatorio';
+	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
+	emsg_schoolYear      = 'El año escolar es obligatorio';
+	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
 }
+
 
 <% 
 /**
@@ -990,6 +1019,89 @@ function problemLevelDetails(JSONData,problems){
 }
 
 function handleclickHandlers() {
+
+    $("#edit_class_form").bootstrapValidator({
+        // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+        	classLanguage: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_classLanguage
+                    }
+                }
+            },                    
+            className: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_className
+                    }
+                }
+            },
+            classGrade: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_classGrade
+                    }
+                }
+            },
+            lowEndDiff: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_lowEndDiff
+                    }
+                }
+            }, highEndDiff: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_highEndDiff
+                    }
+                }
+            }, town: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_town
+                    }
+                }
+            }, schoolName: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_schoolName
+                    }
+                }
+            }, schoolYear: {
+                validators: {
+
+                    between: {
+                        min: new Date().getFullYear(),
+                        max: 2050,
+                        message: emsg_schoolYearRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_schoolYear
+                    }
+                }
+            }, gradeSection: {
+                validators: {
+                    notEmpty: {
+                        message: emsg_gradeSection
+                    }
+                }
+            }
+        }
+    }).on('success.form.bv', function (e) {
+        $("#edit_class_form").data('bootstrapValidator').resetForm();
+        e.preventDefault();
+        var $form = $(e.target);
+        var bv = $form.data('bootstrapValidator');
+        $.post($form.attr('action'), $form.serialize(), function (result) {
+        })
+    });
 	
     $('#reports_handler').click(function () {
         $('#reorg_prob_sets_handler').css('background-color', '');
@@ -3904,9 +4016,8 @@ var completeDataChart;
             $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
             $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
             $('#classLanguage').val("${classInfo.classLanguageCode}").change();
-
-            
-            
+            $("#schoolYear").val("${classInfo.schoolYear}").change();
+                     
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
                 "bFilter": false,
@@ -4164,7 +4275,7 @@ var completeDataChart;
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
                             <th rowspan="2"><span><%= rb.getString("number_of_activated_problems") %>&nbsp;&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th style="text-align: center;" colspan="<c:out value="${activeproblemSetHeaders.size()}"/>"<%= rb.getString("gradewise_distribution") %></th>
+                            <th style="text-align: center;" colspan="<c:out value='${activeproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("deactivate_problem_set") %></th>
                         </tr>
 
@@ -4230,7 +4341,7 @@ var completeDataChart;
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
                             <th rowspan="2"><%= rb.getString("available_problems") %></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th style="text-align: center;" colspan="<c:out value="${inActiveproblemSetHeaders.size()}"/>"<%= rb.getString("gradewise_distribution") %></th>
+                            <th style="text-align: center;" colspan="<c:out value='${inActiveproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("activate_problem_sets") %></th>
                         </tr>
                         <tr>
@@ -4897,7 +5008,7 @@ var completeDataChart;
 				                    <div id="create_class_out" class="col-md-6 col-sm-6">
 				                        <div class="panel panel-default">
 				                             <div class="panel-body">
-				                               <div class="form-group">
+				                               <div class="form-group hidden">
 				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
 				                                    <div class="input-group">
 				                                        <span class="input-group-addon"><i
@@ -4905,7 +5016,7 @@ var completeDataChart;
 				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
 				                                                           name="classLanguage">
 				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
-				                                            <springForm:option value="en:English" selected="selected"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
 				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
 				                                        </springForm:select>
 				                                    </div>
@@ -4945,7 +5056,7 @@ var completeDataChart;
 				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
 				                                                           name="schoolYear" value="${classInfo.schoolYear}">
 				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-				                                            <springForm:option selected="selected" value="2020">2020</springForm:option>
+				                                            <springForm:option value="2020">2020</springForm:option>
 				                                            <springForm:option value="2021">2021</springForm:option>
 				                                            <springForm:option value="2022">2022</springForm:option>
 				                                        </springForm:select>

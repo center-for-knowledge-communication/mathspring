@@ -16,13 +16,13 @@ public interface TTCreateClassAssistService {
 
     public void setTeacherInfo(ModelMap map, String teacherId, String classId);
 
-    public void editClass(CreateClassForm createForm,String tid, int classId) throws TTCustomException;
+    public boolean editClass(CreateClassForm createForm,String tid, int classId) throws TTCustomException;
 
     public Integer createNewClass(CreateClassForm createForm,String tid) throws TTCustomException;
 
     public Integer cloneExistingClass(Integer classId,CreateClassForm createForm) throws TTCustomException;
 
-    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm) throws TTCustomException;
+    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm, String action) throws TTCustomException;
 
     public void createStudentRoster(Integer classId,ClassInfo info,CreateClassForm createForm) throws TTCustomException;
 

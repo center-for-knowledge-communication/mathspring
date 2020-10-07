@@ -21,6 +21,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
  * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
  * Frank	08-08-20	issue #51 return to home page after class creation
  * Frank	10-02-20	issue #254R2 change to return to home page after modifying class info
+ * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  */
 
 
@@ -39,7 +40,7 @@ public class TeacherToolsCreateClassController {
         //Basic Class Setup
         int newClassId = createClassAssistService.createNewClass(classForm, teacherId);
         //Set Default Pedagogy
-        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(newClassId, classForm);
+        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(newClassId, classForm, "create");
         //Add Student Roster and Finish setup
 
         if (!("".equals(classForm.getUserPrefix())) && classForm.getUserPrefix() != null
@@ -62,12 +63,12 @@ public class TeacherToolsCreateClassController {
     	int intClassId = Integer.valueOf(classId.trim());
 
         //Basic Class Setup
-        createClassAssistService.editClass(classForm, teacherId, intClassId);
+        boolean update = createClassAssistService.editClass(classForm, teacherId, intClassId);
 
+        if (update) {
         //Set Default Pedagogy
-        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(intClassId, classForm);
-        //Add Student Roster and Finish setup
-
+        	ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(intClassId, classForm, "edit");
+        }
         createClassAssistService.changeDefaultProblemSets(model, intClassId);
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
