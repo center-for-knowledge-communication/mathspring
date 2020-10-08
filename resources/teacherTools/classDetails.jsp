@@ -244,7 +244,7 @@ catch (Exception e) {
 var summaryReport;
 
 var effortLabelMap;
-
+/*
 if (languageSet == 'es') {
 
 	effortLabelMap = {
@@ -259,9 +259,9 @@ if (languageSet == 'es') {
             "NO DATA" : "No se pudieron recopilar datos."
     }
 }
-/* 
+
 else {
-	
+*/	
 	effortLabelMap = {
 		  "SKIP" : "The student SKIPPED the problem (didn't do anything on the problem)",
           "NOTR" : "NOT even READING the problem --The student answered too fast, in less than 4 seconds",
@@ -273,8 +273,10 @@ else {
           "SHELP" : "Got the problem correct but saw at least one video.",
           "NO DATA" : "No data could be gathered."
     }
-}
+/*
+} 
 */
+
 function getFilterSix() {
 	var showNamesState = "N";
 	if (document.getElementById("showNames").checked == true) {
