@@ -47,6 +47,7 @@ import javax.servlet.http.HttpSession;
  * Frank	07-28-20	issue #74 Force logout if url tampered with
  * Frank	08-10-20	issue #196 add error checking
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
+ * Frank	10-12-20	Issue #272 handle split of classDetails.jsp
  */
 
 @Controller
@@ -70,7 +71,62 @@ public class TeacherToolsViewClassDetailsController {
     private TeacherLogger tLogger;
     
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
-    public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
+    public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
+
+    	Locale loc = request.getLocale();
+
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+    	HttpSession session = request.getSession();
+    	int sTeacherId = (int) session.getAttribute("teacherId");
+    	if (currentSelection == "classHomePage") {
+			try {
+	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+	    			HttpSession MySession = request.getSession();
+	    			int teacherId = (int) MySession.getAttribute("teacherId");
+	    	 		tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+	
+	    	    	session.removeAttribute("tLogger");
+	    	    	session.removeAttribute("teacherUsername");
+	    	    	session.removeAttribute("teacherId");
+	    			session.invalidate();
+	    			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	                request.setAttribute("message",msg);
+	    	        return "login/loginK12_teacher";
+	    		}
+			}
+			catch(SQLException e) {
+				logger.debug(e.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+			catch(java.lang.NullPointerException ne) {
+				logger.debug(ne.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+    	}
+    	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
+    	if (currentSelection == "classHomePage") {
+    		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+    	}
+    	map.addAttribute("createClassForm", new CreateClassForm());
+        map.addAttribute("teacherId", String.valueOf(sTeacherId));
+        session.setAttribute("classId",classId);
+        session.setAttribute("currentSelection",currentSelection);
+        return "teacherTools/classManager";
+    }
+    
+    @RequestMapping(value = "/tt/viewClassReportCard", method = RequestMethod.GET)
+    public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
 
     	Locale loc = request.getLocale();
 
@@ -85,43 +141,13 @@ public class TeacherToolsViewClassDetailsController {
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
 
-		try {
-    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
-    			HttpSession MySession = request.getSession();
-    			int teacherId = (int) MySession.getAttribute("teacherId");
-    	 		tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
-
-    	    	session.removeAttribute("tLogger");
-    	    	session.removeAttribute("teacherUsername");
-    	    	session.removeAttribute("teacherId");
-    			session.invalidate();
-    			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
-                request.setAttribute("message",msg);
-    	        return "login/loginK12_teacher";
-    		}
-		}
-		catch(SQLException e) {
-			logger.debug(e.getMessage());
-			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
-            request.setAttribute("message",msg);
-	        return "login/loginK12_teacher";			
-		}
-		catch(java.lang.NullPointerException ne) {
-			logger.debug(ne.getMessage());
-			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
-            request.setAttribute("message",msg);
-	        return "login/loginK12_teacher";			
-		}
-
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
-        ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
         map.addAttribute("createClassForm", new CreateClassForm());
         map.addAttribute("teacherId", String.valueOf(sTeacherId));
         session.setAttribute("classId",classId);
-        return "teacherTools/classDetails";
+        return "teacherTools/classReportCard";
     }
-
-
+    
     @RequestMapping(value = "/tt/reOrderProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String  reOrderProblemSets(ModelMap map, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
         List<Integer> sequenceNosToBeRemoved = new ArrayList<>();
