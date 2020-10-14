@@ -892,19 +892,19 @@ function registerAllEvents(){
                             <div class="panel-footer">
                            		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
                                   <div> 
-                                  	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
+                                  	<span class="pull-left"><i class="fa fa-eye"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %>&nbsp;&nbsp;&nbsp;</span>
                                   </div>
                               	</a>
                                 <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=1">
                                		<div>
-	                                  	<span class="pull-left"><i class="fa fa-undo fa-2x"></i>&nbsp;</span>
+	                                  	<span class="pull-left"><i class="fa fa-undo"></i>&nbsp;</span>
 	                                  	<span class="pull-left"><%= rb.getString("restore_class") %>&nbsp;&nbsp;&nbsp;</span>
 	                                  </div>
 	                            </a>
                                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=-1">
                                		<div>
-	                                  	<span class="pull-left"><i class="fa fa-trash fa-2x">&nbsp;</i></span>
+	                                  	<span class="pull-left"><i class="fa fa-trash">&nbsp;</i></span>
 	                                  	<span class="pull-left"><%= rb.getString("delete_class") %></span>
 	                                  </div>
 	                            </a>
