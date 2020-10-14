@@ -1315,11 +1315,11 @@ function registerAllEvents(){
 
 
     $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
         $(location).attr('href', newlocation);
     });
     $("#successMsgModelPopupForProblemSets").find("[class*='close']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
         $(location).attr('href', newlocation);
     });
 	
