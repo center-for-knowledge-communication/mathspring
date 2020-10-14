@@ -19,6 +19,7 @@
  *  Frank	08-08-20	issue #51 fix year selection
  *  Frank	09-14-20	issue #237 add pauseStudentUse logic
  *  Frank	10-07-20	issue #267 add school year to class thumbnails
+ *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
  */
 
 Locale loc = request.getLocale();
@@ -830,7 +831,7 @@ function registerAllEvents(){
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
                                   <div> 
                                   	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %></span>
@@ -889,7 +890,7 @@ function registerAllEvents(){
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
                                   <div> 
                                   	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %>&nbsp;&nbsp;&nbsp;</span>

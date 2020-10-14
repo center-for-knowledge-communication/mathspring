@@ -1255,17 +1255,6 @@ else {
         );    	
     }
     
-	
-
-    $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
-        $(location).attr('href', newlocation);
-    });
-    $("#successMsgModelPopupForProblemSets").find("[class*='close']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID;
-        $(location).attr('href', newlocation);
-    });
-	
     var myLineChart;
     $('body').on('click', 'div.getMastery-trajectory-for-problemset', function () {
 
