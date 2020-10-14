@@ -1589,7 +1589,7 @@ function registerAllEvents(){
 
             <li><a id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
 
-            <li><a id="manage_class_handler"><i class="fas fa-fw fa-tools"></i> <%= rb.getString("manage_class") %></a></li>
+            <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             

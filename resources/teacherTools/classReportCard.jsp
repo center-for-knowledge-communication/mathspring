@@ -2962,7 +2962,7 @@ var completeDataChart;
 
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=manage_student_info_handler" id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=manage_class_handler" id="manage_class_handler"><i class="fa fa-fw fa-tools"></i> <%= rb.getString("manage_class") %></a></li>
+            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=manage_class_handler" id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=resetSurveySettings_handler" id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
