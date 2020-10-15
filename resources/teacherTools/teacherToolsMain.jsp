@@ -17,7 +17,9 @@
  *  Frank	07-28-20	Issue #74 Protect from URL editting of teacherId and classId
  *  Frank   07-28-20    Remove Replicate Class from menu
  *  Frank	08-08-20	issue #51 fix year selection
- *  Frank	0914-20		issue #237 add pauseStudentUse logic
+ *  Frank	09-14-20	issue #237 add pauseStudentUse logic
+ *  Frank	10-07-20	issue #267 add school year to class thumbnails
+ *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
  */
 
 Locale loc = request.getLocale();
@@ -805,11 +807,9 @@ function registerAllEvents(){
                 </div>
                 <!-- /.row -->
                 <c:if test="${noClass == false}">
-                <c:set var="colorpicker" value="${['panel-green','panel-red','panel-primary','panel-yellow']}"/>
                 <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
 
                 <c:forEach var="c" items="${classbean.classes}" varStatus="loop">
-                <c:set var="randomColorIndex" value="${random.nextInt(fn:length(colorpicker))}"/>
                 <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
                 <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
                 <c:set var="terminator" value="${loop.index + 3}"/>
@@ -825,12 +825,13 @@ function registerAllEvents(){
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
+	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear}</div>
 	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
                                   <div> 
                                   	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %></span>
@@ -866,10 +867,8 @@ function registerAllEvents(){
                     </div>
          </div>
           <c:if test="${noClass == false}">
-                <c:set var="colorpicker" value="${['panel-green','panel-red','panel-primary','panel-yellow']}"/>
                 <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
                 <c:forEach var="c" items="${classbeanArchived.classes}" varStatus="loop">
-                <c:set var="randomColorIndex" value="${random.nextInt(fn:length(colorpicker))}"/>
                 <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
                 <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
                 <c:set var="terminator" value="${loop.index + 3}"/>
@@ -885,26 +884,27 @@ function registerAllEvents(){
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
+	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear}</div>
 	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}">
+                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
                                   <div> 
-                                  	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
+                                  	<span class="pull-left"><i class="fa fa-eye"></i>&nbsp;</span>
                                   	<span class="pull-left"><%= rb.getString("view_class") %>&nbsp;&nbsp;&nbsp;</span>
                                   </div>
                               	</a>
                                 <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=1">
                                		<div>
-	                                  	<span class="pull-left"><i class="fa fa-undo fa-2x"></i>&nbsp;</span>
+	                                  	<span class="pull-left"><i class="fa fa-undo"></i>&nbsp;</span>
 	                                  	<span class="pull-left"><%= rb.getString("restore_class") %>&nbsp;&nbsp;&nbsp;</span>
 	                                  </div>
 	                            </a>
                                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=-1">
                                		<div>
-	                                  	<span class="pull-left"><i class="fa fa-trash fa-2x">&nbsp;</i></span>
+	                                  	<span class="pull-left"><i class="fa fa-trash">&nbsp;</i></span>
 	                                  	<span class="pull-left"><%= rb.getString("delete_class") %></span>
 	                                  </div>
 	                            </a>

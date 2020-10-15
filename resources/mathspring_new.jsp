@@ -6,7 +6,7 @@
 
 // Frank 10-22-19 Issue # 9 Add Enable Flash message at bottom of screen
 // Frank 04-24-20 Issue # 16 Added Multi-lingual text for tutorhut_new.js
-
+// Frank 10-07-20 Issue # 261 change problem heading
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -144,6 +144,8 @@ else
             learningCompanionMessageSelectionStrategy: '${learningCompanionMessageSelectionStrategy}',
             userName: '${userName}',
             studId : ${studId} ,
+            className : '${className}' ,
+            teacherName : '${teacherName}' ,
             probType : '${probType}',
             exampleProbType : null,
             probId : ${probId},

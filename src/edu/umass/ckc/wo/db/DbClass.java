@@ -30,6 +30,8 @@ import java.util.List;
  * Frank	07-08-20	issue #134 & #156 added isActive flag handling and editClass method
  * Frank	07-28-20	issue #74 add test for classId valid with teacherID 
  * Frank	07-28-20	issue #49 added method deleteClassInactiveStudents()
+ * Frank	10-06-20	issue #267 included class_language
+ * Frank	10-07-20	issue #267 new method editClassConfig()
 */
 public class DbClass {
 
@@ -341,9 +343,15 @@ public class DbClass {
     public static int editClass(Connection conn, int classId, String className,
             String school, String schoolYear,
             String town, String section, String grade, String language) throws Exception {
-		PreparedStatement s = null;
+		
+    	PreparedStatement s = null;
 		try {
-			String q = "update class set school=?, schoolYear=?, name=?, town=?, section=?, grade=? " +
+			String class_language = "English";
+			String splitter[] = language.split(":") ;
+			if (splitter.length > 1) {
+				class_language = splitter[1];
+			}
+			String q = "update class set school=?, schoolYear=?, name=?, town=?, section=?, grade=?, class_language=? " +
 			"where id=?";
 			s = conn.prepareStatement(q);
 			s.setString(1, school);
@@ -352,7 +360,8 @@ public class DbClass {
 			s.setString(4, town);
 			s.setString(5, (section == null) ? "" : section);
 			s.setString(6, grade);
-			s.setInt(7, classId);
+			s.setString(7, class_language);
+			s.setInt(8, classId);
 			return s.executeUpdate();
 		} finally {
 			if (s != null)
@@ -360,6 +369,21 @@ public class DbClass {
 		}
 }
 
+    public static int editClassConfig(Connection conn, int classId, String classGrade, String highEndDiff, String lowEndDiff) throws Exception {
+		PreparedStatement s = null;
+		try {
+			String q = "update classconfig set simpleHighDiff=?, simpleLowDiff=? " +
+			"where classId=?";
+			s = conn.prepareStatement(q);
+			s.setString(1, highEndDiff);
+			s.setString(2, lowEndDiff);
+			s.setInt(3, classId);
+			return s.executeUpdate();
+		} finally {
+			if (s != null)
+			s.close();
+		}
+}
 
     public static int setIsActiveFlag(Connection conn, int classId, String flag) throws Exception {
 		PreparedStatement s = null;

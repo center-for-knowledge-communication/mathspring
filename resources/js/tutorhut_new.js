@@ -2,6 +2,7 @@
 // Frank 05-06-2020 issue #87 call showVideo() at start of example problem
 // Frank 05-12-2020 issue #87 commented out this feature for now
 // Kartik 08-28-2020 issue #202 positioning of example dialog box
+// Frank 10-07-20 Issue # 261 change problem heading
 
 var globals;
 var sysGlobals;
@@ -199,8 +200,8 @@ function displayHintCount () {
 function showProblemInfo (pid, name, topic, standards) {
     $("#pid").text(pid + ":" + name);  // shows the problem ID + resource
 	 $("#problemTopicAndStandards").html(
-			 "<p style='float: left'>" + problem_current_topic + " " + topic + "</p>" +
-			 "<p style='float: right'>" + problem_standards + " "  + standards + "</p>"
+			 "<p style='float: left'>" + globals.teacherName + " - " + globals.className + "</p>" +
+			 "<p style='float: right'>" + problem_current_topic + " " + topic + " | " + problem_standards + " "  + standards  + "</p>"
 	 );
     displayHintCount();
 }

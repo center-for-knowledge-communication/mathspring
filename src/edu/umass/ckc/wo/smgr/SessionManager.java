@@ -42,6 +42,7 @@ import java.util.ResourceBundle;
  * Frank	09-14-20	issue #237 added isTrialUser method changed text message
  * Frank	09-23-20	issue #237 added event logging
  * Frank	09-29-20	issue #237R3 added event logging
+ * Frank	10-07-20  	Issue #261 change problem header
  */
 
 public class SessionManager {
@@ -64,6 +65,8 @@ public class SessionManager {
 
     private int studId = -1;
     private int classId = -1;
+    private String className = "";
+    private String teacherName = "";
     private int sessionId = -1;
     private int pedagogyId = -1;
     private int strategyId = -1;
@@ -348,6 +351,15 @@ public class SessionManager {
         }
         System.out.println("Locale from Class " + this.locale.toString());
         this.user = DbUser.getStudent(connection, this.studId);
+        
+        // Issue #267 add teacher name and class name to problem display header
+        this.className = cl.getName();
+        this.teacherName = cl.getTeacherName();
+        String splitter[] = this.teacherName.split(" ");
+        if (splitter.length > 1) {
+        	this.teacherName = splitter[0].substring(0,1) + ". " + splitter[1];
+        }
+        
         this.setClient(DbSession.getClientType(connection, sessionId));
         woProps = new WoProps(connection);
         woProps.load(studId);   // get all properties for studId
@@ -998,4 +1010,11 @@ public class SessionManager {
     public void setMouseSaveInterval (int numSeconds) {
         this.mouseSaveInterval = numSeconds;
     }
+    public String getTeacherName() {
+    	return this.teacherName;
+    }
+    public String getClassName() {
+    	return this.className;
+    }
+    
 }

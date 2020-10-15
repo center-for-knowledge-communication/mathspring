@@ -37,7 +37,7 @@ import java.util.Map;
  * Created by Neeraj on 3/26/2017.
  * Frank	02-16-2020	Issue #48
  * Frank	07-08-20	issue #134 & #156 added editClass method
- 
+ * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  */
 
 @Service
@@ -96,12 +96,12 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     }
 
     @Override
-    public void editClass(CreateClassForm createForm, String tid, int classId) throws TTCustomException {
+    public boolean editClass(CreateClassForm createForm, String tid, int classId) throws TTCustomException {
+        boolean update = false;
         try {
         	
-        	String strClassId = String.valueOf(classId);
+            ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
         	
-            // Make sure to check initial fields of create class are validated before proceeding ahead
             int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
             DbClass.editClass(connection.getConnection(),
             		classId,
@@ -110,21 +110,33 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             		createForm.getSchoolYear(), 
             		createForm.getTown(), 
             		createForm.getGradeSection(), 
-//            		  tid,
-//                    defaultPropGroup, 
-//                    0, 
                     createForm.getClassGrade(),
                     createForm.getClassLanguage());
+            
+            // Update if any of these were changes
+            if ((!createForm.getClassGrade().equals(ciPrev.getGrade()))) {
+            	update = true;
+            }
+            if ((!createForm.getHighEndDiff().equals(ciPrev.getSimpleHighDiff()))) {
+            	update = true;
+            }
+            if ((!createForm.getLowEndDiff().equals(ciPrev.getSimpleLowDiff()))) {
+            	update = true;
+            }
            
-            DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
-            ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
-            info.setSimpleConfigDefaults();
+            if (update) {
+                DbClass.editClassConfig(connection.getConnection(),
+                		classId, createForm.getClassGrade(), createForm.getHighEndDiff(), createForm.getLowEndDiff());            	
+                DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
+            }
+            //ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
+            //info.setSimpleConfigDefaults();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
 //            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
         }
-
+        return update;
     }
     
     
@@ -141,10 +153,12 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     }
 
     @Override
-    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm) throws TTCustomException {
+    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm, String action) throws TTCustomException {
         try {
-            DbClass.setSimpleConfig(connection.getConnection(), classId, createForm.getSimpleLC(), createForm.getSimpleCollab(), createForm.getProbRate(), createForm.getLowEndDiff(), createForm.getHighEndDiff());
-            ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
+        	if (action.equals("create")) {
+        		DbClass.setSimpleConfig(connection.getConnection(), classId, createForm.getSimpleLC(), createForm.getSimpleCollab(), createForm.getProbRate(), createForm.getLowEndDiff(), createForm.getHighEndDiff());
+        	}
+        	ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
             info.setDefaultClass(true);
             new ClassContentSelector(connection.getConnection()).selectContent(info);
             return info;
