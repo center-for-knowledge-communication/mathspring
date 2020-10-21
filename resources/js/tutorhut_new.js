@@ -704,7 +704,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $(FLASH_CONTAINER_OUTERID).html('<div id="' +FLASH_CONTAINER_INNER+ '"></div>');
     $(PROBLEM_WINDOWID).attr("src","");
     // Replaceing the example div for the same reason as the above.
-    $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="660" height="660" src="" frameborder="no" scrolling="no"></iframe>');
+    $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="650" height="650" src="" frameborder="no" scrolling="no"></iframe>');
     var activity = JSON.parse(responseText);
     console.log(responseText);
     var mode = activity.mode;
