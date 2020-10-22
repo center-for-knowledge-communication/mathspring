@@ -15,8 +15,8 @@ body {
 }
 #ProblemContainer {
     position: relative;
-    width: 660px;
-    height: 660px;
+    width: 650px;
+    height: 650px;
     border: 8px solid transparent;
     box-sizing: border-box;
     background-color: rgba(255, 255, 255, 0.6);
