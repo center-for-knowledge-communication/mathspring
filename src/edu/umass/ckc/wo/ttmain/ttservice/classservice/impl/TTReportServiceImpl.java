@@ -65,6 +65,7 @@ import java.text.SimpleDateFormat;
  * Frank	07-08-20	issue #153 added access code checker
  * Frank	07-28-20	issue #74 valid classId is valid or this teacherId
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
+ * FRank	10-27-20	Issue 149R2 report_type parameter sdded
 */
 
 
@@ -292,7 +293,7 @@ public class TTReportServiceImpl implements TTReportService {
                 		System.out.println("TeacherLogger error " + e.getMessage());
                 	}
                     List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
-                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
+                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName(reportType)}).toArray(String[][]::new);
                     ObjectMapper teacherMapper = new ObjectMapper();
                     Map<String, Object> teacherMap = new HashMap<>();
                     teacherMap.put("levelOneData", teacherData);
@@ -1583,6 +1584,11 @@ public class TTReportServiceImpl implements TTReportService {
         SqlParameterSource namedParameters = new MapSqlParameterSource("targetId", targetId);
         List<TeacherLogEntry> teacherLogEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LOG_QUERY_FIRST, namedParameters, new TeacherLogEntryMapper());
         return teacherLogEntries;
+    }
+ 
+    private String formatTeacherLogAction() {
+    	String formatted = "";
+    	return formatted;
     }
     
     @Override
