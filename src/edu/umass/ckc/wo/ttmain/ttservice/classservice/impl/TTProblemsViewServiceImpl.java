@@ -38,6 +38,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank 	06-13-2020  issue #106 replace use of probstdmap
  * Frank	07-08-20	issue #134 & #156 added setClassActive flag handling and editClass method 
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
+ * Frank	10-27-20	Issue #149R2 teacher logging in JSON format
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -190,7 +191,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     @Override
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	
-    	System.out.println("editStudentInfo - lang=" + lang);
     	// Multi=lingual enhancement
 		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
@@ -201,27 +201,38 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         updateParams.put("uname", editStudentInfoForm.getStudentUsername());
         updateParams.put("studentId", editStudentInfoForm.getStudentId());
         this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_STUDENT_INFO,updateParams);
-        return rb.getString("changes_saved_successfully");
+        String msg = "{ ";
+    	msg += "\"msg\" : \"" + rb.getString("changes_saved_successfully") + "\",";
+    	msg += "\"id\" : \"" + editStudentInfoForm.getStudentId() + "\",";
+    	msg += "\"fname\" : \"" + editStudentInfoForm.getStudentFname() + "\",";
+    	msg += "\"lname\" : \"" + editStudentInfoForm.getStudentLname() + "\",";
+    	msg += "\"username\" : \"" + editStudentInfoForm.getStudentUsername() + "\"";
+    	msg += " }";
+        return msg;
     }
 
     @Override
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
     	
-       	System.out.println("createAdditionalIdForClass - lang=" + lang);
 		// Multi=lingual enhancement
 		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
+        String msg = "";
 
         try {
             ClassInfo info = DbClass.getClass(connection.getConnection(),Integer.valueOf(formValues[4]));
             String prefix = formValues[0].trim() + "-" + formValues[4];
             DbClass.createStudentRoster(connection.getConnection(),info,prefix,formValues[4].trim(),Integer.valueOf(formValues[2]));
+            msg = "{ ";
+        	msg += "\"student ids created\" : \"" + formValues[2] + "\"";
+        	msg += " }";
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
             throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            
         }
-        return rb.getString("changes_saved_successfully");
+        return msg;
     }
 
     @Override
