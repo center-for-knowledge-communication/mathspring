@@ -252,23 +252,11 @@ public class TTReportServiceImpl implements TTReportService {
                     return perStudentPerProblemSetReportMapper.writeValueAsString(resultsPerStandard);
 
                 case "perStudentPerProblemSetReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
                     Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId, filter);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
                     
                 case "perStudentPerProblemReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), filter);
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
                     Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter);
                     ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
                     return perStudentPerProblemReportMapper2.writeValueAsString(result2);
@@ -287,7 +275,8 @@ public class TTReportServiceImpl implements TTReportService {
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                    	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), classId);
+                   		String logmsg = "{ \"teacherId\" : \"" + classId + "\" }";
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), logmsg);
                 	}
                 	catch (Exception e) {
                 		System.out.println("TeacherLogger error " + e.getMessage());
@@ -737,7 +726,16 @@ public class TTReportServiceImpl implements TTReportService {
     			showNames = "Y";   			
     		}
     	}
-    		
+
+       	String logMsg = "{ \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
+
+       	try {
+   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemSetReport"), logMsg);
+    	}
+    	catch (Exception e) {
+    		System.out.println("TeacherLogger error " + e.getMessage());
+    	}
+       	
     	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
@@ -851,7 +849,16 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-    	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
+
+       	try {
+   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemReport"), logMsg);
+    	}
+    	catch (Exception e) {
+    		System.out.println("TeacherLogger error " + e.getMessage());
+    	}
+
+       	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
         params.put("classId", classId);

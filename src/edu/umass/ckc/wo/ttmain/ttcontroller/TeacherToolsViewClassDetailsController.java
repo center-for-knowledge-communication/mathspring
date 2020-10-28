@@ -288,7 +288,6 @@ public class TeacherToolsViewClassDetailsController {
         loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()));
 		HttpSession MySession = request.getSession();
 		int teacherId = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId, 0, formData[4].trim(), "createMoreStudentIds", formData[3].trim());
        return message;
     }
 
