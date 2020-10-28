@@ -108,7 +108,7 @@ public class TTUtil {
     		"where pptd.studid=s.id and ppptm.testId = ppt.id and pptd.probId = ppptm.probId and ppp.id = ppptm.probId and classid=(:classId) order by ppptm.testId, pptd.studid";
   
     
-    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time;";
+    public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time DESC;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
 
     

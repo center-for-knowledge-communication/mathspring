@@ -330,7 +330,7 @@ function deleteInactiveStudents() {
         	}
         	else {
         		logmsg = response;
-        		logmsg = "{ \"result\" : \"" + response + "\"}";
+        		logmsg = "{ \"result\" : \"[" + response + "]\"}";
         	}
             logTeacherEvent("deleteInactiveStudents",logmsg);
         	$("#successMsgModelPopup").find("[class*='modal-body']").html( response );
@@ -362,7 +362,7 @@ function resetPassWordForThisStudent(id,uname){
                  $('#errorMsgModelPopup').modal('show');
              }else{
             	 var logMsg  = "{ \"id\" : \"" + id + "\", \"username\" : \"" + uname + "\", \"msg\" : \"password_is_reset\" }";
-				 logTeacherEvent("deleteInactiveStudents",logMsg);
+				 logTeacherEvent("resetStudentPassword",logMsg);
                  $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
