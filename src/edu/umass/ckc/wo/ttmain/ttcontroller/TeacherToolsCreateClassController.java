@@ -1,5 +1,8 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,6 +17,8 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
+import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
+import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
 
 /**
  * Created by Neeraj on 3/26/2017.
@@ -22,6 +27,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
  * Frank	08-08-20	issue #51 return to home page after class creation
  * Frank	10-02-20	issue #254R2 change to return to home page after modifying class info
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
+ * Frank	10-27-20	issue #149R2 teacher logging changes
  */
 
 
@@ -34,8 +40,11 @@ public class TeacherToolsCreateClassController {
     @Autowired
     private TTCreateClassAssistService createClassAssistService;
 
+    @Autowired
+    private TeacherLogger tLogger;
+
     @RequestMapping(value = "/tt/ttCreateClass", method = RequestMethod.POST)
-    public String createNewClass(@RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
+    public String createNewClass( HttpServletRequest request, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
 
         //Basic Class Setup
         int newClassId = createClassAssistService.createNewClass(classForm, teacherId);
@@ -52,6 +61,11 @@ public class TeacherToolsCreateClassController {
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
         model.addAttribute("createClassForm", new CreateClassForm());
+
+    	int intTeacherId = Integer.valueOf(teacherId);
+    	String strNewClassId = String.valueOf(newClassId);
+
+ 		tLogger.logEntryWorker(intTeacherId, 0, strNewClassId, "createClass", "");
 
         return "teacherTools/teacherToolsMain";
 
@@ -73,7 +87,11 @@ public class TeacherToolsCreateClassController {
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
         model.addAttribute("createClassForm", new CreateClassForm());
-        return "teacherTools/teacherToolsMain";
+
+    	int intTeacherId = Integer.valueOf(teacherId);
+		tLogger.logEntryWorker(intTeacherId, 0, classId, "editClass", "");
+ 		
+ 		return "teacherTools/teacherToolsMain";
 
     }
 
@@ -92,6 +110,8 @@ public class TeacherToolsCreateClassController {
     public String resetSurveySettings(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
          createClassAssistService.restSurveySettings(Integer.valueOf(classId.trim()), classForm);
+     	int intTeacherId = Integer.valueOf(teacherId);
+ 		tLogger.logEntryWorker(intTeacherId, 0, classId, "resetSurvey", "");
         return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
 
     }
@@ -99,6 +119,14 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/setClassActiveFlag", method = RequestMethod.GET)
     String setClassActiveFlag(@RequestParam(value = "teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("activeFlag") String activeFlag, ModelMap model) throws TTCustomException {
   		createClassAssistService.setClassActiveFlag(Integer.valueOf(teacherId), Integer.valueOf(classId), activeFlag);
+    	int intTeacherId = Integer.valueOf(teacherId);
+    	String cmd = "deactivate";
+    	if (activeFlag.equals("1") ) {
+    		cmd = "activate";
+    	}
+    	String logMsg = "{ \"cmd\" : \"" + cmd + "\" }";
+    			
+		tLogger.logEntryWorker(intTeacherId, 0, classId, "setClassActiveStatus", logMsg);
         return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
        
     }

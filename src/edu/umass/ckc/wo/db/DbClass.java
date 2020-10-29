@@ -32,6 +32,7 @@ import java.util.List;
  * Frank	07-28-20	issue #49 added method deleteClassInactiveStudents()
  * Frank	10-06-20	issue #267 included class_language
  * Frank	10-07-20	issue #267 new method editClassConfig()
+ * Frank	10-07-20	issue #149R2 convert return message to JSO format
 */
 public class DbClass {
 
@@ -665,6 +666,7 @@ public class DbClass {
             stmt2 = conn.prepareStatement(q2);
             stmt2.setInt(1, classId);
             rs2 = stmt2.executeQuery();
+            int count = 0;
             while (rs2.next()) {
                 int studId = rs2.getInt(1);
                 String sid = String.valueOf(studId);
@@ -672,9 +674,13 @@ public class DbClass {
                 	continue;
                 }
                 else {
+                	if (count > 0) {
+                    	message += ", ";
+                	}
                 	System.out.println("Deleting " + sid);
                     DbUser.deleteStudent(conn, Integer.valueOf(sid));
-                	message += sid + ", ";
+                	message += sid;
+                	count++;
                 }
             }
             if (message.length() == 0) {

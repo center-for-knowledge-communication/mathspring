@@ -72,7 +72,8 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getCompleteMasteryProjectionForStudent(ModelMap map,@RequestParam("classId") String classId, @RequestParam("chartType") String chartType, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "CompleteMasteryProjectionForStudent", classId+" "+studentId);
+           	String logMsg = "{  \"studentId\" : \"" + studentId + "\" }";     
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "CompleteMasteryProjectionForStudent", logMsg);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
@@ -84,12 +85,14 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getMasterProjectionsForCurrentTopic(ModelMap map,@RequestParam("classId") String classId, @RequestParam("topicID") String topicID, @RequestParam("filter") String filter, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, "MasterProjectionsForCurrentTopic", "Topic: " + topicID);
+    		String filters[] = filter.split("~");
+           	String logMsg = "{  \"topicId\" : \"" +  topicID + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "MasterProjectionsForCurrentTopic", logMsg);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());
     	}
-        return reportService.getMasterProjectionsForCurrentTopic(classId,studentId,topicID,filter);
+    	return reportService.getMasterProjectionsForCurrentTopic(classId,studentId,topicID,filter);
     }
 
 
@@ -97,7 +100,8 @@ public class TeacherToolsReportController {
     public @ResponseBody
     String getProblemDetailsPerCluster(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("clusterId") String clusterId, HttpServletRequest request) throws TTCustomException {
     	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "Problems In Cluster", "Cluster: " + clusterId);
+           	String logMsg = "{  \"Problems In Cluster\" : \"" + clusterId + "\" }";     
+        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "problems_in_cluster", logMsg);
     	}
     	catch (Exception e) {
     		System.out.println("TeacherLogger error " + e.getMessage());

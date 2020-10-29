@@ -9,6 +9,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.ProblemsView;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
+import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.impl.TTLoginServiceImpl;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpSession;
  * Frank	08-10-20	issue #196 add error checking
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  * Frank	10-12-20	Issue #272 handle split of classDetails.jsp
+ * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
  */
 
 @Controller
@@ -69,7 +71,7 @@ public class TeacherToolsViewClassDetailsController {
 
     @Autowired
     private TeacherLogger tLogger;
-    
+
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
 
@@ -147,7 +149,7 @@ public class TeacherToolsViewClassDetailsController {
     }
     
     @RequestMapping(value = "/tt/reOrderProblemSets", method = RequestMethod.POST)
-    public @ResponseBody  String  reOrderProblemSets(ModelMap map, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
+    public @ResponseBody  String  reOrderProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
         List<Integer> sequenceNosToBeRemoved = new ArrayList<>();
         Map<Integer, Integer> insertSequences = new HashMap<>();
         for (String probsetEntries : problemSets) {
@@ -156,18 +158,58 @@ public class TeacherToolsViewClassDetailsController {
             sequenceNosToBeRemoved.add(Integer.valueOf(entries[2]));
         }
         ccService.reOrderProblemSets(Integer.valueOf(classid), sequenceNosToBeRemoved, insertSequences);
+		HttpSession MySession = request.getSession();
+		int teacherId = (int) MySession.getAttribute("teacherId");
+ 		tLogger.logEntryWorker(teacherId, 0, classid,"reOrderTopics", "");
         return "success";
     }
 
     @RequestMapping(value = "/tt/configureProblemSets", method = RequestMethod.POST)
-    public @ResponseBody String activateProblemSets(ModelMap map, @RequestParam(value = "activateData[]") List<String> problemSets, @RequestParam(value = "classid") String classid,@RequestParam(value = "activateFlag") String activateFlag) throws TTCustomException {
+    public @ResponseBody String activateProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "activateData[]") List<String> problemSets, @RequestParam(value = "classid") String classid,@RequestParam(value = "activateFlag") String activateFlag) throws TTCustomException {
         List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
+		HttpSession MySession = request.getSession();
+		System.out.println(problemSets);
+		String logMsg = "{ ";
+		if (activateFlag.equals("deactivate")) {
+			logMsg += "\"cmd\" : \"Deactivate\",";
+			logMsg += "\"result\" : \"Remaining active topics on list\",";
+	    	logMsg += "\"topicIds\" : \"" + problemSets.toString() + "\"";
+		}
+		else {
+			logMsg += "\"cmd\" : \"Activate\",";
+			logMsg += "\"result\" : \"Topics added to active list\",";
+	    	logMsg += "\"topicIds\" : \"" + problemSets.toString() + "\"";
+		}
+		logMsg += " }";
+
+		int teacherId = (int) MySession.getAttribute("teacherId");
+ 		tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
         return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag);
     }
     
     @RequestMapping(value = "/tt/continousContentApply", method = RequestMethod.POST)
-    public @ResponseBody String continousContentApply(ModelMap map, @RequestParam(value = "classesToApply[]") List<String> classIdList, @RequestParam(value = "classid") String classid,@RequestParam(value = "teacherId") String teacherId) throws TTCustomException {
+    public @ResponseBody String continousContentApply(ModelMap map,  HttpServletRequest request, @RequestParam(value = "classesToApply[]") List<String> classIdList, @RequestParam(value = "classid") String classid,@RequestParam(value = "teacherId") String teacherId) throws TTCustomException {
         List<Integer> intClassIDList = classIdList.stream().map(Integer::parseInt).collect(Collectors.toList());
+
+                
+        String logMsg = "{ ";
+        String idList = "[";
+
+        logMsg += "\"result\" : \"CLasses updated\",";
+
+        for (int i=0;i< intClassIDList.size();i++ ) {
+        	if (i > 0) {
+        		idList += ",";
+        	}
+        	idList += String.valueOf(intClassIDList.get(i));
+        }
+        idList = "]";
+    	logMsg += "\"classes Updated\" : \"[" +idList + "]\"";
+        logMsg += " }";
+        
+        HttpSession MySession = request.getSession();
+		int teacherId2 = (int) MySession.getAttribute("teacherId");
+ 		tLogger.logEntryWorker(teacherId2, 0, classid, "continousContentApply", logMsg);
         return ccService.continousContentApply(intClassIDList,Integer.valueOf(classid),Integer.valueOf(teacherId));
     }
 
@@ -210,14 +252,12 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/resetStudentdata", method = RequestMethod.POST)
     public @ResponseBody
     String resetStudentdata(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
-    	System.out.println("resetStudentdata");
     	return pvService.resetStudentData(studentId,action,lang);
     }
 
     @RequestMapping(value = "/tt/deleteInactiveStudents", method = RequestMethod.POST)
     public @ResponseBody
     String deleteInactiveStudents(@RequestParam(value = "classId") String classId, @RequestParam(value = "action") String action,  @RequestParam("lang") String lang) throws TTCustomException {
-    	System.out.println("resetStudentdata");
     	return pvService.deleteInactiveStudents(classId,action,lang);
     }
 
@@ -239,17 +279,33 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/createMoreStudentIds", method = RequestMethod.POST)
     public @ResponseBody
-    String createMoreStudentIds(ModelMap map,@RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
+    String createMoreStudentIds(ModelMap map,  HttpServletRequest request, @RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
     	System.out.println("createMoreStudentIds");
+    	for (int i=0;i<formData.length;i++ ) {
+        	System.out.println(formData[i].trim());    		
+    	}
     	String message =  pvService.createAdditionalIdForClass(formData,lang);
         loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()));
-        return message;
+		HttpSession MySession = request.getSession();
+		int teacherId = (int) MySession.getAttribute("teacherId");
+       return message;
     }
 
     @RequestMapping(value = "/tt/isClassInUse", method = RequestMethod.POST)
     public @ResponseBody
     String isClassInUse(@RequestParam(value = "classId") String classId) {
     	return pvService.isClassInUse(classId);
+    }
+
+    
+    @RequestMapping(value = "/tt/classLogTeacherEvent", method = RequestMethod.POST)
+    public @ResponseBody
+    String classLogTeacherEvent(@RequestParam(value = "teacherId") String teacherId,@RequestParam(value = "sessionId") String sessionId,@RequestParam(value = "classId") String classId,@RequestParam(value = "action") String action,@RequestParam(value = "activityName") String activityName) {
+    	int intTeacherId = Integer.parseInt(teacherId);
+    	int intSessionId =  Integer.parseInt(sessionId);
+    	tLogger.logEntryWorker(intTeacherId, intSessionId, classId, action, activityName);
+    	return "success";
+
     }
 
    
