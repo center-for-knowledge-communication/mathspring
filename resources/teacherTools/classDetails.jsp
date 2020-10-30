@@ -25,6 +25,8 @@
 <!-- Frank	10-01-20	Issue #254R2 fix edit class form - language and schoolYear -->
 <!-- Frank	10-06-20	Issue #267 fix edit class form vaildation -->
 <!-- Frank	10-06-20	Issue #267 hide language selection on edit class form -->
+<!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
+
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -4288,7 +4290,7 @@ var completeDataChart;
 	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                                <td>
 	                                    <label style="width: 50%;">${problemSet.numProbs}</label>
 	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
@@ -4352,7 +4354,7 @@ var completeDataChart;
                             	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                               <td>
 	                                   ${problemSet.numProbs}
 	                                </td>
