@@ -4,6 +4,7 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
  * Created by Neeraj on 3/26/2017.
  * 
  * Frank	02-16-2020	Issue #48 add hypen and useClass for pwd
+ * Frank	10-30-20	Issue #293 added 4 fields to class config form handling
  */
 
 public class CreateClassForm {
@@ -22,6 +23,10 @@ public class CreateClassForm {
     private String classId;
     private String reportType;
     private String classLanguage;
+    private String maxProb;
+    private String minProb;
+    private String maxTime;
+    private String minTime;
     
     
 
@@ -204,4 +209,37 @@ public class CreateClassForm {
     public String getProbRate() {
         return probRate;
     }
+    
+    public String getMaxProb() {
+        return maxProb;
+    }
+
+    public void setMaxProb(String maxProb) {
+        this.maxProb = maxProb;
+    }
+
+    public String getMinProb() {
+        return minProb;
+    }
+
+    public void setMinProb(String minProb) {
+        this.minProb = minProb;
+    }
+
+    public String getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(String maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    public String getMinTime() {
+        return minTime;
+    }
+
+    public void setMinTime(String minTime) {
+        this.minTime = minTime;
+    }
+
 }
