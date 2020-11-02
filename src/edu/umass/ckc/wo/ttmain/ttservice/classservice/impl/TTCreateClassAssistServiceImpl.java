@@ -39,6 +39,7 @@ import java.util.Map;
  * Frank	07-08-20	issue #134 & #156 added editClass method
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  * Frank	10-30-20	Issue #293 added call to setAdvancedCofig()
+ * Kartik	11-02-20	issue #292 test users to be created on class creation
  */
 
 @Service

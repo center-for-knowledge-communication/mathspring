@@ -28,6 +28,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
  * Frank	10-02-20	issue #254R2 change to return to home page after modifying class info
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  * Frank	10-27-20	issue #149R2 teacher logging changes
+ * Kartik	11-02-20	issue #292 test users to be created on class creation
  */
 
 

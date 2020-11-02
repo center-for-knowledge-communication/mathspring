@@ -35,6 +35,7 @@ import java.util.List;
  * Frank	10-07-20	issue #149R2 convert return message to JSO format
  * Frank	10-30-20	Issue #293 added setAdvancedConfig() to class config form handling
  * Frank	10-31-20	Issue #293 added advanced settings to ClassConfig
+ * Kartik	11-02-20	issue #292 test users to be created on class creation
  */
 public class DbClass {
 
