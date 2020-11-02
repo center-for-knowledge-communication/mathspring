@@ -28,9 +28,9 @@
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
 <!-- Frank	10-12-20	Issue #149R2 add logging in JSO format -->
 <!-- Frank	10-12-20	add page-loading indicators -->
+
+<!-- Frank	10-30-20	Issue #293 add new items to class config form -->
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -199,6 +199,14 @@ var emsg_schoolName      = 'School name is mandatory field';
 var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
 var emsg_schoolYear      = 'School year is a mandatory field';
 var emsg_gradeSection    = 'Section name is a mandatory field';
+var emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+var emsg_maxProb         = 'Max Problems is a mandatory field';
+var emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+var emsg_minProb         = 'Min Problems is a mandatory field';
+var emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+var emsg_maxTime         = 'Max Time is a mandatory field';
+var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+var emsg_minTime         = 'Min Time is a mandatory field';
 
 var languagePreference = window.navigator.language;
 var languageSet = "en";
@@ -220,6 +228,14 @@ if (languagePreference.includes("en")) {
 	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
 	emsg_schoolYear      = 'El año escolar es obligatorio';
 	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
+	emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+	emsg_maxProb         = 'Max Problems is a mandatory field';
+	emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+	emsg_minProb         = 'Min Problems is a mandatory field';
+	emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+	emsg_maxTime         = 'Max Time is a mandatory field';
+	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+	emsg_minTime         = 'Min Time is a mandatory field';
 }
 
 function logTeacherEvent(action,activityName) {
@@ -656,6 +672,58 @@ function handleclickHandlers() {
                 validators: {
                     notEmpty: {
                         message: emsg_gradeSection
+                    }
+                }
+            }, maxProb: {
+                validators: {
+
+                    between: {
+                        min: 2,
+                        max: 40,
+                        message: emsg_maxProbRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_maxProb
+                    }
+                }
+            }, minProb: {
+                validators: {
+
+                    between: {
+                        min: 2,
+                        max: 40,
+                        message: emsg_minProbRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_minProb
+                    }
+                }
+            }, maxTime: {
+                validators: {
+
+                    between: {
+                        min: 0,
+                        max: 30,
+                        message: emsg_maxTimeRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_maxTime
+                    }
+                }
+            }, minTime: {
+                validators: {
+
+                    between: {
+                        min: 0,
+                        max: 30,
+                        message: emsg_minTimeRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_minTime
                     }
                 }
             }
@@ -2132,8 +2200,11 @@ function registerAllEvents(){
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
 				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
-				                    <div id="create_class_out" class="col-md-6 col-sm-6">
-				                        <div class="panel panel-default">
+			                        <div class="panel panel-default">
+					                    <div id="create_class_out" class="col-md-4 col-sm-4">
+				                            <div class="panel-heading">
+				                                <%= rb.getString("identification_settings") %>
+				                            </div>
 				                             <div class="panel-body">
 				                                <div class="form-group">
 				                                    <label for="className"><%= rb.getString("class_name") %></label>
@@ -2185,6 +2256,13 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.section}"/>
 				                                    </div>
 				                                </div>
+					                        	</div>
+					                    	</div>
+					                   
+					                    	<div id="create_class_out_middle" class="col-md-4 col-sm-4">
+					                            <div class="panel-heading">
+					                                <%= rb.getString("grade_level_settings") %>
+					                            </div>
 				                                <div class="form-group">
 				                                    <label for="classGrade"><%= rb.getString("class_grade") %></label>
 				                                    <div class="input-group">
@@ -2236,7 +2314,50 @@ function registerAllEvents(){
 				                                    </div>
 				                                </div>
 				                            </div>
-				                        </div>
+					                    	<div id="create_class_out_left" class="col-md-4 col-sm-4">
+					                            <div class="panel-heading">
+					                                <%= rb.getString("advanced_settings") %>
+					                            </div>
+					                            <div class="panel-body">
+					                                
+					                                <div class="form-group">
+					                                    <label for="maxProb"><%= rb.getString("max_problems_per_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="maxProb" id="maxProb" name="maxProb"
+					                                                          class="form-control" type="text" value="${classInfo.maxProb}"/>
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="minProb"><%= rb.getString("min_problems_per_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="minProb" id="minProb" name="minProb"
+					                                                          class="form-control" type="text" value="${classInfo.minProb}"/>
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="maxTime"><%= rb.getString("max_time_in_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="maxTime" id="maxTime" name="maxTime"
+					                                                          class="form-control" type="text" value="${classInfo.maxTime}"/>
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="minTime"><%= rb.getString("min_time_in_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="minTime" id="minTime" name="minTime"
+					                                                          class="form-control" type="text" value="${classInfo.minTime}"/>
+					                                    </div>
+					                                </div>
+					                            </div>
+                        					</div>				                        
 				                    </div>
 				                </div>
 				                <div class="row">
@@ -2246,9 +2367,8 @@ function registerAllEvents(){
 				                </div>
 				            </springForm:form>
                         </div>
-                                         
+					</div>                                         
                  </div>
-            </div>
             
  
             
