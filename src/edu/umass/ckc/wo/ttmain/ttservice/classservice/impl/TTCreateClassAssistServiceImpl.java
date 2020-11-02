@@ -38,6 +38,7 @@ import java.util.Map;
  * Frank	02-16-2020	Issue #48
  * Frank	07-08-20	issue #134 & #156 added editClass method
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
+ * Frank	10-30-20	Issue #293 added call to setAdvancedCofig()
  */
 
 @Service
@@ -113,6 +114,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                     createForm.getClassGrade(),
                     createForm.getClassLanguage());
             
+    		DbClass.setAdvancedConfig(connection.getConnection(), classId, createForm.getMaxProb(), createForm.getMinProb(), createForm.getMaxTime(), createForm.getMinTime());
             // Update if any of these were changes
             if ((!createForm.getClassGrade().equals(ciPrev.getGrade()))) {
             	update = true;
@@ -158,6 +160,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         	if (action.equals("create")) {
         		DbClass.setSimpleConfig(connection.getConnection(), classId, createForm.getSimpleLC(), createForm.getSimpleCollab(), createForm.getProbRate(), createForm.getLowEndDiff(), createForm.getHighEndDiff());
         	}
+    		DbClass.setAdvancedConfig(connection.getConnection(), classId, createForm.getMaxProb(), createForm.getMinProb(), createForm.getMaxTime(), createForm.getMinTime());
         	ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
             info.setDefaultClass(true);
             new ClassContentSelector(connection.getConnection()).selectContent(info);

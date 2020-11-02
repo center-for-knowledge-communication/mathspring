@@ -33,7 +33,9 @@ import java.util.List;
  * Frank	10-06-20	issue #267 included class_language
  * Frank	10-07-20	issue #267 new method editClassConfig()
  * Frank	10-07-20	issue #149R2 convert return message to JSO format
-*/
+ * Frank	10-30-20	Issue #293 added setAdvancedConfig() to class config form handling
+ * Frank	10-31-20	Issue #293 added advanced settings to ClassConfig
+ */
 public class DbClass {
 
     public static final String GUEST_USER_CLASS_NAME = "GuestUserClass";
@@ -49,7 +51,9 @@ public class DbClass {
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language,isActive from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language," +
+                    "maxNumberProbsToShowPerTopic,minNumberProbsToShowPerTopic,maxTimeInTopic,minTimeInTopic," +
+                    "isActive from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -80,6 +84,10 @@ public class DbClass {
                 boolean showPreSurvey = true;
                 String getPreSurvey = rs.getString(23);
                 String getClassLanguage = rs.getString(24);
+                int maxProb = rs.getInt(25);
+                int minProb = rs.getInt(26);
+                int maxTime = rs.getInt(27);
+                int minTime = rs.getInt(28);
                 if("English".equals(getClassLanguage)) {
                 	getClassLanguage = "en:"+getClassLanguage;
                 } else {
@@ -94,7 +102,7 @@ public class DbClass {
                 
                 if(getPreSurvey == null || ("".equals(getPreSurvey)))
                     showPreSurvey = false;
-                int isActive = rs.getInt(25);
+                int isActive = rs.getInt(29);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
                         studentEmailPeriodDays,flashClient,grade, isActive);
@@ -106,6 +114,16 @@ public class DbClass {
                 ci.setShowPostSurvey(showPostSurvey);
                 ci.setShowPreSurvey(showPreSurvey);
                 ci.setClassLanguageCode(getClassLanguage);
+                ci.setMaxProb(String.valueOf(maxProb));
+                ci.setMinProb(String.valueOf(minProb));
+                if (maxTime > 0) {
+                	maxTime = maxTime / 60000;
+                }
+                ci.setMaxTime(String.valueOf(maxTime));
+                if (minTime > 0) {
+                	minTime = minTime / 60000;
+                }
+                ci.setMinTime(String.valueOf(minTime));
                 return ci;
             }
             return null;
@@ -1514,6 +1532,30 @@ public class DbClass {
         }
     }
 
+    public static void setAdvancedConfig(Connection conn, int classId, String maxProbsinTopic, String minProbsinTopic, String maxTimeinTopic, String minTimeinTopic) throws SQLException {
+        PreparedStatement s = null;
+        
+        int iMaxProbs = Integer.valueOf(maxProbsinTopic);
+        int iMinProbs = Integer.valueOf(minProbsinTopic);
+        int iMaxTime  = Integer.valueOf(maxTimeinTopic) * 60000;
+        int iMinTime  = Integer.valueOf(minTimeinTopic) * 60000;
+        
+        try {
+            String q = "update classconfig set maxNumberProbsToShowPerTopic=?, minNumberProbsToShowPerTopic=?, maxTimeInTopic=?, minTimeInTopic=? " +
+                    "where classid=?";
+            s = conn.prepareStatement(q);
+            s.setInt(1, iMaxProbs);
+            s.setInt(2, iMinProbs);
+            s.setInt(3, iMaxTime);
+            s.setInt(4, iMinTime);
+            s.setInt(5, classId);
+            s.executeUpdate();
+        } finally {
+            if (s != null)
+                s.close();
+        }
+    }
+
     public static void main( String[] args )
     {
 
@@ -1536,16 +1578,17 @@ public class DbClass {
         PreparedStatement stmt = null;
         try {
         	if(defaultClass) {
-            String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=?, maxNumberProbsToShowPerTopic=?, minNumberProbsToShowPerTopic=?, maxTimeInTopic=?, minTimeInTopic=? where classid=?";
+            //String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=?, maxNumberProbsToShowPerTopic=?, minNumberProbsToShowPerTopic=?, maxTimeInTopic=?, minTimeInTopic=? where classid=?";
+            String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=? where classid=?";
             stmt = conn.prepareStatement(q);
             stmt.setDouble(1, diffRate);
             stmt.setDouble(2, masteryThresh);
             stmt.setInt(3, contentFailureThresh);
-            stmt.setInt(4, 40);
-            stmt.setInt(5, 2);
-            stmt.setInt(6, 1800000);
-            stmt.setInt(7, 0);
-            stmt.setInt(8, classId);
+            //stmt.setInt(4, 40);
+            //stmt.setInt(5, 2);
+            //stmt.setInt(6, 1800000);
+            //stmt.setInt(7, 0);
+            stmt.setInt(4, classId);
         	}else {
         		String q = "update classconfig set difficultyRate=?, topicMastery=?, contentFailureThreshold=? where classid=?";	
         		stmt = conn.prepareStatement(q);

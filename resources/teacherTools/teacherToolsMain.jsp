@@ -20,6 +20,7 @@
  *  Frank	09-14-20	issue #237 add pauseStudentUse logic
  *  Frank	10-07-20	issue #267 add school year to class thumbnails
  *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
+ *  Frank	10-30-20	Issue #293 add new items to class config form 
  */
 
 Locale loc = request.getLocale();
@@ -195,6 +196,14 @@ catch (Exception e) {
 	var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
 	var emsg_schoolYear      = 'School year is a mandatory field';
 	var emsg_gradeSection    = 'Section name is a mandatory field';
+	var emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+	var emsg_maxProb         = 'Max Problems is a mandatory field';
+	var emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+	var emsg_minProb         = 'Min Problems is a mandatory field';
+	var emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+	var emsg_maxTime         = 'Max Time is a mandatory field';
+	var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+	var emsg_minTime         = 'Min Time is a mandatory field';
 	
 
     if (languagePreference.includes("en")) {
@@ -213,6 +222,14 @@ catch (Exception e) {
     	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
     	emsg_schoolYear      = 'El año escolar es obligatorio';
     	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
+    	emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+    	emsg_maxProb         = 'Max Problems is a mandatory field';
+    	emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+    	emsg_minProb         = 'Min Problems is a mandatory field';
+    	emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+    	emsg_maxTime         = 'Max Time is a mandatory field';
+    	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+    	emsg_minTime         = 'Min Time is a mandatory field';
 
     }   
     	var perTeacherReport;
@@ -245,9 +262,9 @@ catch (Exception e) {
         	
     		document.getElementById("passwordToken").value = "useClass";
         	var pwd = document.getElementById("passwordToken").value;
-    		//alert(pwd);
        		alert("<%= rb.getString("add_students_to_roster_instructions") %>");
-        }
+    	    $('#form-wrapper').find('.loader').show();
+    	}
         
  
         function myFunction() {
@@ -348,7 +365,59 @@ catch (Exception e) {
                                 message: emsg_gradeSection
                             }
                         }
-                    }
+                    }, maxProb: {
+                        validators: {
+
+                            between: {
+                                min: 2,
+                                max: 40,
+                                message: emsg_maxProbRange
+                            },
+
+                            notEmpty: {
+                                message: emsg_maxProb
+                            }
+                        }
+                    }, minProb: {
+                        validators: {
+
+                            between: {
+                                min: 2,
+                                max: 40,
+                                message: emsg_minProbRange
+                            },
+
+                            notEmpty: {
+                                message: emsg_minProb
+                            }
+                        }
+	                }, maxTime: {
+	                    validators: {
+	
+	                        between: {
+	                            min: 0,
+	                            max: 30,
+	                            message: emsg_maxTimeRange
+	                        },
+	
+	                        notEmpty: {
+	                            message: emsg_maxTime
+	                        }
+	                    }
+	                }, minTime: {
+	                    validators: {
+	
+	                        between: {
+	                            min: 0,
+	                            max: 30,
+	                            message: emsg_minTimeRange
+	                        },
+	
+	                        notEmpty: {
+	                            message: emsg_minTime
+	                        }
+	                    }
+	                }
                 }
             }).on('success.form.bv', function (e) {
                 $("#create_class_form").data('bootstrapValidator').resetForm();
@@ -493,7 +562,6 @@ function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
 
 
 function registerAllEvents(){
-	//alert("registerAllEvents begin");
 
 	var headers = changeTeacherActivitiesReportHeaderAccordingToLanguage();
 	
@@ -654,9 +722,6 @@ function registerAllEvents(){
         }    
         );
     }
-
-    
-
 	
 	
     $('#teacherActivities').on('show.bs.collapse', function ()  {
@@ -688,16 +753,40 @@ function registerAllEvents(){
             }
         });
         
-
-
-    
-    
-    
     });
 
     
-	//alert("registerAllEvents end");
-    
+	
+    $('#cohortMonitoring').on('show.bs.collapse', function ()  {
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: targetTeacherID,
+                teacherId: teacherID,
+                reportType: 'perTeacherReport',
+                lang: loc,
+                filter: ''
+            },
+            success : function(data) {
+            	if (data) {
+                	var jsonData = $.parseJSON(data);
+	                eachTeacherData = jsonData.levelOneData;
+    	            perTeacherReport.clear().draw();
+        	        perTeacherReport.rows.add(jsonData.levelOneData).draw();
+            	    perTeacherReport.columns.adjust().draw();            	    
+            	}
+            	else {
+            		alert("response data is null");
+            	}
+            },
+            error : function(e) {
+            	alert("error");
+                console.log(e);
+            }
+        });
+        
+    });    
 }
 
 </script>
@@ -790,6 +879,7 @@ function registerAllEvents(){
 	        </div>
         </div>            
         <div id="report-wrapper" class="row">
+           	<div class="loader" style="display: none" ></div>               
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
@@ -946,7 +1036,7 @@ function registerAllEvents(){
 			                    <input type="text" name="pwd" class="form-control pull-left" id="pwd">
 			                </div>		 		 
 			                <div class="col-sm-2">
-			                    <button id="pwdBtn" type="text" class="btn btn-success pull-left" onclick="pwdBtn();"><%= rb.getString("submit")%></button>
+			                    <button id="pwdBtn" type="text" class="btn btn-success pull-left"><%= rb.getString("submit")%></button>
 			                </div> 							
 						</div>
 			        </div>
@@ -956,27 +1046,27 @@ function registerAllEvents(){
 		        	<p> </p>
 		        </div>
 		        <div class="row">
-		           	<div id="dropdownDiv" class="col-lg-2 teacher-dropdown">
+
+		           		<div id="dropdownDiv" class="col-lg-2 teacher-dropdown">
 						  <ul id="myDropdown" class="nobull">
 						    <i class="fa fa-search" aria-hidden="true"></i>
 						    <input type="text" class="report_filters" placeholder="Search..." id="myInput" onkeyup="filterFunction()" >
 						    <div id="teacherList">
 						  </ul>
-					</div>			           		
+						</div>			           		
 		        </div>
 		    </div>
 		</div>
         <div id="panel-wrapper" class="row" style="display:none;width: 100%;">
 
-
             <div class="panel-group" id="accordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a id="report_three" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#teacherActivities">
+                            <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#teacherActivities">
                                 <%= rb.getString("teacher_log_report") %>
                             </a>
-                            <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                         </h4>
                     </div>
                     <div id="teacherActivities" class="panel-collapse collapse">
@@ -996,9 +1086,29 @@ function registerAllEvents(){
                             </ul>
                         </div>
 
+
                         <div class="panel-body">
 				           	<div id="teacher-activities-content" class="col-lg-10">
 	                            <table id="perTeacherReport" class="table table-striped table-bordered hover" width="100%"></table>
+				           	</div>
+                        </div>
+
+                    </div>
+                </div>
+                  
+                <div class="panel panel-default hidden">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a id="report_two" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#teacherActivities">
+                                REPORT TWO
+                            </a>
+                            <button id="twoButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                        </h4>
+                    </div>
+                    <div id="cohortMontioring" class="panel-collapse collapse">
+                        <div class="panel-body">
+				           	<div id="cohort-monitoring-content" class="col-lg-10">
+	                            <table id="cohortReport" class="table table-striped table-bordered hover" width="100%"></table>
 				           	</div>
                         </div>
 
@@ -1016,14 +1126,15 @@ function registerAllEvents(){
                     <small><%= rb.getString("class_setup") %></small>
                 </h1>
             </div>
+           	<div class="loader" style="display: none" ></div>               
             <springForm:form id="create_class_form" method="post"
                              action="${pageContext.request.contextPath}/tt/tt/ttCreateClass"
                              modelAttribute="createClassForm">
                 <div class="row">
-                    <div id="create_class_out" class="col-md-6 col-sm-6">
-                        <div class="panel panel-default">
+                    <div class="panel panel-default">
+	                    <div id="create_class_out_left" class="col-md-4 col-sm-4">
                             <div class="panel-heading">
-                                <%= rb.getString("part_one") %>: <%= rb.getString("class_configuration") %>
+                                <%= rb.getString("identification_settings") %>
                             </div>
                              <div class="panel-body">
                                <div class="form-group">
@@ -1089,6 +1200,14 @@ function registerAllEvents(){
                                                           class="form-control" type="text"/>
                                     </div>
                                 </div>
+                        	</div>
+                    	</div>
+                   
+                    	<div id="create_class_out_middle" class="col-md-4 col-sm-4">
+                            <div class="panel-heading">
+                                <%= rb.getString("grade_level_settings") %>
+                            </div>
+                            <div class="panel-body">
                                 <div class="form-group">
                                     <label for="classGrade"><%= rb.getString("class_grade") %></label>
                                     <div class="input-group">
@@ -1123,7 +1242,6 @@ function registerAllEvents(){
                                         </springForm:select>
                                     </div>
                                 </div>
-
                                 <div class="form-group">
                                     <label for="highEndDiff"><%= rb.getString("problem_complexity_higher") %></label>
                                     <div class="input-group">
@@ -1141,8 +1259,54 @@ function registerAllEvents(){
                                 </div>
                             </div>
                         </div>
+                    	<div id="create_class_out_left" class="col-md-4 col-sm-4">
+                            <div class="panel-heading">
+                                <%= rb.getString("advanced_settings") %>
+                            </div>
+                            <div class="panel-body">
+                                
+                                <div class="form-group">
+                                    <label for="maxProb"><%= rb.getString("max_problems_per_topic") %></label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon"><i
+                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+                                        <springForm:input path="maxProb" id="maxProb" name="maxProb"
+                                                          class="form-control" type="text" value="40"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="minProb"><%= rb.getString("min_problems_per_topic") %></label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon"><i
+                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+                                        <springForm:input path="minProb" id="minProb" name="minProb"
+                                                          class="form-control" type="text" value="2"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="maxTime"><%= rb.getString("max_time_in_topic") %></label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon"><i
+                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+                                        <springForm:input path="maxTime" id="maxTime" name="maxTime"
+                                                          class="form-control" type="text" value="30"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="minTime"><%= rb.getString("min_time_in_topic") %></label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon"><i
+                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+                                        <springForm:input path="minTime" id="minTime" name="minTime"
+                                                          class="form-control" type="text" value="0"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="add_students_out" class="col-md-6 col-sm-6">
+                </div>
+                <div class="row">
+                    <div id="add_students_out" class="col-md-12 col-sm-12">
                         <div id="add_students_out_panel_default" class="panel panel-default">
                             <div class="panel-heading">
                                <%= rb.getString("part_two_student_roster") %>
