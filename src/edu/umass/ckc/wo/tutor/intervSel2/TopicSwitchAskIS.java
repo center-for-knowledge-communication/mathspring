@@ -1,25 +1,13 @@
 package edu.umass.ckc.wo.tutor.intervSel2;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.jdom.Element;
-
 import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.servlet.servbase.UserException;
-import edu.umass.ckc.wo.event.tutorhut.EndProblemEvent;
-import edu.umass.ckc.wo.event.tutorhut.InputResponseNextProblemInterventionEvent;
-import edu.umass.ckc.wo.event.tutorhut.InterventionTimeoutEvent;
-import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
-import edu.umass.ckc.wo.handler.MyProgressHandler;
+import edu.umass.ckc.wo.event.tutorhut.*;
 import edu.umass.ckc.wo.interventions.InterleavedTopicSwitchIntervention;
 import edu.umass.ckc.wo.interventions.NextProblemIntervention;
 import edu.umass.ckc.wo.interventions.TopicSwitchAskIntervention;
 import edu.umass.ckc.wo.interventions.TopicSwitchIntervention;
 import edu.umass.ckc.wo.smgr.SessionManager;
-import edu.umass.ckc.wo.state.TopicState;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.model.TopicModel;
 import edu.umass.ckc.wo.tutor.pedModel.EndOfTopicInfo;
@@ -27,6 +15,12 @@ import edu.umass.ckc.wo.tutor.pedModel.InterleavedTopic;
 import edu.umass.ckc.wo.tutor.pedModel.PedagogicalModel;
 import edu.umass.ckc.wo.tutor.response.Response;
 import edu.umass.ckc.wo.tutormeta.Intervention;
+import org.apache.log4j.Logger;
+import org.jdom.Element;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,8 +28,6 @@ import edu.umass.ckc.wo.tutormeta.Intervention;
  * Date: 12/2/13
  * Time: 1:06 PM
  * To change this template use File | Settings | File Templates.
- * 
- * Kartik 	10-21-20	Issue #147 Updated intervention dialog when enough time is spend on the topic
  */
 public class TopicSwitchAskIS extends NextProblemInterventionSelector {
 
@@ -123,14 +115,12 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
             int solved = studentState.getTopicProblemsSolved();
             // If configured to ask about staying in the topic and not a content failure, then pop up dialog asking if stay or switch topics.
             // Can only stay in the current topic if we have more content (i.e. maxProbs = true or maxTime has been reached)
-            System.out.println(!reasons.isContentFailure());
             if (smgr.getStudentState().getCurTopic() == Settings.interleavedTopicID)  {
                 intervention = getInterleavedTopicIntervention();
 
             }
-            else if (!reasons.isContentFailure()) {
+            else if (this.ask && !reasons.isContentFailure())
                 intervention = new TopicSwitchAskIntervention(expl,smgr.getSessionNum(),smgr.getLocale());
-            }
                 // just inform that we are moving to next topic
             else intervention = new TopicSwitchIntervention(expl,seen,solved,smgr.getLocale());
         }
@@ -178,18 +168,12 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
             smgr.getStudentState().setTopicNumProbsSeen(1);  // set to one so that it won't play an example
             logger.debug("Topic Switch: Student elects to STAY in topic.  Turning off topicSwitch flag");
             smgr.getStudentState().setTopicSwitch(false);
-            smgr.getStudentState().setTopicInternalState(TopicState.IN_TOPIC);
             setUserInput(this,"<topicSwitch wantSwitch=\"" + wantSwitch + "\"/>",e);
-            return null;  // no interventions 
+            return null;  // no interventions - TODO we were in EndOfTopic and need to do something to return
         }
-        else if (wantSwitch != null && wantSwitch.equals(TopicSwitchAskIntervention.VISIT_MPP)) {
-//        	NavigationEvent ne = new NavigationEvent(params);
-//        	new TutorLogger(smgr).logMPP(ne);
-//        	new MyProgressHandler(e.getServletContext(), smgr, smgr.getConnection(), e.getServletRequest(), e.getServletResponse()).handleRequest(e);
-        	return null;
-        }
-        else {
-            logger.debug("Topic Switch: Student elects to SWITCH to new topic.");
+        else  {
+//            logger.debug("Topic Switch: Student elects to SWITCH to new topic.");
+//            return new BeginningOfTopicEvent(e,smgr.getStudentState().getCurTopic());
             TopicModel tm = (TopicModel) pedagogicalModel.getLessonModel();
             tm.clearEndOfTopicInfo();
             // At this point we generate an EndProblemEvent to end the last problem before going into the next topic

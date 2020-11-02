@@ -16,15 +16,12 @@ import java.util.ResourceBundle;
  * Time: 4:00 PM
  * This intervention informs the user that they are about to switch topics.   It no longer is set to ask them if they
  * want to because it is difficult to show problems in a topic that has just been found to be exhausted.
- * 
- * Kartik 	10-21-20	Issue #147 Updated intervention dialog message
  */
 public class TopicSwitchAskIntervention extends InputResponseIntervention implements NextProblemIntervention {
 
     public static final String WANT_TO_SWITCH = "wantSwitch";
     public static final String SWITCH = "switch";
     public static final String STAY = "stay";
-    public static final String VISIT_MPP = "visitMPP";
     private int sessionId;
     protected String reasons;
     private Locale locale;
@@ -57,13 +54,12 @@ public class TopicSwitchAskIntervention extends InputResponseIntervention implem
         try {           	
         		// Multi=lingual enhancement
         		rb = ResourceBundle.getBundle("MathSpring",this.locale);
-                str = "<div>  " +getFormOpen()+ " <p>" + rb.getString("good_time_to_move_to_new_topic");
+                str = "<div>  " +getFormOpen()+ " <p>" + rb.getString("you_are_about_to_switch_topics_because")+ ":<br>";
                 str += reasons;
-                str += rb.getString("click_want_do") + ":<br>";
-                str += "<br>";
-                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +SWITCH+ "\">" + rb.getString("go_to_next_topic") + "<br>";
-                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +STAY+ "\">" + rb.getString("stay_on_this_topic") + "<br>";
-                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +VISIT_MPP+ "\">" + rb.getString("visit_progress_page_choose_next_topic") + "<br>";
+
+                str += "<br><br>";
+                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +SWITCH+ "\">" + rb.getString("go_forward_to_next_target") + "<br>";
+                str+= "<input type=\"radio\" name=\""+WANT_TO_SWITCH+"\" value=\"" +STAY+ "\">" + rb.getString("stay_in_current_topic") + "<br>";
                 str+="</p></form></div>";
         
         }
