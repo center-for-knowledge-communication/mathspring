@@ -299,9 +299,9 @@ public class UserRegistrationHandler {
         return studId;
     }
 
-    public static int registerStudentUser(Connection conn, String userName, String pw, ClassInfo classInfo) throws Exception {
+    public static int registerStudentUser(Connection conn, String userName, String pw, ClassInfo classInfo, User.UserType userType) throws Exception {
 
-        int studId = DbUser.createUser(conn,"","", userName,pw,"", "0", "", User.UserType.student);
+        int studId = DbUser.createUser(conn,"","", userName,pw,"", "0", "", userType);
         int classId = classInfo.getClassid();
         DbUser.updateStudentClass(conn, studId, classId);
         // Now that the student is in a class, he is assigned a Pedagogy from one of the pedagogies

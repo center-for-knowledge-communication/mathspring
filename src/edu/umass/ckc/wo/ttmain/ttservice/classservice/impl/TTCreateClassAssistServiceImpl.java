@@ -173,14 +173,29 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     }
 
-    @Override
-    public void createStudentRoster(Integer classId, ClassInfo info, CreateClassForm createForm) throws TTCustomException {
-        try {
-        	String password = createForm.getPasswordToken();
-        	password = classId.toString();
+	@Override
+	public void createStudentRoster(Integer classId, ClassInfo info, CreateClassForm createForm)
+			throws TTCustomException {
+		try {
+			String password = createForm.getPasswordToken();
+			password = classId.toString();
 
-        	String userPrefix = createForm.getUserPrefix() + classId.toString();
-            DbClass.createStudentRoster(connection.getConnection(),info,userPrefix,password,createForm.getNoOfStudentAccountsForClass());
+			String userPrefix = createForm.getUserPrefix() + classId.toString();
+			DbClass.createStudentRoster(connection.getConnection(), info, userPrefix, password,
+					createForm.getNoOfStudentAccountsForClass());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+		}
+
+	}
+
+    @Override
+    public void createTestUsers(ClassInfo info, int userCount) throws TTCustomException {
+        try {
+        	String pwd = "mathspring";
+            DbClass.createTestUsers(connection.getConnection(),info,pwd,userCount);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

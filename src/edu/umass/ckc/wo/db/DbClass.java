@@ -1274,7 +1274,7 @@ public class DbClass {
         return true;
     }
 
-
+    
 
     public static void createStudentRoster(Connection conn, ClassInfo classInfo, String prefix, String password, int noOfStudentAccount) throws Exception {
         List<String> pedIds = DbClassPedagogies.getClassPedagogyIds(conn, classInfo.getClassid());
@@ -1289,7 +1289,7 @@ public class DbClass {
             		continue;
             	}
             	else {
-                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo, User.UserType.student);
                     added++;
                     break;
             	}
@@ -1308,16 +1308,30 @@ public class DbClass {
             		continue;
             	}
             	else {
-                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                    UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo, User.UserType.student);
                     break;
             	}
             }
            
         }
     }
-
-
-
+    
+    public static void createTestUsers(Connection conn, ClassInfo classInfo, String password, int noOfTesterAccounts) throws Exception {
+    	String prefix_tester = "tester";
+    	String prefix_teststudent = "teststudent";
+    	for (int i=1; i <= noOfTesterAccounts; i++) {
+    		StringBuffer username_tester = new StringBuffer(prefix_tester);
+    		username_tester.insert(0, classInfo.getClassid());
+    		username_tester.append(i);
+    		StringBuffer username_teststudent = new StringBuffer(prefix_teststudent);
+    		username_teststudent.insert(0, classInfo.getClassid());
+    		username_teststudent.append(i);
+    		
+    		UserRegistrationHandler.registerStudentUser(conn, username_tester.toString(), password, classInfo, User.UserType.tester);
+    		UserRegistrationHandler.registerStudentUser(conn, username_teststudent.toString(), password, classInfo, User.UserType.coopStudentTest);
+    	}
+    }
+    
     private static boolean buildTestUsers(Connection conn, ClassInfo classInfo, String testUserPrefix, String testUserPassword, List<String> pedIds) throws SQLException {
         // Get the test user with the same prefix and max ID.  Then we'll get the number off the end of this username
         // so that the new test users we build will be incremented from that starting point.
@@ -1379,7 +1393,7 @@ public class DbClass {
                 // we need to manually check to see if that user exists first and throw an exception if it does.
                 if (DbUser.getStudent(conn, username.toString()) != -1)
                     throw new UserException("Cannot create users.  User: " + username.toString() + " already exists.");
-                UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo);
+                UserRegistrationHandler.registerStudentUser(conn,username.toString(),password,classInfo, User.UserType.student);
 
             } finally {
                 if (stmt != null)

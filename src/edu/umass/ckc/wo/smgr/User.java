@@ -30,7 +30,7 @@ public class User {
        testStudent:  a tester who sees the same interface a regular student would (no problem stats updates happen)
      */
     public enum UserType {
-        test, guest, student, coopStudent, coopStudentTest, externalTest, externalTempTest, externalTempNonTest, testStudent
+        test, guest, student, coopStudent, coopStudentTest, externalTest, externalTempTest, externalTempNonTest, testStudent, tester
     }
 
     public User(String fname, String lname, String uname, String email, String password, int id) {
@@ -63,12 +63,14 @@ public class User {
             return new boolean[] {false,false,false,true} ;
         else if (userType == UserType.externalTempNonTest)
             return new boolean[] {false,false,false,false} ;
+        else if (userType == UserType.tester)
+            return new boolean[] {true,false,false,true} ;
         else return null;
     }
 
 
     public static boolean isTrialUser (UserType ut) {
-        return (ut==UserType.test || ut==UserType.coopStudentTest || ut==UserType.externalTempTest || ut==UserType.externalTest || ut==UserType.testStudent);
+        return (ut==UserType.test || ut==UserType.coopStudentTest || ut==UserType.externalTempTest || ut==UserType.externalTest || ut==UserType.testStudent || ut == UserType.tester);
     }
 
     public String toString () {
