@@ -17,8 +17,6 @@ import java.util.ResourceBundle;
  * Date: 11/7/13
  * Time: 4:00 PM
  * To change this template use File | Settings | File Templates.
- * 
- * Kartik 	10-21-20	Issue #147 Updated intervention dialog message
  */
 public class TopicSwitchIntervention extends InputResponseIntervention implements NextProblemIntervention {
     protected String reasons;
@@ -50,7 +48,7 @@ public class TopicSwitchIntervention extends InputResponseIntervention implement
         try {           	
         		// Multi=lingual enhancement
         		rb = ResourceBundle.getBundle("MathSpring",this.locale);
-                str = "<div><p>" + rb.getString("good_time_to_move_to_new_topic") + ":<br>";
+                str = "<div><p>" + rb.getString("you_are_about_to_switch_topics_because") + ":<br>";
                 str += reasons;
                 str += "<br><br>" + rb.getString("you_have_solved") + " " + solved + " / " + seen + " " + rb.getString("of_the_problems_you_saw") + ".";
                 str+="</p></div>";
