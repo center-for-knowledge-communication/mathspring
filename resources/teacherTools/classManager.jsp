@@ -28,8 +28,9 @@
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
 <!-- Frank	10-12-20	Issue #149R2 add logging in JSO format -->
 <!-- Frank	10-12-20	add page-loading indicators -->
-
 <!-- Frank	10-30-20	Issue #293 add new items to class config form -->
+
+
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
