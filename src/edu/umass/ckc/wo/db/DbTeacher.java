@@ -21,23 +21,45 @@ import java.util.List;
  * Frank 04-23-2020 Added function to support user profile self-maintenance
  * Frank 05-29-2020 issue #28 new functions for password reset
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
+ * Frank 11-03-2020	issue #276 allow a Master teacher to 'login as' by using Master teacher's password with target teacher username.
  */
 public class DbTeacher {
 
     public static int getTeacherId (Connection conn, String username, String pw) throws SQLException {
 
+    	boolean m = false;
+    	int id = -1;
         PreparedStatement ps = conn.prepareStatement("select ID,password from Teacher where userName=?");
-
         ps.setString(1,username);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
-            int id =  rs.getInt("ID");
+            id =  rs.getInt("ID");
             String token = rs.getString("password");
-            boolean m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
+            m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
             if (m)
                 return id;
             else {
-            	return -1;
+            	String query = "select Administrator from globalsettings where id_shouldBe1 = ?";
+                PreparedStatement ps2 = conn.prepareStatement(query);
+                ps2.setString(1,"1");
+                ResultSet rs2 = ps2.executeQuery();
+                if (rs2.next()) {                	            	
+                    String admin =  rs2.getString(1);
+	                ps.setString(1,admin);
+	                ResultSet rs3 = ps.executeQuery();
+	                if (rs3.next()) {
+	                    token = rs3.getString("password");
+	                    m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
+	                    if (m)
+	                        return id;
+	                    else 
+	                    	return -1;
+	                }
+	                else
+	                	return -1;
+                }
+                else 
+                	return -1;
             }
         }
         else return -1;
