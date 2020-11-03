@@ -30,6 +30,8 @@
 <!-- Frank	10-12-20	add page-loading indicators -->
 <!-- Frank	10-30-20	Issue #293 add new items to class config form -->
 
+
+<!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -1800,7 +1802,7 @@ function registerAllEvents(){
 	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                                <td>
 	                                    <label style="width: 50%;">${problemSet.numProbs}</label>
 	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
@@ -1864,7 +1866,7 @@ function registerAllEvents(){
                             	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                               <td>
 	                                   ${problemSet.numProbs}
 	                                </td>
