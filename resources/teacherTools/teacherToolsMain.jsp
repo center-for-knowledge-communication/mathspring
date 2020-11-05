@@ -257,6 +257,53 @@ catch (Exception e) {
             registerAllEvents();
             handleclickHandlers();
         });
+
+        function verifyProbMinMax() {
+
+
+        	var t1 = 0;
+        	if (isNaN(document.getElementById('maxProb').value)) 
+        		t1 = 0;			
+        	else 
+        		t1 = parseInt(document.getElementById('maxProb').value);		
+        		
+        	var t2 = 0;
+        	if (isNaN(document.getElementById('minProb').value)) 
+        		t2 = 0;			
+        	else
+        		t2 = parseInt(document.getElementById('minProb').value);		
+        	   
+        	if (t2 >= t1) {
+        		alert("<%= rb.getString("max_problems_per_topic") %> must be > <%= rb.getString("min_problems_per_topic") %>");
+        		document.getElementById('maxProb').value = '40';
+            	document.getElementById('minProb').value = '2';
+        		document.getElementById('maxProb').focus();
+        	}
+        }
+
+        function verifyTimeMinMax() {
+
+        	var t1 = 0;
+        	if (isNaN(document.getElementById('maxTime').value)) 
+        		t1 = 0;			
+        	else 
+        		t1 = parseInt(document.getElementById('maxTime').value);		
+        		
+        	var t2 = 0;
+        	if (isNaN(document.getElementById('minTime').value)) 
+        		t2 = 0;			
+        	else
+        		t2 = parseInt(document.getElementById('minTime').value);		
+
+        	 
+        	  if (t2 >= t1) {
+        		  alert("<%= rb.getString("max_time_in_topic") %> must be > <%= rb.getString("min_time_in_topic") %>");
+        		  document.getElementById('maxTime').value = '30';
+        	      document.getElementById('minTime').value = '0';
+        		  document.getElementById('maxTime').focus();
+        	  }
+        	}
+        
         
         function displayCreateRosterInstructions() {
         	
@@ -1271,7 +1318,7 @@ function registerAllEvents(){
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-menu-hamburger"></i></span>
                                         <springForm:input path="maxProb" id="maxProb" name="maxProb"
-                                                          class="form-control" type="text" value="40"/>
+                                                          class="form-control" type="text" value="40" onblur="verifyProbMinMax()"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -1280,7 +1327,7 @@ function registerAllEvents(){
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-menu-hamburger"></i></span>
                                         <springForm:input path="minProb" id="minProb" name="minProb"
-                                                          class="form-control" type="text" value="2"/>
+                                                          class="form-control" type="text" value="2" onblur="verifyProbMinMax()"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -1289,7 +1336,7 @@ function registerAllEvents(){
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-menu-hamburger"></i></span>
                                         <springForm:input path="maxTime" id="maxTime" name="maxTime"
-                                                          class="form-control" type="text" value="30"/>
+                                                          class="form-control" type="text" value="30" onblur="verifyTimeMinMax()"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -1298,7 +1345,7 @@ function registerAllEvents(){
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-menu-hamburger"></i></span>
                                         <springForm:input path="minTime" id="minTime" name="minTime"
-                                                          class="form-control" type="text" value="0"/>
+                                                          class="form-control" type="text" value="0" onblur="verifyTimeMinMax()"/>
                                     </div>
                                 </div>
                             </div>
