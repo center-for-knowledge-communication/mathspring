@@ -29,7 +29,10 @@
 <!-- Frank	10-12-20	Issue #149R2 add logging in JSO format -->
 <!-- Frank	10-12-20	add page-loading indicators -->
 <!-- Frank	10-30-20	Issue #293 add new items to class config form -->
+<!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
 
+
+<!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -60,7 +63,6 @@ int index = msURL.indexOf(msContext);
 String msHost = msURL.substring(0,index);
 System.out.println("msHost = " + msHost + msContext);
 %>
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -260,7 +262,74 @@ function logTeacherEvent(action,activityName) {
 
 }
 
+/*
+$('#edit_class_form').submit(function() {
+	  var t1 = document.getElementById('maxProb').value;
+	  var t2 = document.getElementById('minProb').value;
 
+	  var t3 = 0 + document.getElementById('maxProb').value;
+	  var t4 = 0 + document.getElementById('minProb').value;
+
+
+	 
+	  if (t4 >= t3) {
+		  document.getElementById('maxProb').value = ${classInfo.maxProb};
+		  document.getElementById('minProb').value = ${classInfo.minProb};
+		  alert("Error");
+		  alert(t2 + " cannot be >= " + t1);
+		  return false;
+	  }
+	  else {
+		  alert("OK");
+		  return true;
+	  }
+});
+*/
+function verifyProbMinMax() {
+
+
+	var t1 = 0;
+	if (isNaN(document.getElementById('maxProb').value)) 
+		t1 = 0;			
+	else 
+		t1 = parseInt(document.getElementById('maxProb').value);		
+		
+	var t2 = 0;
+	if (isNaN(document.getElementById('minProb').value)) 
+		t2 = 0;			
+	else
+		t2 = parseInt(document.getElementById('minProb').value);		
+	   
+	if (t2 >= t1) {
+		alert("<%= rb.getString("max_problems_per_topic") %> must be > <%= rb.getString("min_problems_per_topic") %>");
+		document.getElementById('maxProb').value = ${classInfo.maxProb};
+    	document.getElementById('minProb').value = ${classInfo.minProb};
+		document.getElementById('maxProb').focus();
+	}
+}
+
+function verifyTimeMinMax() {
+
+	var t1 = 0;
+	if (isNaN(document.getElementById('maxTime').value)) 
+		t1 = 0;			
+	else 
+		t1 = parseInt(document.getElementById('maxTime').value);		
+		
+	var t2 = 0;
+	if (isNaN(document.getElementById('minTime').value)) 
+		t2 = 0;			
+	else
+		t2 = parseInt(document.getElementById('minTime').value);		
+
+	 
+	  if (t2 >= t1) {
+		  alert("<%= rb.getString("max_time_in_topic") %> must be > <%= rb.getString("min_time_in_topic") %>");
+		  document.getElementById('maxTime').value = ${classInfo.maxTime};
+	      document.getElementById('minTime').value = ${classInfo.minTime};
+		  document.getElementById('maxTime').focus();
+	  }
+	}
 
 var resetStudentDataTitle = "";
 var resetStudentDataId = "";
@@ -732,7 +801,7 @@ function handleclickHandlers() {
         e.preventDefault();
         var $form = $(e.target);
         var bv = $form.data('bootstrapValidator');
-        $.post($form.attr('action'), $form.serialize(), function (result) {
+        $.post($form.attr('action'), $form.serialize(), function (result) {        	
         })
     });
 	
@@ -1800,7 +1869,7 @@ function registerAllEvents(){
 	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                                <td>
 	                                    <label style="width: 50%;">${problemSet.numProbs}</label>
 	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
@@ -1864,7 +1933,7 @@ function registerAllEvents(){
                             	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                               <td>
 	                                   ${problemSet.numProbs}
 	                                </td>
@@ -2325,7 +2394,7 @@ function registerAllEvents(){
 					                                    <span class="input-group-addon"><i
 					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
 					                                        <springForm:input path="maxProb" id="maxProb" name="maxProb"
-					                                                          class="form-control" type="text" value="${classInfo.maxProb}"/>
+					                                                          class="form-control" type="text" value="${classInfo.maxProb}" onblur="verifyProbMinMax()" />
 					                                    </div>
 					                                </div>
 					                                <div class="form-group">
@@ -2334,7 +2403,7 @@ function registerAllEvents(){
 					                                    <span class="input-group-addon"><i
 					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
 					                                        <springForm:input path="minProb" id="minProb" name="minProb"
-					                                                          class="form-control" type="text" value="${classInfo.minProb}"/>
+					                                                          class="form-control" type="text" value="${classInfo.minProb}" onblur="verifyProbMinMax()"/>
 					                                    </div>
 					                                </div>
 					                                <div class="form-group">
@@ -2343,7 +2412,7 @@ function registerAllEvents(){
 					                                    <span class="input-group-addon"><i
 					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
 					                                        <springForm:input path="maxTime" id="maxTime" name="maxTime"
-					                                                          class="form-control" type="text" value="${classInfo.maxTime}"/>
+					                                                          class="form-control" type="text" value="${classInfo.maxTime}" onblur="verifyTimeMinMax()"/>
 					                                    </div>
 					                                </div>
 					                                <div class="form-group">
@@ -2352,7 +2421,7 @@ function registerAllEvents(){
 					                                    <span class="input-group-addon"><i
 					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
 					                                        <springForm:input path="minTime" id="minTime" name="minTime"
-					                                                          class="form-control" type="text" value="${classInfo.minTime}"/>
+					                                                          class="form-control" type="text" value="${classInfo.minTime}" onblur="verifyTimeMinMax()"/>
 					                                    </div>
 					                                </div>
 					                            </div>
@@ -2360,7 +2429,7 @@ function registerAllEvents(){
 				                    </div>
 				                </div>
 				                <div class="row">
-				                        <div class="panel-body class="col-md-6 col-sm-6">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-2 col-sm-2">
 				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
 				                        </div>
 				                </div>
