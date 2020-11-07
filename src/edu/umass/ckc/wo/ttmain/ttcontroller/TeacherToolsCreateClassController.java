@@ -60,7 +60,7 @@ public class TeacherToolsCreateClassController {
         
         // Creating Test Users for class
         int testUserCount = 2;
-        createClassAssistService.createTestUsers(newClassInfo, testUserCount);
+        createClassAssistService.createTestUsers(newClassId,newClassInfo, testUserCount);
         
         createClassAssistService.changeDefaultProblemSets(model, newClassId);
         //Control Back to DashBoard with new Class visible

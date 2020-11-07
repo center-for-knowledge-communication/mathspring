@@ -193,10 +193,9 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 	}
 
     @Override
-    public void createTestUsers(ClassInfo info, int userCount) throws TTCustomException {
+    public void createTestUsers(Integer classId, ClassInfo info, int userCount) throws TTCustomException {
         try {
-        	String pwd = "mathspring";
-            DbClass.createTestUsers(connection.getConnection(),info,pwd,userCount);
+            DbClass.createTestUsers(connection.getConnection(),info,classId.toString(),userCount);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

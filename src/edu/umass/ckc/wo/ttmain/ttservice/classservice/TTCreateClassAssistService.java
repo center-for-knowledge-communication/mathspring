@@ -26,7 +26,7 @@ public interface TTCreateClassAssistService {
 
     public void createStudentRoster(Integer classId,ClassInfo info,CreateClassForm createForm) throws TTCustomException;
 
-    public void createTestUsers(ClassInfo info, int userCount) throws TTCustomException;
+    public void createTestUsers(Integer classId, ClassInfo info, int userCount) throws TTCustomException;
     
     public void changeDefaultProblemSets(ModelMap map,Integer classId) throws TTCustomException;
 
