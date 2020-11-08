@@ -28,6 +28,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
  * Frank	10-02-20	issue #254R2 change to return to home page after modifying class info
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  * Frank	10-27-20	issue #149R2 teacher logging changes
+ * Kartik	11-02-20	issue #292 test users to be created on class creation
  */
 
 
@@ -51,12 +52,16 @@ public class TeacherToolsCreateClassController {
         //Set Default Pedagogy
         ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(newClassId, classForm, "create");
         //Add Student Roster and Finish setup
-
+        
         if (!("".equals(classForm.getUserPrefix())) && classForm.getUserPrefix() != null
                 && !("".equals(classForm.getPasswordToken())) && classForm.getPasswordToken() != null
                 && classForm.getNoOfStudentAccountsForClass() > 0)
             createClassAssistService.createStudentRoster(newClassId, newClassInfo, classForm);
-
+        
+        // Creating Test Users for class
+        int testUserCount = 2;
+        createClassAssistService.createTestUsers(newClassId,newClassInfo, testUserCount);
+        
         createClassAssistService.changeDefaultProblemSets(model, newClassId);
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
