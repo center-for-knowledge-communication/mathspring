@@ -26,8 +26,13 @@
 <!-- Frank	10-06-20	Issue #267 fix edit class form vaildation -->
 <!-- Frank	10-06-20	Issue #267 hide language selection on edit class form -->
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
+<!-- Frank	10-12-20	Issue #149R2 add logging in JSO format -->
+<!-- Frank	10-12-20	add page-loading indicators -->
+<!-- Frank	10-30-20	Issue #293 add new items to class config form -->
+<!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
 
 
+<!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -58,7 +63,6 @@ int index = msURL.indexOf(msContext);
 String msHost = msURL.substring(0,index);
 System.out.println("msHost = " + msHost + msContext);
 %>
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -162,9 +166,6 @@ var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
-var filterSix = "~~Y";
-var filterOne = "~~Y";
-//var urlColumnNames;
 
 //Report2 Varriables
 var perProblemReportTable
@@ -199,6 +200,14 @@ var emsg_schoolName      = 'School name is mandatory field';
 var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
 var emsg_schoolYear      = 'School year is a mandatory field';
 var emsg_gradeSection    = 'Section name is a mandatory field';
+var emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+var emsg_maxProb         = 'Max Problems is a mandatory field';
+var emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+var emsg_minProb         = 'Min Problems is a mandatory field';
+var emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+var emsg_maxTime         = 'Max Time is a mandatory field';
+var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+var emsg_minTime         = 'Min Time is a mandatory field';
 
 var languagePreference = window.navigator.language;
 var languageSet = "en";
@@ -220,10 +229,111 @@ if (languagePreference.includes("en")) {
 	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
 	emsg_schoolYear      = 'El año escolar es obligatorio';
 	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
+	emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
+	emsg_maxProb         = 'Max Problems is a mandatory field';
+	emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
+	emsg_minProb         = 'Min Problems is a mandatory field';
+	emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
+	emsg_maxTime         = 'Max Time is a mandatory field';
+	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
+	emsg_minTime         = 'Min Time is a mandatory field';
 }
+
+function logTeacherEvent(action,activityName) {
+
+	$.ajax({
+	    type : "POST",
+	    url :pgContext+"/tt/tt/classLogTeacherEvent",
+	    data : {
+	        teacherId: teacherID,
+	        classId: classID,
+	        sessionId: sessionID,
+	        action: action,
+	        activityName: activityName
+	    },
+	    success : function(response) {
+	        if (response.includes("success")) {
+	        	console.log("Teacher Event logged");
+	        }else{
+	        	console.log("Teacher Event ERROR");
+	        }
+	    }
+	});
+
+}
+
+/*
+$('#edit_class_form').submit(function() {
+	  var t1 = document.getElementById('maxProb').value;
+	  var t2 = document.getElementById('minProb').value;
+
+	  var t3 = 0 + document.getElementById('maxProb').value;
+	  var t4 = 0 + document.getElementById('minProb').value;
+
+
+	 
+	  if (t4 >= t3) {
+		  document.getElementById('maxProb').value = ${classInfo.maxProb};
+		  document.getElementById('minProb').value = ${classInfo.minProb};
+		  alert("Error");
+		  alert(t2 + " cannot be >= " + t1);
+		  return false;
+	  }
+	  else {
+		  alert("OK");
+		  return true;
+	  }
+});
+*/
+function verifyProbMinMax() {
+
+
+	var t1 = 0;
+	if (isNaN(document.getElementById('maxProb').value)) 
+		t1 = 0;			
+	else 
+		t1 = parseInt(document.getElementById('maxProb').value);		
+		
+	var t2 = 0;
+	if (isNaN(document.getElementById('minProb').value)) 
+		t2 = 0;			
+	else
+		t2 = parseInt(document.getElementById('minProb').value);		
+	   
+	if (t2 >= t1) {
+		alert("<%= rb.getString("max_problems_per_topic") %> must be > <%= rb.getString("min_problems_per_topic") %>");
+		document.getElementById('maxProb').value = ${classInfo.maxProb};
+    	document.getElementById('minProb').value = ${classInfo.minProb};
+		document.getElementById('maxProb').focus();
+	}
+}
+
+function verifyTimeMinMax() {
+
+	var t1 = 0;
+	if (isNaN(document.getElementById('maxTime').value)) 
+		t1 = 0;			
+	else 
+		t1 = parseInt(document.getElementById('maxTime').value);		
+		
+	var t2 = 0;
+	if (isNaN(document.getElementById('minTime').value)) 
+		t2 = 0;			
+	else
+		t2 = parseInt(document.getElementById('minTime').value);		
+
+	 
+	  if (t2 >= t1) {
+		  alert("<%= rb.getString("max_time_in_topic") %> must be > <%= rb.getString("min_time_in_topic") %>");
+		  document.getElementById('maxTime').value = ${classInfo.maxTime};
+	      document.getElementById('minTime').value = ${classInfo.minTime};
+		  document.getElementById('maxTime').focus();
+	  }
+	}
 
 var resetStudentDataTitle = "";
 var resetStudentDataId = "";
+var resetStudentDataLogmsg = "";
 
 function resetStudentDataModal( title,studentId,username) {
 		resetStudentDataTitle = title;
@@ -232,10 +342,12 @@ function resetStudentDataModal( title,studentId,username) {
 		var temp9 = "<%= rb.getString("delete_username_and_data")%>" + ": " + username;
 		
 		if (title == "4") {
+			resetStudentDataLogmsg = "{ \"cmd\" : \"delete_math_data\", \"username\" : \"" + username + "\", \"id\" : \"" + resetStudentDataId + "\"}";
         	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp4);        	
         	$('#resetStudentDataModalPopup').modal('show');
 		}
 		else if (title == "9") {
+			resetStudentDataLogmsg = "{ \"cmd\" : \"delete_username_and_data\", \"username\" : \"" + username + "\", \"id\" : \"" + resetStudentDataId + "\"}";
         	$("#resetStudentDataModalPopup").find("[class*='modal-body']").html(temp9);
         	$('#resetStudentDataModalPopup').modal('show');
 		}	
@@ -243,6 +355,7 @@ function resetStudentDataModal( title,studentId,username) {
 
 function resetStudentData() {
 
+	    $('#student_info_out').find('.loader').show();
     	$.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/resetStudentdata",
@@ -252,10 +365,12 @@ function resetStudentData() {
             lang: loc
         },
         success : function(response) {
+            $('#student_info_out').find('.loader').hide();
             if (response.includes("***")) {
                 $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                 $('#errorMsgModelPopup').modal('show');
             }else{
+                logTeacherEvent("resetStudentData",resetStudentDataLogmsg);
                 $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_info_updated")%>");
                 $('#successMsgModelPopup').modal('show');
             }
@@ -277,20 +392,33 @@ function deleteInactiveStudentsModal( title,studentId,username) {
 
 function deleteInactiveStudents() {
 
+    $('#student_roster_out').find('.loader').show();
 	$.ajax({
     type : "POST",
-    url :pgContext+"/tt/tt/ deleteInactiveStudents",
+    url :pgContext+"/tt/tt/deleteInactiveStudents",
     data : {
         classId: classID,
         action: "0",
         lang: loc
     },
     success : function(response) {
+        $('#student_roster_out').find('.loader').hide();
         if (response.includes("***")) {
             $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
             $('#errorMsgModelPopup').modal('show');
         }else{
-            $("#successMsgModelPopup").find("[class*='modal-body']").html( response );
+        	var logmsg = "";
+        	var responseSplitter = response.split(":");
+        	var list = responseSplitter[0].trim();
+        	if (list.size > 1) {
+        		logmsg = "{ \"result\" : \"deleted_student_ids\", \"idArray\" : \"[ " + list + "]\"}";
+        	}
+        	else {
+        		logmsg = response;
+        		logmsg = "{ \"result\" : \"[" + response + "]\"}";
+        	}
+            logTeacherEvent("deleteInactiveStudents",logmsg);
+        	$("#successMsgModelPopup").find("[class*='modal-body']").html( response );
             $('#successMsgModelPopup').modal('show');
         }
     }
@@ -303,6 +431,7 @@ return false;
 
 function resetPassWordForThisStudent(id,uname){
     var newPassWordToSet = $("#resetPasswordfor"+id).serializeArray()[0].value;
+    $('#student_info_out').find('.loader').show();
      $.ajax({
          type : "POST",
          url :pgContext+"/tt/tt/resetStudentPassword",
@@ -312,17 +441,19 @@ function resetPassWordForThisStudent(id,uname){
              newPassWord : newPassWordToSet
          },
          success : function(response) {
+             $('#student_info_out').find('.loader').hide();
              if (response.includes("***")) {
                  $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                  $('#errorMsgModelPopup').modal('show');
              }else{
+            	 var logMsg  = "{ \"id\" : \"" + id + "\", \"username\" : \"" + uname + "\", \"msg\" : \"password_is_reset\" }";
+				 logTeacherEvent("resetStudentPassword",logMsg);
                  $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
          }
      });
     return false;
-
 }
 
 function cnfirmStudentPasswordForTagDownload() {
@@ -331,11 +462,16 @@ function cnfirmStudentPasswordForTagDownload() {
 
 
 function updateStudentInfo(formName){
+	var activity = "";
     var dataForm = $("#edit_Student_Form"+formName).serializeArray();
     var values = [];
+    var names = [];
     $.each(dataForm, function(i, field){
         values[i] = field.value;
     });
+    
+    
+    $('#student_info_out').find('.loader').show();
     $.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/editStudentInfo",
@@ -345,17 +481,22 @@ function updateStudentInfo(formName){
             lang: loc
         },
         success : function(response) {
+            $('#student_info_out').find('.loader').hide();
             if (response.includes("***")) {
                 $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                 $('#errorMsgModelPopup').modal('show');
             }else{
-                $("#successMsgModelPopup").find("[class*='modal-body']").html( response );
+            	var JSONData = JSON.parse(response);
+            	var msg = JSONData["msg"];
+                logTeacherEvent("updateStudentInfo",response);
+                $("#successMsgModelPopup").find("[class*='modal-body']").html(msg);
                 $('#successMsgModelPopup').modal('show');
             }
         }
 
     });
 }
+
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -411,6 +552,7 @@ if (languageSet == 'es') {
         for(var j=0; j < rowsArray.length; j++)
             problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
 
+	    $('#problem_set_content').find('.loader').show();
         $.ajax({
             type : "POST",
             url :pgContext+"/tt/tt/saveChangesForProblemSet",
@@ -420,7 +562,8 @@ if (languageSet == 'es') {
                 problemsetId: JSONData["problemLevelId"]
             },
             success : function(response) {
-                if (response.includes("***")) {
+        	    $('#problem_set_content').find('.loader').hide();
+        	    if (response.includes("***")) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
@@ -454,7 +597,8 @@ else {
         for(var j=0; j < rowsArray.length; j++)
             problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
 
-        $.ajax({
+	    $('#problem_set_content').find('.loader').show();
+	    $.ajax({
             type : "POST",
             url :pgContext+"/tt/tt/saveChangesForProblemSet",
             data : {
@@ -463,6 +607,7 @@ else {
                 problemsetId: JSONData["problemLevelId"]
             },
             success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
                 if (response.includes("***")) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
@@ -597,6 +742,58 @@ function handleclickHandlers() {
                         message: emsg_gradeSection
                     }
                 }
+            }, maxProb: {
+                validators: {
+
+                    between: {
+                        min: 2,
+                        max: 40,
+                        message: emsg_maxProbRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_maxProb
+                    }
+                }
+            }, minProb: {
+                validators: {
+
+                    between: {
+                        min: 2,
+                        max: 40,
+                        message: emsg_minProbRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_minProb
+                    }
+                }
+            }, maxTime: {
+                validators: {
+
+                    between: {
+                        min: 0,
+                        max: 30,
+                        message: emsg_maxTimeRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_maxTime
+                    }
+                }
+            }, minTime: {
+                validators: {
+
+                    between: {
+                        min: 0,
+                        max: 30,
+                        message: emsg_minTimeRange
+                    },
+
+                    notEmpty: {
+                        message: emsg_minTime
+                    }
+                }
             }
         }
     }).on('success.form.bv', function (e) {
@@ -604,7 +801,7 @@ function handleclickHandlers() {
         e.preventDefault();
         var $form = $(e.target);
         var bv = $form.data('bootstrapValidator');
-        $.post($form.attr('action'), $form.serialize(), function (result) {
+        $.post($form.attr('action'), $form.serialize(), function (result) {        	
         })
     });
 	
@@ -688,9 +885,9 @@ function handleclickHandlers() {
 
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
-            $('#deacivateProblemSets').prop('disabled', false);
+            $('#deactivateProblemSets').prop('disabled', false);
         } else {
-            $('#deacivateProblemSets').prop('disabled', true);
+            $('#deactivateProblemSets').prop('disabled', true);
         }
     });
 
@@ -729,9 +926,9 @@ function handleclickHandlers() {
 
     $('#inActiveProbSetTable input[type="checkbox"]').click(function () {
         if ($('#inActiveProbSetTable input[type="checkbox"]:checked').size()) {
-            $('#acivateProblemSets').prop('disabled', false);
+            $('#activateProblemSets').prop('disabled', false);
         } else {
-            $('#acivateProblemSets').prop('disabled', true);
+            $('#activateProblemSets').prop('disabled', true);
         }
     });
     
@@ -1015,6 +1212,7 @@ function registerAllEvents(){
             var rowData = activetable.row( diff[i].node ).data();
             result[i] = rowData[3]+'~~'+ diff[i].newData+'~~'+diff[i].oldData;
         }
+	    $('#problem_set_content').find('.loader').show();
         $.ajax({
             type : "POST",
             url :pgContext+"/tt/tt/reOrderProblemSets",
@@ -1023,6 +1221,7 @@ function registerAllEvents(){
                 classid: classID
             },
             success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
                 if (response.includes("***")) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
@@ -1097,6 +1296,7 @@ function registerAllEvents(){
             row.child.hide();
         }else{
             var rowID = '#'+row.data()[0];
+    	    $('#problem_set_content').find('.loader').show();
             $.ajax({
                 type : "POST",
                 url :pgContext+"/tt/tt/getProblemForProblemSets",
@@ -1105,6 +1305,7 @@ function registerAllEvents(){
                     classid: classID
                 },
                 success : function(response) {
+            	    $('#problem_set_content').find('.loader').hide();
                     if (response.includes("***")) {
                         $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                         $('#errorMsgModelPopup').modal('show');
@@ -1176,7 +1377,7 @@ function registerAllEvents(){
         }
     }
 
-    $("#deacivateProblemSets").click(function () {
+    $("#deactivateProblemSets").click(function () {
         var rows = $("#activateProbSetTable").dataTable().fnGetNodes();
         var rowsArray = [];
         var activateData = [];
@@ -1193,6 +1394,7 @@ function registerAllEvents(){
         for(var j=0; j < rowsArray.length; j++) {
             activateData[j] = $("#activateProbSetTable").DataTable().row(rowsArray [j]).data()[3];
         }
+	    $('#problem_set_content').find('.loader').show();
         $.ajax({
             type : "POST",
             url :pgContext+"/tt/tt/configureProblemSets",
@@ -1202,6 +1404,7 @@ function registerAllEvents(){
                 activateFlag: 'deactivate'
             },
             success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
                 if (response.includes("***")) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                     $('#errorMsgModelPopup').modal('show');
@@ -1221,7 +1424,7 @@ function registerAllEvents(){
         $.each(dataForm, function(i, field){
             values[i] = field.value;
         });
-
+        $('#student_roster_out').find('.loader').show();
         $.ajax({
             type: "POST",
             url: pgContext + "/tt/tt/createMoreStudentIds",
@@ -1230,10 +1433,12 @@ function registerAllEvents(){
                 lang: loc
             },
             success: function (data) {
+                $('#student_roster_out').find('.loader').hide();
                 if (data.includes("***")) {
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
+                    logTeacherEvent("createMoreStudentId",data);
                     $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("user_creation_successful")%> " );
                     $('#successMsgModelPopup').modal('show');
                 }
@@ -1244,7 +1449,7 @@ function registerAllEvents(){
     });
 
 
-    $("#acivateProblemSets").click(function () {
+    $("#activateProblemSets").click(function () {
         var rows = $("#inActiveProbSetTable").dataTable().fnGetNodes();
         var rowsArray = [];
         var activateData = [];
@@ -1351,11 +1556,13 @@ function registerAllEvents(){
         var classID = '${classInfo.classid}';
         var teacherID = '${teacherId}';
         var currentSelection = '${currentSelection}';
+        var sessionID = "0";
         var prePostIds = '${prepostIds}'.split("~~");		
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
+
             $("#content-conatiner").children().hide();
 
             if (currentSelection == "classHomePage") {
@@ -1619,6 +1826,7 @@ function registerAllEvents(){
 				</div>
 
 				<div id="problem_set_content" style="width: 100%;">
+                <div class="loader" style="display: none" ></div>               
 			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
 			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
@@ -1633,7 +1841,7 @@ function registerAllEvents(){
                         <div class="panel-body"><%= rb.getString("active_problem_sets_note2") %>
                         </div>
                         <div class="panel-body">
-                            <button id="deacivateProblemSets" class="btn btn-primary btn-lg" aria-disabled="true" disabled="disabled"><%= rb.getString("deactivate_problem_sets") %></button>
+                            <button id="deactivateProblemSets" class="btn btn-primary btn-lg" aria-disabled="true" disabled="disabled"><%= rb.getString("deactivate_problem_sets") %></button>
                         </div>
                     </div>
 
@@ -1661,7 +1869,7 @@ function registerAllEvents(){
 	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                                <td>
 	                                    <label style="width: 50%;">${problemSet.numProbs}</label>
 	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
@@ -1699,7 +1907,7 @@ function registerAllEvents(){
                         <div class="panel-body"><%= rb.getString("deactive_problem_sets_note1") %>
                         </div>
                         <div class="panel-body">
-                            <button id="acivateProblemSets" class="btn btn-primary btn-lg" disabled="disabled" aria-disabled="true"><%= rb.getString("activate_problem_sets") %></button>
+                            <button id="activateProblemSets" class="btn btn-primary btn-lg" disabled="disabled" aria-disabled="true"><%= rb.getString("activate_problem_sets") %></button>
                         </div>
                     </div>
 
@@ -1725,7 +1933,7 @@ function registerAllEvents(){
                             	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
 	                            <tr>
 	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
+	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
 	                               <td>
 	                                   ${problemSet.numProbs}
 	                                </td>
@@ -1871,6 +2079,7 @@ function registerAllEvents(){
 	                    </h3>
 	                </div>
                 </div>
+                <div class="loader" style="display: none" ></div>               
                  <div class="panel-group" id="accordion2">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -1984,7 +2193,8 @@ function registerAllEvents(){
 	                    </h3>
 	                </div>
                 </div>
-                 <div class="panel-group">
+                <div class="loader" style="display: none" ></div>               
+                <div class="panel-group">
                     <div class="panel panel-default">
                     	<div class="panel-body">			                	
 		                    <table id="student_roster" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
@@ -2058,8 +2268,11 @@ function registerAllEvents(){
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
 				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
-				                    <div id="create_class_out" class="col-md-6 col-sm-6">
-				                        <div class="panel panel-default">
+			                        <div class="panel panel-default">
+					                    <div id="create_class_out" class="col-md-4 col-sm-4">
+				                            <div class="panel-heading">
+				                                <%= rb.getString("identification_settings") %>
+				                            </div>
 				                             <div class="panel-body">
 				                                <div class="form-group">
 				                                    <label for="className"><%= rb.getString("class_name") %></label>
@@ -2111,6 +2324,13 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.section}"/>
 				                                    </div>
 				                                </div>
+					                        	</div>
+					                    	</div>
+					                   
+					                    	<div id="create_class_out_middle" class="col-md-4 col-sm-4">
+					                            <div class="panel-heading">
+					                                <%= rb.getString("grade_level_settings") %>
+					                            </div>
 				                                <div class="form-group">
 				                                    <label for="classGrade"><%= rb.getString("class_grade") %></label>
 				                                    <div class="input-group">
@@ -2162,19 +2382,61 @@ function registerAllEvents(){
 				                                    </div>
 				                                </div>
 				                            </div>
-				                        </div>
+					                    	<div id="create_class_out_left" class="col-md-4 col-sm-4">
+					                            <div class="panel-heading">
+					                                <%= rb.getString("advanced_settings") %>
+					                            </div>
+					                            <div class="panel-body">
+					                                
+					                                <div class="form-group">
+					                                    <label for="maxProb"><%= rb.getString("max_problems_per_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="maxProb" id="maxProb" name="maxProb"
+					                                                          class="form-control" type="text" value="${classInfo.maxProb}" onblur="verifyProbMinMax()" />
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="minProb"><%= rb.getString("min_problems_per_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="minProb" id="minProb" name="minProb"
+					                                                          class="form-control" type="text" value="${classInfo.minProb}" onblur="verifyProbMinMax()"/>
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="maxTime"><%= rb.getString("max_time_in_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="maxTime" id="maxTime" name="maxTime"
+					                                                          class="form-control" type="text" value="${classInfo.maxTime}" onblur="verifyTimeMinMax()"/>
+					                                    </div>
+					                                </div>
+					                                <div class="form-group">
+					                                    <label for="minTime"><%= rb.getString("min_time_in_topic") %></label>
+					                                    <div class="input-group">
+					                                    <span class="input-group-addon"><i
+					                                            class="glyphicon glyphicon-menu-hamburger"></i></span>
+					                                        <springForm:input path="minTime" id="minTime" name="minTime"
+					                                                          class="form-control" type="text" value="${classInfo.minTime}" onblur="verifyTimeMinMax()"/>
+					                                    </div>
+					                                </div>
+					                            </div>
+                        					</div>				                        
 				                    </div>
 				                </div>
 				                <div class="row">
-				                        <div class="panel-body class="col-md-6 col-sm-6">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-2 col-sm-2">
 				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
 				                        </div>
 				                </div>
 				            </springForm:form>
                         </div>
-                                         
+					</div>                                         
                  </div>
-            </div>
             
  
             

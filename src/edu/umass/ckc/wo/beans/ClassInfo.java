@@ -4,6 +4,7 @@ import edu.umass.ckc.wo.woreports.Report;
 
 /**
  * Frank	07-08-20	issue #156 added isActive flag
+ * Frank	10-31-20	issue #293 added advanced settings
  */
 
 public class ClassInfo {
@@ -33,6 +34,10 @@ public class ClassInfo {
     private boolean showPostSurvey;
     private boolean showPreSurvey;
     private String classLanguageCode;
+    private String maxProb;
+    private String minProb;
+    private String maxTime;
+    private String minTime;
     private boolean isDefaultClass;
     private int isActive;
     
@@ -267,5 +272,37 @@ public class ClassInfo {
 	public int getIsActive() {
 		return isActive;
 	}
-    
+
+    public String getMaxProb() {
+        return maxProb;
+    }
+
+    public void setMaxProb(String maxProb) {
+        this.maxProb = maxProb;
+    }
+
+    public String getMinProb() {
+        return minProb;
+    }
+
+    public void setMinProb(String minProb) {
+        this.minProb = minProb;
+    }
+
+    public String getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(String maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    public String getMinTime() {
+        return minTime;
+    }
+
+    public void setMinTime(String minTime) {
+        this.minTime = minTime;
+    }
+	
 }

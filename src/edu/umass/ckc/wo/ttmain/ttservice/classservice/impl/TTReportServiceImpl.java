@@ -65,6 +65,7 @@ import java.text.SimpleDateFormat;
  * Frank	07-08-20	issue #153 added access code checker
  * Frank	07-28-20	issue #74 valid classId is valid or this teacherId
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
+ * FRank	10-27-20	Issue 149R2 report_type parameter sdded
 */
 
 
@@ -251,23 +252,11 @@ public class TTReportServiceImpl implements TTReportService {
                     return perStudentPerProblemSetReportMapper.writeValueAsString(resultsPerStandard);
 
                 case "perStudentPerProblemSetReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
                     Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId, filter);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
                     
                 case "perStudentPerProblemReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), filter);
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
                     Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter);
                     ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
                     return perStudentPerProblemReportMapper2.writeValueAsString(result2);
@@ -286,13 +275,14 @@ public class TTReportServiceImpl implements TTReportService {
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                    	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), classId);
+                   		String logmsg = "{ \"teacherId\" : \"" + classId + "\" }";
+               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), logmsg);
                 	}
                 	catch (Exception e) {
                 		System.out.println("TeacherLogger error " + e.getMessage());
                 	}
                     List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
-                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName()}).toArray(String[][]::new);
+                    String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName(reportType)}).toArray(String[][]::new);
                     ObjectMapper teacherMapper = new ObjectMapper();
                     Map<String, Object> teacherMap = new HashMap<>();
                     teacherMap.put("levelOneData", teacherData);
@@ -736,7 +726,16 @@ public class TTReportServiceImpl implements TTReportService {
     			showNames = "Y";   			
     		}
     	}
-    		
+
+       	String logMsg = "{ \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
+
+       	try {
+   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemSetReport"), logMsg);
+    	}
+    	catch (Exception e) {
+    		System.out.println("TeacherLogger error " + e.getMessage());
+    	}
+       	
     	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
@@ -850,7 +849,16 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-    	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
+
+       	try {
+   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemReport"), logMsg);
+    	}
+    	catch (Exception e) {
+    		System.out.println("TeacherLogger error " + e.getMessage());
+    	}
+
+       	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
         params.put("classId", classId);
@@ -1583,6 +1591,11 @@ public class TTReportServiceImpl implements TTReportService {
         SqlParameterSource namedParameters = new MapSqlParameterSource("targetId", targetId);
         List<TeacherLogEntry> teacherLogEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LOG_QUERY_FIRST, namedParameters, new TeacherLogEntryMapper());
         return teacherLogEntries;
+    }
+ 
+    private String formatTeacherLogAction() {
+    	String formatted = "";
+    	return formatted;
     }
     
     @Override

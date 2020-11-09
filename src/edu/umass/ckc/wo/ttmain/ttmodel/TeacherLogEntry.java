@@ -8,6 +8,7 @@ import edu.umass.ckc.wo.util.StringUtils;
 /**
  *  Frank 	03-02-2020	Issue #45 teacher selection list & fix - use sql timestamp data type
  * Frank 	06-17-20	Issue #149
+ * Frank	10-27-20	Issue #149R2
  */
 public class TeacherLogEntry {
 
@@ -61,8 +62,25 @@ public class TeacherLogEntry {
         this.classId = classId;
     }
 
+    
     public String getActivityName() {
         return activityName;
+    }
+
+    public String getActivityName(String reportType) {
+    	String result = "";
+    	switch (this.action) {
+    		case "createMoreStudentIds":  ;
+    			if (reportType.equals("perTeacherReport")) {
+    				result = this.activityName;
+    			}
+    			break;
+    		default:
+    			result = this.activityName;
+    			break;
+    		
+    	}
+        return result;
     }
 
     public void setActivityName(String activityName) {
