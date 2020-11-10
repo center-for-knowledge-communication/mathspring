@@ -36,6 +36,7 @@ import java.util.List;
  * Frank	10-30-20	Issue #293 added setAdvancedConfig() to class config form handling
  * Frank	10-31-20	Issue #293 added advanced settings to ClassConfig
  * Kartik	11-02-20	issue #292 test users to be created on class creation
+ * Frank	11-10-20	issue #293R3 validate classconfig fields after fetching them
  */
 public class DbClass {
 
@@ -85,10 +86,35 @@ public class DbClass {
                 boolean showPreSurvey = true;
                 String getPreSurvey = rs.getString(23);
                 String getClassLanguage = rs.getString(24);
-                int maxProb = rs.getInt(25);
-                int minProb = rs.getInt(26);
-                int maxTime = rs.getInt(27);
-                int minTime = rs.getInt(28);
+
+                int maxProb = 40;
+                if (rs.getObject(25) != null && !rs.wasNull()) {
+                	maxProb = rs.getInt(25);
+            	}
+
+                int minProb = 2;
+                if (rs.getObject(26) != null && !rs.wasNull()) {
+                	minProb = rs.getInt(26);
+            	}
+
+                int maxTime = 30 * 60000;
+                if (rs.getObject(27) != null && !rs.wasNull()) {
+                	if (rs.getLong(27) <= 18000000) {
+                		maxTime = rs.getInt(27);
+                	}
+            	}
+
+                int minTime = 0;
+                if (rs.getObject(28) != null && !rs.wasNull()) {
+                	if (rs.getLong(28) < maxTime) {
+                		minProb = rs.getInt(28);
+                	}
+            	}
+                
+                //int maxProb = rs.getInt(25);
+                //int minProb = rs.getInt(26);
+                //int maxTime = rs.getInt(27);
+                //int minTime = rs.getInt(28);
                 if("English".equals(getClassLanguage)) {
                 	getClassLanguage = "en:"+getClassLanguage;
                 } else {
