@@ -36,19 +36,19 @@
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="username"><%= rb.getString("username")%>:</label>
                     <div class="col-sm-6">
-                        <input type="text" name="userName" class="form-control" id="username" placeholder="">
+                        <input type="text" name="userName" class="form-control" id="username"   onblur="verifyUsername()" placeholder="">
                     </div>
                 </div><!-- form-group -->
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="password"><%= rb.getString("password")%>:</label>
                     <div class="col-sm-6">
-                        <input type="password" name="pw1" class="form-control" id="password" placeholder="">
+                        <input type="password" name="pw1" class="form-control" id="password" onblur="removeSingleQuote()" placeholder="">
                     </div>
                 </div><!-- form-group -->
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="password"><%= rb.getString("re_enter_password")%>:</label>
                     <div class="col-sm-6">
-                        <input type="password" name="pw2" class="form-control" id="password-confirmation" placeholder="">
+                        <input type="password" name="pw2" class="form-control" id="password-confirmation" onblur="removeSingleQuote()" placeholder="">
                     </div>
                 </div><!-- form-group -->
 
@@ -66,4 +66,26 @@
     </footer>
 </body>
 </html>
+
+<script type="text/javascript">
+    function verifyUsername() {
+
+    	var username_input = document.getElementById('username').value;
+    	var message = "";
+    	if (username_input.search(/[^0-9A-Za-z\s]/) != -1) {
+			alert("<%= rb.getString("invalid_username_character")%>");
+			document.getElementById('username').value = "";
+			document.getElementById('username').focus();
+    	}
+    } 
+    
+    function removeSingleQuote() {
+
+    	var password_input = document.getElementById('password').value;
+    	if (password_input.search(/[^'\s]/) != -1) {
+    		alert(" ' character not allowed. Please try again")
+	    	document.getElementById('password').value = "";
+    	}
+    }    
+</script>
 
