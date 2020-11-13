@@ -22,6 +22,7 @@ import java.util.List;
  * Frank 05-29-2020 issue #28 new functions for password reset
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
  * Frank 11-03-2020	issue #276 allow a Master teacher to 'login as' by using Master teacher's password with target teacher username.
+ * Frank 11-12-2020	issue #276 change calling interface to pass back password used, Normal or Master 
  */
 public class DbTeacher {
 
@@ -63,6 +64,51 @@ public class DbTeacher {
             }
         }
         else return -1;
+    }
+
+    public static String getTeacherIdAsString (Connection conn, String username, String pw) throws SQLException {
+
+    	boolean m = false;
+    	String result = "-1~failure";
+    	int id = -1;
+        PreparedStatement ps = conn.prepareStatement("select ID,password from Teacher where userName=?");
+        ps.setString(1,username);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            id =  rs.getInt("ID");
+            String token = rs.getString("password");
+            m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
+            if (m) {
+            	result = String.valueOf(id) + "~Normal";
+                return result;
+            }
+            else {
+            	String query = "select Administrator from globalsettings where id_shouldBe1 = ?";
+                PreparedStatement ps2 = conn.prepareStatement(query);
+                ps2.setString(1,"1");
+                ResultSet rs2 = ps2.executeQuery();
+                if (rs2.next()) {                	            	
+                    String admin =  rs2.getString(1);
+	                ps.setString(1,admin);
+	                ResultSet rs3 = ps.executeQuery();
+	                if (rs3.next()) {
+	                    token = rs3.getString("password");
+	                    m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
+	                    if (m) {
+	                    	result = String.valueOf(id) + "~Master";
+	                    	return result;
+	                    }
+	                    else 
+	                    	return result;
+	                }
+	                else
+	                	return result;
+                }
+                else 
+                	return result;
+            }
+        }
+        else return result;
     }
 
     public static void insertTeacher (Connection conn, String userName, String fname, String lname, String pw, String email) throws SQLException {

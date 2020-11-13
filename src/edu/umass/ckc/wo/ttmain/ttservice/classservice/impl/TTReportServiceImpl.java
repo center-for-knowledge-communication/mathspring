@@ -16,6 +16,10 @@ import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportStudentsMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportEvents;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportEventsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherListEntryMapper;
@@ -65,7 +69,9 @@ import java.text.SimpleDateFormat;
  * Frank	07-08-20	issue #153 added access code checker
  * Frank	07-28-20	issue #74 valid classId is valid or this teacherId
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
- * FRank	10-27-20	Issue 149R2 report_type parameter sdded
+ * FRank	10-27-20	Issue #149R2 report_type parameter sdded
+ * Frank	11-12-20	Issue #276 suppress logging when logged in as Master
+ * Frank	11-12-20	Issue #299 Class Landing Page report
 */
 
 
@@ -85,9 +91,8 @@ public class TTReportServiceImpl implements TTReportService {
 	private String showNames = "Y";
 	private Locale ploc;
 
-
     @Override
-    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter) throws TTCustomException {
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException {
 
         try {
         	
@@ -95,7 +100,7 @@ public class TTReportServiceImpl implements TTReportService {
     		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
     		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
-    		
+
         	// Hack - using classId to hold 'Target teacher ID' for teacher activities reports so use URL param not session variable
         	if ( (!reportType.equals("teacherList")) && (!reportType.equals("perTeacherReport")) ) {
         		try {
@@ -113,12 +118,14 @@ public class TTReportServiceImpl implements TTReportService {
     		
         	switch (reportType) {
                 case "perStudentReport":
-                	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
+            		if ("Normal".equals(teacherLoginType)) {
+	                	try {
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+	                	}
+	                	catch (Exception e) {
+	                		System.out.println("TeacherLogger error " + e.getMessage());
+	                	}
+            		}
                     List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
                     Map<String, String> studentIdMap = classStudents.stream().collect(Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
@@ -228,58 +235,75 @@ public class TTReportServiceImpl implements TTReportService {
                     return objMapper.writeValueAsString(dataMap);
 
                 case "perProblemReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, reportType, "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
-                     Map<String, PerProblemReportBean> resultBean = generatePerProblemReportForClass(classId);
+            		if ("Normal".equals(teacherLoginType)) {
+	                   	try {
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, reportType, "");
+	                	}
+	                	catch (Exception e) {
+	                		System.out.println("TeacherLogger error " + e.getMessage());
+	                	}
+            		}
+                    Map<String, PerProblemReportBean> resultBean = generatePerProblemReportForClass(classId);
                     ObjectMapper perStudentPerProblemReportMapper = new ObjectMapper();
                     Map<String, Object> dataMapper = new HashMap<>();
                     dataMapper.put("levelOneDataPerProblem", resultBean);
                     return perStudentPerProblemReportMapper.writeValueAsString(dataMapper);
 
                 case "commonCoreClusterReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId,  rb.getString(reportType), "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
+            		if ("Normal".equals(teacherLoginType)) {
+	                   	try {
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId,  rb.getString(reportType), "");
+	                	}
+	                	catch (Exception e) {
+	                		System.out.println("TeacherLogger error " + e.getMessage());
+	                	}
+            		}
                     Map<String, PerClusterObjectBean> resultsPerStandard = generatePerCommonCoreClusterReport(classId);
                     ObjectMapper perStudentPerProblemSetReportMapper = new ObjectMapper();
                     return perStudentPerProblemSetReportMapper.writeValueAsString(resultsPerStandard);
 
                 case "perStudentPerProblemSetReport":
-                    Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId, filter);
+                    Map<String, Object> result = generateClassReportPerStudentPerProblemSet(teacherId, classId, filter, teacherLoginType);
                     ObjectMapper perClusterReportMapper = new ObjectMapper();
                     return perClusterReportMapper.writeValueAsString(result);
                     
                 case "perStudentPerProblemReport":
-                    Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter);
+                    Map<String, Object> result2 = generateClassReportPerStudentPerProblem(teacherId, classId, filter, teacherLoginType);
                     ObjectMapper perStudentPerProblemReportMapper2 = new ObjectMapper();
                     return perStudentPerProblemReportMapper2.writeValueAsString(result2);
                     
                 case "summarySurveyReport":
-                   	try {
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
-                	}
+            		if ("Normal".equals(teacherLoginType)) {
+	                   	try {
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+	                	}
+	                	catch (Exception e) {
+	                		System.out.println("TeacherLogger error " + e.getMessage());
+	                	}
+            		}
                 	Map<String, Map<Integer, StudentDetails>> result1 = generateSurveyReport(classId);
                     ObjectMapper perClusterReportMapper1 = new ObjectMapper();
                     return perClusterReportMapper1.writeValueAsString(result1);
-                	
+
+                case "classLandingReportOne":
+                    List<ClassLandingReportStudents> landingReportOne_Students = generateClassLandingReportOne(teacherId, classId, filter);
+                    String[][] landingReportOne_levelOneData = landingReportOne_Students.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems(), classStudents1.getTimeInMS(), classStudents1.getLatestLogin() }).toArray(String[][]::new) ;
+                                    	
+                    ObjectMapper landingReportOne_objMapper = new ObjectMapper();
+                    Map<String, Object> landingReportOne_dataMap = new HashMap<>();
+                    landingReportOne_dataMap.put("levelOneData", landingReportOne_levelOneData);
+                    return landingReportOne_objMapper.writeValueAsString(landingReportOne_dataMap);
+                    
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
-                   	try {
-                   		String logmsg = "{ \"teacherId\" : \"" + classId + "\" }";
-               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), logmsg);
-                	}
-                	catch (Exception e) {
-                		System.out.println("TeacherLogger error " + e.getMessage());
+                	if ("Normal".equals(teacherLoginType)) {
+	                   	try {
+	                   		String logmsg = "{ \"teacherId\" : \"" + classId + "\" }";
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, "0", rb.getString("view_teacher_activities"), logmsg);
+	                	}
+	                	catch (Exception e) {
+	                		System.out.println("TeacherLogger error " + e.getMessage());
+	                	}
                 	}
                     List<TeacherLogEntry> TeacherLogEntries = generateTeacherLogReport(classId);
                     String[][] teacherData = TeacherLogEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTimestampString(lang.substring(0,2)),TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getTeacherName(), TeacherLogEntry1.getUserName(), TeacherLogEntry1.getAction(), TeacherLogEntry1.getClassId(), TeacherLogEntry1.getActivityName(reportType)}).toArray(String[][]::new);
@@ -686,7 +710,119 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter) throws TTCustomException {
+    public List<ClassLandingReportStudents> generateClassLandingReportOne(String teacherId, String classId, String filter) {
+    	Timestamp ts = null;
+    	int xDays = 0;
+		try {
+			xDays = Integer.parseInt(filter.trim());
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		if (xDays == 0) {
+			xDays = 365;
+		}
+		Date currentDate = new Date();
+		// convert date to calendar
+		Calendar c = Calendar.getInstance();
+		c.setTime(currentDate);
+		c.add(Calendar.DAY_OF_MONTH, (xDays * -1)); 
+		// convert calendar to date
+		Date xDate = c.getTime();
+		ts = new Timestamp(xDate.getTime());
+		
+        Map<String, Object> eventParams = new HashMap<String, Object>();
+        eventParams.put("classId", classId);
+        eventParams.put("ts", ts);
+        SqlParameterSource eventNamedParameters = new MapSqlParameterSource(eventParams);
+
+        //SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT_EVENTS_QUERY, eventNamedParameters, new ClassLandingReportEventsMapper());
+
+        Map<String, String> probElapsedMap = new HashMap<String, String>();
+        Map<String, String> loginsMap = new HashMap<String, String>();
+        Map<String, String> latestLoginMap = new HashMap<String, String>();
+        String prevStudent = "";
+        int probElapsedTime = 0;
+        int logins = 0;
+        boolean loginRecorded = false;
+        String latestLogin = "";
+        boolean countable = false;
+        for (ClassLandingReportEvents event : classLandingReportEvents) {
+        	switch (event.getAction()) {
+        		case "EndProblem":
+                	System.out.println(event.toString());
+        			countable = true;
+        			break;
+        		case "Student Access":
+                	System.out.println(event.toString());
+                	if (!loginRecorded) {
+                		latestLogin = event.getTimestampString("en");
+                    	loginRecorded = true;
+                	}
+                	logins++;
+        			break;
+        		default:
+        			countable = false;
+        	}
+        	if (event.getStudentId().equals(prevStudent)) {
+            	if (countable) {
+            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            	}
+        	}
+        	else {
+            	if (prevStudent.length() > 0) {
+                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
+            		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+            		probElapsedTime = 0;
+            		loginsMap.put(prevStudent, String.valueOf(logins));
+            		latestLoginMap.put(prevStudent, latestLogin);
+            		latestLogin = "";
+            		loginRecorded = false;
+            		logins = 0;           	}
+            	if (countable) {
+            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            	}
+          	}
+           	prevStudent = event.getStudentId();
+        }
+        
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("classId", classId);
+        params.put("ts", ts);
+        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+
+        List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT_STUDENTS_QUERY, namedParameters, new ClassLandingReportStudentsMapper());
+        
+        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+        	System.out.println("StudentID=" + stu.getStudentId());
+        	String timeInMS = probElapsedMap.get(stu.getStudentId());
+        	if (timeInMS == null) {
+        		timeInMS = "0";
+        	}        	
+        	String sMinutes = "0";
+        	int iMinutes = Integer.parseInt(timeInMS);
+        	if (iMinutes > 0) {
+        		iMinutes = iMinutes / 60000;
+        		sMinutes = String.valueOf(iMinutes);
+        	}
+        	System.out.println("ElapsedTime=" + sMinutes);
+        	stu.setTimeInMS(sMinutes);
+//        	stu.setNoOfLogins(loginsMap.get(stu.getStudentId()));
+        	String test = latestLoginMap.get(stu.getStudentId());
+        	System.out.println("ElapsedTime=" + test);
+        	stu.setLatestLogin(latestLoginMap.get(stu.getStudentId()));
+        }
+        	
+        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+        	System.out.println("StudentID=" + stu.getStudentId() + "ElapsedTime=" + stu.getTimeInMS());
+        }
+
+        return classLandingReportStudents;
+    }
+
+    @Override
+    public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException {
     
 
     	System.out.println("generateClassReportPerStudentPerProblemSet for class " + classId + "filter= " + filter);
@@ -729,13 +865,15 @@ public class TTReportServiceImpl implements TTReportService {
 
        	String logMsg = "{ \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
 
-       	try {
-   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemSetReport"), logMsg);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
-       	
+		if ("Normal".equals(teacherLoginType)) {
+	       	try {
+	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemSetReport"), logMsg);
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
+		
     	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
@@ -809,7 +947,7 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException {
+    public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException {
 
     	System.out.println("generateClassReportPerStudentPerProblem for class " + classId + "filter= " + filter);
     	Timestamp ts = null;
@@ -851,13 +989,14 @@ public class TTReportServiceImpl implements TTReportService {
     		
        	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
 
-       	try {
-   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemReport"), logMsg);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
-
+		if ("Normal".equals(teacherLoginType)) {
+	       	try {
+	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("perStudentPerProblemReport"), logMsg);
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
        	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);

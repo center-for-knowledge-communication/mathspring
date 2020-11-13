@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
  * Frank 	06-17-20	Issue #149
  * Frank	07-28-20	issue #74 use session for teacher id and hack for teacher report 
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
+ * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  */
 @Controller
 public class TeacherToolsReportController {
@@ -52,6 +53,7 @@ public class TeacherToolsReportController {
 
     	HttpSession session = request.getSession();
     	int intTeacherId = (int) session.getAttribute("teacherId");
+    	String teacherLoginType = (String) session.getAttribute("teacherLoginType");
     	String sTeacherId = String.valueOf(intTeacherId);
     	String sClassId = "";
     	
@@ -64,34 +66,40 @@ public class TeacherToolsReportController {
     	}
     	// end Hack
     	
-    	return reportService.generateTeacherReport(sTeacherId, sClassId, reportType, lang, filter);
+    	return reportService.generateTeacherReport(sTeacherId, sClassId, reportType, lang, filter, teacherLoginType);
 
     }
 
     @RequestMapping(value = "/tt/getCompleteMasteryProjectionForStudent", method = RequestMethod.POST)
     public @ResponseBody
     String getCompleteMasteryProjectionForStudent(ModelMap map,@RequestParam("classId") String classId, @RequestParam("chartType") String chartType, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
-    	try {
-           	String logMsg = "{  \"studentId\" : \"" + studentId + "\" }";     
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "CompleteMasteryProjectionForStudent", logMsg);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	           	String logMsg = "{  \"studentId\" : \"" + studentId + "\" }";     
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "CompleteMasteryProjectionForStudent", logMsg);
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         return reportService.getCompleteMasteryProjectionForStudent(classId,studentId,chartType);
     }
 
     @RequestMapping(value = "/tt/getMasterProjectionsForCurrentTopic", method = RequestMethod.POST)
     public @ResponseBody
     String getMasterProjectionsForCurrentTopic(ModelMap map,@RequestParam("classId") String classId, @RequestParam("topicID") String topicID, @RequestParam("filter") String filter, @RequestParam("studentId") String studentId, HttpServletRequest request) throws TTCustomException {
-    	try {
-    		String filters[] = filter.split("~");
-           	String logMsg = "{  \"topicId\" : \"" +  topicID + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "MasterProjectionsForCurrentTopic", logMsg);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	    		String filters[] = filter.split("~");
+	           	String logMsg = "{  \"topicId\" : \"" +  topicID + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "MasterProjectionsForCurrentTopic", logMsg);
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
     	return reportService.getMasterProjectionsForCurrentTopic(classId,studentId,topicID,filter);
     }
 
@@ -99,24 +107,30 @@ public class TeacherToolsReportController {
     @RequestMapping(value = "/tt/getProblemDetailsPerCluster", method = RequestMethod.POST)
     public @ResponseBody
     String getProblemDetailsPerCluster(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("clusterId") String clusterId, HttpServletRequest request) throws TTCustomException {
-    	try {
-           	String logMsg = "{  \"Problems In Cluster\" : \"" + clusterId + "\" }";     
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "problems_in_cluster", logMsg);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	           	String logMsg = "{  \"Problems In Cluster\" : \"" + clusterId + "\" }";     
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "problems_in_cluster", logMsg);
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         return reportService.generateReportForProblemsInCluster(teacherId, classId, clusterId);
     }
 
     @RequestMapping(value = "/tt/downLoadPerStudentReport", method = RequestMethod.GET)
        public ModelAndView downLoadPerStudentReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerStudentReport", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerStudentReport", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         List<ClassStudents> classStudents =  reportService.generateClassReportPerStudent(teacherId, classId);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
@@ -129,13 +143,8 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downLoadPerProblemSetReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerProblemSetReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemSetReport", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
-        Map<String, Object> dataPerProblemSet =  reportService.generateClassReportPerStudentPerProblemSet(teacherId,classId, filter);
+		HttpSession session = request.getSession();
+        Map<String, Object> dataPerProblemSet =  reportService.generateClassReportPerStudentPerProblemSet(teacherId,classId, filter, (String) session.getAttribute("teacherLoginType"));
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForProblemSet",dataPerProblemSet );
@@ -145,13 +154,8 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downLoadPerStudentPerProblemReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerStudentPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "downLoadPerStudentPerProblemReport", filter);
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
-        Map<String, Object> dataPerStudentPerProblem =  reportService.generateClassReportPerStudentPerProblem(teacherId,classId, filter);
+		HttpSession session = request.getSession();
+        Map<String, Object> dataPerStudentPerProblem =  reportService.generateClassReportPerStudentPerProblem(teacherId,classId, filter, (String) session.getAttribute("teacherLoginType"));
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForStudentPerProblem",dataPerStudentPerProblem );
@@ -161,11 +165,14 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downLoadPerProblemReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerProblemReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemReport", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerProblemReport", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
     	}
         Map<String, PerProblemReportBean> perProblemReport =  reportService.generatePerProblemReportForClass(classId);
         map.addAttribute("classId", classId);
@@ -177,12 +184,15 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downLoadPerClusterReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerClusterReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerClusterReport", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerClusterReport", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         Map<String, PerClusterObjectBean> perClusterReport =  reportService.generatePerCommonCoreClusterReport(classId);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
@@ -194,12 +204,15 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downloadStudentEmotions", method = RequestMethod.GET)
     public ModelAndView downloadStudentEmotions(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downloadStudentEmotions", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downloadStudentEmotions", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         Map<String, List<String[]>> perStdentReport =  reportService.generateEmotionsReportForDownload(teacherId,classId);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
@@ -211,12 +224,15 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/printStudentTags", method = RequestMethod.GET)
     public ModelAndView printStudentTags(ModelMap map, @RequestParam("classId") String classId,@RequestParam("formdata") String formData, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "printStudentTags", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "printStudentTags", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         List<EditStudentInfoForm> studentInfoForTags =  reportService.printStudentTags(formData,classId);
         map.addAttribute("classId", classId);
         map.addAttribute("dataForProblem",studentInfoForTags);
@@ -227,12 +243,15 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/downLoadPerSummSurReport", method = RequestMethod.GET)
     public ModelAndView downLoadPerPerSummSurReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
-    	try {
-        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerSummSurReport", "");
-    	}
-    	catch (Exception e) {
-    		System.out.println("TeacherLogger error " + e.getMessage());
-    	}
+		HttpSession session = request.getSession();
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    	try {
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadPerSummSurReport", "");
+	    	}
+	    	catch (Exception e) {
+	    		System.out.println("TeacherLogger error " + e.getMessage());
+	    	}
+		}
         Map<String, Map<Integer, StudentDetails>> perSummSurReport =  reportService.generateSurveyReport(classId);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
