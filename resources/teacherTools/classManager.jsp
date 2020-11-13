@@ -30,6 +30,8 @@
 <!-- Frank	10-12-20	add page-loading indicators -->
 <!-- Frank	10-30-20	Issue #293 add new items to class config form -->
 <!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
+<!-- Frank	11-12-20	Issue #299 Landing Page report -->
+<!-- Frank	11-12-20	Issue #276 Suppress logging if logged in as Master Teacher -->
 
 
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
@@ -174,7 +176,7 @@ var perProblemReportTable
 var perClusterReportTable
 
 //Report5 Varribales
-var perStudentReport;
+var landingPageReport;
 var effortMap;
 var perProblemObject;
 var emotionMap;
@@ -370,7 +372,9 @@ function resetStudentData() {
                 $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                 $('#errorMsgModelPopup').modal('show');
             }else{
-                logTeacherEvent("resetStudentData",resetStudentDataLogmsg);
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("resetStudentData",resetStudentDataLogmsg);
+                }
                 $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_info_updated")%>");
                 $('#successMsgModelPopup').modal('show');
             }
@@ -417,7 +421,9 @@ function deleteInactiveStudents() {
         		logmsg = response;
         		logmsg = "{ \"result\" : \"[" + response + "]\"}";
         	}
-            logTeacherEvent("deleteInactiveStudents",logmsg);
+            if (teacherLoginType === "Normal") {
+	            logTeacherEvent("deleteInactiveStudents",logmsg);
+            }
         	$("#successMsgModelPopup").find("[class*='modal-body']").html( response );
             $('#successMsgModelPopup').modal('show');
         }
@@ -447,8 +453,10 @@ function resetPassWordForThisStudent(id,uname){
                  $('#errorMsgModelPopup').modal('show');
              }else{
             	 var logMsg  = "{ \"id\" : \"" + id + "\", \"username\" : \"" + uname + "\", \"msg\" : \"password_is_reset\" }";
-				 logTeacherEvent("resetStudentPassword",logMsg);
-                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
+                 if (teacherLoginType === "Normal") {
+				 	logTeacherEvent("resetStudentPassword",logMsg);
+                 }
+	             $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
          }
@@ -488,7 +496,9 @@ function updateStudentInfo(formName){
             }else{
             	var JSONData = JSON.parse(response);
             	var msg = JSONData["msg"];
-                logTeacherEvent("updateStudentInfo",response);
+                if (teacherLoginType === "Normal") {
+	                logTeacherEvent("updateStudentInfo",response);
+                }
                 $("#successMsgModelPopup").find("[class*='modal-body']").html(msg);
                 $('#successMsgModelPopup').modal('show');
             }
@@ -980,6 +990,22 @@ function handleclickHandlers() {
 
 }
 
+function changeLandingPageHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','timeInMS': '(sp)Time solving problems (minutes)','latestLogin': '(sp)Most recnt login'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
+	 	return header;
+	}
+}
 
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
@@ -1015,6 +1041,172 @@ function registerAllEvents(){
         "bFilter": false,
         "bLengthChange": false,
         "ordering": false
+    });
+
+    var headers = changeLandingPageHeaderAccordingToLanguage();
+
+    
+    if (languageSet == 'es') {
+    
+    landingPageReport  =  $('#landingPageReport').DataTable({
+        data: [],
+        destroy: true,
+        columns: [
+            { title: headers['sid'] },
+            { title: headers['sname']  },
+            { title: headers['uname']  },
+            { title: headers['problems']  },
+            { title: headers['timeInMS']  },
+            { title: headers['latestLogin']  },
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bLengthChange": false,
+        rowReorder: false,                
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+
+        "scrollX": true,
+        "bSort" : false,
+        "columnDefs": [
+            {
+                "width": "10%",
+                "targets": [ 0 ],
+                "visible": fals
+
+            },{
+                "width": "10%",
+                "targets": [ 1 ],
+                "visible": true
+
+            },{
+                "width": "10%",
+                "targets": [ 2 ],
+                "visible": false
+
+            },
+            {
+                "width": "10%",
+                "targets": [ 3 ],
+                "visible": true
+
+            },
+            {
+                "targets": [ 4 ],
+                "width": "10%",
+                "visible": true
+            }, 
+            {
+                "targets": [ 5 ],
+                "width": "10%",
+                "visible": true
+            }
+                
+    	]
+    }    
+    );
+    }
+    else {
+        landingPageReport  =  $('#landingPageReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers['sid'] },
+                { title: headers['sname']  },
+                { title: headers['uname']  },
+                { title: headers['problems']  },
+                { title: headers['timeInMS']  },
+                { title: headers['latestLogin']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "10%",
+                    "targets": [ 0 ],
+                    "visible": false
+
+                },{
+                    "width": "10%",
+                    "targets": [ 1 ],
+                    "visible": true
+
+                },{
+                    "width": "10%",
+                    "targets": [ 2 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "10%",
+                    "targets": [ 3 ],
+                    "visible": true
+
+                },
+                {
+                    "targets": [ 4 ],
+                    "width": "10%",
+                    "visible": true
+                }, 
+                {
+                    "targets": [ 5 ],
+                    "width": "10%",
+                    "visible": true
+                }
+                    
+        	]
+        }    
+        );    	
+    }
+    
+    $('#classLandingReportOne').on('show.bs.collapse', function ()  {
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'classLandingReportOne',
+                lang: loc,
+                filter: '60'
+            },
+            success : function(data) {
+                var jsonData = $.parseJSON(data);
+                landingPageReport.clear().draw();
+                landingPageReport.rows.add(jsonData.levelOneData).draw();
+                landingPageReport.columns.adjust().draw();
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+
     });
 
     var classListSize = $('#classListSize').val();
@@ -1438,7 +1630,9 @@ function registerAllEvents(){
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    logTeacherEvent("createMoreStudentId",data);
+                    if (teacherLoginType === "Normal") {
+	                    logTeacherEvent("createMoreStudentId",data);
+                    }
                     $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("user_creation_successful")%> " );
                     $('#successMsgModelPopup').modal('show');
                 }
@@ -1555,6 +1749,7 @@ function registerAllEvents(){
         var pgContext = '${pageContext.request.contextPath}';
         var classID = '${classInfo.classid}';
         var teacherID = '${teacherId}';
+        var teacherLoginType = '${teacherLoginType}';
         var currentSelection = '${currentSelection}';
         var sessionID = "0";
         var prePostIds = '${prepostIds}'.split("~~");		
@@ -1567,6 +1762,7 @@ function registerAllEvents(){
 
             if (currentSelection == "classHomePage") {
                 $("#splash_page").show();            	
+            	$("#classLandingReportOne").collapse('show');
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
                     $('#reorg_prob_sets_handler').click();
@@ -2477,16 +2673,31 @@ function registerAllEvents(){
              </div>
 
              <div id="splash_page" style="display:none;width: 100%;">
-             <div>
+             	<div>
                     <h3 class="tt-page-header">
-                    Select activities from the menu on the left
+                    <%= rb.getString("select_activities_from_menu") %>
                     </h3>
                 </div>
-             </div>
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="reportOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportOne">
+				                    <%= rb.getString("student_activities_this_week") %>
+                                </a>
+                                <button id="landingPageReportButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="classLandingReportOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table id="landingPageReport" class="table table-striped table-bordered hover" width="100%"></table>
+                            </div>
 
-            
-        </div>
-</div>
+                        </div>
+                    </div>
+                </div>            
+        	</div>
+	</div>
 </div>
 
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>

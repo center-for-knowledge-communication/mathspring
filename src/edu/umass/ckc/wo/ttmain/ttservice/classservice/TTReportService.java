@@ -4,6 +4,7 @@ package edu.umass.ckc.wo.ttmain.ttservice.classservice;
 import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 
 public interface TTReportService {
-    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter) throws TTCustomException;
+    public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException;
 
     public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException;
 
@@ -40,9 +41,9 @@ public interface TTReportService {
 
     public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId);
 
-    public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter) throws TTCustomException;
+    public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException;
 
-    public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter) throws TTCustomException;
+    public Map<String,Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException;
 
     public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID, String filter) throws TTCustomException;
 
@@ -56,6 +57,8 @@ public interface TTReportService {
     
     public Map<String, Map<Integer,StudentDetails>> generateSurveyReport(String classId) throws TTCustomException;
     
+    public List<ClassLandingReportStudents> generateClassLandingReportOne(String teacherId, String classId, String filter);
+
     public List<TeacherLogEntry> generateTeacherLogReport(String targetId);
 
     public List<TeacherListEntry> generateTeacherList(String targetId);

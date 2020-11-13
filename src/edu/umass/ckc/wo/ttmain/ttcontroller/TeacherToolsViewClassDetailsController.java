@@ -50,6 +50,7 @@ import javax.servlet.http.HttpSession;
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  * Frank	10-12-20	Issue #272 handle split of classDetails.jsp
  * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
+ * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  */
 
 @Controller
@@ -90,10 +91,10 @@ public class TeacherToolsViewClassDetailsController {
     	if (currentSelection == "classHomePage") {
 			try {
 	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
-	    			HttpSession MySession = request.getSession();
-	    			int teacherId = (int) MySession.getAttribute("teacherId");
-	    	 		tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
-	
+	    			int teacherId = (int) session.getAttribute("teacherId");
+	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+	    			}
 	    	    	session.removeAttribute("tLogger");
 	    	    	session.removeAttribute("teacherUsername");
 	    	    	session.removeAttribute("teacherId");
@@ -158,16 +159,18 @@ public class TeacherToolsViewClassDetailsController {
             sequenceNosToBeRemoved.add(Integer.valueOf(entries[2]));
         }
         ccService.reOrderProblemSets(Integer.valueOf(classid), sequenceNosToBeRemoved, insertSequences);
-		HttpSession MySession = request.getSession();
-		int teacherId = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId, 0, classid,"reOrderTopics", "");
+		HttpSession session = request.getSession();
+		int teacherId = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId, 0, classid,"reOrderTopics", "");
+		}
         return "success";
     }
 
     @RequestMapping(value = "/tt/configureProblemSets", method = RequestMethod.POST)
     public @ResponseBody String activateProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "activateData[]") List<String> problemSets, @RequestParam(value = "classid") String classid,@RequestParam(value = "activateFlag") String activateFlag) throws TTCustomException {
         List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
-		HttpSession MySession = request.getSession();
+		HttpSession session = request.getSession();
 		System.out.println(problemSets);
 		String logMsg = "{ ";
 		if (activateFlag.equals("deactivate")) {
@@ -182,8 +185,10 @@ public class TeacherToolsViewClassDetailsController {
 		}
 		logMsg += " }";
 
-		int teacherId = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
+		int teacherId = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
+		}
         return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag);
     }
     
@@ -207,9 +212,11 @@ public class TeacherToolsViewClassDetailsController {
     	logMsg += "\"classes Updated\" : \"[" +idList + "]\"";
         logMsg += " }";
         
-        HttpSession MySession = request.getSession();
-		int teacherId2 = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId2, 0, classid, "continousContentApply", logMsg);
+        HttpSession session = request.getSession();
+		int teacherId2 = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId2, 0, classid, "continousContentApply", logMsg);
+		}
         return ccService.continousContentApply(intClassIDList,Integer.valueOf(classid),Integer.valueOf(teacherId));
     }
 

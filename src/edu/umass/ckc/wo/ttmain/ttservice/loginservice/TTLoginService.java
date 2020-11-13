@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface TTLoginService{
 
-    public int loginAssist(String uname,String password);
+    public String loginAssist(String uname,String password);
 
     public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException;
 
