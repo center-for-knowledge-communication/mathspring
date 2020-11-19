@@ -36,13 +36,14 @@ function setMPPVisibility (showMPP) {
 
 function processRequestSolutionResult (responseText, textStatus, XMLHttpRequest) {
     checkError(responseText);
-    debugAlert("Server returns " + responseText);
+    //console.log("processRequestSolutionResult Server returns " + responseText);
     var activity = $.parseJSON(responseText);
     var soln = activity.solution;
     var labels = new Array();
     for (i = 0; i < soln.length; i++) {
         labels[i] = soln[i].label;
     }
+    //console.log("Here are the hints " + labels);
     callProblemPlayHintSequence(labels);
 }
 
@@ -50,7 +51,7 @@ function processRequestSolutionResult (responseText, textStatus, XMLHttpRequest)
 // XML parsing in case we ever need it.
 function processRequestSolutionResult2(responseText, textStatus, XMLHttpRequest) {
     checkError(responseText);
-    debugAlert("Server returns " + responseText);
+    //console.log("processRequestSolutionResult2 Server returns " + responseText);
 //    var re = new RegExp("&hint=(\w*)&*");  // collect the label out of the param string
     var solutionXML = getXMLElement(responseText, "solution");
 //    debugAlert("XML for hint " + hintXML);
@@ -63,7 +64,7 @@ function processRequestSolutionResult2(responseText, textStatus, XMLHttpRequest)
             labels[i] = $hints[i].textContent;
         }
         // var labels = $hints.text();
-        debugAlert("Here are the hints " + labels);
+        //console.log("Here are the hints " + labels);
         callProblemPlayHintSequence(labels);
     }
 
@@ -72,7 +73,6 @@ function processRequestSolutionResult2(responseText, textStatus, XMLHttpRequest)
 
 function processRequestHintResult(responseText, textStatus, XMLHttpRequest) {
     checkError(responseText);
-    debugAlert("Server returns " + responseText);
 //    var re = new RegExp("&hint=(\w*)&*");  // collect the label out of the param string
     var hint = JSON.parse(responseText);
     var label = hint.label;
@@ -81,7 +81,7 @@ function processRequestHintResult(responseText, textStatus, XMLHttpRequest) {
         globals.numHintsSeen++;
         displayHintCount();
     }
-    debugAlert("hint returned is ID: " + id + " label: " + label);
+    //console.log("processRequestHintResult hint returned is ID: " + id + " label: " + label);
     globals.curHint = label;
     callProblemPlayHint(label);
     showLearningCompanion(hint);
@@ -89,14 +89,16 @@ function processRequestHintResult(responseText, textStatus, XMLHttpRequest) {
 
 
 function callProblemReplayHint() {
-    debugAlert("In callProblemReplayHint with ");
     // These Composition IDs are different for each problem.   So we need to figure out where to get from.
     //    Comp.getStage().play(hintLabel) ;
-    if (isFlashProblem())
-        document.getElementById(FLASH_PROB_PLAYER).playHint(globals.curHint);
-    else if (isHTML5Problem())
-        document.getElementById(PROBLEM_WINDOW).contentWindow.prob_playHint(globals.curHint);    //  TODO this line is causing security violation on macs
 
+    if (!(globals.curHint == null)) {
+        playHint(globals.curHint);    	
+    }
+    else {
+    	alert(no_hints_seen_yet);
+    }
+    
 }
 
 // This function is called when the hint link is clicked on.
@@ -106,10 +108,15 @@ function callProblemReplayHint() {
 // pass it the hint label so it can jump to that label and start
 // playing
 function callProblemPlayHint(hintLabel) {
-    debugAlert("In callProblemPlayHint with " + hintLabel);
+    //console.log("In callProblemPlayHint with " + hintLabel);
     // These Composition IDs are different for each problem.   So we need to figure out where to get from.
     //    Comp.getStage().play(hintLabel) ;
-    playHint(globals.curHint);
+    if (!(globals.curHint == null)) {
+        playHint(globals.curHint);    	
+    }
+    else {
+    	alert(hint_not_found);
+    }
 }
 
 function playHint (hintLabel) {

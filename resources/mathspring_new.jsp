@@ -111,6 +111,7 @@ else
 	var please_watch_video = "<%= rb.getString("please_watch_video") %>";
 	var yes_choice = "<%= rb.getString("yes") %>";	
 	var no_choice = "<%= rb.getString("no") %>";
+	var no_hints_seen_yet = "<%= rb.getString("no_hints_seen_yet") %>";
 </script>
 
 
