@@ -267,6 +267,8 @@ function nextProb(globals,isSessionBegin=false) {
     // A HACK.  Because the Topic Intro is an intervention but it doesn't show in a dialog, it is ended by clicking on New Problem button
     // which comes in here.  We want to send back an InputResponse though becuase thats what TopicIntros should get back.
     // TODO:  Probably should replace NewProblem button when a topic intro shows.  It could have the correct handler on it.
+	globals.curHint = null;
+	globals.hintSequence = null;
     if (globals.lastProbType === TOPIC_INTRO_PROB_TYPE)
         servletGet("InputResponseNextProblemIntervention",
             {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,
@@ -274,7 +276,7 @@ function nextProb(globals,isSessionBegin=false) {
             processNextProblemResult) ;
     // Normal Processing
     else
-        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);
+        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);    	
 }
 
 // This function can only be called if the button is showing
