@@ -9,7 +9,8 @@
 <script>
 var languagePreference = window.navigator.language;
 
-if (languagePreference == "en-US") {
+var lang = languagePreference.substring(0,2);
+if (lang == "en") {
 	document.getElementById("demo").innerHTML = "Choose the My Progress Page to choose your next activity OR click on the next problem button to move on to the next topic.";
 }
 else {
