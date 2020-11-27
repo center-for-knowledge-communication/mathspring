@@ -107,7 +107,7 @@ public class DbClass {
                 int minTime = 0;
                 if (rs.getObject(28) != null && !rs.wasNull()) {
                 	if (rs.getLong(28) < maxTime) {
-                		minProb = rs.getInt(28);
+                		minTime = rs.getInt(28);
                 	}
             	}
                 

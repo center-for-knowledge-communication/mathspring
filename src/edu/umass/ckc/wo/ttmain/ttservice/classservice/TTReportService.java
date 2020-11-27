@@ -33,7 +33,7 @@ public interface TTReportService {
 
     public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException;
 
-    public Map<String,PerClusterObjectBean> generatePerCommonCoreClusterReport(String classId);
+    public Map<String,PerClusterObjectBean> generatePerCommonCoreClusterReport(String teacherId, String classId, String filter, String teacherLoginType);
 
     Map<String, List<Document>> generateEmotionMapValues(Map<String, String> studentIds) throws TTCustomException;
 
@@ -49,7 +49,7 @@ public interface TTReportService {
 
     public String getCompleteMasteryProjectionForStudent(String classId, String studentId, String chartType) throws TTCustomException;
 
-    public String generateReportForProblemsInCluster(String teacherId, String classId, String clusterId) throws TTCustomException;
+    public String generateReportForProblemsInCluster(String teacherId, String classId, String clusterId, String filter, String teacherLoginType) throws TTCustomException;
 
     public Map<String, PerProblemReportBean> generatePerProblemReportForClass(String classId) throws TTCustomException;
 
