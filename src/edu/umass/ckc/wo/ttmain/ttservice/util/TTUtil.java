@@ -34,6 +34,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank	10-01-20	Issue #254R2 restrict inactive topic list columns to selected 'grade', 'above' and 'below' selections
  * Frank	11-12-20	Issue #299 Class Landing Page Report queries
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
+ * Frank    11-28-20	issue #318 Sort by Student Fname - landingReportOne
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -85,7 +86,7 @@ public class TTUtil {
     public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId=(:classId)) and std.clusterID=(:clusterID) and mode='practice' and std.id=pr.standardID and h.problemId = pr.id and h.problemBeginTime >= (:ts)";
     public static final String PER_STANDARD_QUERY_FOURTH = "SELECT * FROM (select std.clusterId,count(h.effort) as totalSOFLogged, problemBeginTime from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=p.standardID and p.id=h.problemId and  h.effort = 'SOF' and h.effort != 'null' group by std.clusterID) as A join ( select std.clusterId,count(h.effort) as totoaleffortlogged, problemBeginTime from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=pr.standardID and pr.id=h.problemId and h.problemBeginTime >= (:ts) and  h.effort != 'null' group by std.clusterID) as B on A.clusterId=B.clusterId";
 
-    public static final String LANDING_REPORT_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.mode != 'demo' and sh.problemBeginTime > (:ts) GROUP BY studId order by studId;";
+    public static final String LANDING_REPORT_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.mode != 'demo' and sh.problemBeginTime > (:ts) GROUP BY studId order by studentName;";
     public static final String LANDING_REPORT_EVENTS_QUERY ="select distinct s.id AS studentId, s.classid, e.clickTime as clickTime, e.action as action, e.sessNum as sessNum, e.probElapsed as probElapsed, e.elapsedTime as elapsedTime from student as s, class as c, eventlog as e where s.classid = (:classId) and e.studId = s.id and e.clickTime > (:ts) order by e.studId, e.time ASC;";
 
     public static final String EMOTION_REPORT = "select e.userInput from eventlog e where studId =(:studId) and action='InputResponse' and userInput != 'null' and userInput not like '%howDoYouFeel%' and userInput not like '%-1%'";
