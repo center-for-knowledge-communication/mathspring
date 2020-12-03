@@ -73,6 +73,7 @@ import java.text.SimpleDateFormat;
  * Frank	11-12-20	Issue #276 suppress logging when logged in as Master
  * Frank	11-12-20	Issue #299 Class Landing Page report
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
+ * Frank	12-03-20	fix xdays computation to go back to just after midnight to include the entire day
 */
 
 
@@ -1716,7 +1717,10 @@ public class TTReportServiceImpl implements TTReportService {
 		// convert date to calendar
 		Calendar c = Calendar.getInstance();
 		c.setTime(currentDate);
-		c.add(Calendar.DAY_OF_MONTH, (xDays * -1)); 
+		c.add(Calendar.DAY_OF_MONTH, (xDays * -1));
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 1);
 		// convert calendar to date
 		Date xDate = c.getTime();
 		ts = new Timestamp(xDate.getTime());
