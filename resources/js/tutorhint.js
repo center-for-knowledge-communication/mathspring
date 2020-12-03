@@ -7,7 +7,8 @@
  * 
  * Frank 04-24-2020 issue #16 removed done button from example dialog
  * Frank 04-27-2020 Issue #16 handle problems with duplicate hint labels hanging the example processing"
- * Frank 05-01-2020 Issue #16R2 cut and paste Typo caused catastrophic failure 
+ * Frank 05-01-2020 Issue #16R2 cut and paste Typo caused catastrophic failure
+ * Frank 12-03-2020 Issue #317 Stop all example hint audios before playing the next hint audio
  */
 
 function requestSolution(globals) {
@@ -167,6 +168,7 @@ function example_solveNextHint () {
         	console.log("Duplicate step label");        	
         	globals.exampleCurHint = "undefined";
         }
+        stopExampleAudio();
         exampleHintStatus = true;
         example_playHint(currHint);
         if (!exampleHintStatus) {
@@ -185,4 +187,14 @@ function callProblemPlayHintSequence(hintSequence) {
     globals.hintSequence = hintSequence;
     globals.curHint = hintSequence[0];
 //    playHint(globals.curHint);
+}
+
+function stopExampleAudio(){
+	var sounds = document.getElementsByTagName("audio");
+    for(i = 1; i < sounds.length; i++) {
+        if(sounds[i].readyState > 0) {
+            sounds[i].pause();
+            sounds[i].currentTime = 0;
+        }
+    }
 }
