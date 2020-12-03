@@ -152,6 +152,7 @@ System.out.println("msHost = " + msHost + msContext);
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank	01-16-20  	Restore corrupted Spanish Special Characters
  * Frank    02-17-20    ttfixesR3
+ * Frank	12-02-20	Issue #322 added currentSelection to classReportCard URL 
  */
  
  
@@ -2008,7 +2009,7 @@ function registerAllEvents(){
                 <a id="classHomePage" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("class_home") %></a>
             </li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
 
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
