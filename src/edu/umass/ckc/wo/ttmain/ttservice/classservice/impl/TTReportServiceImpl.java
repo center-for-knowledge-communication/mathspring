@@ -751,11 +751,9 @@ public class TTReportServiceImpl implements TTReportService {
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
         		case "EndProblem":
-                	System.out.println(event.toString());
         			countable = true;
         			break;
         		case "Student Access":
-                	System.out.println(event.toString());
             		latestLoginMap.put(event.getStudentId(), event.getTimestampString("en"));
         			break;
         		default:
