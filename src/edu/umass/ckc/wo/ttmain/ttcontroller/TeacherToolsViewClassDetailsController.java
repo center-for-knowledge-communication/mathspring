@@ -136,19 +136,22 @@ public class TeacherToolsViewClassDetailsController {
 		        return "login/loginK12_teacher";			
 			}
     	}
-    	else {   		
-			int teacherId = (int) session.getAttribute("teacherId");
-			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
-			}
-	    	session.removeAttribute("tLogger");
-	    	session.removeAttribute("teacherUsername");
-	    	session.removeAttribute("teacherId");
-			session.invalidate();
-			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
-            request.setAttribute("message",msg);
-	        return "login/loginK12_teacher";
+    	else {
+        	if (currentSelection.equals("")) {    		
+				int teacherId = (int) session.getAttribute("teacherId");
+				if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+					tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+				}
+		    	session.removeAttribute("tLogger");
+		    	session.removeAttribute("teacherUsername");
+		    	session.removeAttribute("teacherId");
+				session.invalidate();
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";
+        	}
     	}
+
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
    		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
     	map.addAttribute("createClassForm", new CreateClassForm());
