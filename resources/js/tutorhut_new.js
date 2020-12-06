@@ -1264,6 +1264,11 @@ function clickHandling () {
 			$("#exampleContainer").css('height','600px');
 			$("#exampleContainer").css('width','auto');
 			$("#pulsate_play_button").text(example_problem_play_hints);
+			$("#pulsate_play_button").css({
+				position: 'absolute',
+    			top: '6%',
+    			left: '43%'
+			});
 		    
         },
         close: function () { exampleDialogCloseHandler(); } ,
