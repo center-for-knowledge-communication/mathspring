@@ -10,11 +10,12 @@
 <script>
 var languagePreference = window.navigator.language;
 
-if (languagePreference == "en-US") {
-	document.getElementById("demo").innerHTML = "You are done with this set of problems in Mathspring. Please logout or use the My Progress button to select review problems.";
+var lang = languagePreference.substring(0,2);
+if (lang == "es") {
+	document.getElementById("demo").innerHTML = "Ha terminado con este conjunto de problemas en Mathspring. Cierre la sesión o use el botón Mi progreso para seleccionar problemas de revisión.";
 }
 else {
-	document.getElementById("demo").innerHTML = "Ha terminado con este conjunto de problemas en Mathspring. Cierre la sesión o use el botón Mi progreso para seleccionar problemas de revisión.";
+	document.getElementById("demo").innerHTML = "You are done with this set of problems in Mathspring. Please logout or use the My Progress button to select review problems.";
 }
 </script>
 
