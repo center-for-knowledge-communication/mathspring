@@ -10,11 +10,12 @@
 var languagePreference = window.navigator.language;
 
 var lang = languagePreference.substring(0,2);
-if (lang == "en") {
-	document.getElementById("demo").innerHTML = "You have completed the challenge. Choose the My Progress Page to choose your next activity OR click on the next problem button to move on to the next topic.";
+  
+if (lang == "es") {
+	document.getElementById("demo").innerHTML = "Has completado el reto. Utilice la página de Mi Progreso para seleccionar su próxima actividad O apriete el botón de Próximo Problema para continuar con el próximo tema";
 }
 else {
-	document.getElementById("demo").innerHTML = "Has completado el reto. Utilice la página de Mi Progreso para seleccionar su próxima actividad O apriete el botón de Próximo Problema para continuar con el próximo tema";
+	document.getElementById("demo").innerHTML = "You have completed the challenge. Choose the My Progress Page to choose your next activity OR click on the next problem button to move on to the next topic.";
 }
 </script>
 
