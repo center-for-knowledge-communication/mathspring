@@ -40,6 +40,7 @@ import java.util.Map;
  * Frank	10-02-20	issue #267 detect when grade(s) selected has changed
  * Frank	10-30-20	Issue #293 added call to setAdvancedCofig()
  * Kartik	11-02-20	issue #292 test users to be created on class creation
+ * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  */
 
 @Service
@@ -57,7 +58,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         try {
         String teacherName = DbTeacher.getTeacherName(connection.getConnection(), Integer.valueOf(teacherId));
         ClassInfo classInfo = DbClass.getClass(connection.getConnection(),Integer.valueOf(classId));
-        List<User> students = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId));
+        List<User> students = DbClass.getClassStudentsByName(connection.getConnection(), Integer.valueOf(classId));
         String[] prepostIds = DbPrePost.getActivatedSurveyIdsForClass(connection.getConnection(), Integer.valueOf(classId));
         ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), Integer.valueOf(teacherId));
         Map<Integer,String> activeSurveys = DbPrePost.getActiveSurveyList(connection.getConnection());

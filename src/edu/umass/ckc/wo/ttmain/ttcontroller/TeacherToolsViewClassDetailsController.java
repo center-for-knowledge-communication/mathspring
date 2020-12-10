@@ -51,6 +51,7 @@ import javax.servlet.http.HttpSession;
  * Frank	10-12-20	Issue #272 handle split of classDetails.jsp
  * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
+ * Frank 	12-02-20	issue #322 fixed and enhanced URL manipulation checking to include classId checking
  */
 
 @Controller
@@ -88,10 +89,12 @@ public class TeacherToolsViewClassDetailsController {
 
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
-    	if (currentSelection == "classHomePage") {
+    	if (currentSelection.equals("classHomePage")) {
 			try {
-	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
-	    			int teacherId = (int) session.getAttribute("teacherId");
+				int teacherId = 0;
+    			teacherId = (int) session.getAttribute("teacherId");
+
+    			if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
 	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 	    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
 	    			}
@@ -99,9 +102,25 @@ public class TeacherToolsViewClassDetailsController {
 	    	    	session.removeAttribute("teacherUsername");
 	    	    	session.removeAttribute("teacherId");
 	    			session.invalidate();
-	    			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
 	                request.setAttribute("message",msg);
 	    	        return "login/loginK12_teacher";
+	    		}
+    			
+	    		String sessClassId = (String) session.getAttribute("classId");
+	    		if (sessClassId != null) {
+	    			if (!classId.equals(sessClassId) ) {
+		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+		    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+		    			}
+		    	    	session.removeAttribute("tLogger");
+		    	    	session.removeAttribute("teacherUsername");
+		    	    	session.removeAttribute("teacherId");
+		    			session.invalidate();
+		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
+		                request.setAttribute("message",msg);
+		    	        return "login/loginK12_teacher";
+	    			}
 	    		}
 			}
 			catch(SQLException e) {
@@ -117,6 +136,22 @@ public class TeacherToolsViewClassDetailsController {
 		        return "login/loginK12_teacher";			
 			}
     	}
+    	else {
+        	if (currentSelection.equals("")) {    		
+				int teacherId = (int) session.getAttribute("teacherId");
+				if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+					tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+				}
+		    	session.removeAttribute("tLogger");
+		    	session.removeAttribute("teacherUsername");
+		    	session.removeAttribute("teacherId");
+				session.invalidate();
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";
+        	}
+    	}
+
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
    		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
     	map.addAttribute("createClassForm", new CreateClassForm());
@@ -127,7 +162,7 @@ public class TeacherToolsViewClassDetailsController {
     }
     
     @RequestMapping(value = "/tt/viewClassReportCard", method = RequestMethod.GET)
-    public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
+    public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection  ) throws TTCustomException {
 
     	Locale loc = request.getLocale();
 
@@ -141,6 +176,63 @@ public class TeacherToolsViewClassDetailsController {
 
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
+    	if (currentSelection.equals("classReportCard")) {
+			try {
+	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
+	    			}
+	    	    	session.removeAttribute("tLogger");
+	    	    	session.removeAttribute("teacherUsername");
+	    	    	session.removeAttribute("teacherId");
+	    			session.invalidate();
+	    			String msg = rb.getString("url_tampering_error") + ": " + rb.getString("log_in_and_try_again");
+	                request.setAttribute("message",msg);
+	    	        return "login/loginK12_teacher";
+	    		}
+	    		
+	    		String sessClassId = (String) session.getAttribute("classId");
+	    		if (sessClassId != null) {
+	    			if (!classId.equals(sessClassId) ) {
+		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+		    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
+		    			}
+		    	    	session.removeAttribute("tLogger");
+		    	    	session.removeAttribute("teacherUsername");
+		    	    	session.removeAttribute("teacherId");
+		    			session.invalidate();
+		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
+		                request.setAttribute("message",msg);
+		    	        return "login/loginK12_teacher";
+	    			}
+	    		}
+			}
+			catch(SQLException e) {
+				logger.debug(e.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+			catch(java.lang.NullPointerException ne) {
+				logger.debug(ne.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+    	}
+    	else {   		
+			int teacherId = (int) session.getAttribute("teacherId");
+			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+			}
+	    	session.removeAttribute("tLogger");
+	    	session.removeAttribute("teacherUsername");
+	    	session.removeAttribute("teacherId");
+			session.invalidate();
+			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+            request.setAttribute("message",msg);
+	        return "login/loginK12_teacher";
+    	}
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
         map.addAttribute("createClassForm", new CreateClassForm());

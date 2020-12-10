@@ -152,6 +152,7 @@ System.out.println("msHost = " + msHost + msContext);
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank	01-16-20  	Restore corrupted Spanish Special Characters
  * Frank    02-17-20    ttfixesR3
+ * Frank	12-02-20	Issue #322 added currentSelection to classReportCard URL 
  */
  
  
@@ -191,6 +192,7 @@ var studentData;
 var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
+var filterLandingOne = "~7";
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
@@ -239,6 +241,21 @@ if (languagePreference.includes("en")) {
 	emsg_maxTime         = 'Max Time is a mandatory field';
 	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
 	emsg_minTime         = 'Min Time is a mandatory field';
+}
+
+
+function getFilterLandingOne() {
+	var daysLandingOne = document.getElementById("daysFilterLandingOne").value;
+	
+	const nDays = parseInt(daysLandingOne);
+	if (isNaN(nDays)) {
+		daysLandingOne = "7";
+		document.getElementById("daysFilterLandingOne").value  = "7";
+	}
+	else {
+		daysLandingOne = "" + nDays;
+	}
+	filterLandingOne = daysLandingOne;
 }
 
 function logTeacherEvent(action,activityName) {
@@ -892,6 +909,12 @@ function handleclickHandlers() {
        
     });
 
+    $("#cancelClassProfileBtn").click(function () {
+        $('#reorg_prob_sets_handler').css('color', '#ffffff');
+        $("#content-conatiner").children().hide();
+        $("#splash_page").show();
+    });
+
 
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
@@ -1044,8 +1067,7 @@ function registerAllEvents(){
     });
 
     var headers = changeLandingPageHeaderAccordingToLanguage();
-
-    
+  
     if (languageSet == 'es') {
     
     landingPageReport  =  $('#landingPageReport').DataTable({
@@ -1186,7 +1208,10 @@ function registerAllEvents(){
     }
     
     $('#classLandingReportOne').on('show.bs.collapse', function ()  {
-        $.ajax({
+
+    	
+    	getFilterLandingOne(); 
+       	$.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
             data : {
@@ -1194,7 +1219,7 @@ function registerAllEvents(){
                 teacherId: teacherID,
                 reportType: 'classLandingReportOne',
                 lang: loc,
-                filter: '60'
+                filter: filterLandingOne
             },
             success : function(data) {
                 var jsonData = $.parseJSON(data);
@@ -1984,7 +2009,7 @@ function registerAllEvents(){
                 <a id="classHomePage" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("class_home") %></a>
             </li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
 
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
@@ -2625,8 +2650,9 @@ function registerAllEvents(){
 				                    </div>
 				                </div>
 				                <div class="row">
-				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-2 col-sm-2">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-4 col-sm-4">
 				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                            <button id="cancelClassProfileBtn" class="btn btn-danger btn-lg" aria-disabled="true"><%= rb.getString("cancel") %></button>
 				                        </div>
 				                </div>
 				            </springForm:form>
@@ -2683,11 +2709,18 @@ function registerAllEvents(){
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="reportOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportOne">
-				                    <%= rb.getString("student_activities_this_week") %>
+				                    <%= rb.getString("recent_student_activities") %>
                                 </a>
                                 <button id="landingPageReportButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
+                        <div class="panel-body report_filters">                           
+							  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
+							  <input id="daysFilterLandingOne" style="width:32px" type="text" name="" value="7">   
+							  <label class="report_filters"><%= rb.getString("days") %>.  </label>
+							  <label class="report_filters" >  (Note: To refresh the data, close and re-open the report.)</label>
+
+						</div>
                         <div id="classLandingReportOne" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <table id="landingPageReport" class="table table-striped table-bordered hover" width="100%"></table>

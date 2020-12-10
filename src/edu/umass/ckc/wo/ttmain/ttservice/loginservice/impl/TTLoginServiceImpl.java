@@ -55,6 +55,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank    09-14-20	issue #237 added teacherPauseStudentUse to model
  * Frank	10-07-20	issue #267 removed School year as a determining factor for 'active' vs. 'archived' list entries
  * Frank 	11-12-20	issue #276 handle interface change for remembering type of login
+ * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -110,7 +111,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
                 ClassInfo classInfo = DbClass.getClass(connection.getConnection(), classId);
-                List<User> students = DbClass.getClassStudents(connection.getConnection(), classId);
+                List<User> students = DbClass.getClassStudentsByName(connection.getConnection(), classId);
                 model.addAttribute("students", students);
                 model.addAttribute("classbean", classbean);
                 model.addAttribute("classbeanArchived", classbeanArchived);

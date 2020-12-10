@@ -37,6 +37,8 @@ import javax.servlet.http.HttpSession;
  * Frank	07-28-20	issue #74 use session for teacher id and hack for teacher report 
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
+ * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
+
  */
 @Controller
 public class TeacherToolsReportController {
@@ -106,18 +108,9 @@ public class TeacherToolsReportController {
 
     @RequestMapping(value = "/tt/getProblemDetailsPerCluster", method = RequestMethod.POST)
     public @ResponseBody
-    String getProblemDetailsPerCluster(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("clusterId") String clusterId, HttpServletRequest request) throws TTCustomException {
+    String getProblemDetailsPerCluster(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("clusterId") String clusterId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
 		HttpSession session = request.getSession();
-		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-	    	try {
-	           	String logMsg = "{  \"Problems In Cluster\" : \"" + clusterId + "\" }";     
-	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0,  classId, "problems_in_cluster", logMsg);
-	    	}
-	    	catch (Exception e) {
-	    		System.out.println("TeacherLogger error " + e.getMessage());
-	    	}
-		}
-        return reportService.generateReportForProblemsInCluster(teacherId, classId, clusterId);
+        return reportService.generateReportForProblemsInCluster(teacherId, classId, clusterId, filter, (String) session.getAttribute("teacherLoginType"));
     }
 
     @RequestMapping(value = "/tt/downLoadPerStudentReport", method = RequestMethod.GET)
@@ -183,7 +176,7 @@ public class TeacherToolsReportController {
     }
 
     @RequestMapping(value = "/tt/downLoadPerClusterReport", method = RequestMethod.GET)
-    public ModelAndView downLoadPerClusterReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
+    public ModelAndView downLoadPerClusterReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter,  HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 	    	try {
@@ -193,11 +186,13 @@ public class TeacherToolsReportController {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-        Map<String, PerClusterObjectBean> perClusterReport =  reportService.generatePerCommonCoreClusterReport(classId);
+		
+        Map<String, PerClusterObjectBean> perClusterReport =  reportService.generatePerCommonCoreClusterReport(teacherId,classId,filter,(String) session.getAttribute("teacherLoginType"));
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("dataForProblem",perClusterReport);
         map.addAttribute("reportType", "perClusterReport");
+        
         return new ModelAndView("teachersReport", map);
 
     }

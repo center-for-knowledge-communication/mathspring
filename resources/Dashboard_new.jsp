@@ -123,7 +123,6 @@ catch (Exception e) {
             $('#volume_control').on('click', toggleVolumeControl);
             $(document).mouseup(closeVolumeControl);
             $('.play-button span').on('click', playBackground);
-            langPrefrenceForDashBoardPage();
         });
 
     </script>
