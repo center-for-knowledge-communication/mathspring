@@ -17,6 +17,8 @@ import java.util.*;
  * Date: 3/15/13
  * Time: 10:53 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	12-1320	Removed hard-coded schema name from db query
  */
 public class DbStateTableMgr {
     private static Logger logger = Logger.getLogger(DbStateTableMgr.class);
@@ -58,7 +60,7 @@ public class DbStateTableMgr {
         PreparedStatement stmt=null;
         Map<String,String> m = new Hashtable<String,String>(71);
         try {
-            String q = "select COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ? and table_schema='wayangoutpostdb'";
+            String q = "select COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = ?";
             stmt = conn.prepareStatement(q);
             stmt.setString(1, table);
             rs = stmt.executeQuery();
