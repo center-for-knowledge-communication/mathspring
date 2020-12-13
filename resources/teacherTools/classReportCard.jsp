@@ -27,6 +27,7 @@
 <!-- Frank	10-06-20	Issue #267 hide language selection on edit class form -->
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
 <!-- Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report -->
+<!-- Frank 12-11-20 Issue #315 default locale to en_US -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -40,10 +41,16 @@
 <%@ page import="edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger"%>
 
 <%
+Locale loc = request.getLocale(); 
+String lang = loc.getLanguage();
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
-
+if (lang.equals("es")) {
+	loc = new Locale("es","AR");	
+}
+else {
+	loc = new Locale("en","US");	
+}	
+System.out.println(loc.toString());
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);

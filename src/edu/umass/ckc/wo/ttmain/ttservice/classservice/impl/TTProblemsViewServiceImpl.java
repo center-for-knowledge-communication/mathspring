@@ -105,7 +105,10 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	
     	System.out.println("resetStudentData - lang=" + lang);
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
         try {
@@ -155,8 +158,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	
     	System.out.println("deleteInactiveStudents - lang=" + lang);
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
-		rb = ResourceBundle.getBundle("MathSpring",loc);        
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}		
+    	rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
         try {
             switch (action) {
@@ -192,8 +198,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	
     	// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
-		rb = ResourceBundle.getBundle("MathSpring",loc);        
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}		
+    	rb = ResourceBundle.getBundle("MathSpring",loc);        
 
         Map<String,Object> updateParams = new HashMap<String,Object>();
         updateParams.put("fname", editStudentInfoForm.getStudentFname());
@@ -215,7 +224,10 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
     	
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
         String msg = "";
 

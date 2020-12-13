@@ -74,7 +74,15 @@ public class UserRegistrationHandler {
      */
     public View handleEvent(ServletContext sc, HttpServletRequest servletRequest, Connection conn, ServletEvent e, HttpServletResponse servletResponse) throws Exception {
     	Locale loc = servletRequest.getLocale();
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
     	}

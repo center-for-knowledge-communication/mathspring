@@ -23,9 +23,17 @@
  *  Frank	10-30-20	Issue #293 add new items to class config form 
  */
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+ Locale loc = request.getLocale(); 
+ String lang = loc.getLanguage();
 
+ if (lang.equals("es")) {
+ 	loc = new Locale("es","AR");	
+ }
+ else {
+ 	loc = new Locale("en","US");	
+ }	
+ System.out.println(loc.toString());
+		 
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);

@@ -50,9 +50,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.POST)
     public String printWelcome(@RequestParam("userName") String username, @RequestParam("password") String password, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -118,9 +125,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestParam("userName") String username, @RequestParam("email") String email, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -161,9 +175,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttLoginHelp", method = RequestMethod.POST)
     public String loginHelp(@RequestParam("email") String email, @RequestParam("helpmsg") String helpmsg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);

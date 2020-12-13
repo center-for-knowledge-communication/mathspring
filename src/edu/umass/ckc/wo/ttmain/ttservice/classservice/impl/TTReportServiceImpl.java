@@ -99,7 +99,11 @@ public class TTReportServiceImpl implements TTReportService {
         try {
         	
     		// Multi=lingual enhancement
-    		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+
+        	Locale loc = new Locale("en","US");	
+        	if (lang.substring(0,2).equals("es")) {
+        		loc = new Locale("es","AR");	
+        	}        	
     		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
