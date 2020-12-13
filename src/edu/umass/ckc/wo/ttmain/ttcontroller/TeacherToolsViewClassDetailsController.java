@@ -77,8 +77,16 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -164,8 +172,16 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/viewClassReportCard", method = RequestMethod.GET)
     public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection  ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);

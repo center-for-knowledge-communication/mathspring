@@ -30,7 +30,15 @@ public class TeacherEditHandler {
     public void handleEvent(Connection conn, AdminTeacherEditEvent event, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
     	Locale loc = req.getLocale();
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);

@@ -7,9 +7,18 @@
 // Frank 10-22-19 Issue # 9 Add Enable Flash message at bottom of screen
 // Frank 04-24-20 Issue # 16 Added Multi-lingual text for tutorhut_new.js
 // Frank 10-07-20 Issue # 261 change problem heading
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+// Frank 12-11-20 Issue #315 default locale to en_US
 
+Locale loc = request.getLocale(); 
+String lang = loc.getLanguage();
+
+if (lang.equals("es")) {
+	loc = new Locale("es","AR");	
+}
+else {
+	loc = new Locale("en","US");	
+}			
+		
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);

@@ -32,8 +32,7 @@
 <!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
 <!-- Frank	11-12-20	Issue #299 Landing Page report -->
 <!-- Frank	11-12-20	Issue #276 Suppress logging if logged in as Master Teacher -->
-
-
+<!-- Frank 12-11-20 Issue #315 default locale to en_US -->
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -48,8 +47,16 @@
 
 <% 
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+Locale loc = request.getLocale(); 
+String lang = loc.getLanguage();
+
+if (lang.equals("es")) {
+	loc = new Locale("es","AR");	
+}
+else {
+	loc = new Locale("en","US");	
+}	
+System.out.println(loc.toString());
 
 ResourceBundle rb = null;
 try {
