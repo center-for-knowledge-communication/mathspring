@@ -2,6 +2,17 @@
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
 <% 
+/**
+* Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+*/
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("teacherToolsMain ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -19,13 +30,13 @@ catch (Exception e) {
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css"/>
+        <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css?ver=<%=versions.getString("css_version")%>"/>
         <script src="js/jquery-1.10.2.js"></script>
-        <script src="js/quickAuth/format2json.js"></script>
-        <script src="js/quickAuth/formatBuilder.js"></script>
-        <script src="js/quickAuth/problemUtils.js"></script>
-        <script src="js/quickAuth/buildProblem.js"></script>
-        <script src="js/quickAuth/loadProblem.js"></script>
+        <script src="js/quickAuth/format2json.js?ver=<%=versions.getString("js_version")%>"></script>
+        <script src="js/quickAuth/formatBuilder.js?ver=<%=versions.getString("js_version")%>"></script>
+        <script src="js/quickAuth/problemUtils.js?ver=<%=versions.getString("js_version")%>"></script>
+        <script src="js/quickAuth/buildProblem.js?ver=<%=versions.getString("js_version")%>"></script>
+        <script src="js/quickAuth/loadProblem.js?ver=<%=versions.getString("js_version")%>"></script>
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
                 showMathMenu: false,

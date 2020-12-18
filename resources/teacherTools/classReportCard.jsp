@@ -28,6 +28,7 @@
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
 <!-- Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report -->
 <!-- Frank 12-11-20 Issue #315 default locale to en_US -->
+<!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -41,6 +42,18 @@
 <%@ page import="edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger"%>
 
 <%
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
 
@@ -81,7 +94,7 @@ System.out.println("msHost = " + msHost + msContext);
           rel="stylesheet">
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 
     <!-- Datatables Css Files -->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">

@@ -7,7 +7,17 @@
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-16-2020 issue #123 
  * Frank 07-17-2020 issue #122 added classId to signup() function 
-*/
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+ */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -31,8 +41,8 @@ catch (Exception e) {
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <link href="login/css/loginK12_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="login/js/p7EHCscripts.js"></script>
     <script type="text/javascript">

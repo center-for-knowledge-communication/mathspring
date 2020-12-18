@@ -8,6 +8,16 @@
 // Frank 04-24-20 Issue # 16 Added Multi-lingual text for tutorhut_new.js
 // Frank 10-07-20 Issue # 261 change problem heading
 // Frank 12-11-20 Issue #315 default locale to en_US
+// Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("teacherToolsMain ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
@@ -46,15 +56,15 @@ catch (Exception e) {
 	rel="stylesheet">
 
 <%
-if (loc.getDisplayLanguage() == "Spanish") {
+if (lang.equals("es")) {
 %>
-<link href="sass_compiled/tutores.css" rel="stylesheet">
+<link href="sass_compiled/tutor.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 <%
 }
 else 
 {
 %>
-<link href="sass_compiled/tutor.css" rel="stylesheet">
+<link href="sass_compiled/tutores.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 <%
 }
 %>
@@ -70,9 +80,7 @@ else
 <script type="text/javascript"
 	src="<c:url value="/js/bootstrap/js/bootstrap.min.js" />"></script>
 
-<%--Developer Mode--%>
 <c:if test="${showProblemSelector}">
-	<!-- css for data table -->
 	<link
 		href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap4.min.css"
 		rel="stylesheet" type="text/css">
@@ -80,20 +88,15 @@ else
 		href="https://cdn.datatables.net/colreorder/1.3.2/css/colReorder.bootstrap4.min.css"
 		rel="stylesheet" type="text/css">
 
-	<!-- css for bootstrap / Font Awesome -->
 	<link
 		href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
 		rel="stylesheet">
-	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 
-	<!-- js for bootstrap-->
 
-	<!-- Latest compiled and minified JavaScript -->
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
-	<!-- js for data table -->
 	<script type="text/javascript"
 		src="<c:url value="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js" />"></script>
 	<script type="text/javascript"
@@ -101,10 +104,8 @@ else
 	<script type="text/javascript"
 		src="<c:url value="https://cdn.datatables.net/colreorder/1.3.2/js/dataTables.colReorder.min.js" />"></script>
 
-	<!-- js for bootstrap-->
 </c:if>
 
-	<!-- Multi-lingual text for tutorhut_new.js -->
 <script type="text/javascript">
 	var stepText = "<%= rb.getString("step") %>";
 	var hintText = "<%= rb.getString("hint") %>";
@@ -125,14 +126,17 @@ else
 
 
 <script type="text/javascript" src="js/simple-slider.js"></script>
-<script type="text/javascript" src="js/tutorutils.js"></script>
-<script type="text/javascript" src="js/tutorAnswer.js"></script>
-<script type="text/javascript" src="js/tutorhint.js"></script>
-<script type="text/javascript" src="js/tutorhut_new.js"></script>
-<script type="text/javascript" src="js/devdialog.js"></script>
-<script type="text/javascript" src="js/tutorintervention.js"></script>
-<script type="text/javascript" src="js/intervhandlers_new.js"></script>
+<script type="text/javascript" src="js/tutorutils.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/tutorAnswer.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/tutorhint.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/tutorhut_new.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/devdialog.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/tutorintervention.js?ver=<%=versions.getString("js_version")%>"></script>
+<script type="text/javascript" src="js/intervhandlers_new.js?ver=<%=versions.getString("js_version")%>"></script>
 <script type="text/javascript" src="js/swfobject.js"></script>
+
+
+
 <script type="text/javascript">
         var globals = {
             lastProbType: '${lastProbType}',
@@ -240,6 +244,7 @@ else
                 $('.huytran-practice__character-window').width(250);
             }
         });
+    
     </script>
 
 
