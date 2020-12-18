@@ -21,8 +21,22 @@
  *  Frank	10-07-20	issue #267 add school year to class thumbnails
  *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
  *  Frank	10-30-20	Issue #293 add new items to class config form 
- */
+ *	Frank	12-18-20	Issue #336 added cache-busting for selected .js and .css files
+*/
 
+ System.out.println("teacherToolsMain starting");
+ ResourceBundle versions = null; 
+ try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println(" js_version=" + versions.getString("js_version"));
+ }
+ catch (Exception e) {
+	 System.out.println("teacherToolsMain ERROR");	 
+// 	logger.error(e.getMessage());	
+ }
+
+ 
  Locale loc = request.getLocale(); 
  String lang = loc.getLanguage();
 
@@ -33,7 +47,8 @@
  	loc = new Locale("en","US");	
  }	
  System.out.println(loc.toString());
-		 
+
+ 
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -58,7 +73,7 @@ catch (Exception e) {
           rel="stylesheet">
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.0/css/bootstrapValidator.min.css"
           rel="stylesheet"/>
     <!-- Datatables Css Files -->

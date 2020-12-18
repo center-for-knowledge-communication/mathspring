@@ -8,6 +8,19 @@
 <%@ page import="java.util.ResourceBundle"%>
 <% 
 
+/**
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+ */
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -29,10 +42,7 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="sass_compiled/loginouter.css">
-    <%--<link rel="stylesheet" href="css/bootstrap.min.css">--%>
-    <%--<link href="css/common_new.css" rel="stylesheet" type="text/css" />--%>
-    <%--<link href="login/css/logink12Outer_new.css" rel="stylesheet" type="text/css" />--%>
+    <link rel="stylesheet" href="sass_compiled/loginouter.css?ver=<%=versions.getString("css_version")%>">
     <link href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 
     <script src="js/jquery-1.10.2.js"></script>

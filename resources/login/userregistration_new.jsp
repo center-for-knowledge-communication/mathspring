@@ -7,7 +7,16 @@
 * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
 * Frank	07-17-20	Issue #122 modified for distance learning option
 * Frank	09-10-20	Issue #221 Gender and email changes
+* Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("teacherToolsMain ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -29,7 +38,7 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
-    <link href="sass_compiled/teacher_register.css" rel="stylesheet">
+    <link href="sass_compiled/teacher_register.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 </head>
 <body>
     <div class="nav">

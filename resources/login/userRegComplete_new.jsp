@@ -5,7 +5,17 @@
 <% 
 /**
  * Frank 09-15-2020 fix fname and lname typos
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -28,8 +38,8 @@ catch (Exception e) {
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/userRegComplete_new.css" rel="stylesheet" type="text/css" />
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <link href="login/css/userRegComplete_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div class="main-content">

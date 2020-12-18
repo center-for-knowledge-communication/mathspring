@@ -6,7 +6,16 @@
 
 /**
 * Frank	06-02-2020	Issue #122 Allow student to enter class code on sign-up page
+* Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -32,8 +41,8 @@ catch (Exception e) {
     <meta name="theme-color" content="#ffffff">
     <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/userRegSelectClass_new.css" rel="stylesheet" type="text/css" />
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <link href="login/css/userRegSelectClass_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
 
     <script type="text/javascript">
         $(document).ready(function() {
