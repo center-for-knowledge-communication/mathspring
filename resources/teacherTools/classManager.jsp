@@ -1041,10 +1041,10 @@ function changeLandingPageHeaderAccordingToLanguage(){
 		languageSet = "es"
 	}
 	if (languageSet == 'es') {
-		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': '# de problemas intentados','timeInMS': '(sp)Time solving problems (minutes)','latestLogin': '(sp)Most recnt login'};
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Número de problemas vistos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
 		return header;
 	}else{
-	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'No of problems attempted','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Number of problems seen','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
 	 	return header;
 	}
 }
@@ -2737,7 +2737,6 @@ function registerAllEvents(){
 							  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
 							  <input id="daysFilterLandingOne" style="width:32px" type="text" name="" value="7">   
 							  <label class="report_filters"><%= rb.getString("days") %>.  </label>
-							  <label class="report_filters" >  (Note: To refresh the data, close and re-open the report.)</label>
 
 						</div>
                         <div id="classLandingReportOne" class="panel-collapse collapse">
@@ -2746,8 +2745,17 @@ function registerAllEvents(){
                             </div>
 
                         </div>
+                        <div class="panel-body report_filters">                           
+							  <label class="report_filters" ><%= rb.getString("landing_report_note1") %></label>
+							  <label class="report_filters" ><%= rb.getString("landing_report_note2") %></label>
+						</div>
                     </div>
                 </div>            
+             	<div>
+                    <h3 class="tt-page-header">
+                    <%= rb.getString("select_report_card_from_menu") %>
+                    </h3>
+                </div>
         	</div>
 	</div>
 </div>

@@ -770,7 +770,7 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         	else {
             	if (prevStudent.length() > 0) {
-                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
+//                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
             		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
             		probElapsedTime = 0;
             	}
@@ -780,6 +780,11 @@ public class TTReportServiceImpl implements TTReportService {
           	}
            	prevStudent = event.getStudentId();
         }
+
+    	if (prevStudent.length() > 0) {
+//        	System.out.println("Last student - probElapsedTime = " + String.valueOf(probElapsedTime));
+    		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+    	}
         
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("classId", classId);
@@ -789,27 +794,34 @@ public class TTReportServiceImpl implements TTReportService {
         List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT_STUDENTS_QUERY, namedParameters, new ClassLandingReportStudentsMapper());
         
         for (ClassLandingReportStudents stu : classLandingReportStudents) {
-        	System.out.println("StudentID=" + stu.getStudentId());
+        	//System.out.println("StudentID=" + stu.getStudentId());
         	String timeInMS = probElapsedMap.get(stu.getStudentId());
-        	System.out.println("timeInMS=" + timeInMS);
+        	//System.out.println("timeInMS=" + timeInMS);
         	String sMinutes = "0";
+        	int iMinutes = 0;
         	if (timeInMS != null) {
-	        	int iMinutes = Integer.parseInt(timeInMS);
-	        	if (iMinutes > 0) {
-	        		iMinutes = iMinutes / 60000;
-	        		sMinutes = String.valueOf(iMinutes);
+	        	int tMinutes = Integer.parseInt(timeInMS);
+	        	if (tMinutes > 0) {
+	        		iMinutes = tMinutes / 60000;
 	        	}
+	        	int iSeconds = tMinutes % 60000;
+	        	if (iMinutes == 0) {
+	        		if (iSeconds > 10000) {
+	        			iMinutes++;
+	        		}
+	        	}
+	        	sMinutes = String.valueOf(iMinutes);
         	}
-        	System.out.println("ElapsedTime=" + sMinutes);
+        	//System.out.println("ElapsedTime=" + sMinutes);
         	stu.setTimeInMS(sMinutes);
-        	String test = latestLoginMap.get(stu.getStudentId());
-        	System.out.println("ElapsedTime=" + test);
+        	//String test = latestLoginMap.get(stu.getStudentId());
+        	//System.out.println("latestLogin=" + test);
         	stu.setLatestLogin(latestLoginMap.get(stu.getStudentId()));
         }
         	
-        for (ClassLandingReportStudents stu : classLandingReportStudents) {
-        	System.out.println("StudentID=" + stu.getStudentId() + "ElapsedTime=" + stu.getTimeInMS());
-        }
+//        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+//        	System.out.println("StudentID=" + stu.getStudentId() + " ElapsedTime=" + stu.getTimeInMS());
+//        }
 
         return classLandingReportStudents;
     }
@@ -972,7 +984,7 @@ public class TTReportServiceImpl implements TTReportService {
                 Integer problemId = mappedrow.getInt("problemId");
                 String strProblemId = String.valueOf(problemId);
                 String effort = mappedrow.getString("effort");
-                if ((effort == null) || (effort == "unknown") || (effort == "null") || (effort == "undefined")) {
+                if ((effort == null) || (effort.equals("unknown")) || (effort.equals("null")) || (effort.equals("undefined"))) {
                 	effort = "NoData";                
                 }
                 else {

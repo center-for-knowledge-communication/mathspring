@@ -16,8 +16,8 @@ public class ClassLandingReportEvents {
     private String noOfSessions;
     private String timeInMS;
     private java.sql.Timestamp clickTime;
-	private static final String tsFormat_us = "MM/dd/yyyy HH:mm";
-	private static final String tsFormat_es = "dd/MM/yyyy HH:mm";
+	private static final String tsFormat_us = "MM/dd/yyyy";
+	private static final String tsFormat_es = "dd/MM/yyyy";
 
     public String getStudentId() {
         return studentId;
