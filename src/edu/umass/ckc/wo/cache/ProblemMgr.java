@@ -48,6 +48,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
  * Frank 06-13-2020 issue #106R2 missed one - replace use of probstdmap
  * Kartik 08-07-2020 issue #133 removed condition: where probStats.n =>10 and set default to 0.G5 (G- Grade)
+ * Frank 12-20-2020 issue #333 - handle mulit-lingual video selection
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -507,7 +508,7 @@ public class ProblemMgr {
             vidURL = (vidSel != null) ? vidSel.selectVideo(conn,id) : "";
         else {
             //
-            Video v= DbVideo.getVideo(conn, video);
+            Video v= DbVideo.getVideo(conn, video, prob_language);
             if (v == null) {
                 System.out.println("Error: Problem " + id + " refers to video " + video + ".  Video not found");
                 vidURL=null;
@@ -515,7 +516,7 @@ public class ProblemMgr {
             else vidURL = v.getUrl();
         }
         p.setVideo(vidURL);
-        logger.debug("Loaded ready Problem id="+p.getId() + " name=" + p.getName() + " form=" + (p.isQuickAuth() ? "quickAuth" : type) );
+        logger.debug("Loaded ready Problem id="+p.getId() + " name=" + p.getName() + " form=" + (p.isQuickAuth() ? "quickAuth" : type) + " language=" + prob_language);
         return p;
     }
     
