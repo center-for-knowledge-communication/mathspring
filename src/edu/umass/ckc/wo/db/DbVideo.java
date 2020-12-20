@@ -9,16 +9,19 @@ import java.sql.SQLException;
 
 /**
  * Created by marshall on 6/6/17.
+ * 
+ * Frank 12-20-2020 issue #333 - handle multi-lingual video selection
  */
 public class DbVideo {
 
-    public static Video getVideo (Connection conn, int id) throws SQLException {
+    public static Video getVideo (Connection conn, int id, String prob_language) throws SQLException {
          ResultSet rs = null;
           PreparedStatement ps = null;
           try {
-              String q = "select link from video where id=?";
+              String q = "select link from video where id=? and language=?";
               ps = conn.prepareStatement(q);
               ps.setInt(1, id);
+              ps.setString(2, prob_language);
               rs = ps.executeQuery();
               if (rs.next()) {
                   String url = rs.getString(1);
