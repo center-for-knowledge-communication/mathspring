@@ -3,6 +3,7 @@
 // Frank 05-12-2020 issue #87 commented out this feature for now
 // Kartik 08-28-2020 issue #202 positioning of example dialog box
 // Frank 10-07-20 Issue # 261 change problem heading
+// Frank 12-26-20 Issue #329 translate topic name using lang variable
 
 var globals;
 var sysGlobals;
@@ -723,7 +724,13 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     else  {
         var pid = activity.id;
         var resource =activity.resource;
-        var topic = activity.topicName;
+
+        var topicName = activity.topicName;   
+        var topic = topicName.en;
+        if (lang == "es") {
+            topic = topicName.es;
+        }        
+        
         var standards = activity.standards;
         var varBindings = activity.parameters;
         setGlobalProblemInfo(activity);

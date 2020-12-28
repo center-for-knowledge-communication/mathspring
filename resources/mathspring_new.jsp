@@ -9,6 +9,7 @@
 // Frank 10-07-20 Issue # 261 change problem heading
 // Frank 12-11-20 Issue #315 default locale to en_US
 // Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+// Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
 
 ResourceBundle versions = null; 
 try {
@@ -107,6 +108,7 @@ else
 </c:if>
 
 <script type="text/javascript">
+	var lang = "<%=lang%>";
 	var stepText = "<%= rb.getString("step") %>";
 	var hintText = "<%= rb.getString("hint") %>";
 	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";

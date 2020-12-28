@@ -36,6 +36,8 @@ import java.util.List;
  * should not be added here.  Subclasses of this should be built to support the particular
  * strategies.  A new pedagogy can then be put in the pedagogies.xml file.   The pedagogy configures
  * the selectors and student model to use.
+ * 
+ * Frank	12-26-20	Issue #329 use Multi-lingual topic names
  */
 public class BaseStudentModel extends StudentModel {
 
@@ -188,7 +190,7 @@ public class BaseStudentModel extends StudentModel {
     // the new rows in problemgroup
     private void loadTopicMasteryLevels() throws SQLException {
         List<TopicMastery> levels = DbUser.getTopicMasteryLevels(this.getConnection(),this.objid);
-        List<Topic> topics = DbTopics.getAllTopics(this.getConnection());
+        List<Topic> topics = DbTopics.getAllTopics(this.getConnection(),this.objid);
         if (levels.size() == 0) {
             List<TopicMastery> result = new ArrayList<TopicMastery>();
             // insert the initial estimate for all topics

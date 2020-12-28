@@ -29,6 +29,7 @@
 <!-- Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report -->
 <!-- Frank 12-11-20 Issue #315 default locale to en_US -->
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
+<!-- Frank 12-26-20  	Issue #329 fix errors from splitting classDetails.jsp -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -745,42 +746,6 @@ function handleclickHandlers() {
         $("#perClusterReport").hide();
     });
  
-    $('a[rel=initialPopover]').popover({
-        html: true,
-        trigger: 'hover',
-        container: 'body',
-        title: '<%= rb.getString("what_is_mastery")%>',
-        placement: 'right',
-        content: function () {
-            return "<ul><li><%= rb.getString("what_is_mastery_popover1")%></li><li><%= rb.getString("what_is_mastery_popover2")%></li></ul><%= rb.getString("what_is_mastery_popover3")%>";
-        }
-    });
-
-    $('a[rel="popoverOrder"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("order_problemset_will_be_shown")%>';
-        }
-    });
-    $('a[rel="popoveractivatedProblems"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("nbr_activated_problems_click_to_see")%>';
-        }
-    });
-
-    $('a[rel="popoverproblemsetSummary"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top'
-    });
 
 
 }
@@ -1321,8 +1286,7 @@ else {
     
     var myLineChart;
     $('body').on('click', 'div.getMastery-trajectory-for-problemset', function () {
-
-        var topicId = $(this).find("span").text();
+    	var topicId = $(this).find("span").text();
         var td = $(this).closest('td');
         var bgcolor = "#BDB7B5"
 
@@ -1347,7 +1311,6 @@ else {
         }
         var tr = $(this).closest('tr');
         var row = perProblemSetReport.row(tr);
-        var topicId = $(this).find("span").text();
         var studentId = row.data()['studentId'];
 
         $.ajax({
@@ -1619,6 +1582,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByAVG = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -1673,6 +1637,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByMax = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -1728,6 +1693,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByLatest = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -3229,7 +3195,7 @@ var completeDataChart;
 								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
                             </div>
                             <div class="panel-body">
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
+                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
                                     <thead>
                                     <tr>
                                         <th><%= rb.getString("mastery_range") %></th>
@@ -3488,8 +3454,8 @@ var completeDataChart;
 
     </div>
 </div>
-<!-- Modal -->
 
+<!-- Modal -->
 <div id="completeMasteryForStudent" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -3527,7 +3493,5 @@ var completeDataChart;
     </div>
 </div>
 
-
-<!-- Modal -->
 </body>
 </html>

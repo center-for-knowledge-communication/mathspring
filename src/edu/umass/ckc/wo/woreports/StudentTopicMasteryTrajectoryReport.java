@@ -48,7 +48,7 @@ public class StudentTopicMasteryTrajectoryReport extends TopicTrajectoryReport {
         int studId = e.getStudId();
         String topicX = e.getExtraParam();
         this.topicId = Integer.parseInt(topicX);
-        String topicName = DbTopics.getTopicName(conn, topicId);
+        String topicName = DbTopics.getTopicName(conn, topicId, classId);
         User u = DbUser.getStudent(conn, studId);
         String className = getClassName(cl);
         List<EventLogEntry> userEvents = collectStudentEventHistory(conn,this.studId,this.topicId);
