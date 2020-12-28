@@ -146,7 +146,7 @@ public class ClassTopicLevelsReport extends DirectReport {
         StringBuilder headers = new StringBuilder();
         // build header list
         for (TopicFrequency f: orderedTopics) {
-            String tname = DbTopics.getTopicName(conn,f.topicId);
+            String tname = DbTopics.getTopicName(conn,f.topicId, classId);
             String url = getLinkToClassTopicMasteryTrajectoryReport(tname,f.topicId);
             headers.append("<th class=\"table-sortable:numeric\">" + url + "</th>\n");
         }

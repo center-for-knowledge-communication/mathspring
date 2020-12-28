@@ -10,11 +10,15 @@ import java.util.Set;
  * User: david
  * Date: Jul 17, 2008
  * Time: 10:30:17 AM
+ * 
+ * Frank	12-26-20	Issue #329 Added mlName element for multi-lingual support
  */
+
 
 public class Topic implements Comparable<Topic> {
     private int id;
     private String name;
+    private String mlName;
     private String summary;
     private int seqPos;
     private int oldSeqPos;
@@ -22,14 +26,14 @@ public class Topic implements Comparable<Topic> {
     private int numProbs;
     private int[] problemsByGrade;
     private Map<String,Integer> gradewiseProblemDistribution;
-
+    
     public static final String ID = "id";
     public static final String INTRO = "intro";
     public static final String SUMMARY = "summary";
     public static final String DESCRIPTION = "description";
     public static final String TYPE = "type";
     public static final String ACTIVE = "active";
-
+   
     public Topic () {
     }
 
@@ -44,6 +48,12 @@ public class Topic implements Comparable<Topic> {
         setSummary(summary);
     }
 
+    public Topic (int id, String name, String summary, String mlName) {
+        this(id,name);
+        setSummary(summary);
+        setMlName(mlName);
+    }
+    
     public String getSummary() {
         return summary;
     }
@@ -59,6 +69,15 @@ public class Topic implements Comparable<Topic> {
     public void setName (String n) {
         this.name = n;
     }
+
+    public String getMlName() {
+        return mlName;
+    }
+
+    public void setMlName (String n) {
+        this.mlName = n;
+    }
+
 
     public int getId() {
         return id;

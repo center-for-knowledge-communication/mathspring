@@ -29,6 +29,7 @@ import java.util.ArrayList;
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
  * Frank 09-14-2020	issue #237 added 'exclude test users from pause'
  * Frank 09-29-2020	issue #237R3 added 'exclude test users from pause'
+ * Frank 12-26-20	issue #329 use multi-lingual version of getAllTopics() 
  */
 public class DbUser {
 
@@ -473,7 +474,7 @@ public class DbUser {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            List<Topic> topics = DbTopics.getAllTopics(conn);
+            List<Topic> topics = DbTopics.getAllTopics(conn,studId);
             // Note this fetches all the topics for which a student has levels (If a new topic is added a level for that is not included)
             String q = "select topicId, value, t.description, entered from studenttopicmastery m, problemgroup t where m.topicId=t.id and t.active=1 and studId=? order by m.topicId";
             stmt = conn.prepareStatement(q);

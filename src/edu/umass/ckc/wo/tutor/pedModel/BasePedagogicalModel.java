@@ -527,7 +527,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
             p.setInTopicId(topicId);
             Topic t = ProblemMgr.getTopic(topicId);
             if (t != null)
-                p.setInTopicName(ProblemMgr.getTopic(topicId).getName());
+                p.setInTopicName(ProblemMgr.getTopic(topicId).getMlName());
             else p.setInTopicName("");
         }
     }

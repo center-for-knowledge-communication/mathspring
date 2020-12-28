@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 
+import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.util.Lists;
 import edu.umass.ckc.wo.beans.Topic;
 import org.apache.log4j.Logger;
@@ -24,6 +25,8 @@ import org.apache.log4j.Logger;
  * Date: Jun 29, 2010
  * Time: 11:00:02 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	12-26-20	Issue #329 use multi-lingual topic name
  */
 public class TopicLoader {
     public int classID;
@@ -303,7 +306,7 @@ public class TopicLoader {
         StudentState state = smgr.getStudentState();
         classID = determineClass();  // get either the default class (with default lesson plan) or the actual class (with a custom plan)
         this.topicID = getCurTopic(conn, state, classID);
-        this.topicName = ProblemMgr.getTopic(this.topicID).getName();
+        this.topicName = DbTopics.getTopicName(conn,this.topicID,classID);
         probsInTopic = getProblemsInTopic(conn, topicID);   // get all problems in the topic
 
         excludeProblemsOmittedForClass(conn, classID, probsInTopic, this.topicID); // throw out problems teacher wants to omit

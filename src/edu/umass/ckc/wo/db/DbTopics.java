@@ -24,6 +24,7 @@ import java.util.TreeSet;
  * 
  ** Frank 	06-13-2020 	issue #106 replace use of probstdmap
  *  Frank   06-30-2020  issue #132 use idABC field when user-facing 
+ *  Frank	12-26-20	issue #329 added multi-lingual versions of getAllTopics() and getTopicName()
  */
 public class DbTopics {
 
@@ -37,11 +38,12 @@ public class DbTopics {
      * @return A List of Topic objects in the order they will be presented
      * @throws SQLException
      */
-    public static List<Topic> getDefaultTopicsSequence(Connection conn) throws SQLException {
+    public static List<Topic> getDefaultTopicsSequence(Connection conn, int classId) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String q = "select probGroupId, topic.description, seqPos from classlessonplan, problemgroup topic where isDefault=1 and probGroupId=topic.id order by seqPos";
+            String q = "select probGroupId, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description, seqPos from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where isDefault=1 and probGroupId=topic.id  and pgl.pg_pg_grp_id=probGroupId order by seqPos";
+
             ps = conn.prepareStatement(q);
             rs = ps.executeQuery();
             List<Topic> topics = new ArrayList<Topic>();
@@ -66,11 +68,41 @@ public class DbTopics {
         PreparedStatement stmt=null;
         List<Topic> topics = new ArrayList<Topic>();
         try {
-            String q = "select id, description from problemgroup where active=1 order by id";
+
+        	String q = "select id, json_unquote(json_extract(pgl.pg_language_name, '$.en')) as description from problemgroup, problemgroup_description_multi_language pgl where active=1 and pgl.pg_pg_grp_id=problemgroup.id order by id";
+            
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 Topic t = new Topic(rs.getInt(1),rs.getString(2));
+                topics.add(t);
+            }
+            return topics;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public static List<Topic> getAllTopics (Connection conn, int studId) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        List<Topic> topics = new ArrayList<Topic>();
+        
+    	int classId = DbUser.getStudentClass(conn, studId);
+
+        try {
+        	
+            String q = "select problemgroup.id, pgl.pg_pg_grp_id, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description from problemgroup, problemgroup_description_multi_language pgl where active=1 and pgl.pg_pg_grp_id=problemgroup.id order by id";
+            
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Topic t = new Topic(rs.getInt(1),rs.getString(3));
                 topics.add(t);
             }
             return topics;
@@ -363,7 +395,7 @@ public class DbTopics {
     public static List<Topic> getClassTopicsSequence (Connection conn, int classId) throws SQLException {
         List<Topic> topics = getClassTopicsSequence2(conn,classId);
         if (topics.size() == 0)
-            return getDefaultTopicsSequence(conn);
+            return getDefaultTopicsSequence(conn,classId);
         else return topics;
     }
 
@@ -375,7 +407,7 @@ public class DbTopics {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String q = "select description from problemgroup where id=?";
+            String q = "select problemgroup.id, pgl.pg_pg_grp_id, json_unquote(json_extract(pgl.pg_language_name, concat('$.','en'))) as description from problemgroup, problemgroup_description_multi_language pgl where active=1 and pgl.pg_pg_grp_id=problemgroup.id order by id";
             ps = conn.prepareStatement(q);
             ps.setInt(1,topicId);
             rs = ps.executeQuery();
@@ -394,6 +426,52 @@ public class DbTopics {
         }
     }
 
+    public static String getTopicName (Connection conn, int topicId, String lang) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String q = "select problemgroup.id, pgl.pg_pg_grp_id, json_unquote(json_extract(pgl.pg_language_name, concat('$.','?'))) as description from problemgroup, problemgroup_description_multi_language pgl where active=1 and pgl.pg_pg_grp_id=problemgroup.id order by id";
+            ps = conn.prepareStatement(q);
+            ps.setString(1,lang);
+            rs = ps.executeQuery();
+            
+
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+            return null;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }
+    
+    
+    public static String getTopicName (Connection conn, int topicId, int classId) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String q = "select problemgroup.id, pgl.pg_pg_grp_id, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description from problemgroup, problemgroup_description_multi_language pgl where active=1 and pgl.pg_pg_grp_id=problemgroup.id order by id";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1,topicId);
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getString(3);
+            }
+            return null;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }
+    
     public static boolean hasLessonPlan (Connection conn, int classId) throws SQLException {
         ResultSet rs=null;
         PreparedStatement stmt=null;
@@ -493,32 +571,11 @@ public class DbTopics {
      */
     public static void insertLessonPlanWithDefaultTopicSequence(Connection conn, int classId) throws SQLException {
     	DbTopics.removeClassActiveTopics(conn, classId);
-        List<Topic> topics = getDefaultTopicsSequence(conn);
+        List<Topic> topics = getDefaultTopicsSequence(conn, classId);
         insertTopics(conn,classId,topics);
     }
 
 
-    /**
-     * Returns A topic introduction if there is one.
-     *
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public static TopicIntro getTopicIntros(Connection conn, int topicID) throws SQLException {
-        String q = "select intro,type,description from problemGroup where id = ?";
-        PreparedStatement ps = conn.prepareStatement(q);
-        ps.setInt(1,topicID);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            String intro = rs.getString(1);
-            String type = rs.getString(2);
-            String descr = rs.getString(3);
-            return new TopicIntro(intro,type, descr, topicID);
-        }
-        return null;
-    }
-
-    
     /**
      * Returns A topic introduction if there is one.
      *

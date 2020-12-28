@@ -32,9 +32,10 @@
 <!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
 <!-- Frank	11-12-20	Issue #299 Landing Page report -->
 <!-- Frank	11-12-20	Issue #276 Suppress logging if logged in as Master Teacher -->
-<!-- Frank 12-11-20 Issue #315 default locale to en_US -->
+<!-- Frank 12-11-20 	Issue #315 default locale to en_US -->
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
+<!-- Frank 12-26-20  	Issue #329 fix errors from spliting classDetails.jsp -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -2903,42 +2904,6 @@ function registerAllEvents(){
 </div>
 <!-- Modal -->
 
-<div id="completeMasteryForStudent" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><%= rb.getString("complete_mastery_chart") %></h4>
-            </div>
-            <div class="modal-body" role="alert">
-                <canvas id="completeMasteryForStudentCanvas"></canvas>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- Modal For Mastery Trajecotory Report-->
-<div id="masteryTrajectoryReport" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><%= rb.getString("master_trajectory_report") %></h4>
-            </div>
-            <div class="modal-body" role="alert">
-                <canvas id="masteryTrajectoryReportCanvas"></canvas>
-                <div>
-                    <table id="masteryTrajecotoryLegend" class="table table-striped table-bordered" cellspacing="0"
-                           width="50%"/>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 
 <!-- Modal -->
