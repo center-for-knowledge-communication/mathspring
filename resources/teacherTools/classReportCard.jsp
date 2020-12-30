@@ -1768,6 +1768,10 @@ var completeDataChart;
                         var temp = {
                             "title": v, "name": v.replace(/\s/g, ''), "targets": indexcolumn,
                             "createdCell": function (td, cellData, rowData, row, col) {
+                                if (cellData == null) {
+                                    $(td).text();
+                                    return;
+                                }
                                 if (cellData == '') {
                                     $(td).text();
                                     return;
