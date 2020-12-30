@@ -59,13 +59,13 @@ catch (Exception e) {
 <%
 if (lang.equals("es")) {
 %>
-<link href="sass_compiled/tutor.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+<link href="sass_compiled/tutores.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 <%
 }
 else 
 {
 %>
-<link href="sass_compiled/tutores.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+<link href="sass_compiled/tutor.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 <%
 }
 %>
