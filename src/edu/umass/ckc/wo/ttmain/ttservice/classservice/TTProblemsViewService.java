@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface TTProblemsViewService {
 
-    public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId) throws TTCustomException;
+    public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId, String lang) throws TTCustomException;
 
     public boolean saveChangsForproblemSets(List<String> problemIdIds, Integer classId, String problemSetId) throws TTCustomException;
 

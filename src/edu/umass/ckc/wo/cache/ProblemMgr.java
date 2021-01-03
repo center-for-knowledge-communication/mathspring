@@ -50,6 +50,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Kartik 08-07-2020 issue #133 removed condition: where probStats.n =>10 and set default to 0.G5 (G- Grade)
  * Frank 12-20-2020 issue #333 - handle mulit-lingual video selection
  * Frank 12-28-20	Issue #329 Added multi-lingual support for topic name put multi-lingual topic name in problem object
+ * Frank 02-03-21	Issue #329R2 added mlDescription to new topic() call 
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -61,7 +62,7 @@ public class ProblemMgr {
     private static Map<Integer, Problem> allProblems = new HashMap<Integer, Problem>();
     private static Map<Integer, ArrayList<Integer>> probIdsByTopic;
     private static Map<Integer, Set<CCStandard>> stdsByTopic;
-    private static List<Topic> allTopics = new ArrayList<Topic>();;
+    private static List<Topic> allTopics = new ArrayList<Topic>();
     private static ExampleSelector exSel = new StandardExampleSelector();
     private static VideoSelector vidSel = new StandardVideoSelector();
     private static int[] topicIds;
@@ -325,7 +326,7 @@ public class ProblemMgr {
         ResultSet rs = null;
         try {
             //String q = "select id, description, summary from problemgroup where active=1";
-            String q = "select id, description, summary, pg_language_name from problemgroup, problemgroup_description_multi_language where active=1 and id = pg_pg_grp_id";
+            String q = "select id, description, summary, pg_language_name, pg_lanuage_description from problemgroup, problemgroup_description_multi_language where active=1 and id = pg_pg_grp_id";
 
             ps = conn.prepareStatement(q);
             rs = ps.executeQuery();
@@ -333,9 +334,12 @@ public class ProblemMgr {
                 int id = rs.getInt("id");
                 String description = rs.getString("description");
                 String summary = rs.getString("summary");
-                Object mdo = rs.getObject("pg_language_name");
-                String ml_description = mdo.toString();
-                allTopics.add(new Topic(id, description ,summary,(String) ml_description));
+                Object name_mdo = rs.getObject("pg_language_name");
+                String ml_name = name_mdo.toString();
+                Object desc_mdo = rs.getObject("pg_lanuage_description");
+                String ml_desc = desc_mdo.toString();
+                Topic t = new Topic(id, description, summary, ml_name, ml_desc);
+                allTopics.add(t);
             }
         } finally {
             if (rs != null)

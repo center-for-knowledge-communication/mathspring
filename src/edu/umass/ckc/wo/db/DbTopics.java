@@ -25,6 +25,7 @@ import java.util.TreeSet;
  ** Frank 	06-13-2020 	issue #106 replace use of probstdmap
  *  Frank   06-30-2020  issue #132 use idABC field when user-facing 
  *  Frank	12-26-20	issue #329 added multi-lingual versions of getAllTopics() and getTopicName()
+ *  Frank	01-03-21	issue #329R2 fixed bug missing parameter getDefaultTopicsSequence()
  */
 public class DbTopics {
 
@@ -45,6 +46,7 @@ public class DbTopics {
             String q = "select probGroupId, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description, seqPos from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where isDefault=1 and probGroupId=topic.id  and pgl.pg_pg_grp_id=probGroupId order by seqPos";
 
             ps = conn.prepareStatement(q);
+            ps.setInt(1, classId);
             rs = ps.executeQuery();
             List<Topic> topics = new ArrayList<Topic>();
             while (rs.next()) {
