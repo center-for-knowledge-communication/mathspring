@@ -52,6 +52,7 @@ import javax.servlet.http.HttpSession;
  * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank 	12-02-20	issue #322 fixed and enhanced URL manipulation checking to include classId checking
+ * Frank	01-03-21	issue #329R2 pass lang param to viewProblemSetsInGivenProblem()
  */
 
 @Controller
@@ -329,9 +330,19 @@ public class TeacherToolsViewClassDetailsController {
     }
 
     @RequestMapping(value = "/tt/getProblemForProblemSets", method = RequestMethod.POST)
-    public @ResponseBody  String viewProblemsForProblemSet(ModelMap map, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {
+    public @ResponseBody  String viewProblemsForProblemSet(ModelMap map,  HttpServletRequest request, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {
+
+    	Locale loc = request.getLocale();
+    	String lang = loc.getLanguage();
+
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
         try {
-            ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid));
+            ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid), lang);
             ObjectMapper objectMapp = new ObjectMapper();
             objectMapp.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         	System.out.println("getProblemForProblemSets = success");

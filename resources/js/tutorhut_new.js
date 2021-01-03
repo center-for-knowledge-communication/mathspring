@@ -1396,7 +1396,14 @@ function showHTMLProblemAtStart () {
     var isExample =  (mode == MODE_DEMO || mode == MODE_EXAMPLE);
     var pid = activity.id;
     var resource = activity.resource;
-    var topicName = activity.topicName;
+
+    var topicName = activity.topicName;   
+    var topic = topicName.en;
+    if (lang == "es") {
+        topic = topicName.es;
+    }        
+
+    var topicName = topic;
     var standards = activity.standards;
     var solution = activity.solution;
     setGlobalProblemInfo(activity);

@@ -1136,7 +1136,7 @@ function registerAllEvents(){
             {
                 "width": "10%",
                 "targets": [ 0 ],
-                "visible": fals
+                "visible": false
 
             },{
                 "width": "10%",
