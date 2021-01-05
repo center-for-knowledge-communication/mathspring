@@ -82,7 +82,7 @@
     function removeSingleQuote() {
 
     	var password_input = document.getElementById('password').value;
-    	if (password_input.search(/[^'\s]/) != -1) {
+    	if (password_input.search("'") != -1) {
     		alert(" ' character not allowed. Please try again")
 	    	document.getElementById('password').value = "";
     	}
