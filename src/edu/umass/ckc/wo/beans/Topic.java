@@ -14,6 +14,7 @@ import java.util.Set;
  * 
  * Frank	12-26-20	Issue #329 Added mlName element for multi-lingual support
  * Frank	01-03-21	Issue #329R2 Added mlDescription and fixed setters to parse JSON formats
+ * Frank	01-05-21	Issue #329R3 fixed mlDescription handling of parse JSON formats
  */
 
 
@@ -88,7 +89,7 @@ public class Topic implements Comparable<Topic> {
 
     public String getMlDescription(String lang) {
     	
-    	String result = mlNameMap.get(lang);
+    	String result = mlDescMap.get(lang);
         return result;
     }
 
@@ -103,8 +104,8 @@ public class Topic implements Comparable<Topic> {
     	try {
 		    tmpDesc = tmpDesc.replace("{","");
 		    tmpDesc = tmpDesc.replace("}","");
+		    tmpDesc = tmpDesc.replaceFirst("\",","\"~");
 		    tmpDesc = tmpDesc.replaceAll("\"","");
-		    tmpDesc = tmpDesc.replaceFirst(",","~");
 		    tmpDesc = tmpDesc.trim();
 		    String jsonArr[] = tmpDesc.split("~");
 		    mlDescMap = new HashMap<String, String>();

@@ -36,6 +36,8 @@
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
 <!-- Frank 12-26-20  	Issue #329 fix errors from spliting classDetails.jsp -->
+<!-- Frank 01-05-21  	Issue #329R3 fix error - nickname null not handled -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -671,11 +673,11 @@ var save_changes = "<%= rb.getString("save_changes")%>";
 var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
-
+var summaryLabel="<%= rb.getString("summary")%>"; 
 var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
     " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
     " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body'><strong>Summary : " + JSONData["topicSummary"] + "</strong></div>"+
+    " <div class='panel-body'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
     "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
     "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
 
@@ -708,6 +710,9 @@ function problemLevelDetails(JSONData,problems){
             checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
         }
         var tnickname = obj.nickName;
+        if (tnickname == null) {
+        	tnickname = "";
+        }
         if (tnickname.length > 94) {
         	tnickname = tnickname.substr(0,90) + "...";
         }
