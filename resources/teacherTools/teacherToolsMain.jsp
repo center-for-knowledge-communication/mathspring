@@ -22,6 +22,7 @@
  *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
  *  Frank	10-30-20	Issue #293 add new items to class config form 
  *	Frank	12-18-20	Issue #336 added cache-busting for selected .js and .css files
+ *  Frank 	01-05-21  	Issue #302 teacher username only alpha and numeric characters
 */
 
  System.out.println("teacherToolsMain starting");
@@ -211,6 +212,7 @@ catch (Exception e) {
 
 	var emsg_classLanguage   = 'Class language is mandatory field';
 	var emsg_className       = 'Class name is mandatory field';
+	var emsg_className_invalid = 'Class name must only include letters,numbers or . _ - characters';
 	var emsg_classGrade      = 'Class grade is mandatory field';
 	var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
 	var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
@@ -237,6 +239,7 @@ catch (Exception e) {
     	loc = "es-Ar";
     	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
     	emsg_className       = 'El nombre de la clase es obligatorio';
+    	var emsg_className_invalid = 'El nombre de la clase solo debe incluir letras, números o . _ - ';
     	emsg_classGrade      = 'El grado de la clase es obligatorio';
     	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
     	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
@@ -382,7 +385,11 @@ catch (Exception e) {
                         validators: {
                             notEmpty: {
                                 message: emsg_className
-                            }
+                            },
+	    			        regexp: {
+    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+        	                    message: emsg_className_invalid
+            				}        
                         }
                     },
                     classGrade: {
