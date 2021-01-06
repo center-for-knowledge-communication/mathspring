@@ -37,6 +37,7 @@
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
 <!-- Frank 12-26-20  	Issue #329 fix errors from spliting classDetails.jsp -->
 <!-- Frank 01-05-21  	Issue #329R3 fix error - nickname null not handled -->
+<!-- Frank 01-05-21  	Issue #302 teacher username only alpha and numeric characters -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -218,6 +219,7 @@ var filterLandingOne = "~7";
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
+var emsg_className_invalid = 'Class name must only include letters,numbers or . _ - characters';
 var emsg_classGrade      = 'Class grade is mandatory field';
 var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
 var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
@@ -247,6 +249,7 @@ if (languagePreference.includes("en")) {
 	loc = "es-Ar";
 	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
 	emsg_className       = 'El nombre de la clase es obligatorio';
+	var emsg_className_invalid = 'El nombre de la clase solo debe incluir letras, números o . _ - ';
 	emsg_classGrade      = 'El grado de la clase es obligatorio';
 	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
 	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
@@ -741,7 +744,11 @@ function handleclickHandlers() {
                 validators: {
                     notEmpty: {
                         message: emsg_className
-                    }
+                    },
+			        regexp: {
+            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+                        message: emsg_className_invalid
+        			}        
                 }
             },
             classGrade: {
