@@ -1,3 +1,16 @@
+<!-- Frank 011021 Issue #289 -->
+
+<!-- **** WARNING **** -->
+<!-- **** WARNING **** -->
+<!-- **** WARNING **** -->
+
+<!-- if any hard-coded text is changed you must update its translation in js/bootstrap/js/language_es.js -->
+<!--   and the script reference below -  language_es.js?ver=011021 with the ver=current date to force cache refresh -->
+
+<!-- if anything in js/bootstrap/css/style.css is changed you must update the script reference below - js/bootstrap/css/style.css?ver=011021 with the ver=current date to force cache refresh -->
+
+<!-- **** END WARNING **** -->
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,14 +25,14 @@
     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="js/bootstrap/css/style.css">
+    <link rel="stylesheet" href="js/bootstrap/css/style.css?ver=011021">
 
     <!-- JS LIBRARIES AND CUSTOM JS FILE -->
     <script src="js/bootstrap/js/jquery-2.2.2.min.js"></script>
     <script src="js/bootstrap/js/bootstrap.min.js"></script>
     <script src="js/bootstrap/js/parallax.js"></script>
     <script src="js/bootstrap/js/custom-animate.js"></script>
-    <script src="js/bootstrap/js/language_es.js"></script>
+    <script src="js/bootstrap/js/language_es.js?ver=011021"></script>
     <script type="text/javascript">
     $(document).ready(function () {
     	langPrefrenceForWelcomePage();
@@ -42,17 +55,23 @@
     <article>
         <div class="container clearfix">
             <div class="row">
-                <div class="col-sm-8" id="intro-text">
-                    <h1>Grow your Math with MathSpring</h1>
-                    <p class="banner-text">The MathSpring Tutor will help you
+                <div class="col-sm-12" id="intro-text">
+                    <h1 style="text-align:center">Grow your Math with MathSpring</h1>
+                    <p class="banner-text" style="text-align:center">The MathSpring Tutor will help you
                         succeed at math standardized tests
                         by deeply understanding the material.</p>
                 </div><!-- intro-text-->
-                <div class="col-sm-3 col-sm-offset-1">
+                <div class="col-sm-3 col-sm-offset-2">
                     <a
                             class="btn btn-default"
                             id="signup-button"
-                            href="/ms/WoLoginServlet?action=LoginK12_1&var=b">GET STARTED</a>
+                            href="/ms/WoLoginServlet?action=LoginK12_1&var=b&msRole=student">STUDENT PORTAL</a>
+                </div><!-- col-md-offset-9 -->
+                <div class="col-sm-3 col-sm-offset-2">
+                    <a
+                            class="btn btn-default"
+                            id="signup-teacher-button"
+                            href="/ms/WoLoginServlet?action=LoginK12_1&var=b&msRole=teacher">TEACHER PORTAL</a>
                 </div><!-- col-md-offset-9 -->
             </div><!-- row -->
         </div><!-- container clearfix -->
