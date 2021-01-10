@@ -10,7 +10,8 @@ function langPrefrenceForWelcomePage() {
 		//welcome.html
 		$("#intro-text").find("h1").text("Cultivá tus matemáticas con MathSpring");
 		$("#intro-text").children( ".banner-text" ).text("El MathSpring (Cultivando Matemáticas) te ayudará a tener éxito en las pruebas de matemáticas,  enseñándote a comprender el material profundamente");
-		$('#signup-button').text('COMENZAR');
+		$('#signup-teacher-button').text('PORTAL DE MAESTROS');
+		$('#signup-button').text('PORTAL De ALUMNOS');
 		
 		$("#stat").find("h2").text("MathSpring es...");
 		$("#stat").find( ".container").children("p").text("Software personalizado que utiliza multimedia interactiva para ayudar a los alumnos a resolver problemas de matemáticas");

@@ -20,11 +20,12 @@ import java.io.IOException;
  * 3.   Successful login (not first login).   Generate login_3.jsp (asks for flanking users)
  * 
  *  Frank 04-24-2020 issue #28
+ *  Frank 01-10-2011 Issue #289 support split of student and teacher login pages
  */
 public class LoginK12_2 extends Login2 {
 
-    public static final String LOGIN_JSP = "login/loginK12_new.jsp";
-    public static final String LOGIN_JSP_NEW = "login/loginK12_new.jsp";
+    public static final String LOGIN_JSP = "login/loginK12_student.jsp";
+    public static final String LOGIN_JSP_NEW = "login/loginK12_student.jsp";
 
     public LoginK12_2() {
         this.login1_jsp = LOGIN_JSP;
