@@ -24,8 +24,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -393,6 +395,26 @@ public class DbPedagogy {
 
     }
 
+    public static Map<Integer, String> getLCprofiles(Connection conn) throws SQLException {
+		Map<Integer, String> LCprofiles = new HashMap<Integer, String>();
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select id, name from pedagogy where name like '% Full Empathy'";
+            stmt = conn.prepareStatement(q);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	String lcName = rs.getString(2).split("\\s+")[0];
+            	LCprofiles.put(rs.getInt(1), lcName);
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+		return LCprofiles;
+    }
 
     public static void main(String[] args) {
         try {
