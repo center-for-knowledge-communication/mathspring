@@ -45,6 +45,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Frank	12-08-20	issue #185 student session could be hijacked by altering sessionId on the URL 
+ */
+
 public class TutorBrainHandler {
     private TutorBrainEventFactory eventFactory;
     private static Logger logger =   Logger.getLogger(TutorBrainHandler.class);
@@ -164,7 +169,18 @@ public class TutorBrainHandler {
         else {
             SessionManager smgr = null;
             try {
-                smgr = new SessionManager(servletInfo.getConn(), ((SessionEvent) e).getSessionId(), servletInfo.getHostPath(), servletInfo.getContextPath()).buildExistingSession(servletInfo.getParams());
+            	System.out.println("http session ID = " + servletInfo.getRequest().getSession().getId());
+            	int httpSmgrSessionId = (int) servletInfo.getRequest().getSession().getAttribute("smgrSessionId");
+            	int UrlSmgrSessionId = ((SessionEvent) e).getSessionId();
+            	if (httpSmgrSessionId == UrlSmgrSessionId) {
+            	    smgr = new SessionManager(servletInfo.getConn(), ((SessionEvent) e).getSessionId(), servletInfo.getHostPath(), servletInfo.getContextPath()).buildExistingSession(servletInfo.getParams());
+            	}
+            	else {
+	                NoSessionException nse = new NoSessionException(UrlSmgrSessionId);
+	                View er = new ErrorResponse(nse, true);
+	                servletInfo.getOutput().append(er.getView());
+	                return true;            		
+            	}
             } catch (NoSessionException nse) {
                 nse.printStackTrace();
                 // This is a common exception and we want to pass back a fatal error to the client so it can let the user know their session is dead.
