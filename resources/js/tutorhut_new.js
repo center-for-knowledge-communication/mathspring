@@ -4,6 +4,7 @@
 // Kartik 08-28-2020 issue #202 positioning of example dialog box
 // Frank 10-07-20 Issue # 261 change problem heading
 // Frank 12-26-20 Issue #329 translate topic name using lang variable
+// Frank 01-13-21 Issue #354 fix topicName formatting
 
 var globals;
 var sysGlobals;
@@ -725,11 +726,15 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
         var pid = activity.id;
         var resource =activity.resource;
 
-        var topicName = activity.topicName;   
-        var topic = topicName.en;
-        if (lang == "es") {
-            topic = topicName.es;
-        }        
+        var topic = "";
+        
+        if (activity.topicName != null && activity.topicName != undefined) {
+            var topicName = activity.topicName;   
+            topic = topicName.en;
+            if (lang == "es") {
+                topic = topicName.es;
+            }        
+        }
         
         var standards = activity.standards;
         var varBindings = activity.parameters;
