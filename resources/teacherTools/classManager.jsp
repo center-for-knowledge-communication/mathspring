@@ -30,9 +30,15 @@
 <!-- Frank	10-12-20	add page-loading indicators -->
 <!-- Frank	10-30-20	Issue #293 add new items to class config form -->
 <!-- Frank	10-30-20	Issue #293R2 fix validation on class config form -->
-
-
+<!-- Frank	11-12-20	Issue #299 Landing Page report -->
+<!-- Frank	11-12-20	Issue #276 Suppress logging if logged in as Master Teacher -->
+<!-- Frank 12-11-20 	Issue #315 default locale to en_US -->
 <!-- Kartik	10-30-20	Issue #290 added topic ID in Manage Topics info popup -->
+<!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
+<!-- Frank 12-26-20  	Issue #329 fix errors from spliting classDetails.jsp -->
+<!-- Frank 01-05-21  	Issue #329R3 fix error - nickname null not handled -->
+<!-- Frank 01-05-21  	Issue #302 teacher username only alpha and numeric characters -->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -46,8 +52,27 @@
 
 <% 
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
+Locale loc = request.getLocale(); 
+String lang = loc.getLanguage();
+
+if (lang.equals("es")) {
+	loc = new Locale("es","AR");	
+}
+else {
+	loc = new Locale("en","US");	
+}	
+System.out.println(loc.toString());
 
 ResourceBundle rb = null;
 try {
@@ -78,7 +103,7 @@ System.out.println("msHost = " + msHost + msContext);
           rel="stylesheet">
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 
     <!-- Datatables Css Files -->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
@@ -150,6 +175,7 @@ System.out.println("msHost = " + msHost + msContext);
  *						  The entire file should be replaced during 'pull request & comparison' process.
  * Frank	01-16-20  	Restore corrupted Spanish Special Characters
  * Frank    02-17-20    ttfixesR3
+ * Frank	12-02-20	Issue #322 added currentSelection to classReportCard URL 
  */
  
  
@@ -174,7 +200,7 @@ var perProblemReportTable
 var perClusterReportTable
 
 //Report5 Varribales
-var perStudentReport;
+var landingPageReport;
 var effortMap;
 var perProblemObject;
 var emotionMap;
@@ -189,9 +215,11 @@ var studentData;
 var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
+var filterLandingOne = "~7";
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
+var emsg_className_invalid = 'Class name must only include letters,numbers or . _ - characters';
 var emsg_classGrade      = 'Class grade is mandatory field';
 var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
 var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
@@ -221,6 +249,7 @@ if (languagePreference.includes("en")) {
 	loc = "es-Ar";
 	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
 	emsg_className       = 'El nombre de la clase es obligatorio';
+	var emsg_className_invalid = 'El nombre de la clase solo debe incluir letras, números o . _ - ';
 	emsg_classGrade      = 'El grado de la clase es obligatorio';
 	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
 	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
@@ -237,6 +266,21 @@ if (languagePreference.includes("en")) {
 	emsg_maxTime         = 'Max Time is a mandatory field';
 	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
 	emsg_minTime         = 'Min Time is a mandatory field';
+}
+
+
+function getFilterLandingOne() {
+	var daysLandingOne = document.getElementById("daysFilterLandingOne").value;
+	
+	const nDays = parseInt(daysLandingOne);
+	if (isNaN(nDays)) {
+		daysLandingOne = "7";
+		document.getElementById("daysFilterLandingOne").value  = "7";
+	}
+	else {
+		daysLandingOne = "" + nDays;
+	}
+	filterLandingOne = daysLandingOne;
 }
 
 function logTeacherEvent(action,activityName) {
@@ -370,7 +414,9 @@ function resetStudentData() {
                 $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
                 $('#errorMsgModelPopup').modal('show');
             }else{
-                logTeacherEvent("resetStudentData",resetStudentDataLogmsg);
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("resetStudentData",resetStudentDataLogmsg);
+                }
                 $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_info_updated")%>");
                 $('#successMsgModelPopup').modal('show');
             }
@@ -417,7 +463,9 @@ function deleteInactiveStudents() {
         		logmsg = response;
         		logmsg = "{ \"result\" : \"[" + response + "]\"}";
         	}
-            logTeacherEvent("deleteInactiveStudents",logmsg);
+            if (teacherLoginType === "Normal") {
+	            logTeacherEvent("deleteInactiveStudents",logmsg);
+            }
         	$("#successMsgModelPopup").find("[class*='modal-body']").html( response );
             $('#successMsgModelPopup').modal('show');
         }
@@ -447,8 +495,10 @@ function resetPassWordForThisStudent(id,uname){
                  $('#errorMsgModelPopup').modal('show');
              }else{
             	 var logMsg  = "{ \"id\" : \"" + id + "\", \"username\" : \"" + uname + "\", \"msg\" : \"password_is_reset\" }";
-				 logTeacherEvent("resetStudentPassword",logMsg);
-                 $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
+                 if (teacherLoginType === "Normal") {
+				 	logTeacherEvent("resetStudentPassword",logMsg);
+                 }
+	             $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("password_is_reset")%>  <%= rb.getString("new_password_is")%> "+response+"");
                  $('#successMsgModelPopup').modal('show');
              }
          }
@@ -488,7 +538,9 @@ function updateStudentInfo(formName){
             }else{
             	var JSONData = JSON.parse(response);
             	var msg = JSONData["msg"];
-                logTeacherEvent("updateStudentInfo",response);
+                if (teacherLoginType === "Normal") {
+	                logTeacherEvent("updateStudentInfo",response);
+                }
                 $("#successMsgModelPopup").find("[class*='modal-body']").html(msg);
                 $('#successMsgModelPopup').modal('show');
             }
@@ -624,11 +676,11 @@ var save_changes = "<%= rb.getString("save_changes")%>";
 var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
-
+var summaryLabel="<%= rb.getString("summary")%>"; 
 var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
     " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
     " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body'><strong>Summary : " + JSONData["topicSummary"] + "</strong></div>"+
+    " <div class='panel-body'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
     "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
     "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
 
@@ -661,6 +713,9 @@ function problemLevelDetails(JSONData,problems){
             checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
         }
         var tnickname = obj.nickName;
+        if (tnickname == null) {
+        	tnickname = "";
+        }
         if (tnickname.length > 94) {
         	tnickname = tnickname.substr(0,90) + "...";
         }
@@ -689,7 +744,11 @@ function handleclickHandlers() {
                 validators: {
                     notEmpty: {
                         message: emsg_className
-                    }
+                    },
+			        regexp: {
+            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+                        message: emsg_className_invalid
+        			}        
                 }
             },
             classGrade: {
@@ -882,6 +941,12 @@ function handleclickHandlers() {
        
     });
 
+    $("#cancelClassProfileBtn").click(function () {
+        $('#reorg_prob_sets_handler').css('color', '#ffffff');
+        $("#content-conatiner").children().hide();
+        $("#splash_page").show();
+    });
+
 
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
@@ -980,6 +1045,22 @@ function handleclickHandlers() {
 
 }
 
+function changeLandingPageHeaderAccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Número de problemas vistos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Number of problems seen','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
+	 	return header;
+	}
+}
 
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
@@ -1015,6 +1096,174 @@ function registerAllEvents(){
         "bFilter": false,
         "bLengthChange": false,
         "ordering": false
+    });
+
+    var headers = changeLandingPageHeaderAccordingToLanguage();
+  
+    if (languageSet == 'es') {
+    
+    landingPageReport  =  $('#landingPageReport').DataTable({
+        data: [],
+        destroy: true,
+        columns: [
+            { title: headers['sid'] },
+            { title: headers['sname']  },
+            { title: headers['uname']  },
+            { title: headers['problems']  },
+            { title: headers['timeInMS']  },
+            { title: headers['latestLogin']  },
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bLengthChange": false,
+        rowReorder: false,                
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+
+        "scrollX": true,
+        "bSort" : false,
+        "columnDefs": [
+            {
+                "width": "10%",
+                "targets": [ 0 ],
+                "visible": false
+
+            },{
+                "width": "10%",
+                "targets": [ 1 ],
+                "visible": true
+
+            },{
+                "width": "10%",
+                "targets": [ 2 ],
+                "visible": false
+
+            },
+            {
+                "width": "10%",
+                "targets": [ 3 ],
+                "visible": true
+
+            },
+            {
+                "targets": [ 4 ],
+                "width": "10%",
+                "visible": true
+            }, 
+            {
+                "targets": [ 5 ],
+                "width": "10%",
+                "visible": true
+            }
+                
+    	]
+    }    
+    );
+    }
+    else {
+        landingPageReport  =  $('#landingPageReport').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers['sid'] },
+                { title: headers['sname']  },
+                { title: headers['uname']  },
+                { title: headers['problems']  },
+                { title: headers['timeInMS']  },
+                { title: headers['latestLogin']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "10%",
+                    "targets": [ 0 ],
+                    "visible": false
+
+                },{
+                    "width": "10%",
+                    "targets": [ 1 ],
+                    "visible": true
+
+                },{
+                    "width": "10%",
+                    "targets": [ 2 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "10%",
+                    "targets": [ 3 ],
+                    "visible": true
+
+                },
+                {
+                    "targets": [ 4 ],
+                    "width": "10%",
+                    "visible": true
+                }, 
+                {
+                    "targets": [ 5 ],
+                    "width": "10%",
+                    "visible": true
+                }
+                    
+        	]
+        }    
+        );    	
+    }
+    
+    $('#classLandingReportOne').on('show.bs.collapse', function ()  {
+
+    	
+    	getFilterLandingOne(); 
+       	$.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'classLandingReportOne',
+                lang: loc,
+                filter: filterLandingOne
+            },
+            success : function(data) {
+                var jsonData = $.parseJSON(data);
+                landingPageReport.clear().draw();
+                landingPageReport.rows.add(jsonData.levelOneData).draw();
+                landingPageReport.columns.adjust().draw();
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+
     });
 
     var classListSize = $('#classListSize').val();
@@ -1438,7 +1687,9 @@ function registerAllEvents(){
                     $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
                     $('#errorMsgModelPopup').modal('show');
                 }else{
-                    logTeacherEvent("createMoreStudentId",data);
+                    if (teacherLoginType === "Normal") {
+	                    logTeacherEvent("createMoreStudentId",data);
+                    }
                     $("#successMsgModelPopup").find("[class*='modal-body']").html( "<%= rb.getString("user_creation_successful")%> " );
                     $('#successMsgModelPopup').modal('show');
                 }
@@ -1555,6 +1806,7 @@ function registerAllEvents(){
         var pgContext = '${pageContext.request.contextPath}';
         var classID = '${classInfo.classid}';
         var teacherID = '${teacherId}';
+        var teacherLoginType = '${teacherLoginType}';
         var currentSelection = '${currentSelection}';
         var sessionID = "0";
         var prePostIds = '${prepostIds}'.split("~~");		
@@ -1567,6 +1819,7 @@ function registerAllEvents(){
 
             if (currentSelection == "classHomePage") {
                 $("#splash_page").show();            	
+            	$("#classLandingReportOne").collapse('show');
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
                     $('#reorg_prob_sets_handler').click();
@@ -1788,7 +2041,7 @@ function registerAllEvents(){
                 <a id="classHomePage" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("class_home") %></a>
             </li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
 
             <li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
@@ -2429,8 +2682,9 @@ function registerAllEvents(){
 				                    </div>
 				                </div>
 				                <div class="row">
-				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-2 col-sm-2">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-4 col-sm-4">
 				                            <button id="editClassProfileBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                            <button id="cancelClassProfileBtn" class="btn btn-danger btn-lg" aria-disabled="true"><%= rb.getString("cancel") %></button>
 				                        </div>
 				                </div>
 				            </springForm:form>
@@ -2477,16 +2731,46 @@ function registerAllEvents(){
              </div>
 
              <div id="splash_page" style="display:none;width: 100%;">
-             <div>
+             	<div>
                     <h3 class="tt-page-header">
-                    Select activities from the menu on the left
+                    <%= rb.getString("select_activities_from_menu") %>
                     </h3>
                 </div>
-             </div>
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="reportOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportOne">
+				                    <%= rb.getString("recent_student_activities") %>
+                                </a>
+                                <button id="landingPageReportButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div class="panel-body report_filters">                           
+							  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
+							  <input id="daysFilterLandingOne" style="width:32px" type="text" name="" value="7">   
+							  <label class="report_filters"><%= rb.getString("days") %>.  </label>
 
-            
-        </div>
-</div>
+						</div>
+                        <div id="classLandingReportOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table id="landingPageReport" class="table table-striped table-bordered hover" width="100%"></table>
+                            </div>
+
+                        </div>
+                        <div class="panel-body report_filters">                           
+							  <label class="report_filters" ><%= rb.getString("landing_report_note1") %></label>
+							  <label class="report_filters" ><%= rb.getString("landing_report_note2") %></label>
+						</div>
+                    </div>
+                </div>            
+             	<div>
+                    <h3 class="tt-page-header">
+                    <%= rb.getString("select_report_card_from_menu") %>
+                    </h3>
+                </div>
+        	</div>
+	</div>
 </div>
 
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
@@ -2632,42 +2916,6 @@ function registerAllEvents(){
 </div>
 <!-- Modal -->
 
-<div id="completeMasteryForStudent" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><%= rb.getString("complete_mastery_chart") %></h4>
-            </div>
-            <div class="modal-body" role="alert">
-                <canvas id="completeMasteryForStudentCanvas"></canvas>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- Modal For Mastery Trajecotory Report-->
-<div id="masteryTrajectoryReport" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><%= rb.getString("master_trajectory_report") %></h4>
-            </div>
-            <div class="modal-body" role="alert">
-                <canvas id="masteryTrajectoryReportCanvas"></canvas>
-                <div>
-                    <table id="masteryTrajecotoryLegend" class="table table-striped table-bordered" cellspacing="0"
-                           width="50%"/>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 
 <!-- Modal -->

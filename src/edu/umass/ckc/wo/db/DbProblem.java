@@ -56,7 +56,12 @@ public class DbProblem extends BaseMgr {
             while (rs.next()) {
                 int topicId = rs.getInt(Topic.ID);
                 Topic t = ProblemMgr.getTopic(topicId);
-                topics.add(t);
+                if (t != null) {
+                	topics.add(t);
+                }
+                else {
+                	System.out.println("Problem " + String.valueOf(probId) + " has non-existent topic " +  String.valueOf(topicId) );
+                }
             }
             return topics;
         } finally {

@@ -1,7 +1,8 @@
 package edu.umass.ckc.wo.beans;
 import edu.umass.ckc.wo.content.CCStandard;
+import edu.umass.ckc.wo.content.Problem;
 
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,26 +11,35 @@ import java.util.Set;
  * User: david
  * Date: Jul 17, 2008
  * Time: 10:30:17 AM
+ * 
+ * Frank	12-26-20	Issue #329 Added mlName element for multi-lingual support
+ * Frank	01-03-21	Issue #329R2 Added mlDescription and fixed setters to parse JSON formats
+ * Frank	01-05-21	Issue #329R3 fixed mlDescription handling of parse JSON formats
  */
+
 
 public class Topic implements Comparable<Topic> {
     private int id;
     private String name;
+    private String mlName;
     private String summary;
+    private String mlDescription;
     private int seqPos;
     private int oldSeqPos;
     private Set<CCStandard> ccStandards;
     private int numProbs;
     private int[] problemsByGrade;
     private Map<String,Integer> gradewiseProblemDistribution;
-
+    private Map<String, String> mlNameMap;
+    private Map<String, String> mlDescMap;
+    
     public static final String ID = "id";
     public static final String INTRO = "intro";
     public static final String SUMMARY = "summary";
     public static final String DESCRIPTION = "description";
     public static final String TYPE = "type";
     public static final String ACTIVE = "active";
-
+   
     public Topic () {
     }
 
@@ -44,6 +54,19 @@ public class Topic implements Comparable<Topic> {
         setSummary(summary);
     }
 
+    public Topic (int id, String name, String summary, String mlName) {
+        this(id,name);
+        setSummary(summary);
+        setMlName(mlName);
+    }
+
+    public Topic (int id, String name, String summary, String mlName, String mlDescription) {
+        this(id,name);
+        setSummary(summary);
+        setMlName(mlName);
+        setMlDescription(mlDescription);
+    }
+    
     public String getSummary() {
         return summary;
     }
@@ -59,6 +82,96 @@ public class Topic implements Comparable<Topic> {
     public void setName (String n) {
         this.name = n;
     }
+
+    public String getMlDescription() {
+        return mlDescription;
+    }
+
+    public String getMlDescription(String lang) {
+    	
+    	String result = mlDescMap.get(lang);
+        return result;
+    }
+
+
+    
+    public void setMlDescription (String d) {
+    	// Store JSON-formatted string
+        mlDescription = d;
+
+    	// Convert JSON-formatted string to HashMap
+        String tmpDesc =  d;
+    	try {
+		    tmpDesc = tmpDesc.replace("{","");
+		    tmpDesc = tmpDesc.replace("}","");
+		    tmpDesc = tmpDesc.replaceFirst("\",","\"~");
+		    tmpDesc = tmpDesc.replaceAll("\"","");
+		    tmpDesc = tmpDesc.trim();
+		    String jsonArr[] = tmpDesc.split("~");
+		    mlDescMap = new HashMap<String, String>();
+		    for( int i=0; i< jsonArr.length; i++ ) {
+		    	String jsonObj = jsonArr[i];
+		    	int index = jsonObj.indexOf(":");
+		    	if (index > 1) {
+			    	String lang = jsonObj.substring(0,index);
+			    	String text = jsonObj.substring(index+1,jsonObj.length());
+		        	mlDescMap.put(lang.trim(),text.trim());
+		    	}
+		    	else {
+		    		System.out.println("Malformed topic description " + mlName);
+		    	}
+		   }
+	    
+    	}
+    	catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
+     }
+
+
+    
+    public String getMlName() {
+        
+    	return mlName;
+    }
+
+    public String getMlName(String lang) {
+    	
+    	String result = mlNameMap.get(lang);
+        return result;
+    }
+
+    public void setMlName (String n) {
+    	// Store JSON-formatted string
+        mlName = n;
+    	// Convert JSON-formatted string to HashMap
+        String tmpName =  n;
+    	try {
+		    tmpName = tmpName.replace("{","");
+		    tmpName = tmpName.replace("}","");
+		    tmpName = tmpName.replaceAll("\"","");
+		    tmpName = tmpName.replaceFirst(",","~");
+		    tmpName = tmpName.trim();
+		    String jsonArr[] = tmpName.split("~");
+		    mlNameMap = new HashMap<String, String>();
+		    for( int i=0; i< jsonArr.length; i++ ) {
+		    	String jsonObj = jsonArr[i];
+		    	int index = jsonObj.indexOf(":");
+		    	if (index > 1) {
+		    		String lang = jsonObj.substring(0,index);
+		    		String text = jsonObj.substring(index+1,jsonObj.length());
+		    		mlNameMap.put(lang.trim(),text.trim());
+		    	}
+		    	else {
+		    		System.out.println("Malformed topic name " + mlName);
+		    	}
+		    }
+    	}
+    	catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
+    }
+
 
     public int getId() {
         return id;

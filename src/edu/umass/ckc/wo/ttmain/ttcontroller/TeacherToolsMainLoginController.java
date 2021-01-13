@@ -34,6 +34,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank    05-29-2020  issue #28 re-work password reset
  * Frank	06-18-2020	issue #135 added method loginHelp()
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
+ * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -49,9 +50,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.POST)
     public String printWelcome(@RequestParam("userName") String username, @RequestParam("password") String password, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -66,20 +74,25 @@ public class TeacherToolsMainLoginController {
             return "login/loginK12_teacher";    		
     	}
     	
-    	int loginAllowed  = loginService.loginAssist(username,password);
-            if(loginAllowed == -1) {
+    	String loginResult  = loginService.loginAssist(username,password);
+            if(loginResult.contains("failure")) {
                 request.setAttribute(LoginParams.MESSAGE,rb.getString("invalid_creds_try_again"));
                 return "login/loginK12_teacher";
             }else{
+        		String loginSplitter[] = loginResult.split("~");
+        		int loginId = Integer.valueOf(loginSplitter[0]);
+        		String teacherLoginType = loginSplitter[1];
             	HttpSession session = request.getSession();
 //        		session.invalidate();
 //            	session = request.getSession();
 //            	session.setMaxInactiveInterval(30*60);
-        		session.setAttribute("teacherId", loginAllowed);
+        		session.setAttribute("teacherId", loginId);
         		session.setAttribute("teacherUsername", username);         	
-            	tLogger.logEntryWorker(loginAllowed, 0, "login", "");
+        		session.setAttribute("teacherLoginType", teacherLoginType);
+        		if (teacherLoginType.equals("Normal"))
+        			tLogger.logEntryWorker(loginId, 0, "login", "");
 
-                return loginService.populateClassInfoForTeacher(model,loginAllowed);
+                return loginService.populateClassInfoForTeacher(model,loginId);
             }
     }
 
@@ -97,9 +110,9 @@ public class TeacherToolsMainLoginController {
         System.out.println("logging out");
 		HttpSession MySession = request.getSession();
 		int teacherId = (int) MySession.getAttribute("teacherId");
- 		//TeacherLogger tlogger = (TeacherLogger) MySession.getAttribute("tLogger");
- 		tLogger.logEntryWorker(teacherId, 0, "logout", "");
-
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId, 0, "logout", "");
+		}
     	session.removeAttribute("tLogger");
     	session.removeAttribute("teacherUsername");
     	session.removeAttribute("teacherId");
@@ -112,9 +125,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestParam("userName") String username, @RequestParam("email") String email, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -155,9 +175,16 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttLoginHelp", method = RequestMethod.POST)
     public String loginHelp(@RequestParam("email") String email, @RequestParam("helpmsg") String helpmsg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getDisplayLanguage();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);

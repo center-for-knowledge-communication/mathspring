@@ -26,6 +26,10 @@
 <!-- Frank	10-06-20	Issue #267 fix edit class form vaildation -->
 <!-- Frank	10-06-20	Issue #267 hide language selection on edit class form -->
 <!-- Frank	10-12-20	Issue #272 SPLIT off from classDetail.jsp -->
+<!-- Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report -->
+<!-- Frank 12-11-20 Issue #315 default locale to en_US -->
+<!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
+<!-- Frank 12-26-20  	Issue #329 fix errors from splitting classDetails.jsp -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -40,9 +44,27 @@
 
 <%
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
+Locale loc = request.getLocale(); 
+String lang = loc.getLanguage();
+
+if (lang.equals("es")) {
+	loc = new Locale("es","AR");	
+}
+else {
+	loc = new Locale("en","US");	
+}	
+System.out.println(loc.toString());
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -73,7 +95,7 @@ System.out.println("msHost = " + msHost + msContext);
           rel="stylesheet">
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 
     <!-- Datatables Css Files -->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
@@ -151,14 +173,14 @@ var perProblemSetColumnNamesMap;
 var perProblemSetLevelOneAvg;
 var perProblemSetLevelOneMax;
 var perProblemSetLevelOneLatest;
-var filterOne = "~~Y";
+var filterOne = "~365~Y";
 
 //Report6
 var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
-var filterSix = "~~Y";
+var filterSix = "~365~Y";
 //var urlColumnNames;
 
 //Report2 Varriables
@@ -166,6 +188,9 @@ var perProblemReportTable
 
 //Report3 Varriables
 var perClusterReportTable
+
+//Report4 variables
+var filterFour = "~365"
 
 //Report5 Varribales
 var perStudentReport;
@@ -228,10 +253,17 @@ else {
 
 function getFilterSix() {
 	var showNamesState = "N";
-	if (document.getElementById("showNames").checked == true) {
+	if (document.getElementById("showNamesSix").checked == true) {
 		showNamesState = "Y";
 	}
-	filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
+
+	var daysSix = document.getElementById("daysFilterSix").value;
+	const nDays = parseInt(daysSix);
+	if (isNaN(nDays)) {
+		daysSix = "365";
+	}
+
+	filterSix = document.getElementById("standardsFilter").value + "~" + daysSix + "~" + showNamesState;
 	
 	var a_href = '${pageContext.request.contextPath}';
 	a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
@@ -248,9 +280,14 @@ function getFilterOne() {
 	if (document.getElementById("showNamesOne").checked == true) {
 		showNamesState = "Y";
 	}
-//	filterOne = document.getElementById("standardsFilterOne").value + "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
-	filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
-	
+
+	var daysOne = document.getElementById("daysFilterOne").value;
+	const nDays = parseInt(daysOne);
+	if (isNaN(nDays)) {
+		daysOne = "365";
+	}
+	filterOne = "~" + daysOne + "~" + "Y";
+
 	var a_href = '${pageContext.request.contextPath}';
 	a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
 	a_href = a_href + teacherID;
@@ -261,6 +298,33 @@ function getFilterOne() {
 	document.getElementById("downloadReportOneBtn").href = a_href;
 }
 
+function getFilterFour() {
+	var daysFour = document.getElementById("daysFilterFour").value;
+	
+	const nDays = parseInt(daysFour);
+	if (isNaN(nDays)) {
+		daysFour = "365";
+	}
+	filterFour = "~" + daysFour;
+	
+	var a_href = '${pageContext.request.contextPath}';
+	a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
+	a_href = a_href + teacherID;
+	a_href = a_href + "&classId=";
+	a_href = a_href + ${classInfo.classid};
+	a_href = a_href + "&filter=";
+	a_href = a_href + filterFour;
+	document.getElementById("downloadReportFourClusterBtn").href = a_href;
+
+	a_href = '${pageContext.request.contextPath}';
+	a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
+	a_href = a_href + teacherID;
+	a_href = a_href + "&classId=";
+	a_href = a_href + ${classInfo.classid};
+	a_href = a_href + "&filter=";
+	a_href = a_href + filterFour;
+	document.getElementById("downloadReportFourProblemBtn").href = a_href;
+}
 
 function ftest(problemId) {
 	var tmp1 = '<img style="display: block; margin: 0 auto; max-width:400px; max-height:400px;" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
@@ -679,44 +743,9 @@ function handleclickHandlers() {
         $("#report-wrapper").show();
         $("#report-wrapper2").show();
         $("#perStudentPerProblemSetReport").hide();
+        $("#perClusterReport").hide();
     });
  
-    $('a[rel=initialPopover]').popover({
-        html: true,
-        trigger: 'hover',
-        container: 'body',
-        title: '<%= rb.getString("what_is_mastery")%>',
-        placement: 'right',
-        content: function () {
-            return "<ul><li><%= rb.getString("what_is_mastery_popover1")%></li><li><%= rb.getString("what_is_mastery_popover2")%></li></ul><%= rb.getString("what_is_mastery_popover3")%>";
-        }
-    });
-
-    $('a[rel="popoverOrder"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("order_problemset_will_be_shown")%>';
-        }
-    });
-    $('a[rel="popoveractivatedProblems"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("nbr_activated_problems_click_to_see")%>';
-        }
-    });
-
-    $('a[rel="popoverproblemsetSummary"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top'
-    });
 
 
 }
@@ -1257,8 +1286,7 @@ else {
     
     var myLineChart;
     $('body').on('click', 'div.getMastery-trajectory-for-problemset', function () {
-
-        var topicId = $(this).find("span").text();
+    	var topicId = $(this).find("span").text();
         var td = $(this).closest('td');
         var bgcolor = "#BDB7B5"
 
@@ -1283,7 +1311,6 @@ else {
         }
         var tr = $(this).closest('tr');
         var row = perProblemSetReport.row(tr);
-        var topicId = $(this).find("span").text();
         var studentId = row.data()['studentId'];
 
         $.ajax({
@@ -1555,6 +1582,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByAVG = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -1609,6 +1637,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByMax = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -1664,6 +1693,7 @@ var completeDataChart;
                 studentId: studentID
             },
             success: function (response) {
+                $('#completeMasteryForStudent').modal('hide');
                 var completeProjectionByLatest = $.parseJSON(response);
                 var problemsetName = [];
                 var masteryData = [];
@@ -1738,6 +1768,10 @@ var completeDataChart;
                         var temp = {
                             "title": v, "name": v.replace(/\s/g, ''), "targets": indexcolumn,
                             "createdCell": function (td, cellData, rowData, row, col) {
+                                if (cellData == null) {
+                                    $(td).text();
+                                    return;
+                                }
                                 if (cellData == '') {
                                     $(td).text();
                                     return;
@@ -1847,7 +1881,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'right',
+                            placement: 'top',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                     '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
@@ -1874,7 +1908,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'right',
+                            placement: 'top',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                 '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
@@ -1896,10 +1930,10 @@ var completeDataChart;
     $('#showReportSixBtn').on('click', function ()  {
         $('#collapseSix').find('.loader').show();
         var showNamesState = "N";
-        if (document.getElementById("showNames").checked == true) {
+        if (document.getElementById("showNamesSix").checked == true) {
         	showNamesState = "Y";
         }
-        filterSix=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilter").value + "~" + showNamesState;
+        filterSix=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
         
         $.ajax({
             type : "POST",
@@ -2310,7 +2344,10 @@ var completeDataChart;
 
     });
 
-    $('#collapseFour').on('show.bs.collapse', function ()  {
+    $('#showReportFourBtn').on('click', function ()  {    	
+
+   
+        getFilterFour();
         $('#collapseFourLoader').show();
         $.ajax({
             type : "POST",
@@ -2320,10 +2357,11 @@ var completeDataChart;
                 teacherId: teacherID,
                 reportType: 'commonCoreClusterReport',
                 lang: loc,
-                filter: ''
+                filter: filterFour
             },
             success : function(data) {
                 $('#collapseFourLoader').hide();
+                $("#perClusterReport").show();
                 var jsonData = $.parseJSON(data);
                 var cc_headers = changeReportFourHeaderAccordingToLanguage();
                 var columNvalues = [
@@ -2629,7 +2667,9 @@ var completeDataChart;
                 data: {
                     classId: classID,
                     teacherId: teacherID,
-                    clusterId: clusterId
+                    clusterId: clusterId,
+                    filter: filterFour
+
                 },
                 success: function (data) {
                     var jsonData = $.parseJSON(data);
@@ -2854,6 +2894,7 @@ var completeDataChart;
             $("#splash_page").show();
 
             getFilterOne();
+            getFilterFour();
             getFilterSix();
             
             $('#reorg_prob_sets_handler').css('background-color', '');
@@ -3044,23 +3085,21 @@ var completeDataChart;
                             </h4>
                         </div>
                         <div id="collapseFour" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <ul>
-                                    <li><label><%= rb.getString("common_core_evaluation_students_in_class") %></label>
-                                        <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerClusterReport?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                           data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                           class="downloadPerStudentReport" aria-expanded="true"
-                                           aria-controls="collapseOne">
-                                            <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                        </a></li>
-                                    <li><label><%= rb.getString("problem_wise_performance_students_in_class") %></label>
-                                        <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                           data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                           class="downloadPerStudentReport" aria-expanded="true"
-                                           aria-controls="collapseOne">
-                                            <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                        </a></li>
-                                </ul>
+	                            <div class="panel-body report_filters hidden">                           
+									  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
+									  <input id="standardsFilterFour" style="width:48px" type="text" name="" value="" onblur="getFilterFour();">
+								</div>
+	                            <div class="panel-body report_filters">                           
+									  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
+									  <input id="daysFilterFour" style="width:32px" type="text" name="" value="" onblur="getFilterFour();">   
+									  <label class="report_filters"><%= rb.getString("days") %></label>
+								</div>
+	                            <div class="panel-body report_filters">                           
+									  <input id="showReportFourBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+									  <a id="downloadReportFourClusterBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_common_core_evaluation") %></a>
+									  <a id="downloadReportFourProblemBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_problem_wise_performance_data") %></a>
+	                            </div>                            
+	                            <div class="panel-body">
                             </div>
                             <div class="panel-body">
                                 <table id="perClusterLegendTable" class="table table-striped table-bordered hover" width="60%">
@@ -3160,7 +3199,7 @@ var completeDataChart;
 								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
                             </div>
                             <div class="panel-body">
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
+                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
                                     <thead>
                                     <tr>
                                         <th><%= rb.getString("mastery_range") %></th>
@@ -3228,11 +3267,11 @@ var completeDataChart;
 							</div>
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-								  <input id="daysFilter" style="width:32px" type="text" name="" value="" onblur="getFilterSix();">   
+								  <input id="daysFilterSix" style="width:32px" type="text" name="" value="" onblur="getFilterSix();">   
 								  <label class="report_filters"><%= rb.getString("days") %></label>
 							</div>
                             <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNames" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
 								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -3419,8 +3458,8 @@ var completeDataChart;
 
     </div>
 </div>
-<!-- Modal -->
 
+<!-- Modal -->
 <div id="completeMasteryForStudent" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -3458,7 +3497,5 @@ var completeDataChart;
     </div>
 </div>
 
-
-<!-- Modal -->
 </body>
 </html>

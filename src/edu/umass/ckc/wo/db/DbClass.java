@@ -107,7 +107,7 @@ public class DbClass {
                 int minTime = 0;
                 if (rs.getObject(28) != null && !rs.wasNull()) {
                 	if (rs.getLong(28) < maxTime) {
-                		minProb = rs.getInt(28);
+                		minTime = rs.getInt(28);
                 	}
             	}
                 
@@ -1174,6 +1174,40 @@ public class DbClass {
         PreparedStatement stmt = null;
         try {
             String q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classID);
+            rs = stmt.executeQuery();
+            List<User> res = new ArrayList<User>();
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String fname = rs.getString(2);
+                String lname = rs.getString(3);
+                String uname = rs.getString(4);
+                String email = rs.getString(5);
+                String pw = rs.getString(6);
+                int strategyId = rs.getInt(7);  // can be NULL
+                if (rs.wasNull())
+                    strategyId = -1;
+                User u = new User(fname, lname, uname, email, pw, id);
+                if (strategyId != -1)
+                    u.setStrategyId(strategyId);
+                res.add(u);
+            }
+            return res;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+    public static List<User> getClassStudentsByName(Connection conn, int classID) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=? order by fname asc, lname, username";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classID);
             rs = stmt.executeQuery();

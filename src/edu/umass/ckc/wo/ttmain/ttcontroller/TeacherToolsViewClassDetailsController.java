@@ -50,6 +50,9 @@ import javax.servlet.http.HttpSession;
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  * Frank	10-12-20	Issue #272 handle split of classDetails.jsp
  * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
+ * Frank	11-12-20    issue #276 suppress logging if logged in as Master
+ * Frank 	12-02-20	issue #322 fixed and enhanced URL manipulation checking to include classId checking
+ * Frank	01-03-21	issue #329R2 pass lang param to viewProblemSetsInGivenProblem()
  */
 
 @Controller
@@ -75,8 +78,16 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -87,20 +98,38 @@ public class TeacherToolsViewClassDetailsController {
 
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
-    	if (currentSelection == "classHomePage") {
+    	if (currentSelection.equals("classHomePage")) {
 			try {
-	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
-	    			HttpSession MySession = request.getSession();
-	    			int teacherId = (int) MySession.getAttribute("teacherId");
-	    	 		tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
-	
+				int teacherId = 0;
+    			teacherId = (int) session.getAttribute("teacherId");
+
+    			if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+	    			}
 	    	    	session.removeAttribute("tLogger");
 	    	    	session.removeAttribute("teacherUsername");
 	    	    	session.removeAttribute("teacherId");
 	    			session.invalidate();
-	    			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
 	                request.setAttribute("message",msg);
 	    	        return "login/loginK12_teacher";
+	    		}
+    			
+	    		String sessClassId = (String) session.getAttribute("classId");
+	    		if (sessClassId != null) {
+	    			if (!classId.equals(sessClassId) ) {
+		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+		    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+		    			}
+		    	    	session.removeAttribute("tLogger");
+		    	    	session.removeAttribute("teacherUsername");
+		    	    	session.removeAttribute("teacherId");
+		    			session.invalidate();
+		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
+		                request.setAttribute("message",msg);
+		    	        return "login/loginK12_teacher";
+	    			}
 	    		}
 			}
 			catch(SQLException e) {
@@ -116,6 +145,22 @@ public class TeacherToolsViewClassDetailsController {
 		        return "login/loginK12_teacher";			
 			}
     	}
+    	else {
+        	if (currentSelection.equals("")) {    		
+				int teacherId = (int) session.getAttribute("teacherId");
+				if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+					tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+				}
+		    	session.removeAttribute("tLogger");
+		    	session.removeAttribute("teacherUsername");
+		    	session.removeAttribute("teacherId");
+				session.invalidate();
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";
+        	}
+    	}
+
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
    		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
     	map.addAttribute("createClassForm", new CreateClassForm());
@@ -126,10 +171,18 @@ public class TeacherToolsViewClassDetailsController {
     }
     
     @RequestMapping(value = "/tt/viewClassReportCard", method = RequestMethod.GET)
-    public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId ) throws TTCustomException {
+    public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection  ) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
 
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
     	ResourceBundle rb = null;
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -140,6 +193,63 @@ public class TeacherToolsViewClassDetailsController {
 
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
+    	if (currentSelection.equals("classReportCard")) {
+			try {
+	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
+	    			}
+	    	    	session.removeAttribute("tLogger");
+	    	    	session.removeAttribute("teacherUsername");
+	    	    	session.removeAttribute("teacherId");
+	    			session.invalidate();
+	    			String msg = rb.getString("url_tampering_error") + ": " + rb.getString("log_in_and_try_again");
+	                request.setAttribute("message",msg);
+	    	        return "login/loginK12_teacher";
+	    		}
+	    		
+	    		String sessClassId = (String) session.getAttribute("classId");
+	    		if (sessClassId != null) {
+	    			if (!classId.equals(sessClassId) ) {
+		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+		    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
+		    			}
+		    	    	session.removeAttribute("tLogger");
+		    	    	session.removeAttribute("teacherUsername");
+		    	    	session.removeAttribute("teacherId");
+		    			session.invalidate();
+		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
+		                request.setAttribute("message",msg);
+		    	        return "login/loginK12_teacher";
+	    			}
+	    		}
+			}
+			catch(SQLException e) {
+				logger.debug(e.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+			catch(java.lang.NullPointerException ne) {
+				logger.debug(ne.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+    	}
+    	else {   		
+			int teacherId = (int) session.getAttribute("teacherId");
+			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+			}
+	    	session.removeAttribute("tLogger");
+	    	session.removeAttribute("teacherUsername");
+	    	session.removeAttribute("teacherId");
+			session.invalidate();
+			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+            request.setAttribute("message",msg);
+	        return "login/loginK12_teacher";
+    	}
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
         map.addAttribute("createClassForm", new CreateClassForm());
@@ -158,16 +268,18 @@ public class TeacherToolsViewClassDetailsController {
             sequenceNosToBeRemoved.add(Integer.valueOf(entries[2]));
         }
         ccService.reOrderProblemSets(Integer.valueOf(classid), sequenceNosToBeRemoved, insertSequences);
-		HttpSession MySession = request.getSession();
-		int teacherId = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId, 0, classid,"reOrderTopics", "");
+		HttpSession session = request.getSession();
+		int teacherId = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId, 0, classid,"reOrderTopics", "");
+		}
         return "success";
     }
 
     @RequestMapping(value = "/tt/configureProblemSets", method = RequestMethod.POST)
     public @ResponseBody String activateProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "activateData[]") List<String> problemSets, @RequestParam(value = "classid") String classid,@RequestParam(value = "activateFlag") String activateFlag) throws TTCustomException {
         List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
-		HttpSession MySession = request.getSession();
+		HttpSession session = request.getSession();
 		System.out.println(problemSets);
 		String logMsg = "{ ";
 		if (activateFlag.equals("deactivate")) {
@@ -182,8 +294,10 @@ public class TeacherToolsViewClassDetailsController {
 		}
 		logMsg += " }";
 
-		int teacherId = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
+		int teacherId = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
+		}
         return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag);
     }
     
@@ -207,16 +321,28 @@ public class TeacherToolsViewClassDetailsController {
     	logMsg += "\"classes Updated\" : \"[" +idList + "]\"";
         logMsg += " }";
         
-        HttpSession MySession = request.getSession();
-		int teacherId2 = (int) MySession.getAttribute("teacherId");
- 		tLogger.logEntryWorker(teacherId2, 0, classid, "continousContentApply", logMsg);
+        HttpSession session = request.getSession();
+		int teacherId2 = (int) session.getAttribute("teacherId");
+		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+			tLogger.logEntryWorker(teacherId2, 0, classid, "continousContentApply", logMsg);
+		}
         return ccService.continousContentApply(intClassIDList,Integer.valueOf(classid),Integer.valueOf(teacherId));
     }
 
     @RequestMapping(value = "/tt/getProblemForProblemSets", method = RequestMethod.POST)
-    public @ResponseBody  String viewProblemsForProblemSet(ModelMap map, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {
+    public @ResponseBody  String viewProblemsForProblemSet(ModelMap map,  HttpServletRequest request, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {
+
+    	Locale loc = request.getLocale();
+    	String lang = loc.getLanguage();
+
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
         try {
-            ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid));
+            ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid), lang);
             ObjectMapper objectMapp = new ObjectMapper();
             objectMapp.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         	System.out.println("getProblemForProblemSets = success");

@@ -48,6 +48,9 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 06-13-2020 issue #108 replace use of gradeFromStandard
  * Frank 06-13-2020 issue #106R2 missed one - replace use of probstdmap
  * Kartik 08-07-2020 issue #133 removed condition: where probStats.n =>10 and set default to 0.G5 (G- Grade)
+ * Frank 12-20-2020 issue #333 - handle mulit-lingual video selection
+ * Frank 12-28-20	Issue #329 Added multi-lingual support for topic name put multi-lingual topic name in problem object
+ * Frank 02-03-21	Issue #329R2 added mlDescription to new topic() call 
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -59,7 +62,7 @@ public class ProblemMgr {
     private static Map<Integer, Problem> allProblems = new HashMap<Integer, Problem>();
     private static Map<Integer, ArrayList<Integer>> probIdsByTopic;
     private static Map<Integer, Set<CCStandard>> stdsByTopic;
-    private static List<Topic> allTopics = new ArrayList<Topic>();;
+    private static List<Topic> allTopics = new ArrayList<Topic>();
     private static ExampleSelector exSel = new StandardExampleSelector();
     private static VideoSelector vidSel = new StandardVideoSelector();
     private static int[] topicIds;
@@ -319,18 +322,24 @@ public class ProblemMgr {
   
 
     private static void loadTopics(Connection conn) throws SQLException {
-//        List<TopicEntity> topicEntities = loadTopics2();
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String q = "select id, description, summary from problemgroup where active=1";
+            //String q = "select id, description, summary from problemgroup where active=1";
+            String q = "select id, description, summary, pg_language_name, pg_lanuage_description from problemgroup, problemgroup_description_multi_language where active=1 and id = pg_pg_grp_id";
+
             ps = conn.prepareStatement(q);
             rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String description = rs.getString("description");
                 String summary = rs.getString("summary");
-                allTopics.add(new Topic(id, description,summary));
+                Object name_mdo = rs.getObject("pg_language_name");
+                String ml_name = name_mdo.toString();
+                Object desc_mdo = rs.getObject("pg_lanuage_description");
+                String ml_desc = desc_mdo.toString();
+                Topic t = new Topic(id, description, summary, ml_name, ml_desc);
+                allTopics.add(t);
             }
         } finally {
             if (rs != null)
@@ -480,7 +489,9 @@ public class ProblemMgr {
             problemFormat =Problem.defaultFormat ;
         }
         String prob_language = rs.getString("language");
-        
+        String lang = "en";
+        if (prob_language.equals("Spanish"))
+        	lang = "es";
         Problem p = new Problem(id, resource, answer, name, nname, stratHint,
                 diff, null, form, instructions, type, status, vars, ssURL,
                 questType, statementHTML, imgURL, audioRsc, units, problemFormat, imageFileId, audioFileId, isUsableAsExample,prob_language); // DM 1/23/18 added imageFileId and audioFileId
@@ -507,7 +518,7 @@ public class ProblemMgr {
             vidURL = (vidSel != null) ? vidSel.selectVideo(conn,id) : "";
         else {
             //
-            Video v= DbVideo.getVideo(conn, video);
+            Video v= DbVideo.getVideo(conn, video, prob_language);
             if (v == null) {
                 System.out.println("Error: Problem " + id + " refers to video " + video + ".  Video not found");
                 vidURL=null;
@@ -515,7 +526,7 @@ public class ProblemMgr {
             else vidURL = v.getUrl();
         }
         p.setVideo(vidURL);
-        logger.debug("Loaded ready Problem id="+p.getId() + " name=" + p.getName() + " form=" + (p.isQuickAuth() ? "quickAuth" : type) );
+        logger.debug("Loaded ready Problem id="+p.getId() + " name=" + p.getName() + " form=" + (p.isQuickAuth() ? "quickAuth" : type) + " language=" + prob_language);
         return p;
     }
     

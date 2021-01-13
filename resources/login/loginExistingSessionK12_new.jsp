@@ -1,7 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
-<% 
+<%
+
+/**
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+ */
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -25,9 +38,6 @@ catch (Exception e) {
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="sass_compiled/existing.css">
-    <%--<link href="css/bootstrap.min.css" rel="stylesheet">--%>
-    <%--<link href="css/common_new.css" rel="stylesheet">--%>
-    <%--<link href="login/css/loginExistingSessionK12_new.css" rel="stylesheet">--%>
 </head>
 
 <body>

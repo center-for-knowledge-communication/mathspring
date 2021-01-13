@@ -21,11 +21,35 @@
  *  Frank	10-07-20	issue #267 add school year to class thumbnails
  *  Frank	10-12-20	issue #272 send "classHomePage" selection to viewDetails
  *  Frank	10-30-20	Issue #293 add new items to class config form 
- */
+ *	Frank	12-18-20	Issue #336 added cache-busting for selected .js and .css files
+ *  Frank 	01-05-21  	Issue #302 teacher username only alpha and numeric characters
+*/
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+ System.out.println("teacherToolsMain starting");
+ ResourceBundle versions = null; 
+ try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println(" js_version=" + versions.getString("js_version"));
+ }
+ catch (Exception e) {
+	 System.out.println("teacherToolsMain ERROR");	 
+// 	logger.error(e.getMessage());	
+ }
 
+ 
+ Locale loc = request.getLocale(); 
+ String lang = loc.getLanguage();
+
+ if (lang.equals("es")) {
+ 	loc = new Locale("es","AR");	
+ }
+ else {
+ 	loc = new Locale("en","US");	
+ }	
+ System.out.println(loc.toString());
+
+ 
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -50,7 +74,7 @@ catch (Exception e) {
           rel="stylesheet">
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.0/css/bootstrapValidator.min.css"
           rel="stylesheet"/>
     <!-- Datatables Css Files -->
@@ -188,6 +212,7 @@ catch (Exception e) {
 
 	var emsg_classLanguage   = 'Class language is mandatory field';
 	var emsg_className       = 'Class name is mandatory field';
+	var emsg_className_invalid = 'Class name must only include letters,numbers or . _ - characters';
 	var emsg_classGrade      = 'Class grade is mandatory field';
 	var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
 	var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
@@ -214,6 +239,7 @@ catch (Exception e) {
     	loc = "es-Ar";
     	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
     	emsg_className       = 'El nombre de la clase es obligatorio';
+    	var emsg_className_invalid = 'El nombre de la clase solo debe incluir letras, números o . _ - ';
     	emsg_classGrade      = 'El grado de la clase es obligatorio';
     	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
     	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
@@ -359,7 +385,11 @@ catch (Exception e) {
                         validators: {
                             notEmpty: {
                                 message: emsg_className
-                            }
+                            },
+	    			        regexp: {
+    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+        	                    message: emsg_className_invalid
+            				}        
                         }
                     },
                     classGrade: {

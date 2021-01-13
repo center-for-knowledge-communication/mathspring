@@ -5,7 +5,20 @@
 <% 
 /**
 * Frank 05-18-2020 Commented out obsolete code which would not compile properly
+* Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+
 */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -29,9 +42,9 @@ catch (Exception e) {
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css"/>
-    <link href="css/MyProgress_new.css" rel="stylesheet" type="text/css"/>
-    <link href="css/graph_new.css" rel="stylesheet" type="text/css"/>
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
+    <link href="css/MyProgress_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
+    <link href="css/graph_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>

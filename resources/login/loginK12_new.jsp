@@ -7,7 +7,18 @@
  * Frank 02-17-2020 ttfixes issue #45
  * Frank 05-16-2020 issue #123 
  * Frank 07-17-2020 issue #122 added classId to signup() function 
-*/
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+ * Frank 01-10-21 Issue #289 re-org Welcome.html interface - removed student login components
+ */
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -31,147 +42,29 @@ catch (Exception e) {
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link href="css/common_new.css" rel="stylesheet" type="text/css" />
-    <link href="login/css/loginK12_new.css" rel="stylesheet" type="text/css" />
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <link href="login/css/loginK12_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="login/js/p7EHCscripts.js"></script>
-    <script type="text/javascript">
+    
+<script type="text/javascript">
     $(document).ready(function() {
 
-    	var $userSwitcher = $('#usertypeswitcher');
         var $userLoginForm = $('.user-login-form');
         var $userLoginFormUsername = $('.user-login-form-username');
         var $loginSubmitBtn = $('.js-login-btn');
 
-        $("#forgotPasswordBtn").hide();
-        
-        $userSwitcher.change(function() {
-            if ($(this).is(':checked')) {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
-                $userLoginFormUsername.attr('name', 'userName');
-                $loginSubmitBtn.attr('name', 'login');
-                $loginSubmitBtn.attr('value', 'Login');
-                $("#forgotPasswordBtn").show();
-            } else {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
-                $userLoginFormUsername.attr('name', 'uname');
-                $("#forgotPasswordBtn").hide();
-            }
-        });
+        $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
+        $userLoginFormUsername.attr('name', 'userName');
+        $loginSubmitBtn.attr('name', 'login');
+        $loginSubmitBtn.attr('value', 'Login');
+       
     });
            
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
         }
-
-    </script>
-
-<style>
-input.checkbox { 
-    width: 16px; 
-    height: 16px; 
-}
-
-
-.onoffswitch {
-  margin-top: 2px;
-  position: relative;
-  width: 70px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-.onoffswitch-checkbox {
-  display: none;
-}
-.onoffswitch-label {
-  display: block;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid lightgrey;
-  border-radius: 20px;
-}
-.onoffswitch-inner {
-  display: block;
-  width: 100px;
-  margin-left: -100%;
-  transition: margin 0.3s ease-in 0s;
-}
-.onoffswitch-inner:before, .onoffswitch-inner:after {
-  display: block;
-  float: left;
-  width: 50%;
-  height: 30px;
-  padding: 0;
-  line-height: 30px;
-  font-size: 14px;
-  color: white;
-  box-sizing: border-box;
-}
-.onoffswitch-switch {
-  display: block;
-  width: 20px;
-  margin: 6px;
-  background: lightgrey;
-  position: absolute;
-  top: 0;
-  bottom: 9px;
-  right: 37px;
-  border-radius: 25px;
-  transition: all 0.3s ease-in 0s;
-}
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-  margin-left: 0;
-}
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-  right: 0px;
-  background: #2ECC71;
-}
-
- 
-</style>
-
-<% 
-// styles contain hard-coded content - conditionally include style based on langauge
-if (lang == "Spanish" ) {
-%>
-<style>
-.onoffswitch-inner:before {
-  content: "si"; 
-  padding-left: 10px;
-  color: #000;
-}
-.onoffswitch-inner:after {
-  content:"no"; 
-  background-color: white;
-  color: #000;
-  text-align: right;
-  position: relative;
-  left: 22px;
-}
-</style>
-<%
-}
-else {
-%>
-<style>
-.onoffswitch-inner:before {
-  content: "yes"; 
-  padding-left: 10px;
-  color: #000;
-}
-.onoffswitch-inner:after {
-  content:"no"; 
-  background-color: white;
-  color: #000;
-  text-align: right;
-  position: relative;
-  left: 22px;
-}
-</style>
-<% 
-}
-%>
+</script>
 
 </head>
 
@@ -234,31 +127,14 @@ else {
 	                            
 	                                      <div class="row">
                                 <div class="col-sm-6">
-                                    <div class="switch-group-1">
-                                        <div class="switch-label pull-left"><%= rb.getString("are_you_teacher") %></div>
-                                        <div class="onoffswitch pull-left">
-                                            <input
-                                                    type="checkbox"
-                                                    name="usertype"
-                                                    class="onoffswitch-checkbox"
-                                                    id="usertypeswitcher">
-                                            <label class="onoffswitch-label" for="usertypeswitcher">
-                                                <span class="onoffswitch-inner"></span>
-                                                <span class="onoffswitch-switch"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
                                     <button
                                             type="submit"
                                             class="btn btn-default btn-block sign-in-btn js-login-btn"><%= rb.getString("login") %></button>
                                 </div>
                                 <div class="col-sm-6">
-                                	<p> </p>
                                     <a <button id="forgotPasswordBtn"
                                             href='${pageContext.request.contextPath}/login/forgotPassword.jsp'
-                                            class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>
+                                            class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>                                    
                                     </a>
                                 </div>
                             </div>

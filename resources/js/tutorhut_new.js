@@ -3,6 +3,7 @@
 // Frank 05-12-2020 issue #87 commented out this feature for now
 // Kartik 08-28-2020 issue #202 positioning of example dialog box
 // Frank 10-07-20 Issue # 261 change problem heading
+// Frank 12-26-20 Issue #329 translate topic name using lang variable
 
 var globals;
 var sysGlobals;
@@ -267,6 +268,8 @@ function nextProb(globals,isSessionBegin=false) {
     // A HACK.  Because the Topic Intro is an intervention but it doesn't show in a dialog, it is ended by clicking on New Problem button
     // which comes in here.  We want to send back an InputResponse though becuase thats what TopicIntros should get back.
     // TODO:  Probably should replace NewProblem button when a topic intro shows.  It could have the correct handler on it.
+	globals.curHint = null;
+	globals.hintSequence = null;
     if (globals.lastProbType === TOPIC_INTRO_PROB_TYPE)
         servletGet("InputResponseNextProblemIntervention",
             {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,
@@ -274,7 +277,7 @@ function nextProb(globals,isSessionBegin=false) {
             processNextProblemResult) ;
     // Normal Processing
     else
-        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);
+        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);    	
 }
 
 // This function can only be called if the button is showing
@@ -721,7 +724,13 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     else  {
         var pid = activity.id;
         var resource =activity.resource;
-        var topic = activity.topicName;
+
+        var topicName = activity.topicName;   
+        var topic = topicName.en;
+        if (lang == "es") {
+            topic = topicName.es;
+        }        
+        
         var standards = activity.standards;
         var varBindings = activity.parameters;
         setGlobalProblemInfo(activity);
@@ -1262,6 +1271,11 @@ function clickHandling () {
 			$("#exampleContainer").css('height','600px');
 			$("#exampleContainer").css('width','auto');
 			$("#pulsate_play_button").text(example_problem_play_hints);
+			$("#pulsate_play_button").css({
+				position: 'absolute',
+    			top: '6%',
+    			left: '43%'
+			});
 		    
         },
         close: function () { exampleDialogCloseHandler(); } ,
@@ -1382,7 +1396,14 @@ function showHTMLProblemAtStart () {
     var isExample =  (mode == MODE_DEMO || mode == MODE_EXAMPLE);
     var pid = activity.id;
     var resource = activity.resource;
-    var topicName = activity.topicName;
+
+    var topicName = activity.topicName;   
+    var topic = topicName.en;
+    if (lang == "es") {
+        topic = topicName.es;
+    }        
+
+    var topicName = topic;
     var standards = activity.standards;
     var solution = activity.solution;
     setGlobalProblemInfo(activity);

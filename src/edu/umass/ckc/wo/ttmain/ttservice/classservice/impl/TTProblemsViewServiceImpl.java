@@ -39,6 +39,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank	07-08-20	issue #134 & #156 added setClassActive flag handling and editClass method 
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  * Frank	10-27-20	Issue #149R2 teacher logging in JSON format
+ * Frank	01-03-21	Issue #329R2 Update topic elements with multi-ligual values 
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -54,18 +55,19 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 	private ResourceBundle rb = null;
 
     @Override
-    public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId) throws TTCustomException {
+    public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId, String lang) throws TTCustomException {
         ProblemsView view= new ProblemsView();
         DbProblem dbProb = new DbProblem();
         try {
-            Topic problemSet = ProblemMgr.getTopic(problemId);
+            Topic topic = ProblemMgr.getTopic(problemId);
             List<Problem> problems = ProblemMgr.getWorkingProblems(problemId);
             dbProb.filterproblemsBasedOnLanguagePreference(connection.getConnection(), problems, classId);
             List<SATProb> satProbs = new DbProblem().getTopicOmittedProblems(connection.getConnection(), classId, problems, problemId);
-            view.setProblemLevelId(String.valueOf(problemSet.getId()));
-            view.setTopicName(problemSet.getName());
-            view.setTopicStandars(DbTopics.getRptTopicStandards(connection.getConnection(), problemSet.getId()));
-            view.setTopicSummary(problemSet.getSummary());
+            view.setProblemLevelId(String.valueOf(topic.getId()));
+            
+            view.setTopicName(topic.getMlName(lang));
+            view.setTopicStandars(DbTopics.getRptTopicStandards(connection.getConnection(), topic.getId()));
+            view.setTopicSummary(topic.getMlDescription(lang));
             view.setUri(Settings.probPreviewerPath);
             view.setHtml5ProblemURI(Settings.html5ProblemURI);
             view.setProblems(satProbs);
@@ -105,7 +107,10 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	
     	System.out.println("resetStudentData - lang=" + lang);
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
         try {
@@ -155,8 +160,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	
     	System.out.println("deleteInactiveStudents - lang=" + lang);
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
-		rb = ResourceBundle.getBundle("MathSpring",loc);        
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}		
+    	rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
         try {
             switch (action) {
@@ -192,8 +200,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	
     	// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
-		rb = ResourceBundle.getBundle("MathSpring",loc);        
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}		
+    	rb = ResourceBundle.getBundle("MathSpring",loc);        
 
         Map<String,Object> updateParams = new HashMap<String,Object>();
         updateParams.put("fname", editStudentInfoForm.getStudentFname());
@@ -215,7 +226,10 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
     	
 		// Multi=lingual enhancement
-		Locale loc = new Locale(lang.substring(0,2),lang.substring(2,4));
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
         String msg = "";
 

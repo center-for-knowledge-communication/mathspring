@@ -3,6 +3,14 @@
 <%@ page import="java.util.ResourceBundle"%>
 
 <% 
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+//	logger.error(e.getMessage());	
+}
 
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
@@ -17,7 +25,8 @@ catch (Exception e) {
 
 /**
  * Frank 06-18-2020 issue #135 new jsp for login help request
-*/
+ * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+ */
 
 %>
 <!DOCTYPE html>
@@ -30,10 +39,8 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
-    <%--<link href="css/bootstrap.min.css" rel="stylesheet">--%>
-    <%--<link href="css/common_new.css" rel="stylesheet">--%>
-    <link href="../../sass_compiled/teacher_register.css" rel="stylesheet">
-    <link href="../../login/css/forgotPassword.css" rel="stylesheet" type="text/css" />
+    <link href="../../sass_compiled/teacher_register.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+    <link href="../../login/css/forgotPassword.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
       <script type="text/javascript" src="../js/jquery-1.10.2.js"></script>
     <script type="text/javascript">
 

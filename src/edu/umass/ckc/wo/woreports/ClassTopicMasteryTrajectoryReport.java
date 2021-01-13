@@ -81,7 +81,7 @@ public class ClassTopicMasteryTrajectoryReport extends TopicTrajectoryReport {
 
         String topicX = e.getExtraParam();
         this.topicId = Integer.parseInt(topicX);
-        topicName = DbTopics.getTopicName(conn, topicId);
+        topicName = DbTopics.getTopicName(conn, topicId, classId);
         User u = DbUser.getStudent(conn, studId);
         String className = getClassName(cl);
 //        this.src.append(generateHeader2("Topic Mastery history for student - " + u.getUname() + " in class " + className ));

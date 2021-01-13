@@ -9,11 +9,13 @@
 <script>
 var languagePreference = window.navigator.language;
 
-if (languagePreference == "en") {
-	document.getElementById("demo").innerHTML = "You have completed the review. Use the My Progress Page to select your next activity.";
+var lang = languagePreference.substring(0,2);
+
+if (lang == "es") {
+	document.getElementById("demo").innerHTML = "Utilice la página de Mi Progreso para seleccionar su próxima actividad O apriete el botón de Próximo Problema para continuar con el próximo tema";
 }
 else {
-	document.getElementById("demo").innerHTML = "Usted ha completado la revisión. Utilice la página Mi progreso para seleccionar su próxima actividad..";
+	document.getElementById("demo").innerHTML = "Choose the My Progress Page to choose your next activity OR click on the next problem button to move on to the next topic.";
 }
 </script>
 

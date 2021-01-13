@@ -19,6 +19,7 @@ import java.io.IOException;
  * Time: 3:47:51 PM
  * The first login page for a k12 user.    Presents user/password inputs plus other buttons
  * Frank 04-24-2020 issue #28
+ * Frank 01-10-2011 Issue #289 support split of student and teacher login pages
  */
 public class LoginK12_1 implements LoginServletAction {
 
@@ -31,6 +32,8 @@ public class LoginK12_1 implements LoginServletAction {
      */
     public LoginResult process(ServletInfo servletInfo) throws ServletException, IOException {
         HttpServletRequest req = servletInfo.getRequest() ;
+        ServletParams params = servletInfo.getParams();
+        String msRole = params.getString("msRole");
         req.setAttribute(LoginParams.USER_NAME,"" );
         req.setAttribute(LoginParams.PASSWORD,"" );
         req.setAttribute(LoginParams.LOGOUT_EXISTING_SESSION,"false");
@@ -43,7 +46,10 @@ public class LoginK12_1 implements LoginServletAction {
             name = name.substring(name.lastIndexOf('.')+1);
         req.setAttribute(LoginParams.START_PAGE,name);  // must be name of this class
         req.setAttribute(LoginParams.MESSAGE,null);
-        String jsp = "login/loginK12_new.jsp";
+    	String jsp = "login/loginK12_new.jsp";
+        if (msRole.equals("student")) {
+        	jsp = "login/loginK12_student.jsp";
+        }
         req.getRequestDispatcher(jsp).forward(req, servletInfo.getResponse());
         LoginResult lr = new LoginResult(-1,null,LoginResult.PRE_LOGIN,LoginResult.FORWARDED_TO_JSP);
         return lr;
