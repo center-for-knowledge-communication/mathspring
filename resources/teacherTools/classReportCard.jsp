@@ -1881,7 +1881,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'right',
+                            placement: 'top',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                     '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
@@ -1908,7 +1908,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'right',
+                            placement: 'top',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                 '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +

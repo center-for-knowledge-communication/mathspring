@@ -3,13 +3,10 @@
 <%@ page import="java.util.ResourceBundle"%>
 <% 
 /**
- * Frank 01-20-2020 Issue #39 use classId as alternative password
- * Frank 02-17-2020 ttfixes issue #45
- * Frank 05-16-2020 issue #123 
- * Frank 07-17-2020 issue #122 added classId to signup() function 
- * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
- * Frank 01-10-21 Issue #289 re-org Welcome.html interface
-*/
+
+ * Frank 01-10-21 Issue #289 new file cloned from loginK12_new.jsp for re-org Welcome.html interface - provides 'student only' login page
+
+ */
 ResourceBundle versions = null; 
 try {
 	 versions = ResourceBundle.getBundle("Versions");
@@ -41,30 +38,39 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link href="../../css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
-    <link href="../../login/css/loginK12_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="../../js/jquery-1.10.2.js"></script>
-    <script type="text/javascript" src="../../login/js/p7EHCscripts.js"></script>
-
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <link href="login/css/loginK12_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="login/js/p7EHCscripts.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {            
-            var $userLoginForm = $('.user-login-form');
-            var $userLoginFormUsername = $('.user-login-form-username');
-            var $loginSubmitBtn = $('.js-login-btn');
-            
-            $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
-            $userLoginFormUsername.attr('name', 'userName');
-            $loginSubmitBtn.attr('name', 'login');
-            $loginSubmitBtn.attr('value', 'Login');
-        });
-              
+    $(document).ready(function() {
+
+        var $userLoginForm = $('.user-login-form');
+        var $userLoginFormUsername = $('.user-login-form-username');
+        var $loginSubmitBtn = $('.js-login-btn');
+
+        $("#forgotPasswordBtn").hide();
         
+        $userSwitcher.change(function() {
+            if ($(this).is(':checked')) {
+                $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
+                $userLoginFormUsername.attr('name', 'userName');
+                $loginSubmitBtn.attr('name', 'login');
+                $loginSubmitBtn.attr('value', 'Login');
+                $("#forgotPasswordBtn").show();
+            } else {
+                $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
+                $userLoginFormUsername.attr('name', 'uname');
+                $("#forgotPasswordBtn").hide();
+            }
+        });
+    });
+           
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
         }
-        
-       
+
     </script>
 
 </head>
@@ -72,7 +78,7 @@ catch (Exception e) {
 <header class="site-header" role="banner">
     <div class="row" id="wrapper">
         <div class="navbar-header">
-            <img class="logo" src="../../img/ms_mini_logo_new.png">
+            <img class="logo" src="img/ms_mini_logo_new.png">
         </div><!-- navbar-header -->
     </div>
 </header>
@@ -126,21 +132,15 @@ catch (Exception e) {
 	                                />
 	                            </div>
 	                            
-	                                      <div class="row">
+                                <div class="row">
+
                                 <div class="col-sm-6">
                                     <button
                                             type="submit"
                                             class="btn btn-default btn-block sign-in-btn js-login-btn"><%= rb.getString("login") %></button>
                                 </div>
-                                <div class="col-sm-6">
-                                    <a <button id="forgotPasswordBtn"
-                                            href='${pageContext.request.contextPath}/login/forgotPassword.jsp'
-                                            class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>
-                                    </a>
-                                </div>
                             </div>
-
-	                        </form>
+	                       	</form>
 	                    </div>                
 	
 	                
@@ -148,15 +148,6 @@ catch (Exception e) {
 	                        <p class="text-center"><%= rb.getString("do_you_need_username") %></p>
 	                        <p class="text-center"></p>
 	                        <p> </p>                   
-	                        <form
-	                                method="post"
-	                                action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherLogin&var=b">
-	                            <button
-	                                    class="btn btn-warning btn-lg btn-block signup-btn teacher-sign-up-btn"
-	                                    type="submit"
-	                                    name="register" value="Register"
-	                            ><%= rb.getString("signup_teacher") %></button>
-	                        </form>
 	                        <form action="${pageContext.request.contextPath}/WoAdmin">
 	                            <button
 	                                    class="btn btn-primary btn-lg btn-block signup-btn student-sign-up-btn"
