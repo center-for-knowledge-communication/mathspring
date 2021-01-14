@@ -395,13 +395,15 @@ public class DbPedagogy {
 
     }
 
-    public static Map<Integer, String> getLCprofiles(Connection conn) throws SQLException {
+    public static Map<Integer, String> getLCprofiles(Connection conn, int classId) throws SQLException {
 		Map<Integer, String> LCprofiles = new HashMap<Integer, String>();
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select id, name from pedagogy where name like '% Full Empathy'";
+        	String q = "select cp.pedagogyId, p.name from classpedagogies cp INNER JOIN\r\n" + 
+        			"pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?";
             stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
             rs = stmt.executeQuery();
             while (rs.next()) {
             	String lcName = rs.getString(2).split("\\s+")[0];

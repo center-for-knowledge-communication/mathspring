@@ -35,9 +35,11 @@ catch (Exception e) {
 			<div class="row">	
 			</c:if>
 			<div class="col-md-4">
+			    
        			<label class="radio-inline">
-        			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}">${lcompanion.value}
-          			<img class="img-responsive" src="https://lcharacter.s3.amazonaws.com/${lcompanion.value}.png" width="180" height="180">
+          			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}">
+          			<img src="https://lcharacter.s3.amazonaws.com/${lcompanion.value}.png" width="180px" height="226px">
+          			<span style="display:block; text-align: center;">${lcompanion.value}</span>
          		</label>
        		</div>
 		    <c:if test="${loop.index == terminator}">
@@ -49,11 +51,8 @@ catch (Exception e) {
 		</c:forEach>
 		
 		<div class="row">
-			<div class="col-md-offset-4"></div>
-			<div class="col-md-offset-4 col-md-4">
-				<input class="btn btn-success" type="submit" value="<%= rb.getString("submit")%>" />
-			</div>
-			<div class="col-md-4"></div>
+			<input class="btn btn-success" type="submit" value="Submit" style="
+			    display: block;margin: auto;margin-top: 20px;">
 		</div>
     </form>
 </div>
