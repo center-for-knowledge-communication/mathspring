@@ -20,6 +20,8 @@ import java.io.IOException;
  * The first login page for a k12 user.    Presents user/password inputs plus other buttons
  * Frank 04-24-2020 issue #28
  * Frank 01-10-2011 Issue #289 support split of student and teacher login pages
+ * Frank 01-05-21  	Issue #366 blank screen after adding student - default to student
+ * 
  */
 public class LoginK12_1 implements LoginServletAction {
 
@@ -34,6 +36,9 @@ public class LoginK12_1 implements LoginServletAction {
         HttpServletRequest req = servletInfo.getRequest() ;
         ServletParams params = servletInfo.getParams();
         String msRole = params.getString("msRole");
+        if (msRole == null) {
+        	msRole = "student";
+        };
         req.setAttribute(LoginParams.USER_NAME,"" );
         req.setAttribute(LoginParams.PASSWORD,"" );
         req.setAttribute(LoginParams.LOGOUT_EXISTING_SESSION,"false");
