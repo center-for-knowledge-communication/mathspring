@@ -40,6 +40,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank	08-20-20	Issue #49 added method deleteInactiveStudents()
  * Frank	10-27-20	Issue #149R2 teacher logging in JSON format
  * Frank	01-03-21	Issue #329R2 Update topic elements with multi-ligual values 
+ * Frank	01-16-21	Issue #368 Edit profile should not allow dups
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -204,22 +205,37 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	if (lang.substring(0,2).equals("es")) {
     		loc = new Locale("es","AR");	
     	}		
-    	rb = ResourceBundle.getBundle("MathSpring",loc);        
+    	rb = ResourceBundle.getBundle("MathSpring",loc);
+		String msg =  "";
+        try {
+        	int id = DbUser.getStudent(connection.getConnection(), editStudentInfoForm.getStudentUsername());
+        	if (id > 0) {
+        		msg =  "*** " + rb.getString("username_in_use") +  " ***";
+            	return msg;
+        	}
+        	else {
+		        Map<String,Object> updateParams = new HashMap<String,Object>();
+		        updateParams.put("fname", editStudentInfoForm.getStudentFname());
+		        updateParams.put("lname", editStudentInfoForm.getStudentLname());
+		        updateParams.put("uname", editStudentInfoForm.getStudentUsername());
+		        updateParams.put("studentId", editStudentInfoForm.getStudentId());
+		        this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_STUDENT_INFO,updateParams);
+		        msg = "{ ";
+		    	msg += "\"msg\" : \"" + rb.getString("changes_saved_successfully") + "\",";
+		    	msg += "\"id\" : \"" + editStudentInfoForm.getStudentId() + "\",";
+		    	msg += "\"fname\" : \"" + editStudentInfoForm.getStudentFname() + "\",";
+		    	msg += "\"lname\" : \"" + editStudentInfoForm.getStudentLname() + "\",";
+		    	msg += "\"username\" : \"" + editStudentInfoForm.getStudentUsername() + "\"";
+		    	msg += " }";
+	        	return msg;
+		    }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+    		msg =  "*** " + rb.getString("system_error") + "(" + ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA + ")" +  " ***";
+        	return msg;
 
-        Map<String,Object> updateParams = new HashMap<String,Object>();
-        updateParams.put("fname", editStudentInfoForm.getStudentFname());
-        updateParams.put("lname", editStudentInfoForm.getStudentLname());
-        updateParams.put("uname", editStudentInfoForm.getStudentUsername());
-        updateParams.put("studentId", editStudentInfoForm.getStudentId());
-        this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_STUDENT_INFO,updateParams);
-        String msg = "{ ";
-    	msg += "\"msg\" : \"" + rb.getString("changes_saved_successfully") + "\",";
-    	msg += "\"id\" : \"" + editStudentInfoForm.getStudentId() + "\",";
-    	msg += "\"fname\" : \"" + editStudentInfoForm.getStudentFname() + "\",";
-    	msg += "\"lname\" : \"" + editStudentInfoForm.getStudentLname() + "\",";
-    	msg += "\"username\" : \"" + editStudentInfoForm.getStudentUsername() + "\"";
-    	msg += " }";
-        return msg;
+        }
     }
 
     @Override

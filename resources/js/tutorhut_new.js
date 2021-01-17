@@ -5,6 +5,7 @@
 // Frank 10-07-20 Issue # 261 change problem heading
 // Frank 12-26-20 Issue #329 translate topic name using lang variable
 // Frank 01-13-21 Issue #354 fix topicName formatting
+// Frank 01-16-21 Issue #357 fix topicName formatting
 
 var globals;
 var sysGlobals;
@@ -728,7 +729,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 
         var topic = "";
         
-        if (activity.topicName != null && activity.topicName != undefined) {
+        if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
             var topicName = activity.topicName;   
             topic = topicName.en;
             if (lang == "es") {

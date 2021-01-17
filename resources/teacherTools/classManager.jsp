@@ -38,6 +38,7 @@
 <!-- Frank 12-26-20  	Issue #329 fix errors from spliting classDetails.jsp -->
 <!-- Frank 01-05-21  	Issue #329R3 fix error - nickname null not handled -->
 <!-- Frank 01-05-21  	Issue #302 teacher username only alpha and numeric characters -->
+<!-- Frank 01-05-21  	Issue #366 blank screen after adding student -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2422,7 +2423,7 @@ function registerAllEvents(){
 					            	<div class="col-md-8">
 					            		<p><%= rb.getString("distance_learning_email_greeting")%></p>
 					            		<p><%= rb.getString("distance_learning_email_text")%></p>
-					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}</p>
+					            		<p><%=msHost%><%=msContext%>/WoAdmin?action=UserRegistrationStart&var=b&startPage=LoginK12_1&classId=${classInfo.classid}&msRole=student</p>
 					            		<p><%= rb.getString("distance_learning_email_password_is")%>:  ${classInfo.classid}</p>
 					            		<p><%= rb.getString("distance_learning_email_write_it_down")%></p>
 									</div>
