@@ -39,6 +39,8 @@ public class LoginSequence {
     public static final String SERVLET_NAME = "servletName";
     public static final String SESSION_ID = "sessionId";
     public static final String LCPROFILE = "lcprofile";
+    public static final String URL = "url";
+    
     private static Logger logger = Logger.getLogger(LoginSequence.class);
     private SessionManager smgr;
     private PedagogicalModel pedagogicalModel;
@@ -124,6 +126,7 @@ public class LoginSequence {
             servletInfo.getRequest().setAttribute(SERVLET_NAME,servletInfo.getServletName());
             servletInfo.getRequest().setAttribute(SESSION_ID,smgr.getSessionNum());
             servletInfo.getRequest().setAttribute(LCPROFILE, li.getLCprofile());
+            servletInfo.getRequest().setAttribute(URL, li.getURL());
             RequestDispatcher disp = servletInfo.getRequest().getRequestDispatcher(loginJSP);
             logger.debug("<< forward to JSP " + loginJSP);
             disp.forward(servletInfo.getRequest(),servletInfo.getResponse());

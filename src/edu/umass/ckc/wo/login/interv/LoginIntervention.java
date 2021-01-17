@@ -14,7 +14,7 @@ import net.sf.json.JSONObject;
  */
 public class LoginIntervention implements Intervention {
     private String view;  // name of JSP
-    private String url;   // URL which will be shown in a separate browser window   -- DM 8/16 not seeing evidence of this being used
+    private String url;   // URL which will be shown in a separate browser window   
     private Map<Integer, String> LCprofile;
     private boolean separateWindow =false; // tells whether to display the URL in a separate window      -- DM 8/16 not seeing evidence of this being used
     private boolean topLevel = false; // indicates if the JSP should be within an outer JSP or not
@@ -58,6 +58,10 @@ public class LoginIntervention implements Intervention {
 
 	public void setLCprofile(Map<Integer, String> lcprofile) {
 		LCprofile = lcprofile;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	@Override

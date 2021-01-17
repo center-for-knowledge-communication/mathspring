@@ -44,6 +44,7 @@ catch (Exception e) {
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
   <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="sass_compiled/loginouter.css?ver=<%=versions.getString("css_version")%>">
     <link href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 

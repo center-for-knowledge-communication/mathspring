@@ -37,8 +37,8 @@ catch (Exception e) {
 			<div class="col-md-4">
 			    
        			<label class="radio-inline">
-          			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}">
-          			<img src="https://lcharacter.s3.amazonaws.com/${lcompanion.value}.png" width="180px" height="226px">
+          			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}" required>
+          			<img src="${url}/${lcompanion.value}/character.png" width="180px" height="226px">
           			<span style="display:block; text-align: center;">${lcompanion.value}</span>
          		</label>
        		</div>

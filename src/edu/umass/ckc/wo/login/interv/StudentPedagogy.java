@@ -10,6 +10,7 @@ import edu.umass.ckc.wo.event.SessionEvent;
 import edu.umass.ckc.wo.log.TutorLogger;
 import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.smgr.SessionManager;
+import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.TransactionLogger;
 import edu.umass.ckc.wo.tutor.response.InterventionResponse;
 import edu.umass.ckc.wo.tutormeta.Intervention;
@@ -32,6 +33,7 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	String studentPedagogyUrl = JSP_NEW;
         	Map<Integer, String> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), smgr.getClassID());
             LoginIntervention li = new LoginIntervention(studentPedagogyUrl);
+            li.setUrl(Settings.webContentPath + "LearningCompanion");
             li.setLCprofile(lcprofile);
         	return li;                    
         }
