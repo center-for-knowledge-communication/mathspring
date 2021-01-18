@@ -29,4 +29,5 @@ public class LoginParams {
     public static final String ADULT = "adult";
     public static final String K12 = "k12";
     public static final String PRETEST_QUESTION = "pretestQuestion";
+    public static final String LEARNING_COMPANION = "optLC";
 }
