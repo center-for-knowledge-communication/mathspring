@@ -35,7 +35,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	06-18-2020	issue #135 added method loginHelp()
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
- * Frank	01-17-21	issue #358 keep track of number of active logins
+ * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -84,23 +84,15 @@ public class TeacherToolsMainLoginController {
         		int loginId = Integer.valueOf(loginSplitter[0]);
         		String teacherLoginType = loginSplitter[1];
             	HttpSession session = request.getSession();
-//        		session.invalidate();
-//            	session = request.getSession();
-//            	session.setMaxInactiveInterval(30*60);
+
+        		Object activeTeacherIdObject = session.getAttribute("teacherId");
+        		if (activeTeacherIdObject != null) {
+                    request.setAttribute(LoginParams.MESSAGE,rb.getString("multiple_teacher_logins_detected"));
+        			session.invalidate();
+                    return "login/loginK12_teacher";        				
+        		}
+        		
         		session.setAttribute("teacherId", loginId);
-        		
-        		// keep track of active logins
-        		int activeLogins = 0;
-        		Object activeLoginsObject = session.getAttribute("activeLogins");
-        		if (activeLoginsObject == null) { 
-        			session.setAttribute("activeLogins",1);
-        		}
-        		else {
-        			activeLogins = (int) session.getAttribute("activeLogins");
-        			activeLogins++;
-        			session.setAttribute("activeLogins",activeLogins);
-        		}
-        		
         		session.setAttribute("teacherUsername", username);         	
         		session.setAttribute("teacherLoginType", teacherLoginType);
         		if (teacherLoginType.equals("Normal"))
@@ -127,23 +119,8 @@ public class TeacherToolsMainLoginController {
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 			tLogger.logEntryWorker(teacherId, 0, "logout", "");
 		}
-		// keep track of active logins
-		int activeLogins = 0;
-		Object activeLoginsObject = session.getAttribute("activeLogins");
-		if (activeLoginsObject == null) { 
-			session.invalidate();
-		}
-		else {
-			activeLogins = (int) session.getAttribute("activeLogins");
-			if (activeLogins <= 1) {
-				session.invalidate();				
-			}
-			else {
-				activeLogins--;
-				session.setAttribute("activeLogins",activeLogins);				
-			}
-		}
 
+		session.invalidate();
         return "login/loginK12_teacher";
         
     }
