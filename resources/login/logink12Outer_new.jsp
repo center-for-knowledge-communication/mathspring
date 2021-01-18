@@ -37,11 +37,14 @@ catch (Exception e) {
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>MathSpring | <%= rb.getString("thank_you_for_using_ms")%></title>
+    
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link href="css/common_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="sass_compiled/loginouter.css?ver=<%=versions.getString("css_version")%>">
     <link href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 
