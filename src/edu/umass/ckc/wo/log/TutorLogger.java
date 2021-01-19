@@ -500,4 +500,9 @@ public class TutorLogger {
     public void logDynamicChange(TutorHutEvent e, String change) throws Exception {
         insertLogEntry("DynamicChange", null, false, e.getElapsedTime(), 0, null, -1, null, change, smgr.getStudentState().getCurTopic(), e.getClickTime());
     }
+    
+	public void logChoosePedagogy(String userInput) throws Exception {
+		insertLogEntryWorker(smgr.getStudentId(), smgr.getSessionId(), RequestActions.CHOOSE_PEDAGOGY, userInput, false, 0, 0, -1, null, -1,
+				null, null, -1, null, 0, 0);
+	}
 }

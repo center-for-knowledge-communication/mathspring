@@ -52,7 +52,9 @@ import javax.servlet.http.HttpSession;
  * Frank	10-27-20	Issue #149R2 teacher logging in JSO format
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank 	12-02-20	issue #322 fixed and enhanced URL manipulation checking to include classId checking
+ * Frank	01-17-21	issue #358 don't check classId 
  * Frank	01-03-21	issue #329R2 pass lang param to viewProblemSetsInGivenProblem()
+ * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  */
 
 @Controller
@@ -105,31 +107,15 @@ public class TeacherToolsViewClassDetailsController {
 
     			if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
 	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-	    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+	    				tLogger.logEntryWorker(teacherId, 0, "logout", "Multiple teacher logins detected");
 	    			}
 	    	    	session.removeAttribute("tLogger");
 	    	    	session.removeAttribute("teacherUsername");
 	    	    	session.removeAttribute("teacherId");
 	    			session.invalidate();
-	    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
+	    			String msg = rb.getString("multiple_teacher_logins_detected");
 	                request.setAttribute("message",msg);
 	    	        return "login/loginK12_teacher";
-	    		}
-    			
-	    		String sessClassId = (String) session.getAttribute("classId");
-	    		if (sessClassId != null) {
-	    			if (!classId.equals(sessClassId) ) {
-		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-		    				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
-		    			}
-		    	    	session.removeAttribute("tLogger");
-		    	    	session.removeAttribute("teacherUsername");
-		    	    	session.removeAttribute("teacherId");
-		    			session.invalidate();
-		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
-		                request.setAttribute("message",msg);
-		    	        return "login/loginK12_teacher";
-	    			}
 	    		}
 			}
 			catch(SQLException e) {
@@ -149,7 +135,7 @@ public class TeacherToolsViewClassDetailsController {
         	if (currentSelection.equals("")) {    		
 				int teacherId = (int) session.getAttribute("teacherId");
 				if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-					tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+					tLogger.logEntryWorker(teacherId, 0, "logout", "Multiple teacher logins detected");
 				}
 		    	session.removeAttribute("tLogger");
 		    	session.removeAttribute("teacherUsername");
@@ -197,31 +183,15 @@ public class TeacherToolsViewClassDetailsController {
 			try {
 	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
 	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-	    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
+	    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Multiple teacher logins detected");
 	    			}
 	    	    	session.removeAttribute("tLogger");
 	    	    	session.removeAttribute("teacherUsername");
 	    	    	session.removeAttribute("teacherId");
 	    			session.invalidate();
-	    			String msg = rb.getString("url_tampering_error") + ": " + rb.getString("log_in_and_try_again");
+	    			String msg = rb.getString("multiple_teacher_logins_detected");
 	                request.setAttribute("message",msg);
 	    	        return "login/loginK12_teacher";
-	    		}
-	    		
-	    		String sessClassId = (String) session.getAttribute("classId");
-	    		if (sessClassId != null) {
-	    			if (!classId.equals(sessClassId) ) {
-		    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-		    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Forced - URL tampering");
-		    			}
-		    	    	session.removeAttribute("tLogger");
-		    	    	session.removeAttribute("teacherUsername");
-		    	    	session.removeAttribute("teacherId");
-		    			session.invalidate();
-		    			String msg = rb.getString("url_tampering_error") + " " + rb.getString("log_in_and_try_again");
-		                request.setAttribute("message",msg);
-		    	        return "login/loginK12_teacher";
-	    			}
 	    		}
 			}
 			catch(SQLException e) {
@@ -240,7 +210,7 @@ public class TeacherToolsViewClassDetailsController {
     	else {   		
 			int teacherId = (int) session.getAttribute("teacherId");
 			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
-				tLogger.logEntryWorker(teacherId, 0, "logout", "Forced - URL tampering");
+				tLogger.logEntryWorker(teacherId, 0, "logout", "Multiple teacher logins detected");
 			}
 	    	session.removeAttribute("tLogger");
 	    	session.removeAttribute("teacherUsername");

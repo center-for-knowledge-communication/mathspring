@@ -35,6 +35,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	06-18-2020	issue #135 added method loginHelp()
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
+ * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -83,9 +84,14 @@ public class TeacherToolsMainLoginController {
         		int loginId = Integer.valueOf(loginSplitter[0]);
         		String teacherLoginType = loginSplitter[1];
             	HttpSession session = request.getSession();
-//        		session.invalidate();
-//            	session = request.getSession();
-//            	session.setMaxInactiveInterval(30*60);
+
+        		Object activeTeacherIdObject = session.getAttribute("teacherId");
+        		if (activeTeacherIdObject != null) {
+                    request.setAttribute(LoginParams.MESSAGE,rb.getString("multiple_teacher_logins_detected"));
+        			session.invalidate();
+                    return "login/loginK12_teacher";        				
+        		}
+        		
         		session.setAttribute("teacherId", loginId);
         		session.setAttribute("teacherUsername", username);         	
         		session.setAttribute("teacherLoginType", teacherLoginType);
@@ -113,11 +119,8 @@ public class TeacherToolsMainLoginController {
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 			tLogger.logEntryWorker(teacherId, 0, "logout", "");
 		}
-    	session.removeAttribute("tLogger");
-    	session.removeAttribute("teacherUsername");
-    	session.removeAttribute("teacherId");
-		session.invalidate();
 
+		session.invalidate();
         return "login/loginK12_teacher";
         
     }

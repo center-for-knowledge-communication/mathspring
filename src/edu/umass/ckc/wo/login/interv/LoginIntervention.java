@@ -1,5 +1,7 @@
 package edu.umass.ckc.wo.login.interv;
 
+import java.util.Map;
+
 import edu.umass.ckc.wo.tutormeta.Intervention;
 import net.sf.json.JSONObject;
 
@@ -12,7 +14,8 @@ import net.sf.json.JSONObject;
  */
 public class LoginIntervention implements Intervention {
     private String view;  // name of JSP
-    private String url;   // URL which will be shown in a separate browser window   -- DM 8/16 not seeing evidence of this being used
+    private String url;   // URL which will be shown in a separate browser window   
+    private Map<Integer, String> LCprofile;
     private boolean separateWindow =false; // tells whether to display the URL in a separate window      -- DM 8/16 not seeing evidence of this being used
     private boolean topLevel = false; // indicates if the JSP should be within an outer JSP or not
 
@@ -48,13 +51,25 @@ public class LoginIntervention implements Intervention {
     public String getURL () {
         return this.url;
     }
+        
+    public Map<Integer, String> getLCprofile() {
+		return LCprofile;
+	}
 
-    @Override
+	public void setLCprofile(Map<Integer, String> lcprofile) {
+		LCprofile = lcprofile;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	@Override
     public String getName() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    @Override
+	
+	@Override
     public int getId() {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
