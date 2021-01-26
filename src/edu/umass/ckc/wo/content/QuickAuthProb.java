@@ -10,6 +10,7 @@ import net.sf.json.JSONObject;
  * Date: 11/16/15
  * Time: 5:55 PM
  * To change this template use File | Settings | File Templates.
+ * Frank 01-26-21 Added short answer problems answer 
  */
 public class QuickAuthProb {
     private Problem prob;
@@ -24,6 +25,7 @@ public class QuickAuthProb {
 
     public JSONObject buildJSON (JSONObject jo) {
         JSONObject probJSON = new JSONObject();
+        prob.setAnswersViewList();
         prob.buildJSON(probJSON);
         jo.element("problem",probJSON);
         jo.element("binding",binding.getJSON())  ;
