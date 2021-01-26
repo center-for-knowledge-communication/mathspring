@@ -4,6 +4,8 @@
 // Frank 04-24-20 fixed multi-lingual bug
 // Kartik 08-11-20 fixed #158 issue of displaying unit next to problems
 // Frank 09-08-20 Touch this file to force build error
+// Frank 01-26-21 Added 'correct answers' to preview page
+
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -37,6 +39,7 @@ m.build = function(activity, previewMode) {
     var probStatement = problem.statementHTML;
     var probFigure = problem.questionImage; // DM 1/23/18 filled with either a full URL OR a filename coming from the ProblemMediafile table via Problem.imageFileId
     var answers = problem.answers;
+    var answersViewList = problem.answersViewList;
     var hints = problem.hints;
     var problemFormat = problem.format;
 
@@ -74,12 +77,11 @@ m.build = function(activity, previewMode) {
 			languageSet = "es"
 		}
 	
-	var stepText = "";
-	if (languageSet == "en") {
-		stepText = "Step";
-	}
-	else {
+	var stepText = "Step";
+	var correctAnswerText = "Correct Answer:";
+	if (languageSet == "es") {
 		stepText = "Paso";
+		correctAnswerText = "Respuesta correcta";
 	}
 
     var hint_labels = [];
@@ -221,6 +223,20 @@ m.build = function(activity, previewMode) {
         }
         document.body.appendChild(play_hint_button);
     }
+
+    if(previewMode) {
+    	var ca = document.getElementById("CorrectAnswers");
+    	var answerTxt = correctAnswerText;
+        if (problem.answer != undefined && problem.answer != "") {
+   	    	answerTxt = answerTxt + " " + problem.answer;
+        }
+        else {
+        	answerTxt = answerTxt + " " + answersViewList;
+        }
+        document.getElementById("CorrectAnswers").innerHTML = answerTxt;
+        document.getElementById("CorrectAnswers").style.display = "block";
+    }
+
     // Detects LaTeX code and turns it into nice HTML
     MathJax.Hub.Typeset();
 
