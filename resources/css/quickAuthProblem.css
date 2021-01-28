@@ -239,3 +239,12 @@ body {
     display: none;
     z-index: 2;
 }
+#CorrectAnswers{
+    margin-top: 30px;
+}
+.answer_text{
+    display: inline-block;
+    /* height: 27px; */
+    position: relative;
+    vertical-align: top;
+}

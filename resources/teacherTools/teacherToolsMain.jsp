@@ -339,11 +339,11 @@ catch (Exception e) {
     	    $('#form-wrapper').find('.loader').show();
     	}
         
- 
+/* 
         function myFunction() {
           alert("Input field lost focus.");
         }
-
+*/
         function addToTeacherList(item, index) {
           
         	var titem = "" + item;
@@ -363,7 +363,7 @@ catch (Exception e) {
         }
         
         
-        document.getElementById("className").addEventListener("blur", myFunction);
+//        document.getElementById("className").addEventListener("blur", myFunction);
         
         function handleclickHandlers() {
             $("#create_class_form").bootstrapValidator({

@@ -18,6 +18,7 @@ import java.util.*;
  * 
  * Frank	10-25-19	Issue #4 new status value in-progress
  * Frank	10-25-19	Issue #5 accordion V doesn't open
+ * Frank	01-26-21	Issue #378 added corect answers to preview page
  */
 
 public class Problem implements Activity {
@@ -65,6 +66,7 @@ public class Problem implements Activity {
     private String answer;   // the letter of the multi-choice answer (a-e)
                         // client forces a prob + topic.   This is then used to make sure logging shows the given topic
     private List<ProblemAnswer> answers;  // for short answer questions we have all possible answers  and multiple choice will be here too for quickAuth probs
+    private String answersViewList;  // for short answer questions we have all possible answers  and multiple choice will be here too for quickAuth probs
     private QuestType questType; // multichoice or shortanswer
     private double diff_level ;
     private String form;
@@ -252,6 +254,24 @@ public class Problem implements Activity {
         return jo.toString();
     }
 
+    public void setAnswersViewList () {
+        answersViewList = "";
+        if (isShortAnswer()) {
+	        	boolean started = false;
+		        for (ProblemAnswer ans : getAnswers()) {
+		        	if (started) {
+		        		answersViewList += ", ";		        	
+		        	}
+		        	started = true;
+		        	answersViewList += ans.getVal();
+		        }
+        }
+    }
+    public String getAnswersViewList () {
+        return answersViewList;
+    }
+    
+    
     public JSONObject buildJSON(JSONObject jo) {
         if (isExternalActivity())
             jo.element("activityType", "ExternalActivity");
@@ -281,6 +301,7 @@ public class Problem implements Activity {
             jo.element("questionAudio", questionAudio);  // DM 1/23/18 e.g. {[file.mp3]}
             jo.element("questionImage", imageURL); // DM 1/23/18 this will be Either a URL or {[myimage.jpg]}
             jo.element("units", units);
+            jo.element("answersViewList",answersViewList);
             jo.element("questType",this.questType.name());
             jo.element("hints", new JSONArray());
             for (Hint hint : allHints) {

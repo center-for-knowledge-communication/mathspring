@@ -4,6 +4,7 @@
 <% 
 /**
 * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+* Frank 01-16-21 Issue #378 added correct answers element
 */
 ResourceBundle versions = null; 
 try {
@@ -79,6 +80,8 @@ catch (Exception e) {
                 <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
+            </div>
+            <div id="CorrectAnswers" class="answer_text" style="display: none">
             </div>
         </div>
     </div>
