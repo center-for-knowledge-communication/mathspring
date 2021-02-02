@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.login.interv;
 
+import java.util.List;
 import java.util.Map;
 
 import edu.umass.ckc.wo.tutormeta.Intervention;
@@ -15,7 +16,7 @@ import net.sf.json.JSONObject;
 public class LoginIntervention implements Intervention {
     private String view;  // name of JSP
     private String url;   // URL which will be shown in a separate browser window   
-    private Map<Integer, String> LCprofile;
+    private Map<Integer, List<String>> LCprofile;
     private boolean separateWindow =false; // tells whether to display the URL in a separate window      -- DM 8/16 not seeing evidence of this being used
     private boolean topLevel = false; // indicates if the JSP should be within an outer JSP or not
 
@@ -52,12 +53,12 @@ public class LoginIntervention implements Intervention {
         return this.url;
     }
         
-    public Map<Integer, String> getLCprofile() {
+	public Map<Integer, List<String>> getLCprofile() {
 		return LCprofile;
 	}
 
-	public void setLCprofile(Map<Integer, String> lcprofile) {
-		LCprofile = lcprofile;
+	public void setLCprofile(Map<Integer, List<String>> lCprofile) {
+		LCprofile = lCprofile;
 	}
 
 	public void setUrl(String url) {

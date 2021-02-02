@@ -1,5 +1,23 @@
 package edu.umass.ckc.wo.db;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+
 import edu.umass.ckc.wo.admin.LessonMap;
 import edu.umass.ckc.wo.admin.LoginMap;
 import edu.umass.ckc.wo.admin.PedMap;
@@ -8,26 +26,10 @@ import edu.umass.ckc.wo.config.LessonXML;
 import edu.umass.ckc.wo.config.LoginXML;
 import edu.umass.ckc.wo.lc.DbLCRule;
 import edu.umass.ckc.wo.lc.LCRuleset;
-import edu.umass.ckc.wo.lc.XMLLCRule;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.probSel.LessonModelParameters;
 import edu.umass.ckc.wo.xml.JDOMUtils;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-
-import javax.servlet.ServletContext;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -395,19 +397,19 @@ public class DbPedagogy {
 
     }
 
-    public static Map<Integer, String> getLCprofiles(Connection conn, int classId) throws SQLException {
-		Map<Integer, String> LCprofiles = new HashMap<Integer, String>();
+    public static Map<Integer, List<String>> getLCprofiles(Connection conn, int classId) throws SQLException {
+		Map<Integer, List<String>> LCprofiles = new HashMap<Integer, List<String>>();
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select cp.pedagogyId, p.name from classpedagogies cp INNER JOIN\r\n" + 
-        			"pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?";
+        	String q = "select cp.pedagogyId, p.name, p.shortName from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?\r\n" + 
+        			"UNION\r\n" + 
+        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classId);
             rs = stmt.executeQuery();
             while (rs.next()) {
-            	String lcName = rs.getString(2).split("\\s+")[0];
-            	LCprofiles.put(rs.getInt(1), lcName);
+            	LCprofiles.put(rs.getInt(1), new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3))));
             }
         } finally {
             if (stmt != null)
