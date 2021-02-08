@@ -38,8 +38,10 @@ catch (Exception e) {
 			    
        			<label class="radio-inline">
           			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}" required>
-          			<img src="${url}/${lcompanion.value}/character.png" width="180px" height="226px">
-          			<span style="display:block; text-align: center;">${lcompanion.value}</span>
+          			<c:if test="${lcompanion.value[1] != 'NoLC'}">
+          				<img src="${url}/${lcompanion.value[1]}/character.png" width="180px" height="226px">
+          			</c:if>
+          			<span style="display:block; text-align: center;">${lcompanion.value[0]}</span>
          		</label>
        		</div>
 		    <c:if test="${loop.index == terminator}">
