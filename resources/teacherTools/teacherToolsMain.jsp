@@ -901,7 +901,7 @@ function registerAllEvents(){
     <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
         <ul class="nav sidebar-nav">
             <li>
-                <a id="PageRefresh" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
+            	<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
             <li>
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
