@@ -6,6 +6,7 @@ import edu.umass.ckc.wo.content.CCStandard;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbProblem;
 import edu.umass.ckc.wo.db.DbUtil;
+import edu.umass.ckc.wo.db.DbVideo;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutormeta.VideoSelector;
@@ -26,6 +27,8 @@ import java.util.*;
  * Requested by Ivon.  Selects a video for a problem based on CCSS and difficulty.
  * If the cur problem doesn't have a video, find a problem with the same standard and the similar difficulty level that does
  * have a video.
+ * 
+ * Kartik 02-12-2021 issue #384 video retrieval from video-standard-map table
  */
 public class StandardVideoSelector implements VideoSelector {
 
@@ -43,14 +46,21 @@ public class StandardVideoSelector implements VideoSelector {
      */
     public String selectVideo(Connection conn, int targetProbId) throws SQLException {
 
-
         Problem p = ProblemMgr.getProblem(targetProbId);
         if (p.hasVideo())
             return p.getVideo();
-        double targetDiff = p.getDiff_level();
         List<CCStandard> standards = p.getStandards();
-        List<Problem> relatedProbs = new ArrayList<Problem> ();
+        
+        String standardCode = standards.get(0).getCode();
+        String videoUrl = DbVideo.getVideoByStandardCode(conn, standardCode, p.getProblemLanguage());
+        
+        return videoUrl;
+        		
+        // Re-implemented functionality to retrieve video for a problem, when video not found and commented previous code below (issue #384)
+        
+        /*List<Problem> relatedProbs = new ArrayList<Problem> ();
         // go through all the related problems, keeping only those that have videos
+        double targetDiff = p.getDiff_level();
         for (CCStandard s : standards) {
             List<Problem> probs = ProblemMgr.getStandardProblems(conn, s.getCode());
             for (Problem p2: probs) {
@@ -106,7 +116,7 @@ public class StandardVideoSelector implements VideoSelector {
 //            System.out.print("problem-"+pm(item.getP2()) + " ");
 //        }
 //        System.out.println();
-        return winner.getVideo();
+        return winner.getVideo(); */
     }
 
     // debugging util for above fn's commented out debug code
