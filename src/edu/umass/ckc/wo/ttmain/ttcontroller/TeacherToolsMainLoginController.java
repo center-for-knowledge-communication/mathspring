@@ -217,6 +217,44 @@ public class TeacherToolsMainLoginController {
         	return "login/loginHelpRequest_error";    		
     	}
     }    
+
+    
+    @RequestMapping(value = "/tt/ttLogFeedback", method = RequestMethod.POST)
+    public String logFeedback(@RequestParam("messageType") String messageType,@RequestParam("teacherId") int teacherId,@RequestParam("objectId") String objectId,@RequestParam("priority") String priority, @RequestParam("msg") String msg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
+
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
+
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+  	
+    	int result  = loginService.logFeedback(messageType,teacherId,objectId,priority, msg);
+    	switch (result) {
+    	case 0:
+    		break;
+    	case 1:
+    		request.setAttribute(LoginParams.MESSAGE,"No feedback message entered.");
+    		break;
+    	default:
+    		request.setAttribute(LoginParams.MESSAGE,"unexpected error");
+    		break;
+    	
+    	}
+    	
+    	return "teacherTools/feedbackRequest_status";            			
+    }    
     
 }
 

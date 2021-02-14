@@ -728,7 +728,7 @@ function problemLevelDetails(JSONData,problems){
             "<td>"+html+"</td>"+
             "<td>"+obj.type+"</td></tr>";
     });
-    return tableHeader + "</tbody><table></div>";
+    return tableHeader + "</tbody></table></div>";
 }
 
 function handleclickHandlers() {
