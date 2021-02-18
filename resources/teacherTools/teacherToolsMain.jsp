@@ -924,7 +924,7 @@ function registerAllEvents(){
                 <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("view_teacher_activities") %></a>
             </li>
             <li>
-                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("teacher_tools_feedback") %></a>
+                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
             </li>
 <!--
 

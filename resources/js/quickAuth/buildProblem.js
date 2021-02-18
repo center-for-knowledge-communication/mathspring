@@ -5,6 +5,7 @@
 // Kartik 08-11-20 fixed #158 issue of displaying unit next to problems
 // Frank 09-08-20 Touch this file to force build error
 // Frank 01-26-21 Added 'correct answers' to preview page
+// Frank 02-17-21 Added div for comment button
 
 var quickAuthBuildProblem = (function() {
 
@@ -79,9 +80,13 @@ m.build = function(activity, previewMode) {
 	
 	var stepText = "Step";
 	var correctAnswerText = "Correct Answer:";
+	var feedback = 'Feedback';
+	var play_hint = "Play hint";
 	if (languageSet == "es") {
 		stepText = "Paso";
 		correctAnswerText = "Respuesta correcta";
+		feedback = "Comentario";
+		play_hint = "mostrar ayuda";
 	}
 
     var hint_labels = [];
@@ -222,6 +227,18 @@ m.build = function(activity, previewMode) {
                 (problemContainer.offsetWidth * parseFloat(matches[1])) + "px";
         }
         document.body.appendChild(play_hint_button);
+        
+        var comment_button = document.createElement("div");
+        comment_button.className = "comment-button";
+        comment_button.innerHTML = "Comment";
+
+        var url = contextPath + "/teacherTools/problemFeedbackRequest.jsp?objectId=" + problem.id;
+        
+        comment_button.onclick = function() {
+            window.open(url, "_blank", "width=400,height=600,top=100,left=900");         	
+        }
+        document.body.appendChild(comment_button);
+    
     }
 
     if(previewMode) {

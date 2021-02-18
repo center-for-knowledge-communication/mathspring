@@ -23,7 +23,8 @@ catch (Exception e) {
 	//logger.error(e.getMessage());
 }
 
-
+String objId = (String)request.getAttribute("objectId");
+System.out.println("objId = " + objId);
 /**
 
  */
@@ -33,7 +34,7 @@ catch (Exception e) {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>MathSpring | <%= rb.getString("teacher_tools_feedback_form")%></title>
+    <title>MathSpring | <%= rb.getString("problem_feedback_form")%></title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -42,7 +43,11 @@ catch (Exception e) {
     <link href="../../sass_compiled/teacher_register.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
       <script type="text/javascript" src="../js/jquery-1.10.2.js"></script>
     <script type="text/javascript">
+    var objectIdParam = "<%=objId%>";
 
+    $(document).ready(function() {
+    	console.log("hello");
+    });
     </script>
 </head>
 
@@ -64,16 +69,16 @@ catch (Exception e) {
             <c:if test="${message == null}">
                 <div class="alert alert-success msg-bar" role="alert"><%= rb.getString("success")%></div>
             </c:if>
-            <h3 class="text-center form-label form-title"><%= rb.getString("teacher_feedback_title1")%></h3>
+            <h3 class="text-center form-label form-title"><%= rb.getString("problem_feedback_title1")%></h3>
             <hr>
             <form
                     class="form-horizontal"
                     method="post"
                     action="${pageContext.request.contextPath}/tt/tt/ttLogFeedback"
             >		
-                <input type="hidden" name="messageType" value="teacherToolFeedback"/>
+                <input type="hidden" id="messageType" name="messageType" value="problemFeedback"/>
                 <input type="hidden" name="teacherId" value="${teacherId}"/>
-                <input type="hidden" name="objectId" value="0"/>
+                <input type="hidden" id="objectId" name="objectId"/>
                 <div class="form-group">
                     <label id="msgLabel" class="control-label col-sm-4" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
                     <div class="col-sm-6">
@@ -101,7 +106,7 @@ catch (Exception e) {
                 </div><!-- form-group -->
             </form>
             <hr>
-            <h4 class="text-center form-label form-title"><%= rb.getString("teacher_feedback_title2")%></h4>
+            <h4 class="text-center form-label form-title"><%= rb.getString("problem_feedback_title2")%></h4>
         </div>
    </div>   	
 </div>
