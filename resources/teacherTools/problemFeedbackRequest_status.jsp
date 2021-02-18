@@ -43,11 +43,7 @@ System.out.println("objId = " + objId);
     <link href="../../sass_compiled/teacher_register.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
       <script type="text/javascript" src="../js/jquery-1.10.2.js"></script>
     <script type="text/javascript">
-    var objectIdParam = "<%=objId%>";
 
-    $(document).ready(function() {
-    	console.log("hello");
-    });
     </script>
 </head>
 
@@ -78,7 +74,7 @@ System.out.println("objId = " + objId);
             >		
                 <input type="hidden" id="messageType" name="messageType" value="problemFeedback"/>
                 <input type="hidden" name="teacherId" value="${teacherId}"/>
-                <input type="hidden" id="objectId" name="objectId"/>
+                <input type="hidden" id="objectId" name="objectId" value="<%=objId%>"/>
                 <div class="form-group">
                     <label id="msgLabel" class="control-label col-sm-4" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
                     <div class="col-sm-6">
