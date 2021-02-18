@@ -30,7 +30,7 @@ public class Feedback implements Serializable {
     public Feedback() {
     }
 
-    public Feedback(int teacherId, String messageType, String priority, String message, String objectid, Timestamp timestamp) {
+    public Feedback(int teacherId, String messageType, String priority, String message, String objectId, Timestamp timestamp) {
         this.teacherId = teacherId;
         this.messageType = messageType;
         this.priority = priority;

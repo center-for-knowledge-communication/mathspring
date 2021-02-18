@@ -36,6 +36,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
+ * Franjk	02-27-21	issue #383 logFeeaback
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -252,8 +253,12 @@ public class TeacherToolsMainLoginController {
     		break;
     	
     	}
-    	
-    	return "teacherTools/feedbackRequest_status";            			
+    	String responseUrl = "teacherTools/feedbackRequest_status";
+    	if (messageType.equals("problemFeedback")) {
+    		request.setAttribute("objectId",objectId);
+    		responseUrl = "teacherTools/problemFeedbackRequest_status";   		
+    	}
+    	return responseUrl;            			
     }    
     
 }
