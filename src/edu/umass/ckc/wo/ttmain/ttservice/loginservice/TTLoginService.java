@@ -20,4 +20,6 @@ public interface TTLoginService{
     public int resetPassword(String uname,String email);
 
     public int sendHelpMessage(String subject, String email,String helpmsg) throws TTCustomException;
+
+    public int logFeedback(String messageType, int teacherId, String objectId, String priority, String msg) throws TTCustomException;
 }

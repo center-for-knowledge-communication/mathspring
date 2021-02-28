@@ -240,11 +240,30 @@ body {
     z-index: 2;
 }
 #CorrectAnswers{
-    margin-top: 30px;
+    margin-top: 10px;
+    color:white;
+    background-color:blue;
 }
 .answer_text{
     display: inline-block;
     /* height: 27px; */
     position: relative;
     vertical-align: top;
+}
+
+.comment-button{
+    position: absolute;
+    left: 750px;
+    width: 100px;
+    height: 600px;
+    box-sizing: border-box;
+    line-height: 600px;
+    font-size: 20px;
+    color: white;
+    background-color: #888;
+    padding: 5px;
+}
+.comment-button:hover{
+    background-color: #666;
+    transition: background-color 0.25s;
 }

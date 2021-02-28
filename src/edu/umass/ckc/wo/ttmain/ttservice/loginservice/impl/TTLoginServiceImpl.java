@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.ttmain.ttservice.loginservice.impl;
 
+import java.sql.Timestamp;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +29,10 @@ import edu.umass.ckc.wo.beans.Teacher;
 import edu.umass.ckc.email.Emailer;
 import edu.umass.ckc.wo.beans.ClassInfo;
 import edu.umass.ckc.wo.beans.Classes;
+import edu.umass.ckc.wo.beans.Feedback;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.db.DbFeedback;
 import edu.umass.ckc.wo.db.DbPedagogy;
 import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.login.LoginParams;
@@ -56,6 +59,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank	10-07-20	issue #267 removed School year as a determining factor for 'active' vs. 'archived' list entries
  * Frank 	11-12-20	issue #276 handle interface change for remembering type of login
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
+ * Frank	02-14-21	issue #383R1 added logFeedback method
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -183,6 +187,34 @@ public class TTLoginServiceImpl implements TTLoginService {
             e.printStackTrace();
             logger.error(e.getMessage());
             return 1;
+        }
+    }
+    @Override
+    public int logFeedback(String messageType, int teacherId, String objectId, String priority, String msg) {
+        try {
+//        	String helpDeskEmail = Settings.getString(connection.getConnection(), "teacher_login_help_email");
+//          SendEM sender = new SendEM();
+//        	sender.sendHelpEmail(connection.getConnection(),helpDeskEmail, severity, email, msg);
+           	System.out.println(messageType);
+           	System.out.println(String.valueOf(teacherId));
+           	System.out.println(objectId);
+           	System.out.println(priority);
+           	System.out.println(msg);
+           	
+           	
+
+           	if (msg.length() == 0) {
+           		return(1);
+           	}
+           	
+           	Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+           	Feedback f  = new Feedback(teacherId,messageType,priority,msg,objectId,timestamp);
+           	DbFeedback.addFeedback(connection.getConnection(), f);
+           	return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            return 2;
         }
     }
 

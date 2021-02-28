@@ -36,6 +36,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
+ * Franjk	02-27-21	issue #383 logFeeaback
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -216,6 +217,48 @@ public class TeacherToolsMainLoginController {
         	request.setAttribute(LoginParams.MESSAGE,rb.getString("enter_email_and_message"));
         	return "login/loginHelpRequest_error";    		
     	}
+    }    
+
+    
+    @RequestMapping(value = "/tt/ttLogFeedback", method = RequestMethod.POST)
+    public String logFeedback(@RequestParam("messageType") String messageType,@RequestParam("teacherId") int teacherId,@RequestParam("objectId") String objectId,@RequestParam("priority") String priority, @RequestParam("msg") String msg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
+
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
+
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+  	
+    	int result  = loginService.logFeedback(messageType,teacherId,objectId,priority, msg);
+    	switch (result) {
+    	case 0:
+    		break;
+    	case 1:
+    		request.setAttribute(LoginParams.MESSAGE,"No feedback message entered.");
+    		break;
+    	default:
+    		request.setAttribute(LoginParams.MESSAGE,"unexpected error");
+    		break;
+    	
+    	}
+    	String responseUrl = "teacherTools/feedbackRequest_status";
+    	if (messageType.equals("problemFeedback")) {
+    		request.setAttribute("objectId",objectId);
+    		responseUrl = "teacherTools/problemFeedbackRequest_status";   		
+    	}
+    	return responseUrl;            			
     }    
     
 }

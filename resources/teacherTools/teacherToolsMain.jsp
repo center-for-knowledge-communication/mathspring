@@ -23,6 +23,7 @@
  *  Frank	10-30-20	Issue #293 add new items to class config form 
  *	Frank	12-18-20	Issue #336 added cache-busting for selected .js and .css files
  *  Frank 	01-05-21  	Issue #302 teacher username only alpha and numeric characters
+ *  Frank 	02-14-21  	Issue #303R1 added teacher feedback on teacher tools
 */
 
  System.out.println("teacherToolsMain starting");
@@ -274,7 +275,7 @@ catch (Exception e) {
             $("#teacher-activities-wrapper").hide();
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
-            $("#edit-teacher-wrapper").hide();
+            $("#edit-teacher-wrapper").hide();          
             var pause = ${teacherPauseStudentUse};
             if (pause == "1")
             	$("#pause-status").show();            
@@ -522,8 +523,18 @@ catch (Exception e) {
                 $("#form-wrapper").hide();
                 $("#edit-teacher-wrapper").show();
             });
-
-
+            
+            $("#teacher_feedback_handler").click(function () { 
+                window.open( 
+                  "${pageContext.request.contextPath}/teacherTools/feedbackRequest.jsp", "_blank"); 
+                $("#report-wrapper").show();
+                $("#report-wrapper2").show();
+                $("#teacher-activities-wrapper").hide();
+                $("#panel-wrapper").hide();
+                $("#form-wrapper").hide();
+                $("#edit-teacher-wrapper").hide();
+            });
+            
             $("#teacher_activities_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
@@ -901,7 +912,7 @@ function registerAllEvents(){
     <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
         <ul class="nav sidebar-nav">
             <li>
-                <a id="PageRefresh" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
+            	<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
             <li>
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
@@ -912,7 +923,11 @@ function registerAllEvents(){
             <li>
                 <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("view_teacher_activities") %></a>
             </li>
+            <li>
+                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
+            </li>
 <!--
+
             <li id="pause_logins_handler">
                 <a href="#" id="pause_logins_handler"><i class="fa fa-fw fa-ban"></i> Pause student logins</a>
             </li>
@@ -1428,7 +1443,8 @@ function registerAllEvents(){
                 </div>
             </springForm:form>
         </div>
-        <div id="edit-teacher-wrapper" style="display: none;">
+                
+         <div id="edit-teacher-wrapper" style="display: none;">
     		<div class="registration-form vertical-center">
 		        <div class="col-sm-6 col-sm-offset-3 registration-box">
 		            <c:if test="${message != null && not empty message}">

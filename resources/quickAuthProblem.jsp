@@ -5,6 +5,8 @@
 /**
 * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 * Frank 01-16-21 Issue #378 added correct answers element
+* Frank 01-16-21 Issue #378R2 move correct answers element to top
+* Frank 02-17-21 Issue #383R2 get context for buildProblems.js
 */
 ResourceBundle versions = null; 
 try {
@@ -25,6 +27,9 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
+
+String ctx = request.getContextPath();
+
 %>
 
 <jsp:useBean id="problem" scope="request" class="edu.umass.ckc.wo.content.Problem"/>
@@ -33,6 +38,9 @@ catch (Exception e) {
     <head>
         <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css?ver=<%=versions.getString("css_version")%>"/>
         <script src="js/jquery-1.10.2.js"></script>
+        <script>
+        	var contextPath = "<%=ctx%>";
+        </script>
         <script src="js/quickAuth/format2json.js?ver=<%=versions.getString("js_version")%>"></script>
         <script src="js/quickAuth/formatBuilder.js?ver=<%=versions.getString("js_version")%>"></script>
         <script src="js/quickAuth/problemUtils.js?ver=<%=versions.getString("js_version")%>"></script>
@@ -67,7 +75,9 @@ catch (Exception e) {
             <div id="HintContent">
             </div>
         </div>
-        <div id="ProblemStatement"></div>
+        <div id="CorrectAnswers" class="answer_text" style="display: none">
+   	    </div>
+         <div id="ProblemStatement"></div>
         <div id="ProblemFigure"></div>
         <div id="Answers">
             <div id="ShortAnswerBox" style="display: none">
@@ -80,8 +90,6 @@ catch (Exception e) {
                 <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
-            </div>
-            <div id="CorrectAnswers" class="answer_text" style="display: none">
             </div>
         </div>
     </div>
