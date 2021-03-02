@@ -22,6 +22,8 @@ import java.util.*;
  * Time: 11:36 AM
  * This is an in-memory representation of a students problem history.   It works with the DbStudentProblemHistory class
  * Note: A problem shown to the student more than once has multiple entries.   It is stored with the most recent entry on the end of the list.
+ * 
+ * Kartik 03-01-21	issue #286 Mastery Update is Incorrect, goes down to 0.1 due to incorrect topicId. Fixed topicId retrieval. 
  */
 public class StudentProblemHistory {
 
@@ -120,6 +122,12 @@ public class StudentProblemHistory {
        // TODO do not set effort if the current problem is Topic Intro or Example
         // Special case:  If starting a problem or topic from MPP, it first does an EndProblem on the old problem.
         // But some of the topicState got reset so we can't compute effort.  So just leave the effort as it was
+        
+        //In the special case, if starting a new topic, the old problem shoud be ended with the correct topicId 
+        if (curProbData.getTopicId()!=0) {
+        	topicId = curProbData.getTopicId();
+        }
+        
         String effort = null;
         if (state.getCurProblemMode() != null)
             effort = effortComputer.computeEffort(state);
