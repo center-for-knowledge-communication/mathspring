@@ -10,7 +10,8 @@
 // Frank 12-11-20 Issue #315 default locale to en_US
 // Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 // Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
-// Frank 03-01-21 Issue #400 remove Flash message from problem window
+// Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
+
 
 ResourceBundle versions = null; 
 try {
