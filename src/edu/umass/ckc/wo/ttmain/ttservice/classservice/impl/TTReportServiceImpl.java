@@ -74,7 +74,8 @@ import java.text.SimpleDateFormat;
  * Frank	11-12-20	Issue #299 Class Landing Page report
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
  * Frank	12-03-20	fix xdays computation to go back to just after midnight to include the entire day
-*/
+ * Frank	12-03-20	Issue #388 Landing Report Two - by date range
+ */
 
 
 @Service
@@ -292,6 +293,15 @@ public class TTReportServiceImpl implements TTReportService {
                     landingReportOne_dataMap.put("levelOneData", landingReportOne_levelOneData);
                     return landingReportOne_objMapper.writeValueAsString(landingReportOne_dataMap);
                     
+                case "classLandingReportTwo":
+                    List<ClassLandingReportStudents> landingReportTwo_Students = generateClassLandingReportTwo(teacherId, classId, filter);
+                    String[][] landingReportTwo_levelOneData = landingReportTwo_Students.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems(), classStudents1.getTimeInMS(), classStudents1.getLatestLogin() }).toArray(String[][]::new) ;
+                                    	
+                    ObjectMapper landingReportTwo_objMapper = new ObjectMapper();
+                    Map<String, Object> landingReportTwo_dataMap = new HashMap<>();
+                    landingReportTwo_dataMap.put("levelOneData", landingReportTwo_levelOneData);
+                    return landingReportTwo_objMapper.writeValueAsString(landingReportTwo_dataMap);
+
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                 	if ("Normal".equals(teacherLoginType)) {
@@ -736,7 +746,7 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public List<ClassLandingReportStudents> generateClassLandingReportOne(String teacherId, String classId, String filter) {
 
-    	
+
     	Timestamp ts = xDaysAgoToDate(filter);
 		
         Map<String, Object> eventParams = new HashMap<String, Object>();
@@ -826,6 +836,111 @@ public class TTReportServiceImpl implements TTReportService {
         return classLandingReportStudents;
     }
 
+
+    @Override
+    public List<ClassLandingReportStudents> generateClassLandingReportTwo(String teacherId, String classId, String filter) {
+
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
+    	
+    	String filters[] = filter.split("~");
+    	if (filter.length() > 1) {    		
+    		String dateFilters[] = filters[1].split("thru");
+    		tsFromDate = convertFromDate(dateFilters[0].trim());
+    		tsToDate = convertToDate(dateFilters[1].trim());
+    	}
+		
+        Map<String, Object> eventParams = new HashMap<String, Object>();
+        eventParams.put("classId", classId);
+        eventParams.put("tsFromDate", tsFromDate);
+        eventParams.put("tsToDate", tsToDate);
+        SqlParameterSource eventNamedParameters = new MapSqlParameterSource(eventParams);
+
+        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT2_EVENTS_QUERY, eventNamedParameters, new ClassLandingReportEventsMapper());
+
+        Map<String, String> probElapsedMap = new HashMap<String, String>();
+        Map<String, String> latestLoginMap = new HashMap<String, String>();
+        String prevStudent = "";
+        int probElapsedTime = 0;
+        String latestLogin = "";
+        boolean countable = false;
+        for (ClassLandingReportEvents event : classLandingReportEvents) {
+        	switch (event.getAction()) {
+        		case "EndProblem":
+        			countable = true;
+        			break;
+        		case "Student Access":
+            		latestLoginMap.put(event.getStudentId(), event.getTimestampString("en"));
+        			break;
+        		default:
+        			countable = false;
+        	}
+        	if (event.getStudentId().equals(prevStudent)) {
+            	if (countable) {
+            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            	}
+        	}
+        	else {
+            	if (prevStudent.length() > 0) {
+//                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
+            		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+            		probElapsedTime = 0;
+            	}
+            	if (countable) {
+            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            	}
+          	}
+           	prevStudent = event.getStudentId();
+        }
+
+    	if (prevStudent.length() > 0) {
+//        	System.out.println("Last student - probElapsedTime = " + String.valueOf(probElapsedTime));
+    		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+    	}
+        
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("classId", classId);
+        params.put("tsFromDate", tsFromDate);
+        params.put("tsToDate", tsToDate);
+        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+
+        List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT2_STUDENTS_QUERY, namedParameters, new ClassLandingReportStudentsMapper());
+        
+        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+        	//System.out.println("StudentID=" + stu.getStudentId());
+        	String timeInMS = probElapsedMap.get(stu.getStudentId());
+        	//System.out.println("timeInMS=" + timeInMS);
+        	String sMinutes = "0";
+        	int iMinutes = 0;
+        	if (timeInMS != null) {
+	        	int tMinutes = Integer.parseInt(timeInMS);
+	        	if (tMinutes > 0) {
+	        		iMinutes = tMinutes / 60000;
+	        	}
+	        	int iSeconds = tMinutes % 60000;
+	        	if (iMinutes == 0) {
+	        		if (iSeconds > 10000) {
+	        			iMinutes++;
+	        		}
+	        	}
+	        	sMinutes = String.valueOf(iMinutes);
+        	}
+        	//System.out.println("ElapsedTime=" + sMinutes);
+        	stu.setTimeInMS(sMinutes);
+        	//String test = latestLoginMap.get(stu.getStudentId());
+        	//System.out.println("latestLogin=" + test);
+        	stu.setLatestLogin(latestLoginMap.get(stu.getStudentId()));
+        }
+        	
+//        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+//        	System.out.println("StudentID=" + stu.getStudentId() + " ElapsedTime=" + stu.getTimeInMS());
+//        }
+
+        return classLandingReportStudents;
+    }
+
+ 
+    
     @Override
     public Map<String, Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException {
     
@@ -1741,4 +1856,46 @@ public class TTReportServiceImpl implements TTReportService {
 		return ts;
     }
 
+    private Timestamp convertFromDate(String filter) {
+		Timestamp ts = null;
+
+		try {
+			Date fDate=new SimpleDateFormat("MM/dd/yyyy").parse(filter);
+			Calendar c = Calendar.getInstance();
+			c.setTime(fDate);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 1);
+			// convert calendar to date
+			Date xDate = c.getTime();
+			ts = new Timestamp(xDate.getTime());
+		}
+		catch (Exception e) {
+			
+		}
+		return ts;
+    }
+
+    private Timestamp convertToDate(String filter) {
+		Timestamp ts = null;
+
+		try {
+			Date fDate=new SimpleDateFormat("MM/dd/yyyy").parse(filter);
+			Calendar c = Calendar.getInstance();
+			c.setTime(fDate);
+			c.set(Calendar.HOUR_OF_DAY, 23);
+			c.set(Calendar.MINUTE, 59);
+			c.set(Calendar.SECOND, 59);
+			// convert calendar to date
+			Date xDate = c.getTime();
+			ts = new Timestamp(xDate.getTime());
+		}
+		catch (Exception e) {
+			
+		}
+		return ts;
+    }
+
+
+    
 }

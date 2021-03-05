@@ -452,6 +452,12 @@ background-color: #FF4766;
   	font-size: 16px;
 	
 }
+.report_note {
+	color: black;
+  	background-color: white;
+  	font-size: 16px;
+	
+}
 
 .modal-content {
   max-width: 1500px;
