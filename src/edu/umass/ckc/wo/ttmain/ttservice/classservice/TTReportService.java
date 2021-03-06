@@ -59,6 +59,8 @@ public interface TTReportService {
     
     public List<ClassLandingReportStudents> generateClassLandingReportOne(String teacherId, String classId, String filter);
 
+    public List<ClassLandingReportStudents> generateClassLandingReportTwo(String teacherId, String classId, String filter);
+
     public List<TeacherLogEntry> generateTeacherLogReport(String targetId);
 
     public List<TeacherListEntry> generateTeacherList(String targetId);

@@ -388,14 +388,6 @@ function showVideo (globals) {
 }
 
 // TODO this should be changed to use a non-modal dialog
-function showGlossary (globals) {
-    var glossURL = "http://www.amathsdictionaryforkids.com/dictionary.html";
-    utilDialogOpen(glossURL, "Glossary");
-    sendSimpleNotificationEvent(globals,"ShowGlossary");
-//    window.open(glossURL, "width=500, height=500");
-}
-
-// TODO this should be changed to use a non-modal dialog
 function showFormulas (globals) {
     //var formURL = "http://math2.org/math/geometry/areasvols.htm";
     var formURL = "img/formulaMathSpring.pdf"
