@@ -197,6 +197,7 @@ var perStudentPerProblemXrefMap;
 //Report5 Varribales
 var landingPageReport1;
 var landingPageReport2;
+
 var effortMap;
 var perProblemObject;
 var emotionMap;
@@ -321,11 +322,11 @@ function getFilterLandingTwo() {
                 filter: filterLandingTwo
             },
             success : function(data) {
+                $('#classLandingReportTwo').collapse('show');
                 var jsonData = $.parseJSON(data);
                 landingPageReport2.clear().draw();
                 landingPageReport2.rows.add(jsonData.levelOneData).draw();
                 landingPageReport2.columns.adjust().draw();
-                $('#classLandingReportTwo').collapse('show');
             },
             error : function(e) {
                 console.log(e);
@@ -1120,6 +1121,23 @@ function changeLandingPageHeaderAccordingToLanguage(){
 	}
 }
 
+function changeLandingPageHeader2AccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Número de problemas vistos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Number of problems seen','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
+	 	return header;
+	}
+}
+
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
@@ -1157,6 +1175,7 @@ function registerAllEvents(){
     });
 
     var headers = changeLandingPageHeaderAccordingToLanguage();
+    var headers2 = changeLandingPageHeader2AccordingToLanguage();
   
     if (languageSet == 'es') {
     
@@ -1324,8 +1343,7 @@ function registerAllEvents(){
 
     });
 
-    var headers2 = changeLandingPageHeaderAccordingToLanguage();
-    
+
     if (languageSet == 'es') {
     
     landingPageReport2  =  $('#landingPageReport2').DataTable({
