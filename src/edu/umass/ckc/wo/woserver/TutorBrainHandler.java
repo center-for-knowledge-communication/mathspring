@@ -45,6 +45,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * Frank	03-08-21	Handle NoSession case by forwarding to student login page
+ *
+ */
+
 public class TutorBrainHandler {
     private TutorBrainEventFactory eventFactory;
     private static Logger logger =   Logger.getLogger(TutorBrainHandler.class);
@@ -168,9 +174,16 @@ public class TutorBrainHandler {
             } catch (NoSessionException nse) {
                 nse.printStackTrace();
                 // This is a common exception and we want to pass back a fatal error to the client so it can let the user know their session is dead.
-                View er = new ErrorResponse(nse, true);
-                servletInfo.getOutput().append(er.getView());
-                return true;
+                //View er = new ErrorResponse(nse, true);
+                //servletInfo.getOutput().append(er.getView());
+                //return true;
+                RequestDispatcher disp=null;
+                String loginJSP = LoginK12_2.LOGIN_JSP;
+                servletInfo.request.setAttribute("startPage","LoginK12_1");
+                disp = servletInfo.getRequest().getRequestDispatcher(loginJSP);
+                disp.forward(servletInfo.getRequest(),servletInfo.getResponse());
+                logger.info("<< JSP: " + loginJSP);
+                return false;
 
             }
 
