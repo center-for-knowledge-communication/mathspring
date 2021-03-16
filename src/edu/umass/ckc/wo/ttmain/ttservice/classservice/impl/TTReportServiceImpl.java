@@ -13,6 +13,7 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.TeacherClassListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
@@ -23,6 +24,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportEventsMapper
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherListEntryMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherClassListEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
@@ -75,6 +77,7 @@ import java.text.SimpleDateFormat;
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
  * Frank	12-03-20	fix xdays computation to go back to just after midnight to include the entire day
  * Frank	12-03-20	Issue #388 Landing Report Two - by date range
+ * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another added
  */
 
 
@@ -339,7 +342,16 @@ public class TTReportServiceImpl implements TTReportService {
                 	catch (Exception e) {
             			return "Unexpected Error";
                 	}
-                	
+                case "teacherClassList":
+
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+            		List<TeacherClassListEntry> ClassListEntries = generateTeacherClassList(teacherId);
+                    String[][] clsData = ClassListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getClassName(),TeacherLogEntry1.getClassId()}).toArray(String[][]::new);
+                    ObjectMapper clsMapper = new ObjectMapper();
+                    Map<String, Object> clsMap = new HashMap<>();
+                    clsMap.put("levelOneData", clsData);
+                    return clsMapper.writeValueAsString(clsMap);       
+
 
         	}
         } catch (IOException e) {
@@ -1827,6 +1839,13 @@ public class TTReportServiceImpl implements TTReportService {
         SqlParameterSource namedParameters = new MapSqlParameterSource("targetId", targetId);
         List<TeacherListEntry> teacherListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LIST_QUERY_FIRST, namedParameters, new TeacherListEntryMapper());
         return teacherListEntries;
+    }
+    @Override
+    public List<TeacherClassListEntry> generateTeacherClassList(String teacherId) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter. 
+        SqlParameterSource namedParameters = new MapSqlParameterSource("teacherId", teacherId);
+        List<TeacherClassListEntry> teacherClassListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_CLASSLIST_QUERY, namedParameters, new TeacherClassListEntryMapper());
+        return teacherClassListEntries;
     }
 
     private Timestamp xDaysAgoToDate(String filter) {

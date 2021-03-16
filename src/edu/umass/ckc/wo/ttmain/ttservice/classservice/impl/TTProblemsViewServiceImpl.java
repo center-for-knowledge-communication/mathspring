@@ -41,6 +41,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank	10-27-20	Issue #149R2 teacher logging in JSON format
  * Frank	01-03-21	Issue #329R2 Update topic elements with multi-ligual values 
  * Frank	01-16-21	Issue #368 Edit profile should not allow dups
+ * Frank    03-15-21  	Issue #398 New feature to move student from one class to another
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -185,7 +186,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     }
 
 
-    
     @Override
     public String resetPassWordForStudent(String studentId, String userName, String newPassWordTobeSet) throws TTCustomException {
         String token = newPassWordTobeSet;
@@ -196,7 +196,28 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_PASSWORD_FOR_STUDENT, updateParams);
         return token;
     }
+    
+    @Override
+    public String changeClassForStudent(String studentId, String newClassId) throws TTCustomException {
+		String msg = "***";
+        try {
+        	Map<String, Object> updateParams = new HashMap<String, Object>();
+	        updateParams.put("studentId", Integer.valueOf(studentId.trim()));
+	        updateParams.put("newClassId", Integer.valueOf(newClassId.trim()));
+	        this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_CLASS_FOR_STUDENT, updateParams);
+	        msg = "{ ";
+	    	msg += "\"studentid\" : \"" + studentId.trim() + "\",";
+	    	msg += "\"newClassId\" : \"" + newClassId.trim() + "\",";
+	    	msg += " }";
+	    	return msg;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        	msg =  "*** " + rb.getString("system_error") + "(" + ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA + ")" +  " ***";
+        	return msg;
 
+        }
+    }
     @Override
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	

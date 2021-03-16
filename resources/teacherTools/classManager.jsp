@@ -40,6 +40,7 @@
 <!-- Frank 01-05-21  	Issue #302 teacher username only alpha and numeric characters -->
 <!-- Frank 01-05-21  	Issue #366 blank screen after adding student -->
 <!-- Frank 03-05-21  	Issue #388 Landing page report by date range -->
+<!-- Frank 03-15-21  	Issue #398 New feature to move student from one class to another -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -160,9 +161,44 @@ System.out.println("msHost = " + msHost + msContext);
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
 
-
+<style>
+.nobull {
+  list-style-type: none;
+ }
  
+.dropdown-content:focus {
+	background-color: #ddd;
+	outline: 3px solid black;
+}
 
+.dropdown-content:hover {
+  background-color: lightgreen;
+	outline: 3px solid black;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  background-color: #f6f6f6;
+  font-size: 16px;
+  max-width: 40%;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+}
+
+.dropdown-content li {
+  color: black;
+  text-decoration: none;
+  display: block;
+  list-style-type: none;
+}
+
+</style>
+ 
 <script type="text/javascript">
 /**
  * Created by nsmenon on 6/1/2017.
@@ -340,6 +376,70 @@ function getFilterLandingTwo() {
 	}
 
 }
+var teacherClassSelections = "";
+
+function moveThisStudent(id) {
+
+	var newClassId = document.getElementById('moveBtn').value;
+    $('#student_info_out').find('.loader').show();
+	$.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/changeStudentClass",
+        data : {
+        	studentId:id,
+        	newClassId: newClassId,
+            lang: loc
+        },
+        success : function(response) {
+            $('#student_info_out').find('.loader').hide();
+            if (response.includes("***")) {
+                $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                $('#errorMsgModelPopup').modal('show');
+            }else{
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("changeStudentClass",response);
+                }
+                $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_class_changed")%>");
+                $('#successMsgModelPopup').modal('show');
+            }
+	    },
+	    error : function(e) {
+	        console.log(e);
+	    }
+    });
+}
+
+
+
+function selectTeacherClass(myClassId) {
+
+
+
+	var txtClassId = "" + myClassId;
+	for (var i=0; i < classChoices.length; i++) {	
+		var splitter = classChoices[i].split(',');
+		if (splitter[2] === txtClassId) {
+			document.getElementById('moveBtn').value = splitter[2];			
+			document.getElementById('moveBtn').innerHTML = '<%= rb.getString("move_this_student_to")%>: ' + splitter[1];
+			break;
+		}
+	}
+	
+	$("#moveBtn").show();
+}
+
+var classChoices = [];
+
+function addToTeacherList(item, index) {
+    
+	var titem = "" + item;
+	var tlist = titem.split(",");
+
+	classChoices.push(titem);
+	
+	teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
+}
+
 
 function logTeacherEvent(action,activityName) {
 
@@ -2150,6 +2250,40 @@ function registerAllEvents(){
     <script id="editStudentInformation">
 
     function editStudentInformation(id,fname,lname,uname,context){
+
+    	
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+            	classId: classID,
+                teacherId: teacherID,
+                reportType: 'teacherClassList',
+                lang: loc,
+                filter: "~"
+
+            },
+            success : function(data) {
+            	    if (data) {
+            	    	teacherClassSelections = "";
+            	    	$("#moveBtn").hide();
+            	    	var msg = "" + data;
+                       	var jsonData = $.parseJSON(data);
+       	                eachTeacherListData = jsonData.levelOneData;
+       	                eachTeacherListData.forEach(addToTeacherList);		           	             	
+       	             	document.getElementById("teacherList").innerHTML = "<ul>" + teacherClassSelections + "</ul>";
+                  	}
+                  	else {
+                  		alert("response data is null");
+                  	}
+            },
+            error : function(e) {
+            	alert("error");
+                console.log(e);
+            }
+        });
+	
+    	
     var tr = context.closest('tr')
     var row = $('#student_roster').DataTable().row( tr );
 
@@ -2188,16 +2322,19 @@ function registerAllEvents(){
             '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary"> <%= rb.getString("reset_password") %></button></div></form></div>';
 
 
-
-        var tabPanel = '<div style="width: 40%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
+        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass">New Class</label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
+            
+        var tabPanel = '<div style="width: 60%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
             '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> <%= rb.getString("update_student_information") %> </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("reset_password_for_student") %> </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> </div> </div>';
+            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
+            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
+            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="changeClass'+id+'">'+formHtmlChangeClass+'</div> </div> </div>';
 
         row.child(tabPanel).show();
       }
     }
     </script>
+    
         
     <script type="text/template" id="editStudentInfoDiv">
         <div style="width: 50%">
@@ -3120,8 +3257,9 @@ function registerAllEvents(){
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
-    </div>
-</div>
+    	</div>
+	</div>
+</div>	
 <!-- Modal -->
 
 

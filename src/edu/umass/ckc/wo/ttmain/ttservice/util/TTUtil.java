@@ -36,6 +36,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
  * Frank    11-28-20	issue #318 Sort by Student Fname - landingReportOne
  * Frank	12-26-20	Issue #329 changed topic query to refer to problemgroup_description_multi_language table
+ * Frank    03-15-21  	Issue #398 New feature to move student from one class to another - added getter for teacherClassList
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -51,6 +52,7 @@ public class TTUtil {
     public static final String REMOVE_FROM_CLASSOMITTED_PROBLEMS =  "DELETE FROM ClassOmittedProblems where classId=(:classId) and topicId=(:problemSetId)";
     public static final String INSERT_ON_CLASSOMITTED_PROBLEMS = "INSERT INTO ClassOmittedProblems (classId,topicId,probId) values (:classId, :topicId, :probId)";
     public static final String UPDATE_PASSWORD_FOR_STUDENT = "UPDATE STUDENT SET password=(:resetPassword) where id=(:studentId)";
+    public static final String UPDATE_CLASS_FOR_STUDENT = "UPDATE STUDENT SET classId=(:newClassId) where id=(:studentId)";
     public static final String UPDATE_STUDENT_INFO = "UPDATE STUDENT SET fname=(:fname),lname=(:lname),userName=(:uname) where id=(:studentId)";
     public static final String GET_STUDENTS_INFO_FOR_CLASS = "select s.id,s.fname,s.lname,s.userName,c.name from student s,class c where s.classId=c.id and s.classId=(:classId)";
     public static final String VALIDATE_STUDENT_PASSWORD_TO_DOWNLOAD = "select s.password from student s,class c where s.classId=c.id and s.classId=(:classId) order by s.id limit 1";
@@ -119,6 +121,7 @@ public class TTUtil {
     
     public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time DESC;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
+    public static final String TEACHER_CLASSLIST_QUERY ="select t.ID as teacherId, c.teacher as teacherName, c.id as classId, c.name as className from teacher t, class c where t.ID = (:teacherId) and t.ID = c.teacherId;";
 
     
     public static final String COUNT_STUDENTS_USING_CLASS = "select count(distinct h.studId), s.userName, s.classId from studentproblemhistory h, student s where h.studId = s.id and s.classId = ?";
