@@ -435,9 +435,10 @@ function addToTeacherList(item, index) {
 	var titem = "" + item;
 	var tlist = titem.split(",");
 
-	classChoices.push(titem);
-	
-	teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
+	if (tlist[2] != classID) {
+		classChoices.push(titem);	
+		teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
+	}
 }
 
 
@@ -2324,10 +2325,10 @@ function registerAllEvents(){
 
         var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass">New Class</label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
             
-        var tabPanel = '<div style="width: 60%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> <%= rb.getString("update_student_information") %> </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
-            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
+        var tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
+            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
+            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
+            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
             '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="changeClass'+id+'">'+formHtmlChangeClass+'</div> </div> </div>';
 
         row.child(tabPanel).show();
