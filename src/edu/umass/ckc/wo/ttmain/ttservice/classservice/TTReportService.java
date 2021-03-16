@@ -7,6 +7,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.TeacherClassListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
@@ -64,4 +65,7 @@ public interface TTReportService {
     public List<TeacherLogEntry> generateTeacherLogReport(String targetId);
 
     public List<TeacherListEntry> generateTeacherList(String targetId);
+
+    public List<TeacherClassListEntry> generateTeacherClassList(String targetId);
+    
 }
