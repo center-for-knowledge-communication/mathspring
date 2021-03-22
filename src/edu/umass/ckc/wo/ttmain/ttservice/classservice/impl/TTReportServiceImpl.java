@@ -78,6 +78,7 @@ import java.text.SimpleDateFormat;
  * Frank	12-03-20	fix xdays computation to go back to just after midnight to include the entire day
  * Frank	12-03-20	Issue #388 Landing Report Two - by date range
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another added
+ * Frank 	03-22-21  	Issue #391 change date selection to BETWEEN date range 
  */
 
 
@@ -498,15 +499,25 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public Map<String,PerClusterObjectBean> generatePerCommonCoreClusterReport(String teacherId, String classId, String filter, String teacherLoginType) {
 
-       	String logMsg = "";     
+       	     
 
-       	Timestamp ts = null;
-       	String filters[] = filter.split("~");
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
+    	
+    	String filters[] = filter.split("~");
     	String modFilter = "%";
-    	if (filter.length() > 1) {
-        	ts = xDaysAgoToDate(filters[1].trim());
-           	logMsg = "{ \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
+    	if (filter.length() > 0) {
+    		modFilter = filters[0].trim() + "%";
     	}
+
+    	if (filter.length() > 1) {
+    		String dateFilters[] = filters[1].split("thru");
+    		tsFromDate = convertFromDate(dateFilters[0].trim());
+    		tsToDate = convertToDate(dateFilters[1].trim());
+    	}
+		
+       	String logMsg = "{ \"dates\" : \"" +  filters[1].trim() + "\" }";     
+
 		if ("Normal".equals(teacherLoginType)) {
 	       	try {
 	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("commonCoreClusterReport"), logMsg);
@@ -515,14 +526,16 @@ public class TTReportServiceImpl implements TTReportService {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-    	
+		
+		
     	Map<String,PerClusterObjectBean> completeDataMap = new LinkedHashMap<>();
 //        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
 
         Map<String, Object> params = new HashMap<String, Object>();
   //      params.put("filter", modFilter);
         params.put("classId", classId);
-        params.put("ts", ts);
+        params.put("tsFromDate", tsFromDate);
+        params.put("tsToDate",tsToDate);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);        
         
         Map<String,PerClusterObjectBean> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STANDARD_QUERY_FIRST, namedParameters, (ResultSet mappedrow) -> {
@@ -958,15 +971,15 @@ public class TTReportServiceImpl implements TTReportService {
     
 
     	System.out.println("generateClassReportPerStudentPerProblemSet for class " + classId + "filter= " + filter);
-    	Timestamp ts = null;
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
+    	
     	String filters[] = filter.split("~");
     	String modFilter = "%";
     	if (filter.length() > 0) {
     		modFilter = filters[0].trim() + "%";
     	}
-    	if (filter.length() > 1) {
-        	ts = xDaysAgoToDate(filters[1].trim());
-    	}
+
     	if (filter.length() >= 2) {
     		if (filters[2].trim().equals("N")) {
     			showNames = "N";
@@ -975,8 +988,13 @@ public class TTReportServiceImpl implements TTReportService {
     			showNames = "Y";   			
     		}
     	}
-
-       	String logMsg = "{ \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
+    	if (filter.length() > 1) {
+    		String dateFilters[] = filters[1].split("thru");
+    		tsFromDate = convertFromDate(dateFilters[0].trim());
+    		tsToDate = convertToDate(dateFilters[1].trim());
+    	}
+    	
+       	String logMsg = "{ \"dates\" : \"" +  filters[1].trim() + "\" }";     
 
 		if ("Normal".equals(teacherLoginType)) {
 	       	try {
@@ -991,9 +1009,10 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
         params.put("classId", classId);
-        params.put("ts", ts);
+        params.put("tsFromDate", tsFromDate);
+        params.put("tsToDate", tsToDate);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);
-//        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
         Map<String, String> columnNamesMap = new LinkedHashMap<>();
@@ -1063,15 +1082,17 @@ public class TTReportServiceImpl implements TTReportService {
     public Map<String, Object> generateClassReportPerStudentPerProblem(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException {
 
     	System.out.println("generateClassReportPerStudentPerProblem for class " + classId + "filter= " + filter);
-    	Timestamp ts = null;
+    	
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
     	String filters[] = filter.split("~");
     	String modFilter = "%";
+
+    	
     	if (filter.length() > 0) {
     		modFilter = filters[0].trim() + "%";
     	}
-    	if (filter.length() > 1) {
-        	ts = xDaysAgoToDate(filters[1].trim());
-    	}
+    	
     	if (filter.length() >= 2) {
     		if (filters[2].trim().equals("N")) {
     			showNames = "N";
@@ -1081,7 +1102,14 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
+
+    	if (filter.length() > 1) {
+    		String dateFilters[] = filters[1].split("thru");
+    		tsFromDate = convertFromDate(dateFilters[0].trim());
+    		tsToDate = convertToDate(dateFilters[1].trim());
+    	}
+    	
+       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"dates\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
 
 		if ("Normal".equals(teacherLoginType)) {
 	       	try {
@@ -1091,12 +1119,15 @@ public class TTReportServiceImpl implements TTReportService {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-       	logger.debug("generateClassReportPerStudentPerProblem for class " + classId);
+
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
         params.put("classId", classId);
-        params.put("ts", ts);
+        params.put("tsFromDate", tsFromDate);
+        params.put("tsToDate", tsToDate);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+
+        
         
         Map<String, List<String>> finalMapLevelOne = new LinkedHashMap<>();
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
@@ -1227,13 +1258,15 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public String getMasterProjectionsForCurrentTopic(String classId, String studentId, String topicID, String filter) throws TTCustomException {
 
-    	Timestamp ts = null;
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
     	String filters[] = filter.split("~");
 
     	if (filter.length() > 1) {
-        	ts = xDaysAgoToDate(filters[1].trim());
-    	}
-    	
+    		String dateFilters[] = filters[1].split("thru");
+    		tsFromDate = convertFromDate(dateFilters[0].trim());
+    		tsToDate = convertToDate(dateFilters[1].trim());
+    	}    	
     	try {
             ObjectMapper objMapper = new ObjectMapper();
 /*
@@ -1248,7 +1281,8 @@ public class TTReportServiceImpl implements TTReportService {
             params.put("classId", classId);
             params.put("studId", studentId);
             params.put("topicId", topicID);
-            params.put("ts", ts);
+            params.put("tsFromDate", tsFromDate);
+            params.put("tsToDate", tsToDate);
             SqlParameterSource namedParameters = new MapSqlParameterSource(params);
 
 
@@ -1316,15 +1350,18 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public String generateReportForProblemsInCluster(String teacherId, String classId, String clusterId, String filter, String teacherLoginType) throws TTCustomException {
         try {
-           	String logMsg = "{ \"clusterId\" : \"" + clusterId + "\"}";     
+       	
+        	Timestamp tsFromDate = null;
+        	Timestamp tsToDate = null;
+        	String filters[] = filter.split("~");
 
-           	Timestamp ts = null;
-           	String filters[] = filter.split("~");
-        	String modFilter = "%";
         	if (filter.length() > 1) {
-            	ts = xDaysAgoToDate(filters[1].trim());
-               	logMsg = ", { \"clusterId\" : \"" + clusterId + "\", \"nbrofdays\" : \"" +  filters[1].trim() + "\" }";     
+        		String dateFilters[] = filters[1].split("thru");
+        		tsFromDate = convertFromDate(dateFilters[0].trim());
+        		tsToDate = convertToDate(dateFilters[1].trim());
         	}
+        	
+           	String logMsg = "{ \"clusterId\" : \"" + clusterId + "\", \"dates\" : \"" +  filters[1].trim() + "\" }";     
     		if ("Normal".equals(teacherLoginType)) {
     	       	try {
     	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("ProblemsInClusterReport"), logMsg);
@@ -1339,7 +1376,8 @@ public class TTReportServiceImpl implements TTReportService {
             Map<String, String> problemDescriptionMap = new LinkedHashMap<String, String>();
             selectParams.put("classId", classId);
             selectParams.put("clusterID", clusterId);
-            selectParams.put("ts", ts);
+            selectParams.put("tsFromDate", tsFromDate);
+            selectParams.put("tsToDate", tsToDate);
             List<String> problemIdsList = namedParameterJdbcTemplate.query(TTUtil.PER_STANDARD_QUERY_THIRD, selectParams, new RowMapper<String>() {
                 @Override
                 public String mapRow(ResultSet resultSet, int i) throws SQLException {
