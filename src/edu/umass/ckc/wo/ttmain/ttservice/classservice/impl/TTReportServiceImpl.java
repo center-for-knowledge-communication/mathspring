@@ -511,10 +511,27 @@ public class TTReportServiceImpl implements TTReportService {
     	}
 
     	if (filter.length() > 1) {
-    		String dateFilters[] = filters[1].split("thru");
-    		tsFromDate = convertFromDate(dateFilters[0].trim());
-    		tsToDate = convertToDate(dateFilters[1].trim());
+    		if (filters[1].equals("")) {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			
+    		}
+    		else {
+	    		String dateFilters[] = filters[1].split("thru");
+	    		if (dateFilters[0].length() > 1) {
+	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+	    		}
+	    		else {
+	    			tsFromDate = defaultFromDate();
+	    			tsToDate = defaultToDate();    		
+	    		}
+	    	}
     	}
+    	else {
+   			tsFromDate = defaultFromDate();
+   			tsToDate = defaultToDate();    		    			    		
+    	}
+
 		
        	String logMsg = "{ \"dates\" : \"" +  filters[1].trim() + "\" }";     
 
@@ -874,6 +891,10 @@ public class TTReportServiceImpl implements TTReportService {
     		tsFromDate = convertFromDate(dateFilters[0].trim());
     		tsToDate = convertToDate(dateFilters[1].trim());
     	}
+    	else {
+    		tsFromDate = defaultFromDate();
+    		tsToDate = defaultToDate();    		
+    	}
 		
         Map<String, Object> eventParams = new HashMap<String, Object>();
         eventParams.put("classId", classId);
@@ -988,11 +1009,28 @@ public class TTReportServiceImpl implements TTReportService {
     			showNames = "Y";   			
     		}
     	}
+
     	if (filter.length() > 1) {
-    		String dateFilters[] = filters[1].split("thru");
-    		tsFromDate = convertFromDate(dateFilters[0].trim());
-    		tsToDate = convertToDate(dateFilters[1].trim());
+    		if (filters[1].equals("")) {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			
+    		}
+    		else {
+	    		String dateFilters[] = filters[1].split("thru");
+	    		if (dateFilters[0].length() > 1) {
+	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+	    		}
+	    		else {
+	    			tsFromDate = defaultFromDate();
+	    			tsToDate = defaultToDate();    		
+	    		}
+	    	}
     	}
+    	else {
+   			tsFromDate = defaultFromDate();
+   			tsToDate = defaultToDate();    		    			    		
+    	}    	
     	
        	String logMsg = "{ \"dates\" : \"" +  filters[1].trim() + "\" }";     
 
@@ -1102,11 +1140,26 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-
     	if (filter.length() > 1) {
-    		String dateFilters[] = filters[1].split("thru");
-    		tsFromDate = convertFromDate(dateFilters[0].trim());
-    		tsToDate = convertToDate(dateFilters[1].trim());
+    		if (filters[1].equals("")) {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			
+    		}
+    		else {
+	    		String dateFilters[] = filters[1].split("thru");
+	    		if (dateFilters[0].length() > 1) {
+	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+	    		}
+	    		else {
+	    			tsFromDate = defaultFromDate();
+	    			tsToDate = defaultToDate();    		
+	    		}
+	    	}
+    	}
+    	else {
+   			tsFromDate = defaultFromDate();
+   			tsToDate = defaultToDate();    		    			    		
     	}
     	
        	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"dates\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
@@ -1263,10 +1316,27 @@ public class TTReportServiceImpl implements TTReportService {
     	String filters[] = filter.split("~");
 
     	if (filter.length() > 1) {
-    		String dateFilters[] = filters[1].split("thru");
-    		tsFromDate = convertFromDate(dateFilters[0].trim());
-    		tsToDate = convertToDate(dateFilters[1].trim());
-    	}    	
+    		if (filters[1].equals("")) {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			
+    		}
+    		else {
+	    		String dateFilters[] = filters[1].split("thru");
+	    		if (dateFilters[0].length() > 1) {
+	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+	    		}
+	    		else {
+	    			tsFromDate = defaultFromDate();
+	    			tsToDate = defaultToDate();    		
+	    		}
+	    	}
+    	}
+    	else {
+   			tsFromDate = defaultFromDate();
+   			tsToDate = defaultToDate();    		    			    		
+    	}
+    	
     	try {
             ObjectMapper objMapper = new ObjectMapper();
 /*
@@ -1356,9 +1426,25 @@ public class TTReportServiceImpl implements TTReportService {
         	String filters[] = filter.split("~");
 
         	if (filter.length() > 1) {
-        		String dateFilters[] = filters[1].split("thru");
-        		tsFromDate = convertFromDate(dateFilters[0].trim());
-        		tsToDate = convertToDate(dateFilters[1].trim());
+        		if (filters[1].equals("")) {
+           			tsFromDate = defaultFromDate();
+           			tsToDate = defaultToDate();    		    			
+        		}
+        		else {
+    	    		String dateFilters[] = filters[1].split("thru");
+    	    		if (dateFilters[0].length() > 1) {
+    	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+    	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+    	    		}
+    	    		else {
+    	    			tsFromDate = defaultFromDate();
+    	    			tsToDate = defaultToDate();    		
+    	    		}
+    	    	}
+        	}
+        	else {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			    		
         	}
         	
            	String logMsg = "{ \"clusterId\" : \"" + clusterId + "\", \"dates\" : \"" +  filters[1].trim() + "\" }";     
@@ -1913,6 +1999,42 @@ public class TTReportServiceImpl implements TTReportService {
 		return ts;
     }
 
+    private Timestamp defaultFromDate() {
+		Timestamp ts = null;
+		
+		Date currentDate = new Date();
+		// convert date to calendar
+		Calendar c = Calendar.getInstance();
+		c.setTime(currentDate);
+
+		c.add(Calendar.DAY_OF_MONTH,-365);
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 1);
+		// convert calendar to date
+		Date xDate = c.getTime();
+		ts = new Timestamp(xDate.getTime());
+		return ts;
+    }
+
+    private Timestamp defaultToDate() {
+		Timestamp ts = null;
+		
+		int xDays = 365;
+		Date currentDate = new Date();
+		// convert date to calendar
+		Calendar c = Calendar.getInstance();
+		c.setTime(currentDate);
+		c.set(Calendar.HOUR_OF_DAY, 23);
+		c.set(Calendar.MINUTE, 59);
+		c.set(Calendar.SECOND, 1);
+		// convert calendar to date
+		Date xDate = c.getTime();
+		ts = new Timestamp(xDate.getTime());
+		return ts;
+    }
+
+ 
     private Timestamp convertFromDate(String filter) {
 		Timestamp ts = null;
 

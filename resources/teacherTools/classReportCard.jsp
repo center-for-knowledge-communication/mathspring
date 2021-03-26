@@ -203,7 +203,7 @@ var perProblemSetColumnNamesMap;
 var perProblemSetLevelOneAvg;
 var perProblemSetLevelOneMax;
 var perProblemSetLevelOneLatest;
-var filterOne = "~365~Y";
+var filterOne = "~~Y";
 
 //Report6
 var perStudentperProblemReport;
@@ -220,7 +220,9 @@ var perProblemReportTable
 var perClusterReportTable
 
 //Report4 variables
-var filterFour = "~~"
+var filterFour = "~~";
+
+
 
 //Report5 Varribales
 var perStudentReport;
@@ -317,29 +319,41 @@ function getFilterSix() {
 		}	
 
 		document.getElementById("daysFilterSix").value = fromDate + " thru " + toDate;
+		filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterSix;
+		document.getElementById("downloadReportSixBtn").href = a_href;
+		
 	}
-
-	filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterSix").value = "";
+			filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterSix;
+			document.getElementById("downloadReportSixBtn").href = a_href;
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		}
+	}
 	
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterSix;
-	document.getElementById("downloadReportSixBtn").href = a_href;
 }
 
 function getFilterOne() {
 
 	document.getElementById("daysFilterOne").value = "";
 	
-	var showNamesState = "N";
-	if (document.getElementById("showNamesOne").checked == true) {
-		showNamesState = "Y";
-	}
-
 	var d1 = parseInt(document.getElementById("selectDay_r1_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay_r1_cal1").value);
 
@@ -366,18 +380,34 @@ function getFilterOne() {
 		}	
 
 		document.getElementById("daysFilterOne").value = fromDate + " thru " + toDate;
-	}	
-
-	filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
-
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterOne;
-	document.getElementById("downloadReportOneBtn").href = a_href;
+		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
+	
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterOne;
+		document.getElementById("downloadReportOneBtn").href = a_href;
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterOne").value = "";
+			filterOne = "~" + "" + "~" + "Y";			
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterOne;
+			document.getElementById("downloadReportOneBtn").href = a_href;
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+		}
+	}
 }
 
 function getFilterFour() {
@@ -408,31 +438,58 @@ function getFilterFour() {
 			fromDate = toDate;
 			toDate = temp;
 		}	
-		daysFilterFour = fromDate + "thru" + toDate;
+		
 		document.getElementById("daysFilterFour").value = fromDate + " thru " + toDate;
-	}	
-
-	filterFour = "~" + daysFilterFour + "~" + "Y";
+		
 	
+		filterFour = "~" + document.getElementById("daysFilterFour").value + "~" + "Y";		
+		
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterFour;
+		document.getElementById("downloadReportFourClusterBtn").href = a_href;
 	
-	
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterFour;
-	document.getElementById("downloadReportFourClusterBtn").href = a_href;
-
-	a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterFour;
-	document.getElementById("downloadReportFourProblemBtn").href = a_href;
+		a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterFour;
+		document.getElementById("downloadReportFourProblemBtn").href = a_href;
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterFour").value= "";	
+		
+			filterFour = "~" + "" + "~" + "Y";		
+			
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterFour;
+			document.getElementById("downloadReportFourClusterBtn").href = a_href;
+		
+			a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterFour;
+			document.getElementById("downloadReportFourProblemBtn").href = a_href;	
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+		}
+	}
 }
 
 function ftest(problemId) {
@@ -1849,12 +1906,6 @@ var completeDataChart;
 
     $('#showReportOneBtn').on('click', function ()  {    	
         $('#collapseOne').find('.loader').show();
-        var showNamesState = "N";
-        if (document.getElementById("showNamesOne").checked == true) {
-        	showNamesState = "Y";
-        }
-        filterOne=document.getElementById("standardsFilterOne").value + "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
-
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2324,7 +2375,7 @@ var completeDataChart;
                     { "title": "<%= rb.getString("problem_id")%>", "name" : "problemId" , "targets" : [0]},
                     { "title": "<%= rb.getString("problem_name")%>", "name" : "problemName" , "targets" : [1],"render": function ( data, type, full, meta ) {
                             var problemId = full['problemId'];
-                            var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                            var attri = ", '<%= rb.getString("problem_preview")%>'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                              var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                             return '<a  onclick="window.open('+window+');" style="cursor:pointer" rel="popoverPerProblem" data-img="' + problemImageMap[problemId] + '">' + data + '</a>';
                     }},
@@ -2458,7 +2509,7 @@ var completeDataChart;
    
         getFilterFour();
         $('#collapseFourLoader').show();
-        filterFour=document.getElementById("standardsFilterFour").value + "~" + document.getElementById("daysFilterFour").value;
+
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2814,7 +2865,7 @@ var completeDataChart;
                             "targets": [1],
                             "render": function (data, type, full, meta) {
                                 var problemId = full['problemId'];
-                                var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                                var attri = ", '<%= rb.getString("problem_preview")%>'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                                 var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                                 var imageURL = problem_imageURL+full['problemId']+'.jpg';
                                 return '<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+problemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
@@ -3127,6 +3178,7 @@ var completeDataChart;
             Report Card for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
+
         <div id="content-conatiner" class="container-fluid">
 
 				<div id="loading_spinner" style="display: none">
@@ -3297,10 +3349,6 @@ var completeDataChart;
 
                         <div id="collapseOne" class="panel-collapse collapse">
                             <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
-                            <div class="panel-body report_filters hidden">                           
-								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilterOne" style="width:48px" type="text" name="" value="" onblur="getFilterOne();">
-							</div>
                             <div class="panel-body report_filters">                           
 	                        	<div id="chooseDateRange" class="row">
 	                        		<div class="col-md-2 offset-md-1">                       
@@ -3311,9 +3359,6 @@ var completeDataChart;
 					                </div>
 	 							</div>
 	 						</div>  
-                            <div class="panel-body report_filters hidden">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
-                            </div>
                             <div class="panel-body report_filters">                           
 								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
 								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
@@ -3497,7 +3542,7 @@ var completeDataChart;
 			     <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal1" name="selectDay_r6_cal1">
-   				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
@@ -3536,7 +3581,7 @@ var completeDataChart;
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal2" name="selectDay_r6_cal2">
-				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
@@ -3597,7 +3642,7 @@ var completeDataChart;
 			     <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal1" name="selectDay_r1_cal1">
-   				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
@@ -3636,7 +3681,7 @@ var completeDataChart;
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal2" name="selectDay_r1_cal2">
-				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
@@ -3697,7 +3742,7 @@ var completeDataChart;
 			     <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal1" name="selectDay_r4_cal1">
-   				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
@@ -3736,7 +3781,7 @@ var completeDataChart;
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal2" name="selectDay_r4_cal2">
-				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
 			          <div class="button-container-calendar">
 			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
        							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
