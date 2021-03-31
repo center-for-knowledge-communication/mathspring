@@ -79,6 +79,7 @@ import java.text.SimpleDateFormat;
  * Frank	12-03-20	Issue #388 Landing Report Two - by date range
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another added
  * Frank 	03-22-21  	Issue #391 change date selection to BETWEEN date range 
+ * Frank 	03-31-21  	Issue #418 add student selection filter for to perStudentPerProblem report 
  */
 
 
@@ -96,6 +97,7 @@ public class TTReportServiceImpl implements TTReportService {
     private static Logger logger = Logger.getLogger(TTReportServiceImpl.class);
 	private ResourceBundle rb = null;
 	private String showNames = "Y";
+	private String selectedStudent = "";
 	private Locale ploc;
 
     @Override
@@ -1140,6 +1142,10 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
+    	if (filter.length() >= 3) {
+    		selectedStudent = filters[3].trim();
+    	}
+    		
     	if (filter.length() > 1) {
     		if (filters[1].equals("")) {
        			tsFromDate = defaultFromDate();
@@ -1162,7 +1168,7 @@ public class TTReportServiceImpl implements TTReportService {
    			tsToDate = defaultToDate();    		    			    		
     	}
     	
-       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"dates\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\" }";     
+       	String logMsg = "{ \"standard\" : \"" + filters[0].trim() + "\", \"dates\" : \"" +  filters[1].trim() + "\", \"shownames\" : \"" + showNames + "\", \"student\" : \"" + selectedStudent + "\" }";     
 
 		if ("Normal".equals(teacherLoginType)) {
 	       	try {
@@ -1191,7 +1197,10 @@ public class TTReportServiceImpl implements TTReportService {
 
         Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_PER_PROBLEM, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
-                String studentId = ((String) mappedrow.getString("studId")).trim();
+            	String studentId = ((String) mappedrow.getString("studId")).trim();
+                if ((!selectedStudent.equals("")) && (!selectedStudent.equals(studentId) )) {
+                	continue;
+                }
                 Integer problemId = mappedrow.getInt("problemId");
                 String strProblemId = String.valueOf(problemId);
                 String effort = mappedrow.getString("effort");
@@ -1243,7 +1252,8 @@ public class TTReportServiceImpl implements TTReportService {
                 }
                 //List<String> noOfProblemsSolved = shHistory.getTopicProblemsSolved(problemSetId);
                 //List<String> noOfProblemsSolvedOnFirstAttempt = shHistory.getTopicProblemsSolvedOnFirstAttempt(problemSetId);
-                */ 
+                */
+                
                 if (finalMapLevelOne.containsKey(studentId)) {
                     studentValuesList = finalMapLevelOne.get(studentId);
                     tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
