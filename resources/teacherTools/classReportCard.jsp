@@ -31,6 +31,7 @@
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
 <!-- Frank 12-26-20  	Issue #329 fix errors from splitting classDetails.jsp -->
 <!-- Frank 03-22-21  	Issue #391 change date selection to date range popups -->
+<!-- Frank 03-31-21  	Issue #418 add student dropdown and put selection in  filter -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -194,7 +195,7 @@ System.out.println("msHost = " + msHost + msContext);
  * Frank    02-17-20    ttfixesR3
  */
  
- 
+var studentList; 
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -283,6 +284,43 @@ else {
     }
 }
 
+
+function getStudentList() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentList = response;
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+
+var studentSelectionList = "";
+function populateStudentSelectionListSix() {
+	
+	var studentsArr = studentList.split(",");	
+
+	studentSelectionList = "<select name='students' id='studentsSix' size='5' style='width:220px' >"; 	
+	studentsArr.forEach(addStudent);
+	studentSelectionList += "</select>";
+	document.getElementById("studentSelectionListSix").innerHTML=studentSelectionList; 
+
+}
+
+function addStudent(item, index) {
+		var sArr = item.split("~");
+		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1] + "</option>";	
+	}
+
 function getFilterSix() {
 	
 	document.getElementById("daysFilterSix").value = "";
@@ -292,7 +330,8 @@ function getFilterSix() {
 		showNamesState = "Y";
 	}
 
-	
+	var selectedStudent =  document.getElementById("studentsSix").value;
+
 	var d1 = parseInt(document.getElementById("selectDay_r6_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay_r6_cal1").value);
 
@@ -320,6 +359,11 @@ function getFilterSix() {
 
 		document.getElementById("daysFilterSix").value = fromDate + " thru " + toDate;
 		filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+		
+		if (selectedStudent.length > 0) {
+			filterSix += "~" + selectedStudent;	
+		}
+		
 		var a_href = '${pageContext.request.contextPath}';
 		a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
 		a_href = a_href + teacherID;
@@ -334,6 +378,10 @@ function getFilterSix() {
 		if ((d1 + d2) == 0) {
 			document.getElementById("daysFilterSix").value = "";
 			filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+
+			if (selectedStudent.length > 0) {
+				filterSix += "~" + selectedStudent;	
+			}
 			var a_href = '${pageContext.request.contextPath}';
 			a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
 			a_href = a_href + teacherID;
@@ -2093,8 +2141,14 @@ var completeDataChart;
         if (document.getElementById("showNamesSix").checked == true) {
         	showNamesState = "Y";
         }
+
         filterSix=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
-        
+ 
+    	var selectedStudent =  document.getElementById("studentsSix").value;
+		if (selectedStudent.length > 0) {
+			filterSix += "~" + selectedStudent;	
+		}
+		
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -3054,6 +3108,7 @@ var completeDataChart;
             $("#content-conatiner").children().hide();
             $("#splash_page").show();
 
+            getStudentList();
             getFilterOne();
             getFilterFour();
             getFilterSix();
@@ -3437,6 +3492,16 @@ var completeDataChart;
 					                </div>
 	                        		<div class="col-md-3">                       
 									    <input id="daysFilterSix" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>  
+	
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseStudents" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListSix();" ><%= rb.getString("choose_student") %></button>
+					                </div>
+	                        		<div id="studentSelectionListSix" name="studentSelectionListSix" class="col-md-5">                       
 					                </div>
 	 							</div>  
 	
@@ -3829,6 +3894,42 @@ var completeDataChart;
     	</div>
 	</div>
 </div>	
+
+
+<div id="studentsModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-students col-sm-6">
+			      <div class="container-calendar">
+			          
+			          <div class="footer-container-calendar">
+			              <label for="studentsSix">Select Students: </label>
+						  <select name='students' id='studentsSix' size='5' multiple>;
+			              </select>
+     
+			          </div>
+			      </div>			      
+			    </div> 
+            </div>
+
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="alert('Hello');" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#studentsModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
 <!-- Modal -->
 
 
