@@ -7,6 +7,7 @@ import org.springframework.ui.ModelMap;
 
 import java.util.List;
 
+
 /**
  * Created by nsmenon on 4/14/2017.
  */
@@ -31,4 +32,6 @@ public interface TTProblemsViewService {
     public boolean saveSurveySettingsForClass(String[] prePostToActivate, Integer classId) throws TTCustomException;
     
     public String isClassInUse(String classId);
+    
+    public String getStudentList(String classId);
 }
