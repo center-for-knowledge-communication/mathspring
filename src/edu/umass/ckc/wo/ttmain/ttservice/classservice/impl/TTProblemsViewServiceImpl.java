@@ -45,7 +45,7 @@ import edu.umass.ckc.wo.smgr.User;
  * Frank	01-03-21	Issue #329R2 Update topic elements with multi-ligual values 
  * Frank	01-16-21	Issue #368 Edit profile should not allow dups
  * Frank    03-15-21  	Issue #398 New feature to move student from one class to another
- * Frank    04-01-21  	Issue #418 getStudentList
+ * Frank    04-01-21  	Issue #418 getStudentList()
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
