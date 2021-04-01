@@ -56,6 +56,7 @@ import javax.servlet.http.HttpSession;
  * Frank	01-03-21	issue #329R2 pass lang param to viewProblemSetsInGivenProblem()
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another - added changeStudentClass method
+ * Frank 	04-01-21  	Issue #418 getStudentList()
  */
 
 @Controller
@@ -410,6 +411,12 @@ public class TeacherToolsViewClassDetailsController {
     	tLogger.logEntryWorker(intTeacherId, intSessionId, classId, action, activityName);
     	return "success";
 
+    }
+
+    @RequestMapping(value = "/tt/getStudentList", method = RequestMethod.POST)
+    public @ResponseBody
+    String getStudentList(@RequestParam(value = "classId") String classId) {
+    	return pvService.getStudentList(classId);
     }
 
    
