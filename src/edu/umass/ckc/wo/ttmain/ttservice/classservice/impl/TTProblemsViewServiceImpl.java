@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Locale;
@@ -31,6 +32,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
 
+import edu.umass.ckc.wo.smgr.User;
+
 /**
  * Created by nsmenon on 4/14/2017.
  * 
@@ -42,6 +45,7 @@ import edu.umass.ckc.wo.tutor.Settings;
  * Frank	01-03-21	Issue #329R2 Update topic elements with multi-ligual values 
  * Frank	01-16-21	Issue #368 Edit profile should not allow dups
  * Frank    03-15-21  	Issue #398 New feature to move student from one class to another
+ * Frank    04-01-21  	Issue #418 getStudentList()
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -332,5 +336,34 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         }
     }
 
-    
+    public String getStudentList(String classId) {
+    	
+    	String result = "";
+  		List<User> theList = null;
+        try {
+        	theList = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId.trim()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        int count = 0;
+        ListIterator iterator = theList.listIterator();
+        if (iterator.hasNext()) {        	
+	        while (iterator.hasNext()) {
+	        	User u = (User) iterator.next();
+	        	if (count > 0) {
+	        		result += ",";
+	        	}
+	        	else {
+	        		count++;	        		
+	        	}
+	        	result += u.getUname() + "~" + u.getLname() + "~" + u.getFname() + "~" + String.valueOf(u.getId());    	
+	        }
+	        
+        }
+        else {
+        	result = "No Data found";
+        }
+        return result;
+    }    
 }
