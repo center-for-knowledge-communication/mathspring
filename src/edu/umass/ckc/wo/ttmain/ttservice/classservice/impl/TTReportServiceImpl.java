@@ -1142,8 +1142,11 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-    	if (filter.length() >= 3) {
+    	if (filter.length() > 3) {
     		selectedStudent = filters[3].trim();
+    	}
+    	else {
+    		selectedStudent = "";
     	}
     		
     	if (filter.length() > 1) {
