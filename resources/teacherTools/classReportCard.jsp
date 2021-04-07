@@ -32,6 +32,7 @@
 <!-- Frank 12-26-20  	Issue #329 fix errors from splitting classDetails.jsp -->
 <!-- Frank 03-22-21  	Issue #391 change date selection to date range popups -->
 <!-- Frank 03-31-21  	Issue #418 add student dropdown and put selection in  filter -->
+<!-- Frank 03-31-21  	Issue #418R4 add paging, padding and legend control -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -284,7 +285,16 @@ else {
     }
 }
 
-
+function hideLegend() {
+    $("#hideLegendBtn").hide();
+    $("#showLegendBtn").show();
+    $("#perStudentPerProblemLegend").hide();
+}
+function showLegend() {
+    $("#showLegendBtn").hide();
+    $("#hideLegendBtn").show();
+    $("#perStudentPerProblemLegend").show();
+}
 function getStudentList() {
 	
     $.ajax({
@@ -2052,7 +2062,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
-
+                    "fixedColumns": {
+                        "leftColumns": 2,
+                        "heightMatch": 'auto'                        
+                    },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -2103,7 +2116,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
-                   
+                    "fixedColumns": {
+                        "leftColumns": 2,
+                        "heightMatch": 'auto'                        
+                    },                   
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -2166,9 +2182,12 @@ var completeDataChart;
                 perStudentperProblemLevelOne = jsonData.levelOneData;               
                 perStudentPerProblemColumnNamesMap = jsonData.columns;
                 perStudentPerProblemXrefMap = jsonData.IdXref;
+                var problemImageWindow = [];
  
                 var txt="";
                 var abbr="";
+
+                var popover = "popoverTop";
                 var indexcolumn = 3;
                 var columNvalues = $.map(perStudentPerProblemColumnNamesMap, function (v) {
                         var temp = {
@@ -2179,10 +2198,19 @@ var completeDataChart;
                                     $(td).text("");
                                     return;
                                 }
-
+                                
+                                var trow = row % 16;
+								if (trow > 8) {
+									popover = "popoverTop";
+								}
+								else {
+									popover = "popoverBottom";
+								}
+								
                                 var cellArray = cellData.split("^");
                                 var cellEffort = cellArray[0];
                                 var cellDate   = cellArray[1];
+                                var cellProblemId   = cellArray[2];
 								
                                 if ((cellData == null) || (cellData == "null")) {
                                 	cellData = " ";
@@ -2191,55 +2219,65 @@ var completeDataChart;
                                 else if (cellEffort == "SKIP") {                                	
                                 	txt = "<%= rb.getString("skip")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SKIP');
                                 }
                                 else if (cellEffort == "NOTR") {
                                 	txt = "<%= rb.getString("notr")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
-                                	$(td).addClass('p-NOTR');
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
+                                	$(td).addClass('p-NOTR');                                                                    
                                 }
                                 else if (cellEffort == "GIVEUP") {
                                 	txt = "<%= rb.getString("giveup")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-GIVEUP');
                                 }
                                 else if (cellEffort == "SOF") {
                                 	txt = "<%= rb.getString("sof")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
-                                	$(td).addClass('p-SOF');
+                                	var imageURL = problem_imageURL+cellProblemId+'.jpg';
+//                                	$(td).html('<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+cellProblemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + '<p>' + abbr[0] + ' ' + cellDate + '</p>' + '</a>');
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
+                                    $(td).addClass('p-SOF');                             
                                 }
                                 else if (cellEffort == "ATT") {
                                 	txt = "<%= rb.getString("att")%>";
                                     var abbr = txt.split(":");2
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-ATT');
                                 }
                                 else if (cellEffort == "GUESS") {
                                 	txt = "<%= rb.getString("guess")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-GUESS');
                                 }
                                 else if (cellEffort == "SHINT") {
                                 	txt = "<%= rb.getString("shint")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SHINT');
                                 }
                                 else if (cellEffort == "SHELP") {
                                 	txt = "<%= rb.getString("shelp")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + ""+abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SHELP');
                                 }
                                 else if (cellEffort == "NODATA") {
                                 	txt = "<%= rb.getString("no_data")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-NODATA');
                                 }
                                 else {
@@ -2291,7 +2329,8 @@ var completeDataChart;
                     },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
-                    "bPaginate": false,
+                    "bPaginate": true,
+                    "pageLength": 16,
                     "language": {
                             "sProcessing":     "Procesando...",
                             "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -2330,7 +2369,22 @@ var completeDataChart;
                             trigger : 'hover',
                             placement: 'bottom'
                         });
-
+                        $('a[rel=popoverTop]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $('a[rel=popoverBottom]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'bottom',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
                     },
                     headerCallback: function headerCallback(thead, data, start, end, display) {
 						var str = thead.cells.length;
@@ -2354,7 +2408,8 @@ var completeDataChart;
                     },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
-                    "bPaginate": false,
+                    "bPaginate": true,
+                    "pageLength": 16,
                     "scrollX": true,
                     "scrollY": "600px",
                     "scrollCollapse": true,                    
@@ -2369,7 +2424,22 @@ var completeDataChart;
                             trigger : 'hover',
                             placement: 'bottom'
                         });
-
+                        $('a[rel=popoverTop]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $('a[rel=popoverBottom]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'bottom',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
                     },
                      headerCallback: function headerCallback(thead, data, start, end, display) {
 						var str = thead.cells.length;
@@ -3512,10 +3582,12 @@ var completeDataChart;
                             <div class="panel-body report_filters">                           
 								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
 								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
+								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
+								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
                             </div>
                             <div class="panel-body">
                                 <div class="loader" style="display: none"></div>
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
+                                <table id="perStudentPerProblemLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
                                     <thead>
                                     <tr>
                                         <th><%= rb.getString("student_effort")%>:</th>
