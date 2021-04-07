@@ -80,6 +80,7 @@ import java.text.SimpleDateFormat;
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another added
  * Frank 	03-22-21  	Issue #391 change date selection to BETWEEN date range 
  * Frank 	03-31-21  	Issue #418 add student selection filter for to perStudentPerProblem report 
+ * Frank 	03-31-21  	Issue #418R4 add paging, padding -->
  */
 
 
@@ -1245,6 +1246,8 @@ public class TTReportServiceImpl implements TTReportService {
                 
                 List<String> studentValuesList = null;
                 List<String> tempProblemDescriptionList = null;
+                
+                
                 /*
                 StudentProblemHistory shHistory = null;
                 try {
@@ -1256,12 +1259,12 @@ public class TTReportServiceImpl implements TTReportService {
                 //List<String> noOfProblemsSolved = shHistory.getTopicProblemsSolved(problemSetId);
                 //List<String> noOfProblemsSolvedOnFirstAttempt = shHistory.getTopicProblemsSolvedOnFirstAttempt(problemSetId);
                 */
-                
+
                 if (finalMapLevelOne.containsKey(studentId)) {
                     studentValuesList = finalMapLevelOne.get(studentId);
                     tempProblemDescriptionList = finalMapLevelOneTemp.get(studentId);
 //                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
-                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate );
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate + "^" + strProblemId );
                     tempProblemDescriptionList.add(description.trim().replace(" ", ""));
                 } else {
                     studentValuesList = new ArrayList<>();
@@ -1276,11 +1279,11 @@ public class TTReportServiceImpl implements TTReportService {
                     	studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
                     }
 //                    studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
-                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate );
+                    studentValuesList.add(description.trim().replace(" ", "") + "~~~" + effort + "^" + problemDate + "^" + strProblemId );
                     tempProblemDescriptionList.add(description.trim().replace(" ", ""));
                 }
 
-                String strDebug = "[" + mappedrow.getString("studentName") + " " + studentId + " " + strProblemId + " " + description + " " + effort + " " + strBeginTime + " " + problemDate + "]";
+                String strDebug = "[" + mappedrow.getString("studentName") + " " + studentId + " " + strProblemId + " " + description + " " + effort + " " + strBeginTime + " " + problemDate + " " + strProblemId  + "]";
             	System.out.println(strDebug);
 
                 columnNamesMap.put(problemId.toString(), description);
@@ -1290,6 +1293,24 @@ public class TTReportServiceImpl implements TTReportService {
             }
             return finalMapLevelOne;
         });
+        int finalMapLevelOneCount = finalMapLevelOne.size();
+
+        List<String> dummyStudentValuesList = null;
+        List<String> dummyTempProblemDescriptionList = null;
+        int padCount = (finalMapLevelOneCount % 16);
+        if (padCount < 16) {
+    		dummyStudentValuesList = new ArrayList<>();
+            dummyTempProblemDescriptionList = new ArrayList<>();
+        	for (int i=0; i < (16 - padCount); i++) {
+                dummyStudentValuesList.add("studentName" + "~~~" + "_");
+                dummyStudentValuesList.add("userName" + "~~~" +" ");
+                dummyStudentValuesList.add("padEffort^0^0");
+                dummyTempProblemDescriptionList.add("padEffort^0^0");
+                String dummyId = String.valueOf(i+999990);
+                finalMapLevelOne.put(dummyId, dummyStudentValuesList);
+                finalMapLevelOneTemp.put(dummyId, dummyTempProblemDescriptionList);        		
+        	}
+        }
         finalMapLevelOne.forEach((studentId, studentDetails) -> {
             //Map<String, String> selectParams = new LinkedHashMap<String, String>();
             //selectParams.put("classId", classId);
