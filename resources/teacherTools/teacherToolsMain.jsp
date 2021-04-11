@@ -281,6 +281,7 @@ catch (Exception e) {
             	$("#pause-status").show();            
             else 
             	$("#pause-status").hide();
+        	$("#no-refresh-msg").hide();            
             registerAllEvents();
             handleclickHandlers();
         });
@@ -336,8 +337,10 @@ catch (Exception e) {
         	
     		document.getElementById("passwordToken").value = "useClass";
         	var pwd = document.getElementById("passwordToken").value;
+       		$("#no-refresh-msg").show();
        		alert("<%= rb.getString("add_students_to_roster_instructions") %>");
-    	    $('#form-wrapper').find('.loader').show();
+        	$("#form-wrapper").hide();
+    	    $('#page-content-wrapper').find('.loader').show();
     	}
         
 /* 
@@ -939,12 +942,20 @@ function registerAllEvents(){
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
+       	<div class="loader" style="display: none" ></div>               
         <div id="content-conatiner" class="container-fluid">
             <div id="pause-status">
             	<div class="row">
                  <h1 class="tt-paused-logins-message">
                  	<%= rb.getString("student_logins_are_paused") %>
                  </h1>
+                 </div>
+            </div>
+            <div id="no-refresh-msg">
+            	<div class="row">
+                 <h1 class="tt-paused-logins-message">
+					<%= rb.getString("do_not_reload_page") %>                 
+				</h1>
                  </div>
             </div>
         
@@ -957,12 +968,12 @@ function registerAllEvents(){
 		                    action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherEdit"
 		            >
 		                <div class="form-group">
-		                    <label class="control-label col-sm-6" for="first_name">Student Logins are: </label>
+		                    <label class="control-label col-sm-6" for="first_name"><%= rb.getString("student_logins_are") %>: </label>
 		                    <div class="col-sm-3">
 		                        <input type="text" name="fname" class="form-control" id="first_name" value="paused">
 		                    </div>
 		                    <div class="col-sm-3">
-		                        <button type="submit" class="btn btn-default pull-right btn-block teacher-button">resume</button>
+		                        <button type="submit" class="btn btn-default pull-right btn-block teacher-button"><%= rb.getString("resume") %></button>
 		                    </div>
 		                </div><!-- form-group -->
 		            </form>
@@ -989,10 +1000,8 @@ function registerAllEvents(){
                 </div>
                 <!-- /.row -->
                 <c:if test="${noClass == false}">
-                <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
 
                 <c:forEach var="c" items="${classbean.classes}" varStatus="loop">
-                <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
                 <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
                 <c:set var="terminator" value="${loop.index + 3}"/>
                 <div class="row">
@@ -1002,8 +1011,7 @@ function registerAllEvents(){
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa ${thumbNailPicker[randomChartIndex]}
-										fa-5x"></i>
+                                        <i class="fa fa-bar-chart fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
@@ -1049,9 +1057,7 @@ function registerAllEvents(){
                     </div>
          </div>
           <c:if test="${noClass == false}">
-                <c:set var="thumbNailPicker" value="${['fa-bar-chart','fa-area-chart','fa-pie-chart','fa-line-chart']}"/>
                 <c:forEach var="c" items="${classbeanArchived.classes}" varStatus="loop">
-                <c:set var="randomChartIndex" value="${random.nextInt(fn:length(thumbNailPicker))}"/>
                 <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
                 <c:set var="terminator" value="${loop.index + 3}"/>
                 <div class="row">
@@ -1061,8 +1067,7 @@ function registerAllEvents(){
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa ${thumbNailPicker[randomChartIndex]}
-										fa-5x"></i>
+                                        <i class="fa fa-bar-chart fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
