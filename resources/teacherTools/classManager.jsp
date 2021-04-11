@@ -371,7 +371,7 @@ function getFilterLandingTwo() {
 
 	}
 	else{
-		alert('Must select both from and to dates');
+		alert('<%= rb.getString("must_select_a_day_from_each_calender")%>');
 		$('#calendarModalPopup').modal('show');
 	}
 
@@ -3189,18 +3189,18 @@ function registerAllEvents(){
 			          <div class="footer-container-calendar">
 			              <label for="month"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month" onchange="jump()">
-			                  <option value=0>Jan</option>
-			                  <option value=1>Feb</option>
-			                  <option value=2>Mar</option>
-			                  <option value=3>Apr</option>
-			                  <option value=4>May</option>
-			                  <option value=5>Jun</option>
-			                  <option value=6>Jul</option>
-			                  <option value=7>Aug</option>
-			                  <option value=8>Sep</option>
-			                  <option value=9>Oct</option>
-			                  <option value=10>Nov</option>
-			                  <option value=11>Dec</option>
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year" onchange="jump()">
 			                  <option value=2020>2020</option>
@@ -3228,18 +3228,18 @@ function registerAllEvents(){
 			          <div class="footer-container-calendar">
 			              <label for="month_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_cal2" onchange="jump_cal2()">
-			                  <option value=0>Jan</option>
-			                  <option value=1>Feb</option>
-			                  <option value=2>Mar</option>
-			                  <option value=3>Apr</option>
-			                  <option value=4>May</option>
-			                  <option value=5>Jun</option>
-			                  <option value=6>Jul</option>
-			                  <option value=7>Aug</option>
-			                  <option value=8>Sep</option>
-			                  <option value=9>Oct</option>
-			                  <option value=10>Nov</option>
-			                  <option value=11>Dec</option>
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_cal2" onchange="jump_cal2()">
 			                  <option value=2020>2020</option>
