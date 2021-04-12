@@ -371,7 +371,7 @@ function getFilterLandingTwo() {
 
 	}
 	else{
-		alert('<%= rb.getString("must_select_a_day_from_each_calender")%>');
+		alert("<%= rb.getString("must_select_a_day_from_each_calendar")%>");
 		$('#calendarModalPopup').modal('show');
 	}
 
