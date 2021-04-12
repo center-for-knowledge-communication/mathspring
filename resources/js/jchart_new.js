@@ -223,7 +223,7 @@ var Chart = {
 
                 case "GIVEUP":
                     table.className ="giveupCard";
-                    effortFeedback = languageSet == "es" ? "Abandonaste, dejase de trabajar en este problema" : "You gave up this problem.";
+                    effortFeedback = languageSet == "es" ? "Abandonaste, dejase de trabajar en este problema" : "You gave up on this problem.";
                     cell.innerHTML="_";
                     break;
 
