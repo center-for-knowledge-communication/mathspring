@@ -98,14 +98,14 @@ public class ClassContentSelector {
             if (simpleLC.equals("none"))
                 p = getPedagogyByName("No Learning Companion");
             else if (simpleLC.equals("male"))
-                p = getPedagogyByName("Jake Full Empathy");
+                p = getPedagogyByName("Jake Learning Companion");
             else if (simpleLC.equals("female"))
-                p = getPedagogyByName("Jane Full Empathy");
+                p = getPedagogyByName("Jane Learning Companion");
             // if they want both, given them Jane semi and Jake full empathy
             else if (simpleLC.equals("both")) {
                 p = getPedagogyByName("Jane Semi Empathy");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Jake Full Empathy");
+                p = getPedagogyByName("Jake Learning Companion");
             }
             DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
         }
