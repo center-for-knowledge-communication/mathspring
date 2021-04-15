@@ -82,7 +82,8 @@ catch (Exception e) {
         var globals = {
                 mouseSaveInterval: ${mouseSaveInterval},
                 mouseHistory: [],
-                sessionId: ${sessionId}
+                sessionId: ${sessionId},
+                timeInSession: ${timeInSession}
             }
 
         var sysGlobals = {
@@ -250,6 +251,7 @@ catch (Exception e) {
             initiate() ;
             renderProgressPage();
             addComments();
+            startSessionClock(globals.timeInSession);
 
             $("#searchlink").click(function(){
                 $(".dropdown_contentBox").toggle();
@@ -514,6 +516,12 @@ catch (Exception e) {
                 </c:choose>
             </li>
             <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
+            <li class="nav-item">
+            	<a href="#" class="huytran-practice__navitem--clock huytran-practice__navitem--last"> <span
+						class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
+							aria-hidden="true"></i>
+						</span> <span id="session_clock"></span> </a>
+            </li>
         </nav>
     </div><!-- wrapper -->
 </header>

@@ -43,7 +43,8 @@ catch (Exception e) {
         var globals = {
             mouseSaveInterval: ${mouseSaveInterval},
             mouseHistory: [],
-            sessionId: ${sessionId}
+            sessionId: ${sessionId},
+            timeInSession: ${timeInSession}
         }
 
         var sysGlobals = {
@@ -99,6 +100,7 @@ catch (Exception e) {
 
 
             chart.init();
+            startSessionClock(globals.timeInSession);
             chart.giveFeedbackAndPlant(
                 null,
                 "plant_"+topicId,
@@ -169,6 +171,12 @@ catch (Exception e) {
             <a href="#">
                 <i class="fa fa-volume-up"></i>
             </a>
+        </li>
+        <li class="nav__item" id="sessionclock">
+        	<a href="#" class="huytran-practice__navitem--clock huytran-practice__navitem--last"> <span
+						class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
+							aria-hidden="true"></i>
+			</span> <span id="session_clock"></span> </a>
         </li>
         <div class="slider-wrapper">
             <div class="play-button">

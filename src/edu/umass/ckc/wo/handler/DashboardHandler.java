@@ -112,6 +112,7 @@ public class DashboardHandler {
 
         request.setAttribute("mouseSaveInterval", smgr.getMouseSaveInterval());
         request.setAttribute("gritServletContext","gritms");
+        request.setAttribute("timeInSession", smgr.getTimeInSession());
         String servContext= request.getContextPath();
         if (servContext != null && servContext.length()>1)
             servContext=servContext.substring(1);    // strip off the leading /
