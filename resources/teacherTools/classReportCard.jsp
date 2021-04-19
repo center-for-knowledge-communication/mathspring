@@ -3322,6 +3322,84 @@ var completeDataChart;
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
                 <div class="panel-group" id="accordion">
+                
+                
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
+                                    <%= rb.getString("perStudentPerProblemReport") %>
+                                </a>
+                               	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="collapseSix" class="panel-collapse collapse">                
+                            <div class="panel-body report_filters">                           
+								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r6_cal1();initCalendar_r6_cal2();$('#calendarModalPopupSix').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysFilterSix" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>  
+	
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseStudents" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListSix();" ><%= rb.getString("choose_student") %></button>
+					                </div>
+	                        		<div id="studentSelectionListSix" name="studentSelectionListSix" class="col-md-5">                       
+					                </div>
+	 							</div>  
+	
+							</div>
+                            <div class="panel-body report_filters">
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+                            </div>
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
+								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
+								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
+                            </div>
+                            <div class="panel-body">
+                                <div class="loader" style="display: none"></div>
+                                <table id="perStudentPerProblemLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("student_effort")%>:</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
+                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
+                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
+                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
+                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
+                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
+                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
+                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
+                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="perStudentPerProblemReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>                
+                
+                
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -3540,79 +3618,6 @@ var completeDataChart;
 
 
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
-                                    <%= rb.getString("perStudentPerProblemReport") %>
-                                </a>
-                               	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-
-                        <div id="collapseSix" class="panel-collapse collapse">                
-                            <div class="panel-body report_filters">                           
-								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
-							</div>
-	                        <div class="panel-body report_filters">
-	                        	<div id="chooseDateRange" class="row">
-	                        		<div class="col-md-2 offset-md-1">                       
-					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r6_cal1();initCalendar_r6_cal2();$('#calendarModalPopupSix').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-					                </div>
-	                        		<div class="col-md-3">                       
-									    <input id="daysFilterSix" style="width:220px" type="text" name="" value="" >   
-					                </div>
-	 							</div>  
-	
-							</div>
-	                        <div class="panel-body report_filters">
-	                        	<div id="chooseStudents" class="row">
-	                        		<div class="col-md-2 offset-md-1">                       
-					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListSix();" ><%= rb.getString("choose_student") %></button>
-					                </div>
-	                        		<div id="studentSelectionListSix" name="studentSelectionListSix" class="col-md-5">                       
-					                </div>
-	 							</div>  
-	
-							</div>
-                            <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
-                            </div>
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
-								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
-								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
-                            </div>
-                            <div class="panel-body">
-                                <div class="loader" style="display: none"></div>
-                                <table id="perStudentPerProblemLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
-                                    <thead>
-                                    <tr>
-                                        <th><%= rb.getString("student_effort")%>:</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
-                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
-                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
-                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
-                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
-                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
-                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
-                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
-                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="panel-body">
-                                <table id="perStudentPerProblemReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
-                            </div>
-
-                        </div>
-                    </div>
 
 
 
