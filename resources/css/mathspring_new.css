@@ -121,9 +121,14 @@ body {
   color: #003364;
 }
 
+
 .huytran-practice__navitem:hover {
   background: #92DDA3;
   cursor: pointer;
+}
+
+.huytran-practice__navitem--clock:hover {
+  cursor: default;
 }
 
 .huytran-practice__navitem:active {

@@ -22,6 +22,7 @@ import javax.servlet.RequestDispatcher;
  * Time: 1:43 PM
  * To change this template use File | Settings | File Templates.
  * Frank	10-07-20  Issue #261 change problem header
+ * Kartik 04-22-21 Issue #390 Added session clock functionality
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)

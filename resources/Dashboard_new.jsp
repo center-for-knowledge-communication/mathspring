@@ -4,6 +4,21 @@
 <%@ page import="java.util.ResourceBundle"%>
 <% 
 
+/**
+* Kartik 04-22-21 Issue #390 Added session clock functionality
+
+*/
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+}
+
 Locale loc = request.getLocale();
 String lang = loc.getDisplayLanguage();
 
@@ -24,7 +39,7 @@ catch (Exception e) {
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
     <link rel="manifest" href="manifest.json">
-
+    <link href="css/Dashboard_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
     <link href="sass_compiled/dashboard.css" rel="stylesheet" type="text/css" />
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart_new.js"></script>
@@ -173,8 +188,7 @@ catch (Exception e) {
             </a>
         </li>
         <li class="nav__item" id="sessionclock">
-        	<a href="#" class="huytran-practice__navitem--clock huytran-practice__navitem--last"> <span
-						class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
+        	<a href="#" class="session-clock-item"> <span> <i class="fa fa-clock-o"
 							aria-hidden="true"></i>
 			</span> <span id="session_clock"></span> </a>
         </li>

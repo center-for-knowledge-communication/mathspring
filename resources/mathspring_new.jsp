@@ -11,7 +11,7 @@
 // Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 // Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
 // Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
-
+// Kartik 04-22-21 Issue #390 Added session clock functionality
 
 ResourceBundle versions = null; 
 try {
@@ -57,6 +57,8 @@ catch (Exception e) {
 <link
 	href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css"
 	rel="stylesheet">
+<link href="css/mathspring_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
+
 
 <%
 if (lang.equals("es")) {

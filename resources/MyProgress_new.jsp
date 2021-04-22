@@ -6,6 +6,7 @@
 /**
 * Frank 05-18-2020 Commented out obsolete code which would not compile properly
 * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+* Kartik 04-22-21 Issue #390 Added session clock functionality
 
 */
 ResourceBundle versions = null; 
@@ -515,10 +516,9 @@ catch (Exception e) {
                     </c:otherwise>
                 </c:choose>
             </li>
-            <li class="nav-item nav-item--last"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
-            <li class="nav-item">
-            	<a href="#" class="huytran-practice__navitem--clock huytran-practice__navitem--last"> <span
-						class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
+            <li class="nav-item"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
+            <li class="nav-item nav-item--last">
+            	<a href="#" class="session-clock-item"> <span> <i class="fa fa-clock-o"
 							aria-hidden="true"></i>
 						</span> <span id="session_clock"></span> </a>
             </li>

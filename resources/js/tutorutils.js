@@ -4,6 +4,8 @@
  * Date: 6/12/13
  * Time: 2:42 PM
  * To change this template use File | Settings | File Templates.
+
+* Kartik 04-22-21 Issue #390 Added session clock functionality
  */
 
 function debugAlert(msg) {

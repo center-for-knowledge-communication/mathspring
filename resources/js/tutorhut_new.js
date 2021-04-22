@@ -6,6 +6,7 @@
 // Frank 12-26-20 Issue #329 translate topic name using lang variable
 // Frank 01-13-21 Issue #354 fix topicName formatting
 // Frank 01-16-21 Issue #357 fix topicName formatting
+// Kartik 04-22-21 Issue #390 Removed previous display of current time in the problems screen
 
 var globals;
 var sysGlobals;

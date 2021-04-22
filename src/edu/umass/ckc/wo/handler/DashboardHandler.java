@@ -28,6 +28,9 @@ import java.util.List;
  * Date: 8/16/12
  * Time: 3:30 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Kartik 04-22-21 Issue #390 Added session clock functionality
+ * 
  */
 public class DashboardHandler {
     private ServletContext sc;
