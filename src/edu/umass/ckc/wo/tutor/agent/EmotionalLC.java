@@ -7,6 +7,7 @@ import edu.umass.ckc.wo.tutor.response.AttemptResponse;
 import edu.umass.ckc.wo.tutormeta.StudentModel;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.event.tutorhut.InputResponseEvent;
+import edu.umass.ckc.wo.interventions.ChangeGUIIntervention;
 import edu.umass.ckc.wo.event.tutorhut.ContinueEvent;
 import edu.umass.ckc.wo.event.tutorhut.AttemptEvent;
 
@@ -20,6 +21,8 @@ import java.sql.SQLException;
  * Date: Jul 24, 2008
  * Time: 11:04:18 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	04-26-21	Issue# 432 - In processAttempt() don't play LC clip if processing an intervention like ShowVideo or ShowExample
  */
 public abstract class EmotionalLC extends BaseLearningCompanion
 {
@@ -324,10 +327,11 @@ public abstract class EmotionalLC extends BaseLearningCompanion
         StudentState state = smgr.getStudentState();
         // N.B. The Pedagogical Model that calls this must grade the user input and set the isCorrect value
         // within the AttemptEvent - we no longer rely on what Flash passes for isCorrect
-        //If it is an irncorrect response.
+        //If it is an incorrect response.
         if ( ! attemptEvent.isCorrect())   {
-            if ( smgr.getStudentState().getNumAttemptsOnCurProblem() == 2 ) { //Only the first time
-                // If there was No Effort: chosen incorrectly, fast, on the first attempt
+        	ChangeGUIIntervention tIntervention = (ChangeGUIIntervention) r.getIntervention();
+        	if (tIntervention == null) { //Only if not processing an intervention
+            	// If there was No Effort: chosen incorrectly, fast, on the first attempt
                 if ( java.lang.Math.random() > .5 ) {//state.getProbElapsedTime() < LOWEFFORT_TIME_THRESHOLD ) {
                     r=getIncorrectNoEffortResponse(r, smgr) ;
                     getBestClip(clips);

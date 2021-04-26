@@ -46,6 +46,8 @@ import java.util.List;
  * Date: 11/14/13
  * Time: 12:59 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	04-26-21	Issue# 432 - In processAttempt() don't play LC clip if processing an intervention like ShowVideo or ShowExample
  */
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 
@@ -234,6 +236,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         if (intervention == null) {
 //            studentModel.studentAttempt(smgr.getStudentState(), e.getUserInput(), isCorrect, e.getProbElapsedTime());
             r = new AttemptResponse(isCorrect, studentModel.getTopicMasteries(),smgr.getStudentState().getCurTopic());
+            if (learningCompanion != null )
+                learningCompanion.processAttempt(smgr,e, r);
         }
         else if (r == null) {
             // record this attempt.  We will need to send back information about its correctness
@@ -241,10 +245,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
             attemptGraded(isCorrect); // inform pedagogical move listeners that an intervention is given
             r = new AttemptResponse(isCorrect,intervention, studentModel.getTopicMasteries(),
                     smgr.getStudentState().getCurTopic()) ;
+            if (learningCompanion != null )
+                learningCompanion.processAttempt(smgr,e, r);
         }
 
-        if (learningCompanion != null )
-            learningCompanion.processAttempt(smgr,e, r);
         new TutorLogger(smgr).logAttempt(e, r);
         return r;
     }
