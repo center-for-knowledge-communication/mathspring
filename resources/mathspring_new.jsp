@@ -11,7 +11,7 @@
 // Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 // Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
 // Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
-
+// Kartik 04-22-21 Issue #390 Added session clock functionality
 
 ResourceBundle versions = null; 
 try {
@@ -57,6 +57,8 @@ catch (Exception e) {
 <link
 	href="js/jquery-ui-1.10.4.custom/css/spring/jquery-ui-1.10.4.custom.min.css"
 	rel="stylesheet">
+<link href="css/mathspring_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
+
 
 <%
 if (lang.equals("es")) {
@@ -146,6 +148,7 @@ else
             lastProbType: '${lastProbType}',
             isBeginningOfSession: ${isBeginningOfSession},
             sessionId: ${sessionId},
+            timeInSession: ${timeInSession},
             elapsedTime: ${elapsedTime},
             probElapsedTime: 0,
             clock: 0,
@@ -237,6 +240,8 @@ else
             } else {
                 $(".dev-view").show();
             }
+            
+        	startSessionClock(globals.timeInSession);
 
             // Adjust the width of the character window
             var srcCompanion = $('#learningCompanionWindow').attr('src');
@@ -396,10 +401,6 @@ label {
 					</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("view_log") %></span>
 					</a>
 				</c:if>
-				<a href="#" class="huytran-sitenav__button" id="video"> <span
-					class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
-						aria-hidden="true"></i>
-				</span> <span id="clock"></span>
 				</a> <label class="huytran-sitenav__showmore-trigger" for="post">
 				</label>
 			</div>
@@ -411,11 +412,16 @@ label {
 					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> <a
 						class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> <a
 						class="huytran-practice__navitem" href="#"><%= rb.getString("practice_area") %></a>
-				<a class="huytran-practice__navitem huytran-practice__navitem--last"
+						
+				<a class="huytran-practice__navitem"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
 					<%= rb.getString("log_out") %> &nbsp; 
 					<span class="fa fa-sign-out"></span>
 				</a>
+				<a href="#" class="huytran-practice__navitem--clock huytran-practice__navitem--last"> <span
+						class="huytran-sitenav__icon"> <i class="fa fa-clock-o"
+							aria-hidden="true"></i>
+						</span> <span id="session_clock"></span> </a>
 				</div>				
 			</div>
 

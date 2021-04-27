@@ -850,3 +850,18 @@ textarea {
     cursor: pointer;
 }
 
+.session-clock-item {
+	width: 130px;
+	display: block;
+	padding: 0px !important;
+}
+
+.nav__item a.session-clock-item:hover {
+  cursor: default;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.nav__item a.session-clock-item span{
+  padding-right: 0px;
+}

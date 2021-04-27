@@ -4,6 +4,8 @@
  * Date: 6/12/13
  * Time: 2:42 PM
  * To change this template use File | Settings | File Templates.
+
+* Kartik 04-22-21 Issue #390 Added session clock functionality
  */
 
 function debugAlert(msg) {
@@ -198,4 +200,26 @@ function utilDialogOpen (url, title, html) {
     $("#"+UTIL_DIALOG_IFRAME).attr("src",url);
     $("#"+UTIL_DIALOG).dialog("open");
 
+}
+
+function startSessionClock(curTime) {
+	var seconds = Math.floor(curTime/1000);
+	var minutes = Math.floor(seconds/60);
+	var hours = Math.floor(minutes/60);
+	
+	minutes = minutes-(hours*60);
+	seconds = seconds-(hours*60*60)-(minutes*60);
+    
+	seconds = checkTime(seconds);
+	minutes = checkTime(minutes);
+	hours = checkTime(hours);
+	document.getElementById('session_clock').innerHTML = hours + ":" + minutes + ":" + seconds;
+	curTime = curTime + 1000;
+    var t = setTimeout(startSessionClock.bind(this, curTime), 1000);
+
+}
+
+function checkTime(i) {
+    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+    return i;
 }
