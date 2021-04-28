@@ -12,8 +12,6 @@ import java.util.List;
  * User: david
  * Date: Dec 29, 2008
  * Time: 12:24:50 PM
- * 
- * Frank	04-26-21	Issue# 432 - support for processAttempt() to not play LC clip if processing an intervention like ShowVideo or ShowExample
  */
 public class AttemptResponse extends Response {
     private boolean isCorrect;
@@ -45,10 +43,7 @@ public class AttemptResponse extends Response {
 
     }
 
-    public Intervention getIntervention() {
-    	return this.intervention;
-    }
-    
+
     public JSONObject buildJSON() {
         jsonObject = new JSONObject();
         jsonObject.element("isCorrect", isCorrect);
