@@ -4,8 +4,6 @@
  * Date: 11/15/13
  * Time: 3:08 PM
  * To change this template use File | Settings | File Templates.
- * 
- * Frank	04-26-21	Issue# 432 - add ShowVideoIntervention and ShowExampleIntervention to processAttemptIntervention() 
  */
 
 function processNextProblemIntervention(activityJSON) {
@@ -92,14 +90,6 @@ function processAttemptIntervention (interv) {
         checkIfInputIntervention(interv);
         if (changeGUIIntervention)
             processChangeGUIIntervention(interv);
-        if (type === 'ShowVideoIntervention') {
-            updateTimers();
-            servletGet("ShowVideo",{probElapsedTime: globals.probElapsedTime },processShowVideo);
-        }
-        else if (type === 'ShowExampleIntervention') {
-            updateTimers();
-            servletGet("ShowExample",{probElapsedTime: globals.probElapsedTime },processShowExample);
-        }
         else if (type === 'HighlightHintButton')
             highlightHintButton();
         else if (type === 'RapidAttemptIntervention')
