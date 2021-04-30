@@ -471,14 +471,15 @@ background-color: #FF4766;
 }
 
 .pspp-modal-dialog {
-          width: 200px;
-          height: 100px !important;
+          width: 500px;
+          height: 300px !important;
         }
 .pspp-modal-content {
     /* 80% of window height */
 
     height: 60%;
-    background-color:#DADADA;
+    background-color:white;
+    color:black;
 }        
 .pspp-modal-header {
 

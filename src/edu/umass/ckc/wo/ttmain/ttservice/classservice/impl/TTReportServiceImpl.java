@@ -81,6 +81,8 @@ import java.text.SimpleDateFormat;
  * Frank 	03-22-21  	Issue #391 change date selection to BETWEEN date range 
  * Frank 	03-31-21  	Issue #418 add student selection filter for to perStudentPerProblem report 
  * Frank 	03-31-21  	Issue #418R4 add paging, padding -->
+ * Frank 	04-30-21  	Fix filter parsing
+ *  Frank 	04-30-21  	Send problem nickname to perStudentPerproblem report
  */
 
 
@@ -509,11 +511,11 @@ public class TTReportServiceImpl implements TTReportService {
     	
     	String filters[] = filter.split("~");
     	String modFilter = "%";
-    	if (filter.length() > 0) {
+    	if (filters.length > 0) {
     		modFilter = filters[0].trim() + "%";
     	}
 
-    	if (filter.length() > 1) {
+    	if (filters.length > 1) {
     		if (filters[1].equals("")) {
        			tsFromDate = defaultFromDate();
        			tsToDate = defaultToDate();    		    			
@@ -889,7 +891,7 @@ public class TTReportServiceImpl implements TTReportService {
     	Timestamp tsToDate = null;
     	
     	String filters[] = filter.split("~");
-    	if (filter.length() > 1) {    		
+    	if (filters.length > 1) {    		
     		String dateFilters[] = filters[1].split("thru");
     		tsFromDate = convertFromDate(dateFilters[0].trim());
     		tsToDate = convertToDate(dateFilters[1].trim());
@@ -1000,11 +1002,11 @@ public class TTReportServiceImpl implements TTReportService {
     	
     	String filters[] = filter.split("~");
     	String modFilter = "%";
-    	if (filter.length() > 0) {
+    	if (filters.length > 0) {
     		modFilter = filters[0].trim() + "%";
     	}
 
-    	if (filter.length() >= 2) {
+    	if (filters.length >= 2) {
     		if (filters[2].trim().equals("N")) {
     			showNames = "N";
     		}
@@ -1013,7 +1015,7 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
 
-    	if (filter.length() > 1) {
+    	if (filters.length > 1) {
     		if (filters[1].equals("")) {
        			tsFromDate = defaultFromDate();
        			tsToDate = defaultToDate();    		    			
@@ -1130,11 +1132,11 @@ public class TTReportServiceImpl implements TTReportService {
     	String modFilter = "%";
 
     	
-    	if (filter.length() > 0) {
+    	if (filters.length > 0) {
     		modFilter = filters[0].trim() + "%";
     	}
     	
-    	if (filter.length() >= 2) {
+    	if (filters.length >= 2) {
     		if (filters[2].trim().equals("N")) {
     			showNames = "N";
     		}
@@ -1143,14 +1145,14 @@ public class TTReportServiceImpl implements TTReportService {
     		}
     	}
     		
-    	if (filter.length() > 3) {
+    	if (filters.length > 3) {
     		selectedStudent = filters[3].trim();
     	}
     	else {
     		selectedStudent = "";
     	}
     		
-    	if (filter.length() > 1) {
+    	if (filters.length > 1) {
     		if (filters[1].equals("")) {
        			tsFromDate = defaultFromDate();
        			tsToDate = defaultToDate();    		    			
@@ -1222,8 +1224,20 @@ public class TTReportServiceImpl implements TTReportService {
                 if (effort.equals("NoData") ) {
                 	continue;
                 }
+
                 String description = ((String) mappedrow.getString("description")).trim();
                 description = description.replace(".", "_");
+
+                String nickname = ((String) mappedrow.getString("nickname"));
+                if (nickname == null) {
+                	nickname = "???";
+                }
+                if (nickname.length() > 0) {
+                	nickname = nickname.trim();
+                	nickname = nickname.replace(".", "_");                }
+                else {
+                	nickname = description;
+                }
                 
                 Timestamp beginTime = mappedrow.getTimestamp("problemBeginTime");
                 
@@ -1241,7 +1255,8 @@ public class TTReportServiceImpl implements TTReportService {
                 String URI = Settings.probPreviewerPath;
                 String html5ProblemURI = Settings.html5ProblemURI;
 
-                descriptionIdMap.put(description,strProblemId);
+                String prob_nickname = strProblemId + "^" + nickname;
+                descriptionIdMap.put(description,prob_nickname);
                 
                 
                 List<String> studentValuesList = null;
@@ -1349,7 +1364,7 @@ public class TTReportServiceImpl implements TTReportService {
     	Timestamp tsToDate = null;
     	String filters[] = filter.split("~");
 
-    	if (filter.length() > 1) {
+    	if (filters.length > 1) {
     		if (filters[1].equals("")) {
        			tsFromDate = defaultFromDate();
        			tsToDate = defaultToDate();    		    			
@@ -1459,7 +1474,7 @@ public class TTReportServiceImpl implements TTReportService {
         	Timestamp tsToDate = null;
         	String filters[] = filter.split("~");
 
-        	if (filter.length() > 1) {
+        	if (filters.length > 1) {
         		if (filters[1].equals("")) {
            			tsFromDate = defaultFromDate();
            			tsToDate = defaultToDate();    		    			

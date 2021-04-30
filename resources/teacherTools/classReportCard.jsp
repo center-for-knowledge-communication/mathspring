@@ -33,6 +33,7 @@
 <!-- Frank 03-22-21  	Issue #391 change date selection to date range popups -->
 <!-- Frank 03-31-21  	Issue #418 add student dropdown and put selection in  filter -->
 <!-- Frank 03-31-21  	Issue #418R4 add paging, padding and legend control -->
+<!-- Frank 03-31-21  	Issue #418 display problem nickname when column header is clicked -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -213,6 +214,7 @@ var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
 var filterSix = "~~Y";
+
 //var urlColumnNames;
 
 //Report2 Varriables
@@ -320,16 +322,28 @@ function populateStudentSelectionListSix() {
 	var studentsArr = studentList.split(",");	
 
 	studentSelectionList = "<select name='students' id='studentsSix' size='5' style='width:220px' >"; 	
-	studentsArr.forEach(addStudent);
+	studentsArr.forEach(addStudent1);
+	studentsArr.forEach(addStudent2);
 	studentSelectionList += "</select>";
 	document.getElementById("studentSelectionListSix").innerHTML=studentSelectionList; 
 
 }
 
-function addStudent(item, index) {
-		var sArr = item.split("~");
-		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1] + "</option>";	
+function addStudent1(item, index) {
+	var sArr = item.split("~");
+	if ((sArr[2].length + sArr[1].length) > 0) {
+		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
 	}
+}
+
+function addStudent2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+
 
 function getFilterSix() {
 	
@@ -550,24 +564,13 @@ function getFilterFour() {
 	}
 }
 
-function ftest(problemId) {
-	var tmp1 = '<img style="display: block; margin: 0 auto; max-width:400px; max-height:400px;" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
-    var tmp2 = '.jpg" />';
-    var tmp3 = tmp1 + problemId + tmp2;
-    $('#perStudentPerProblemImage').empty();
-    $('#perStudentPerProblemImage').append(tmp3);
-    
-    document.getElementById("perStudentPerProblemImageHdr").textContent = "";
-    var tmp;
-    var strProblemId = "" + problemId;
-    for (const Desc in perStudentPerProblemXrefMap) {
-    	tmp = "" + perStudentPerProblemXrefMap[Desc];
-    	if (tmp === strProblemId) {
-    		document.getElementById("perStudentPerProblemImageHdr").textContent = "" + Desc;
-    		break;
-    	}
-    }
-    
+function nicknameOpen(problemName) {
+
+    var tmpProblemName = "" + problemName;
+    var tmp = perStudentPerProblemXrefMap[tmpProblemName];
+    var tmpArr = tmp.split("^");
+	document.getElementById("perStudentPerProblemImageHdr").textContent = "<%= rb.getString("problem_id")%>" + ": " + tmpProblemName;
+	document.getElementById("perStudentPerProblemContent").textContent = "" + tmpArr[1];
 	$("#ModalPopupProblem").modal('show');
 }
 
@@ -2391,9 +2394,8 @@ var completeDataChart;
 						var i = 2;
 						for (i=2;i<thead.cells.length;i++) {
 							var inner = "" + thead.cells[i].innerText;
-							var problemId = perStudentPerProblemXrefMap[inner];
-							var t_html = "<div class='btn btn-primary btn-sm' onclick='ftest(" + problemId + ");'>" + inner + "</div>";
-	    							$(thead).find('th').eq(i).html(t_html);							
+							var t_html = "<div class='btn btn-primary btn-sm' onclick='nicknameOpen(\"" + inner + "\");' >" + inner + "</div>";
+	    					$(thead).find('th').eq(i).html(t_html);							
 						}
                      }                    
                 });
@@ -2446,9 +2448,8 @@ var completeDataChart;
 						var i = 2;
 						for (i=2;i<thead.cells.length;i++) {
 							var inner = "" + thead.cells[i].innerText;
-							var problemId = perStudentPerProblemXrefMap[inner];
-							var t_html = "<div class='btn btn-primary btn-sm' onclick='ftest(" + problemId + ");'>" + inner + "</div>";
-	    							$(thead).find('th').eq(i).html(t_html);							
+							var t_html = "<div class='btn btn-primary btn-sm' onclick='nicknameOpen(\"" + inner + "\");' >" + inner + "</div>";
+							$(thead).find('th').eq(i).html(t_html);							
 						}
                      }
 	            });
@@ -4057,11 +4058,11 @@ var completeDataChart;
 <div id="ModalPopupProblem" class="modal fade" role="dialog" style="display: none;">
     <div class="pspp-modal-dialog modal-md modal-dialog-centered">
         <!-- Modal content-->
-        <div class="pspp-modal-content perStudentperProblem-modal-content">
+        <div class="pspp-modal-content ">
             <div class="pspp-modal-header">
             	<span id="perStudentPerProblemImageHdr" class="modal-title"></span></div>
             <div>
-            	<div id="perStudentPerProblemImage" ></div>
+            	<div id="perStudentPerProblemContent" ></div>
             </div>
         </div>
 

@@ -42,7 +42,7 @@ catch (Exception e) {
     <link href="css/Dashboard_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
     <link href="sass_compiled/dashboard.css" rel="stylesheet" type="text/css" />
     <script src="js/jquery-1.10.2.js"></script>
-    <script src="js/jchart_new.js"></script>
+    <script src="js/jchart_new.js?ver=<%=versions.getString("js_version")%>"></script>
     <script src="js/huy-slider.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
     <script src="js/bootstrap/js/language_es.js"></script>
