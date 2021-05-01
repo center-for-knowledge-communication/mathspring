@@ -34,6 +34,7 @@
 <!-- Frank 03-31-21  	Issue #418 add student dropdown and put selection in  filter -->
 <!-- Frank 03-31-21  	Issue #418R4 add paging, padding and legend control -->
 <!-- Frank 03-31-21  	Issue #418 display problem nickname when column header is clicked -->
+<!-- Frank 05-01-21  	Hide survey selection and panel -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -3292,7 +3293,7 @@ var completeDataChart;
 
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=manage_class_handler" id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=resetSurveySettings_handler" id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
+            <!-- <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=resetSurveySettings_handler" id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li> -->
             
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=content_apply_handler" id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
         </ul>
@@ -3618,13 +3619,7 @@ var completeDataChart;
                     </div>
 
 
-
-
-
-
-
-
-					<div class="panel panel-default">
+					<div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
