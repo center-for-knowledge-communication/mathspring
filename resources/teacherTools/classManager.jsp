@@ -41,6 +41,7 @@
 <!-- Frank 01-05-21  	Issue #366 blank screen after adding student -->
 <!-- Frank 03-05-21  	Issue #388 Landing page report by date range -->
 <!-- Frank 03-15-21  	Issue #398 New feature to move student from one class to another -->
+<!-- Frank 05-01-21  	Hide survey selection -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2408,7 +2409,7 @@ function registerAllEvents(){
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
-            <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
+<!--             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li> -->
             
              <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
