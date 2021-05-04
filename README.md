@@ -25,13 +25,26 @@ It will go smoother for you if you make sure your commits are small and commente
 Mathspring developers: Clone the repository on your local machine.
    - On Windows use Git Bash/  Linux use CLI git.  Mac Users are on your own.
    - cd to dir where you want it
-   - git clone git@github.com:nsmenon/mathspring-V2.git
+   - git clone https://github.com/center-for-knowledge-communication/mathspring.git
 
+2. You will need to install Tomcat (apache-tomcat-9.0.35 is the latest version) and configure eclipse to find its installation directory.  You will also need Java runtime environment. For a MAC OSX you will need the whole Java Development Kit. 
 
-2. You will need to install Tomcat 8 (apache-tomcat-8.0.53 recommended) and configure eclipse to find its installation directory.
+Useful video for installing Java on a MAC, and updating  path variables:
 
-3.  Make sure your Eclipse project points at the correct Java JDK 
+https://www.youtube.com/watch?v=sNYvYTmOGhU
+
+3.  Install Eclipse. Make sure your Eclipse project points at the correct Java JDK 
 (vers 8 or higher - same with the language level because of lambdas in use)
+
+A few videos that were useful for installing Eclipse for the MAC:
+https://www.youtube.com/watch?v=CL36-szyr1c
+
+There is a Video here where Ankit explains how to set up Eclipse with Maven and Tomcat and the database:
+https://drive.google.com/drive/u/0/folders/1QdoEQaZ1iBiVH0J6bGjFv6BiZ9xHQDoY
+
+We got an error at the end, as apparently it needed Java 8 and no later.
+See here how to install an older version of Java on a MAC:
+https://support.planwithvoyant.com/hc/en-us/articles/209725003-Install-or-revert-to-a-prior-version-of-Java-Mac-OS-X
 
 4.  Project dependencies are managed by Maven so you will want to make sure you have the eclipse with maven plugin installed.
 The project is maintained as a single module (pom.xml) with all the dependencies and plugins configured under them.You should make changes to the Project's pom.xml unless you
