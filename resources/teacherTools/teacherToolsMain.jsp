@@ -24,6 +24,7 @@
  *	Frank	12-18-20	Issue #336 added cache-busting for selected .js and .css files
  *  Frank 	01-05-21  	Issue #302 teacher username only alpha and numeric characters
  *  Frank 	02-14-21  	Issue #303R1 added teacher feedback on teacher tools
+ *  Frank 	05-04-21  	ms-fixes-042921 - removed onclick event from create class submit button
 */
 
  System.out.println("teacherToolsMain starting");
@@ -281,7 +282,6 @@ catch (Exception e) {
             	$("#pause-status").show();            
             else 
             	$("#pause-status").hide();
-        	$("#no-refresh-msg").hide();            
             registerAllEvents();
             handleclickHandlers();
         });
@@ -332,16 +332,6 @@ catch (Exception e) {
         	  }
         	}
         
-        
-        function displayCreateRosterInstructions() {
-        	
-    		document.getElementById("passwordToken").value = "useClass";
-        	var pwd = document.getElementById("passwordToken").value;
-       		$("#no-refresh-msg").show();
-       		alert("<%= rb.getString("add_students_to_roster_instructions") %>");
-        	$("#form-wrapper").hide();
-    	    $('#page-content-wrapper').find('.loader').show();
-    	}
         
 /* 
         function myFunction() {
@@ -951,13 +941,6 @@ function registerAllEvents(){
                  </h1>
                  </div>
             </div>
-            <div id="no-refresh-msg">
-            	<div class="row">
-                 <h1 class="tt-paused-logins-message">
-					<%= rb.getString("do_not_reload_page") %>                 
-				</h1>
-                 </div>
-            </div>
         
         <div id="pause-wrapper" style="display: none;">
     		<div vertical-center">
@@ -1253,7 +1236,7 @@ function registerAllEvents(){
                                     <span class="input-group-addon"><i
                                             class="glyphicon glyphicon-blackboard"></i></span>
                                         <springForm:input path="className" id="className" name="className"
-                                                          class="form-control" type="text"/>
+                                                          class="form-control" type="text" required="required" />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -1444,9 +1427,21 @@ function registerAllEvents(){
                     </div>
                 </div>
                 <div style="text-align:center;">
-                    <button role="button" type="submit" class="btn btn-primary" onclick="displayCreateRosterInstructions();"><%= rb.getString("create_class") %></button>
+                    <button role="button" type="submit" class="btn btn-primary btn-lg" ><%= rb.getString("create_class") %></button>
                 </div>
             </springForm:form>
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    <small><%= rb.getString("add_students_to_roster_instructions") %></small>
+                </h1>
+            </div>
+            <div id="no-refresh-msg">
+            	<div class="row">
+                 <h1 class="tt-paused-logins-message">
+					<%= rb.getString("do_not_reload_page") %>                 
+				</h1>
+                 </div>
+            </div>
         </div>
                 
          <div id="edit-teacher-wrapper" style="display: none;">
