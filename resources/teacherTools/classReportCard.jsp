@@ -3445,6 +3445,82 @@ var completeDataChart;
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                    <%= rb.getString("perStudentPerProblemSetReport") %>
+                                </a>
+                                <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
+                            <div class="panel-body report_filters">                           
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r1_cal1();initCalendar_r1_cal2();$('#calendarModalPopupOne').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysFilterOne" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>
+	 						</div>  
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
+                            </div>
+                            <div class="panel-body">
+                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("mastery_range") %></th>
+                                        <th><%= rb.getString("grade_color_for_2_or_more_problems") %></th>
+                                        <th><%= rb.getString("grade_color_for_10_or_more_problems") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><%= rb.getString("grade_a_range") %></td>
+                                        <td class="span-sucess-layer-two"><%= rb.getString("grade_a_description") %></td>
+                                        <td class="span-sucess-layer-one"><%= rb.getString("grade_a_description") %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_b_range") %></td>
+                                        <td class="span-info-layer-two"><%= rb.getString("grade_b_description") %></td>
+                                        <td class="span-info-layer-one"><%= rb.getString("grade_b_description") %>)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_c_range") %></td>
+                                        <td class="span-warning-layer-two"><%= rb.getString("grade_c_description") %></td>
+                                        <td class="span-warning-layer-one"><%= rb.getString("grade_c_description") %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_d_range") %></td>
+                                        <td class="span-danger-layer-two"><%= rb.getString("grade_d_description") %></td>
+                                        <td class="span-danger-layer-one"><%= rb.getString("grade_d_description") %></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="loader" style="display: none"></div>
+                            </div>
+
+                            <div class="panel-body">
+                                <ul>
+                                    <li><%= rb.getString("cell_info1") %> <a title="<%= rb.getString("what_is_mastery")%>" style="cursor:pointer" rel="initialPopover"> <i class="fa fa-question-circle-o" aria-hidden="true"></i></a> value for that problem set.</li>
+                                    <li><%= rb.getString("cell_info2") %></li>
+                                    <li><%= rb.getString("cell_info3") %></li>
+                                </ul>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
                                 <a id="report_four" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
                                     <%= rb.getString("commonCoreClusterReport") %>
                                 </a>
@@ -3542,81 +3618,7 @@ var completeDataChart;
                         </div>
                     </div>--%>
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    <%= rb.getString("perStudentPerProblemSetReport") %>
-                                </a>
-                                <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
 
-                        <div id="collapseOne" class="panel-collapse collapse">
-                            <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
-                            <div class="panel-body report_filters">                           
-	                        	<div id="chooseDateRange" class="row">
-	                        		<div class="col-md-2 offset-md-1">                       
-					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r1_cal1();initCalendar_r1_cal2();$('#calendarModalPopupOne').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-					                </div>
-	                        		<div class="col-md-3">                       
-									    <input id="daysFilterOne" style="width:220px" type="text" name="" value="" >   
-					                </div>
-	 							</div>
-	 						</div>  
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
-                            </div>
-                            <div class="panel-body">
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
-                                    <thead>
-                                    <tr>
-                                        <th><%= rb.getString("mastery_range") %></th>
-                                        <th><%= rb.getString("grade_color_for_2_or_more_problems") %></th>
-                                        <th><%= rb.getString("grade_color_for_10_or_more_problems") %></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><%= rb.getString("grade_a_range") %></td>
-                                        <td class="span-sucess-layer-two"><%= rb.getString("grade_a_description") %></td>
-                                        <td class="span-sucess-layer-one"><%= rb.getString("grade_a_description") %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_b_range") %></td>
-                                        <td class="span-info-layer-two"><%= rb.getString("grade_b_description") %></td>
-                                        <td class="span-info-layer-one"><%= rb.getString("grade_b_description") %>)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_c_range") %></td>
-                                        <td class="span-warning-layer-two"><%= rb.getString("grade_c_description") %></td>
-                                        <td class="span-warning-layer-one"><%= rb.getString("grade_c_description") %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_d_range") %></td>
-                                        <td class="span-danger-layer-two"><%= rb.getString("grade_d_description") %></td>
-                                        <td class="span-danger-layer-one"><%= rb.getString("grade_d_description") %></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div class="loader" style="display: none"></div>
-                            </div>
-
-                            <div class="panel-body">
-                                <ul>
-                                    <li><%= rb.getString("cell_info1") %> <a title="<%= rb.getString("what_is_mastery")%>" style="cursor:pointer" rel="initialPopover"> <i class="fa fa-question-circle-o" aria-hidden="true"></i></a> value for that problem set.</li>
-                                    <li><%= rb.getString("cell_info2") %></li>
-                                    <li><%= rb.getString("cell_info3") %></li>
-                                </ul>
-                            </div>
-
-                            <div class="panel-body">
-                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
-                            </div>
-
-                        </div>
-                    </div>
 
 
 					<div class="panel panel-default hidden">
