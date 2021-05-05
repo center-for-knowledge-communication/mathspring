@@ -136,6 +136,7 @@ catch (Exception e) {
                                     <a <button id="forgotPasswordBtn"
                                             href='${pageContext.request.contextPath}/login/forgotPassword.jsp'
                                             class="btn btn-warning btn-block sign-in-btn"><%= rb.getString("forgot_password") %></button>
+                                    >
                                     </a>
                                 </div>
                             </div>

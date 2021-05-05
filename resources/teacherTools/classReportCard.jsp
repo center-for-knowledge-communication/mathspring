@@ -30,6 +30,11 @@
 <!-- Frank 12-11-20 Issue #315 default locale to en_US -->
 <!-- Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files -->
 <!-- Frank 12-26-20  	Issue #329 fix errors from splitting classDetails.jsp -->
+<!-- Frank 03-22-21  	Issue #391 change date selection to date range popups -->
+<!-- Frank 03-31-21  	Issue #418 add student dropdown and put selection in  filter -->
+<!-- Frank 03-31-21  	Issue #418R4 add paging, padding and legend control -->
+<!-- Frank 03-31-21  	Issue #418 display problem nickname when column header is clicked -->
+<!-- Frank 05-01-21  	Hide survey selection and panel -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -96,6 +101,7 @@ System.out.println("msHost = " + msHost + msContext);
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/calendar.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 
     <!-- Datatables Css Files -->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
@@ -111,6 +117,9 @@ System.out.println("msHost = " + msHost + msContext);
     
 	<link href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet"
           type="text/css">
+
+
+
     <style>
         .buttonCustomColor {
             color: #FFFFFF;
@@ -149,6 +158,31 @@ System.out.println("msHost = " + msHost + msContext);
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
 
+<%= rb.getString("pct_students_gave_up")%>
+
+<script type="text/javascript">
+	var jan_name = "<%=rb.getString("January")%>";
+	var feb_name = "<%=rb.getString("February")%>";
+	var mar_name = "<%=rb.getString("March")%>";
+	var apr_name = "<%=rb.getString("April")%>";
+	var may_name = "<%=rb.getString("May")%>";
+	var jun_name = "<%=rb.getString("June")%>";
+	var jul_name = "<%=rb.getString("July")%>";
+	var aug_name = "<%=rb.getString("August")%>";
+	var sep_name = "<%=rb.getString("September")%>";
+	var oct_name = "<%=rb.getString("October")%>";
+	var nov_name = "<%=rb.getString("November")%>";
+	var dec_name = "<%=rb.getString("December")%>";
+
+	var sun_name = "<%=rb.getString("Sun")%>";
+	var mon_name = "<%=rb.getString("Mon")%>";
+	var tue_name = "<%=rb.getString("Tue")%>";
+	var wed_name = "<%=rb.getString("Wed")%>";
+	var thu_name = "<%=rb.getString("Thu")%>";
+	var fri_name = "<%=rb.getString("Fri")%>";
+	var sat_name = "<%=rb.getString("Sat")%>";
+	
+	</script>
 
 <script type="text/javascript">
 /**
@@ -164,7 +198,7 @@ System.out.println("msHost = " + msHost + msContext);
  * Frank    02-17-20    ttfixesR3
  */
  
- 
+var studentList; 
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -173,14 +207,15 @@ var perProblemSetColumnNamesMap;
 var perProblemSetLevelOneAvg;
 var perProblemSetLevelOneMax;
 var perProblemSetLevelOneLatest;
-var filterOne = "~365~Y";
+var filterOne = "~~Y";
 
 //Report6
 var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
-var filterSix = "~365~Y";
+var filterSix = "~~Y";
+
 //var urlColumnNames;
 
 //Report2 Varriables
@@ -190,7 +225,9 @@ var perProblemReportTable
 var perClusterReportTable
 
 //Report4 variables
-var filterFour = "~365"
+var filterFour = "~~";
+
+
 
 //Report5 Varribales
 var perStudentReport;
@@ -251,99 +288,290 @@ else {
     }
 }
 
+function hideLegend() {
+    $("#hideLegendBtn").hide();
+    $("#showLegendBtn").show();
+    $("#perStudentPerProblemLegend").hide();
+}
+function showLegend() {
+    $("#showLegendBtn").hide();
+    $("#hideLegendBtn").show();
+    $("#perStudentPerProblemLegend").show();
+}
+function getStudentList() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentList = response;
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+
+var studentSelectionList = "";
+function populateStudentSelectionListSix() {
+	
+	var studentsArr = studentList.split(",");	
+
+	studentSelectionList = "<select name='students' id='studentsSix' size='5' style='width:220px' >"; 	
+	studentsArr.forEach(addStudent1);
+	studentsArr.forEach(addStudent2);
+	studentSelectionList += "</select>";
+	document.getElementById("studentSelectionListSix").innerHTML=studentSelectionList; 
+
+}
+
+function addStudent1(item, index) {
+	var sArr = item.split("~");
+	if ((sArr[2].length + sArr[1].length) > 0) {
+		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
+	}
+}
+
+function addStudent2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+
+
 function getFilterSix() {
+	
+	document.getElementById("daysFilterSix").value = "";
+		
 	var showNamesState = "N";
 	if (document.getElementById("showNamesSix").checked == true) {
 		showNamesState = "Y";
 	}
 
-	var daysSix = document.getElementById("daysFilterSix").value;
-	const nDays = parseInt(daysSix);
-	if (isNaN(nDays)) {
-		daysSix = "365";
-	}
+	var selectedStudent =  document.getElementById("studentsSix").value;
 
-	filterSix = document.getElementById("standardsFilter").value + "~" + daysSix + "~" + showNamesState;
+	var d1 = parseInt(document.getElementById("selectDay_r6_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r6_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r6_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r6_cal1").value) + 1;
 	
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterSix;
-	document.getElementById("downloadReportSixBtn").href = a_href;
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupSix').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r6_cal2").value + "/" +  document.getElementById("year_r6_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r6_cal1").value + "/" + document.getElementById("year_r6_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r6_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r6_cal2").value;
+			toDate = document.getElementById("selectDay_r6_cal1").value + "/" + m2 + "/" + document.getElementById("year_r6_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterSix").value = fromDate + " thru " + toDate;
+		filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+		
+		if (selectedStudent.length > 0) {
+			filterSix += "~" + selectedStudent;	
+		}
+		
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterSix;
+		document.getElementById("downloadReportSixBtn").href = a_href;
+		
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterSix").value = "";
+			filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
+
+			if (selectedStudent.length > 0) {
+				filterSix += "~" + selectedStudent;	
+			}
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerStudentPerProblemReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterSix;
+			document.getElementById("downloadReportSixBtn").href = a_href;
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		}
+	}
+	
 }
 
 function getFilterOne() {
-	var showNamesState = "N";
-	if (document.getElementById("showNamesOne").checked == true) {
-		showNamesState = "Y";
-	}
 
-	var daysOne = document.getElementById("daysFilterOne").value;
-	const nDays = parseInt(daysOne);
-	if (isNaN(nDays)) {
-		daysOne = "365";
-	}
-	filterOne = "~" + daysOne + "~" + "Y";
+	document.getElementById("daysFilterOne").value = "";
+	
+	var d1 = parseInt(document.getElementById("selectDay_r1_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r1_cal1").value);
 
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterOne;
-	document.getElementById("downloadReportOneBtn").href = a_href;
+	var m1 = parseInt(document.getElementById("month_r1_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r1_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupOne').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r1_cal2").value + "/" +  document.getElementById("year_r1_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r1_cal1").value + "/" + document.getElementById("year_r1_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r1_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r1_cal2").value;
+			toDate = document.getElementById("selectDay_r1_cal1").value + "/" + m2 + "/" + document.getElementById("year_r1_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterOne").value = fromDate + " thru " + toDate;
+		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
+	
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterOne;
+		document.getElementById("downloadReportOneBtn").href = a_href;
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterOne").value = "";
+			filterOne = "~" + "" + "~" + "Y";			
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterOne;
+			document.getElementById("downloadReportOneBtn").href = a_href;
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+		}
+	}
 }
 
 function getFilterFour() {
-	var daysFour = document.getElementById("daysFilterFour").value;
-	
-	const nDays = parseInt(daysFour);
-	if (isNaN(nDays)) {
-		daysFour = "365";
-	}
-	filterFour = "~" + daysFour;
-	
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterFour;
-	document.getElementById("downloadReportFourClusterBtn").href = a_href;
 
-	a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
-	a_href = a_href + teacherID;
-	a_href = a_href + "&classId=";
-	a_href = a_href + ${classInfo.classid};
-	a_href = a_href + "&filter=";
-	a_href = a_href + filterFour;
-	document.getElementById("downloadReportFourProblemBtn").href = a_href;
+	document.getElementById("daysFilterFour").value = "";
+	
+	var d1 = parseInt(document.getElementById("selectDay_r4_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r4_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r4_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r4_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupFour').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r4_cal2").value + "/" +  document.getElementById("year_r4_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r4_cal1").value + "/" + document.getElementById("year_r4_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r4_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r4_cal2").value;
+			toDate = document.getElementById("selectDay_r4_cal1").value + "/" + m2 + "/" + document.getElementById("year_r4_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+		
+		document.getElementById("daysFilterFour").value = fromDate + " thru " + toDate;
+		
+	
+		filterFour = "~" + document.getElementById("daysFilterFour").value + "~" + "Y";		
+		
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterFour;
+		document.getElementById("downloadReportFourClusterBtn").href = a_href;
+	
+		a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterFour;
+		document.getElementById("downloadReportFourProblemBtn").href = a_href;
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterFour").value= "";	
+		
+			filterFour = "~" + "" + "~" + "Y";		
+			
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerClusterReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterFour;
+			document.getElementById("downloadReportFourClusterBtn").href = a_href;
+		
+			a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerProblemReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterFour;
+			document.getElementById("downloadReportFourProblemBtn").href = a_href;	
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+		}
+	}
 }
 
-function ftest(problemId) {
-	var tmp1 = '<img style="display: block; margin: 0 auto; max-width:400px; max-height:400px;" src="http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/problemSnapshots/prob_';
-    var tmp2 = '.jpg" />';
-    var tmp3 = tmp1 + problemId + tmp2;
-    $('#perStudentPerProblemImage').empty();
-    $('#perStudentPerProblemImage').append(tmp3);
-    
-    document.getElementById("perStudentPerProblemImageHdr").textContent = "";
-    var tmp;
-    var strProblemId = "" + problemId;
-    for (const Desc in perStudentPerProblemXrefMap) {
-    	tmp = "" + perStudentPerProblemXrefMap[Desc];
-    	if (tmp === strProblemId) {
-    		document.getElementById("perStudentPerProblemImageHdr").textContent = "" + Desc;
-    		break;
-    	}
-    }
-    
+function nicknameOpen(problemName) {
+
+    var tmpProblemName = "" + problemName;
+    var tmp = perStudentPerProblemXrefMap[tmpProblemName];
+    var tmpArr = tmp.split("^");
+	document.getElementById("perStudentPerProblemImageHdr").textContent = "<%= rb.getString("problem_id")%>" + ": " + tmpProblemName;
+	document.getElementById("perStudentPerProblemContent").textContent = "" + tmpArr[1];
 	$("#ModalPopupProblem").modal('show');
 }
 
@@ -1740,12 +1968,6 @@ var completeDataChart;
 
     $('#showReportOneBtn').on('click', function ()  {    	
         $('#collapseOne').find('.loader').show();
-        var showNamesState = "N";
-        if (document.getElementById("showNamesOne").checked == true) {
-        	showNamesState = "Y";
-        }
-        filterOne=document.getElementById("standardsFilterOne").value + "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
-
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -1844,7 +2066,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
-
+                    "fixedColumns": {
+                        "leftColumns": 2,
+                        "heightMatch": 'auto'                        
+                    },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -1895,7 +2120,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     destroy: true,
-                   
+                    "fixedColumns": {
+                        "leftColumns": 2,
+                        "heightMatch": 'auto'                        
+                    },                   
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -1933,8 +2161,14 @@ var completeDataChart;
         if (document.getElementById("showNamesSix").checked == true) {
         	showNamesState = "Y";
         }
+
         filterSix=document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
-        
+ 
+    	var selectedStudent =  document.getElementById("studentsSix").value;
+		if (selectedStudent.length > 0) {
+			filterSix += "~" + selectedStudent;	
+		}
+		
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -1952,9 +2186,12 @@ var completeDataChart;
                 perStudentperProblemLevelOne = jsonData.levelOneData;               
                 perStudentPerProblemColumnNamesMap = jsonData.columns;
                 perStudentPerProblemXrefMap = jsonData.IdXref;
+                var problemImageWindow = [];
  
                 var txt="";
                 var abbr="";
+
+                var popover = "popoverTop";
                 var indexcolumn = 3;
                 var columNvalues = $.map(perStudentPerProblemColumnNamesMap, function (v) {
                         var temp = {
@@ -1965,10 +2202,19 @@ var completeDataChart;
                                     $(td).text("");
                                     return;
                                 }
-
+                                
+                                var trow = row % 16;
+								if (trow > 8) {
+									popover = "popoverTop";
+								}
+								else {
+									popover = "popoverBottom";
+								}
+								
                                 var cellArray = cellData.split("^");
                                 var cellEffort = cellArray[0];
                                 var cellDate   = cellArray[1];
+                                var cellProblemId   = cellArray[2];
 								
                                 if ((cellData == null) || (cellData == "null")) {
                                 	cellData = " ";
@@ -1977,55 +2223,65 @@ var completeDataChart;
                                 else if (cellEffort == "SKIP") {                                	
                                 	txt = "<%= rb.getString("skip")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SKIP');
                                 }
                                 else if (cellEffort == "NOTR") {
                                 	txt = "<%= rb.getString("notr")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
-                                	$(td).addClass('p-NOTR');
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
+                                	$(td).addClass('p-NOTR');                                                                    
                                 }
                                 else if (cellEffort == "GIVEUP") {
                                 	txt = "<%= rb.getString("giveup")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-GIVEUP');
                                 }
                                 else if (cellEffort == "SOF") {
                                 	txt = "<%= rb.getString("sof")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
-                                	$(td).addClass('p-SOF');
+                                	var imageURL = problem_imageURL+cellProblemId+'.jpg';
+//                                	$(td).html('<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+cellProblemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + '<p>' + abbr[0] + ' ' + cellDate + '</p>' + '</a>');
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
+                                    $(td).addClass('p-SOF');                             
                                 }
                                 else if (cellEffort == "ATT") {
                                 	txt = "<%= rb.getString("att")%>";
                                     var abbr = txt.split(":");2
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-ATT');
                                 }
                                 else if (cellEffort == "GUESS") {
                                 	txt = "<%= rb.getString("guess")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-GUESS');
                                 }
                                 else if (cellEffort == "SHINT") {
                                 	txt = "<%= rb.getString("shint")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SHINT');
                                 }
                                 else if (cellEffort == "SHELP") {
                                 	txt = "<%= rb.getString("shelp")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + ""+abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-SHELP');
                                 }
                                 else if (cellEffort == "NODATA") {
                                 	txt = "<%= rb.getString("no_data")%>";
                                     var abbr = txt.split(":");
-                                    $(td).html("<p>" + abbr[0] + " " + cellDate + "</p>");
+                                    var imageURL = problem_imageURL+cellProblemId+'.jpg';
+                                    $(td).html("<a style='cursor:pointer' rel='" + popover + "' data-img='" + imageURL + "'>" + "<p>" + abbr[0] + " " + cellDate + "</p>" + "</a>");
                                 	$(td).addClass('p-NODATA');
                                 }
                                 else {
@@ -2077,7 +2333,8 @@ var completeDataChart;
                     },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
-                    "bPaginate": false,
+                    "bPaginate": true,
+                    "pageLength": 16,
                     "language": {
                             "sProcessing":     "Procesando...",
                             "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -2116,16 +2373,30 @@ var completeDataChart;
                             trigger : 'hover',
                             placement: 'bottom'
                         });
-
+                        $('a[rel=popoverTop]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $('a[rel=popoverBottom]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'bottom',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
                     },
                     headerCallback: function headerCallback(thead, data, start, end, display) {
 						var str = thead.cells.length;
 						var i = 2;
 						for (i=2;i<thead.cells.length;i++) {
 							var inner = "" + thead.cells[i].innerText;
-							var problemId = perStudentPerProblemXrefMap[inner];
-							var t_html = "<div class='btn btn-primary btn-sm' onclick='ftest(" + problemId + ");'>" + inner + "</div>";
-	    							$(thead).find('th').eq(i).html(t_html);							
+							var t_html = "<div class='btn btn-primary btn-sm' onclick='nicknameOpen(\"" + inner + "\");' >" + inner + "</div>";
+	    					$(thead).find('th').eq(i).html(t_html);							
 						}
                      }                    
                 });
@@ -2140,7 +2411,8 @@ var completeDataChart;
                     },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
-                    "bPaginate": false,
+                    "bPaginate": true,
+                    "pageLength": 16,
                     "scrollX": true,
                     "scrollY": "600px",
                     "scrollCollapse": true,                    
@@ -2155,16 +2427,30 @@ var completeDataChart;
                             trigger : 'hover',
                             placement: 'bottom'
                         });
-
+                        $('a[rel=popoverTop]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'top',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
+                        $('a[rel=popoverBottom]').popover({
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'bottom',
+                            content: function () {
+                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
+                            }
+                        });
                     },
                      headerCallback: function headerCallback(thead, data, start, end, display) {
 						var str = thead.cells.length;
 						var i = 2;
 						for (i=2;i<thead.cells.length;i++) {
 							var inner = "" + thead.cells[i].innerText;
-							var problemId = perStudentPerProblemXrefMap[inner];
-							var t_html = "<div class='btn btn-primary btn-sm' onclick='ftest(" + problemId + ");'>" + inner + "</div>";
-	    							$(thead).find('th').eq(i).html(t_html);							
+							var t_html = "<div class='btn btn-primary btn-sm' onclick='nicknameOpen(\"" + inner + "\");' >" + inner + "</div>";
+							$(thead).find('th').eq(i).html(t_html);							
 						}
                      }
 	            });
@@ -2215,7 +2501,7 @@ var completeDataChart;
                     { "title": "<%= rb.getString("problem_id")%>", "name" : "problemId" , "targets" : [0]},
                     { "title": "<%= rb.getString("problem_name")%>", "name" : "problemName" , "targets" : [1],"render": function ( data, type, full, meta ) {
                             var problemId = full['problemId'];
-                            var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                            var attri = ", '<%= rb.getString("problem_preview")%>'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                              var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                             return '<a  onclick="window.open('+window+');" style="cursor:pointer" rel="popoverPerProblem" data-img="' + problemImageMap[problemId] + '">' + data + '</a>';
                     }},
@@ -2349,6 +2635,7 @@ var completeDataChart;
    
         getFilterFour();
         $('#collapseFourLoader').show();
+
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2704,7 +2991,7 @@ var completeDataChart;
                             "targets": [1],
                             "render": function (data, type, full, meta) {
                                 var problemId = full['problemId'];
-                                var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
+                                var attri = ", '<%= rb.getString("problem_preview")%>'"+","+"'width=750,height=550,status=yes,resizable=yes'";
                                 var window = "'" + problemImageWindow[problemId] + "'" + attri ;
                                 var imageURL = problem_imageURL+full['problemId']+'.jpg';
                                 return '<a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+problemId+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer" rel="popoverPerProblem" data-img="' + imageURL + '">' + data + '</a>';
@@ -2893,6 +3180,7 @@ var completeDataChart;
             $("#content-conatiner").children().hide();
             $("#splash_page").show();
 
+            getStudentList();
             getFilterOne();
             getFilterFour();
             getFilterSix();
@@ -3005,7 +3293,7 @@ var completeDataChart;
 
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=manage_class_handler" id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=resetSurveySettings_handler" id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
+            <!-- <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=resetSurveySettings_handler" id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li> -->
             
             <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${classInfo.classid}&currentSelection=content_apply_handler" id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
         </ul>
@@ -3016,6 +3304,7 @@ var completeDataChart;
         <h1 class="page-header">
             Report Card for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
+
 
         <div id="content-conatiner" class="container-fluid">
 
@@ -3035,6 +3324,84 @@ var completeDataChart;
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
                 <div class="panel-group" id="accordion">
+                
+                
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
+                                    <%= rb.getString("perStudentPerProblemReport") %>
+                                </a>
+                               	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="collapseSix" class="panel-collapse collapse">                
+                            <div class="panel-body report_filters">                           
+								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r6_cal1();initCalendar_r6_cal2();$('#calendarModalPopupSix').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysFilterSix" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>  
+	
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseStudents" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListSix();" ><%= rb.getString("choose_student") %></button>
+					                </div>
+	                        		<div id="studentSelectionListSix" name="studentSelectionListSix" class="col-md-5">                       
+					                </div>
+	 							</div>  
+	
+							</div>
+                            <div class="panel-body report_filters">
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+                            </div>
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
+								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
+								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
+                            </div>
+                            <div class="panel-body">
+                                <div class="loader" style="display: none"></div>
+                                <table id="perStudentPerProblemLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("student_effort")%>:</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
+                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
+                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
+                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
+                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
+                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
+                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
+                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
+                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="perStudentPerProblemReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>                
+                
+                
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -3078,6 +3445,82 @@ var completeDataChart;
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                    <%= rb.getString("perStudentPerProblemSetReport") %>
+                                </a>
+                                <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
+                            <div class="panel-body report_filters">                           
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r1_cal1();initCalendar_r1_cal2();$('#calendarModalPopupOne').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysFilterOne" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>
+	 						</div>  
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
+                            </div>
+                            <div class="panel-body">
+                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("mastery_range") %></th>
+                                        <th><%= rb.getString("grade_color_for_2_or_more_problems") %></th>
+                                        <th><%= rb.getString("grade_color_for_10_or_more_problems") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><%= rb.getString("grade_a_range") %></td>
+                                        <td class="span-sucess-layer-two"><%= rb.getString("grade_a_description") %></td>
+                                        <td class="span-sucess-layer-one"><%= rb.getString("grade_a_description") %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_b_range") %></td>
+                                        <td class="span-info-layer-two"><%= rb.getString("grade_b_description") %></td>
+                                        <td class="span-info-layer-one"><%= rb.getString("grade_b_description") %>)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_c_range") %></td>
+                                        <td class="span-warning-layer-two"><%= rb.getString("grade_c_description") %></td>
+                                        <td class="span-warning-layer-one"><%= rb.getString("grade_c_description") %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= rb.getString("grade_d_range") %></td>
+                                        <td class="span-danger-layer-two"><%= rb.getString("grade_d_description") %></td>
+                                        <td class="span-danger-layer-one"><%= rb.getString("grade_d_description") %></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="loader" style="display: none"></div>
+                            </div>
+
+                            <div class="panel-body">
+                                <ul>
+                                    <li><%= rb.getString("cell_info1") %> <a title="<%= rb.getString("what_is_mastery")%>" style="cursor:pointer" rel="initialPopover"> <i class="fa fa-question-circle-o" aria-hidden="true"></i></a> value for that problem set.</li>
+                                    <li><%= rb.getString("cell_info2") %></li>
+                                    <li><%= rb.getString("cell_info3") %></li>
+                                </ul>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
                                 <a id="report_four" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
                                     <%= rb.getString("commonCoreClusterReport") %>
                                 </a>
@@ -3090,10 +3533,15 @@ var completeDataChart;
 									  <input id="standardsFilterFour" style="width:48px" type="text" name="" value="" onblur="getFilterFour();">
 								</div>
 	                            <div class="panel-body report_filters">                           
-									  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-									  <input id="daysFilterFour" style="width:32px" type="text" name="" value="" onblur="getFilterFour();">   
-									  <label class="report_filters"><%= rb.getString("days") %></label>
-								</div>
+		                        	<div id="chooseDateRange" class="row">
+		                        		<div class="col-md-2 offset-md-1">                       
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r4_cal1();initCalendar_r4_cal2();$('#calendarModalPopupFour').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                </div>
+		                        		<div class="col-md-3">                       
+										    <input id="daysFilterFour" style="width:220px" type="text" name="" value="" >   
+						                </div>
+		 							</div>								
+	 							</div>
 	                            <div class="panel-body report_filters">                           
 									  <input id="showReportFourBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
 									  <a id="downloadReportFourClusterBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_common_core_evaluation") %></a>
@@ -3170,147 +3618,10 @@ var completeDataChart;
                         </div>
                     </div>--%>
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_one" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-                                    <%= rb.getString("perStudentPerProblemSetReport") %>
-                                </a>
-                                <button id="oneButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-
-                        <div id="collapseOne" class="panel-collapse collapse">
-                            <label><h3><%= rb.getString("table_shows_set-wise_performance_of_students_class") %></h3></label>
-                            <div class="panel-body report_filters hidden">                           
-								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilterOne" style="width:48px" type="text" name="" value="" onblur="getFilterOne();">
-							</div>
-                            <div class="panel-body report_filters">                           
-								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-								  <input id="daysFilterOne" style="width:32px" type="text" name="" value="" onblur="getFilterOne();">   
-								  <label class="report_filters"><%= rb.getString("days") %></label>
-							</div>
-                            <div class="panel-body report_filters hidden">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
-                            </div>
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-								  <a id="downloadReportOneBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
-                            </div>
-                            <div class="panel-body">
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="70%">
-                                    <thead>
-                                    <tr>
-                                        <th><%= rb.getString("mastery_range") %></th>
-                                        <th><%= rb.getString("grade_color_for_2_or_more_problems") %></th>
-                                        <th><%= rb.getString("grade_color_for_10_or_more_problems") %></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><%= rb.getString("grade_a_range") %></td>
-                                        <td class="span-sucess-layer-two"><%= rb.getString("grade_a_description") %></td>
-                                        <td class="span-sucess-layer-one"><%= rb.getString("grade_a_description") %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_b_range") %></td>
-                                        <td class="span-info-layer-two"><%= rb.getString("grade_b_description") %></td>
-                                        <td class="span-info-layer-one"><%= rb.getString("grade_b_description") %>)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_c_range") %></td>
-                                        <td class="span-warning-layer-two"><%= rb.getString("grade_c_description") %></td>
-                                        <td class="span-warning-layer-one"><%= rb.getString("grade_c_description") %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= rb.getString("grade_d_range") %></td>
-                                        <td class="span-danger-layer-two"><%= rb.getString("grade_d_description") %></td>
-                                        <td class="span-danger-layer-one"><%= rb.getString("grade_d_description") %></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div class="loader" style="display: none"></div>
-                            </div>
-
-                            <div class="panel-body">
-                                <ul>
-                                    <li><%= rb.getString("cell_info1") %> <a title="<%= rb.getString("what_is_mastery")%>" style="cursor:pointer" rel="initialPopover"> <i class="fa fa-question-circle-o" aria-hidden="true"></i></a> value for that problem set.</li>
-                                    <li><%= rb.getString("cell_info2") %></li>
-                                    <li><%= rb.getString("cell_info3") %></li>
-                                </ul>
-                            </div>
-
-                            <div class="panel-body">
-                                <table id="perStudentPerProblemSetReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
-                            </div>
-
-                        </div>
-                    </div>
 
 
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
-                                    <%= rb.getString("perStudentPerProblemReport") %>
-                                </a>
-                               	<button id="sixButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-
-                        <div id="collapseSix" class="panel-collapse collapse">                
-                            <div class="panel-body report_filters">                           
-								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
-							</div>
-                            <div class="panel-body report_filters">                           
-								  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
-								  <input id="daysFilterSix" style="width:32px" type="text" name="" value="" onblur="getFilterSix();">   
-								  <label class="report_filters"><%= rb.getString("days") %></label>
-							</div>
-                            <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
-                            </div>
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-								  <a id="downloadReportSixBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_this_report") %></a>
-                            </div>
-                            <div class="panel-body">
-                                <div class="loader" style="display: none"></div>
-                                <table id="perTopicReportLegendTable" class="table table-striped table-bordered hover" width="40%">
-                                    <thead>
-                                    <tr>
-                                        <th><%= rb.getString("student_effort")%>:</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
-                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
-                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
-                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
-                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
-                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
-                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
-                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
-                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="panel-body">
-                                <table id="perStudentPerProblemReport" class="table table-striped table-bordered hover display nowrap" width="100%"></table>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-
-
-
-					<div class="panel panel-default">
+					<div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
@@ -3359,6 +3670,345 @@ var completeDataChart;
 
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
 
+<div id="calendarModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r6_cal1" name="selectDay_r6_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal1" onclick="next_r6_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal1" data-lang="en">
+			              <thead id="thead-month_r6_cal1"></thead>
+			              <tbody id="calendar-body_r6_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r6_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r6_cal1" onchange="jump_r6_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r6_cal1" onchange="jump_r6_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r6_cal2" name="selectDay_r6_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal2" onclick="next_r6_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal2" data-lang="en">
+			              <thead id="thead-month_r6_cal2"></thead>
+			              <tbody id="calendar-body_r6_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r6_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r6_cal2" onchange="jump_r6_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r6_cal2" onchange="jump_r6_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterSix();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupSix').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+<div id="calendarModalPopupOne" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r1_cal1" name="selectDay_r1_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
+			              <thead id="thead-month_r1_cal1"></thead>
+			              <tbody id="calendar-body_r1_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r1_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r1_cal1" onchange="jump_r1_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r1_cal1" onchange="jump_r1_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r1_cal2" name="selectDay_r1_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
+			              <thead id="thead-month_r1_cal2"></thead>
+			              <tbody id="calendar-body_r1_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r1_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r1_cal2" onchange="jump_r1_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r1_cal2" onchange="jump_r1_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterOne();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupOne').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+<div id="calendarModalPopupFour" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r4_cal1" name="selectDay_r4_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal1" onclick="next_r4_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal1" data-lang="en">
+			              <thead id="thead-month_r4_cal1"></thead>
+			              <tbody id="calendar-body_r4_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r4_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r4_cal1" onchange="jump_r4_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r4_cal1" onchange="jump_r4_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r4_cal2" name="selectDay_r4_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal2" onclick="next_r4_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal2" data-lang="en">
+			              <thead id="thead-month_r4_cal2"></thead>
+			              <tbody id="calendar-body_r4_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r4_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r4_cal2" onchange="jump_r4_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r4_cal2" onchange="jump_r4_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterFour();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupFour').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
+<div id="studentsModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-students col-sm-6">
+			      <div class="container-calendar">
+			          
+			          <div class="footer-container-calendar">
+			              <label for="studentsSix">Select Students: </label>
+						  <select name='students' id='studentsSix' size='5' multiple>;
+			              </select>
+     
+			          </div>
+			      </div>			      
+			    </div> 
+            </div>
+
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="alert('Hello');" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#studentsModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
+<!-- Modal -->
+
+
+
 <!-- Modal For Mastery Trajecotory Report-->
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
@@ -3405,11 +4055,11 @@ var completeDataChart;
 <div id="ModalPopupProblem" class="modal fade" role="dialog" style="display: none;">
     <div class="pspp-modal-dialog modal-md modal-dialog-centered">
         <!-- Modal content-->
-        <div class="pspp-modal-content perStudentperProblem-modal-content">
+        <div class="pspp-modal-content ">
             <div class="pspp-modal-header">
             	<span id="perStudentPerProblemImageHdr" class="modal-title"></span></div>
             <div>
-            	<div id="perStudentPerProblemImage" ></div>
+            	<div id="perStudentPerProblemContent" ></div>
             </div>
         </div>
 
@@ -3498,4 +4148,13 @@ var completeDataChart;
 </div>
 
 </body>
+<!-- Modal -->
+    <script type="text/javascript" src="<c:url value="/js/calendar_r1_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r1_2.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r4_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r4_2.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r6_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r6_2.js" />"></script>
+</body>
+
 </html>

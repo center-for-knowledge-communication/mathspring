@@ -39,6 +39,9 @@
 <!-- Frank 01-05-21  	Issue #329R3 fix error - nickname null not handled -->
 <!-- Frank 01-05-21  	Issue #302 teacher username only alpha and numeric characters -->
 <!-- Frank 01-05-21  	Issue #366 blank screen after adding student -->
+<!-- Frank 03-05-21  	Issue #388 Landing page report by date range -->
+<!-- Frank 03-15-21  	Issue #398 New feature to move student from one class to another -->
+<!-- Frank 05-01-21  	Hide survey selection -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -105,7 +108,8 @@ System.out.println("msHost = " + msHost + msContext);
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
-
+    <link href="${pageContext.request.contextPath}/css/calendar.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+    
     <!-- Datatables Css Files -->
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.datatables.net/rowreorder/1.2.0/css/rowReorder.dataTables.min.css" rel="stylesheet"
@@ -158,12 +162,44 @@ System.out.println("msHost = " + msHost + msContext);
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
 
+<style>
+.nobull {
+  list-style-type: none;
+ }
+ 
+.dropdown-content:focus {
+	background-color: #ddd;
+	outline: 3px solid black;
+}
 
+.dropdown-content:hover {
+  background-color: lightgreen;
+	outline: 3px solid black;
+}
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
 
+.dropdown-content {
+  background-color: #f6f6f6;
+  font-size: 16px;
+  max-width: 40%;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+}
 
+.dropdown-content li {
+  color: black;
+  text-decoration: none;
+  display: block;
+  list-style-type: none;
+}
 
-
+</style>
+ 
 <script type="text/javascript">
 /**
  * Created by nsmenon on 6/1/2017.
@@ -194,14 +230,11 @@ var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
 
-//Report2 Varriables
-var perProblemReportTable
-
-//Report3 Varriables
-var perClusterReportTable
 
 //Report5 Varribales
-var landingPageReport;
+var landingPageReport1;
+var landingPageReport2;
+
 var effortMap;
 var perProblemObject;
 var emotionMap;
@@ -217,6 +250,7 @@ var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
 var filterLandingOne = "~7";
+var filterLandingTwo = "~0";
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
@@ -271,6 +305,8 @@ if (languagePreference.includes("en")) {
 
 
 function getFilterLandingOne() {
+	
+
 	var daysLandingOne = document.getElementById("daysFilterLandingOne").value;
 	
 	const nDays = parseInt(daysLandingOne);
@@ -283,6 +319,129 @@ function getFilterLandingOne() {
 	}
 	filterLandingOne = daysLandingOne;
 }
+
+function getFilterLandingTwo() {
+	
+	
+	var d1 = parseInt(document.getElementById("selectDay_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay").value);
+
+	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopup').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_cal2").value + "/" +  document.getElementById("year_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay").value + "/" + document.getElementById("year").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_cal2").value + "/" +  m1 + "/" + document.getElementById("year_cal2").value;
+			toDate = document.getElementById("selectDay").value + "/" + m2 + "/" + document.getElementById("year").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}
+		filterLandingTwo = "~" + fromDate + "thru" + toDate;
+    	$.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'classLandingReportTwo',
+                lang: loc,
+                filter: filterLandingTwo
+            },
+            success : function(data) {
+                $('#classLandingReportTwo').collapse('show');
+                var jsonData = $.parseJSON(data);
+                landingPageReport2.clear().draw();
+                landingPageReport2.rows.add(jsonData.levelOneData).draw();
+                landingPageReport2.columns.adjust().draw();
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+
+	}
+	else{
+		alert("<%= rb.getString("must_select_a_day_from_each_calendar")%>");
+		$('#calendarModalPopup').modal('show');
+	}
+
+}
+var teacherClassSelections = "";
+
+function moveThisStudent(id) {
+
+	var newClassId = document.getElementById('moveBtn').value;
+    $('#student_info_out').find('.loader').show();
+	$.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/changeStudentClass",
+        data : {
+        	studentId:id,
+        	newClassId: newClassId,
+            lang: loc
+        },
+        success : function(response) {
+            $('#student_info_out').find('.loader').hide();
+            if (response.includes("***")) {
+                $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                $('#errorMsgModelPopup').modal('show');
+            }else{
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("changeStudentClass",response);
+                }
+                $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_class_changed")%>");
+                $('#successMsgModelPopup').modal('show');
+            }
+	    },
+	    error : function(e) {
+	        console.log(e);
+	    }
+    });
+}
+
+
+
+function selectTeacherClass(myClassId) {
+
+
+
+	var txtClassId = "" + myClassId;
+	for (var i=0; i < classChoices.length; i++) {	
+		var splitter = classChoices[i].split(',');
+		if (splitter[2] === txtClassId) {
+			document.getElementById('moveBtn').value = splitter[2];			
+			document.getElementById('moveBtn').innerHTML = '<%= rb.getString("move_this_student_to")%>: ' + splitter[1];
+			break;
+		}
+	}
+	
+	$("#moveBtn").show();
+}
+
+var classChoices = [];
+
+function addToTeacherList(item, index) {
+    
+	var titem = "" + item;
+	var tlist = titem.split(",");
+
+	if (tlist[2] != classID) {
+		classChoices.push(titem);	
+		teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
+	}
+}
+
 
 function logTeacherEvent(action,activityName) {
 
@@ -868,6 +1027,7 @@ function handleclickHandlers() {
     $("#classHomePage").click(function () {
         $('#reorg_prob_sets_handler').css('color', '#ffffff');
         $("#content-conatiner").children().hide();
+        
         $("#splash_page").show();
     });
     
@@ -1063,6 +1223,23 @@ function changeLandingPageHeaderAccordingToLanguage(){
 	}
 }
 
+function changeLandingPageHeader2AccordingToLanguage(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+		languageSet = "en"
+	} else if (languagePreference.includes("es")) {
+		languageSet = "es"
+	}
+	if (languageSet == 'es') {
+		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Número de problemas vistos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
+		return header;
+	}else{
+	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Number of problems seen','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
+	 	return header;
+	}
+}
+
 function registerAllEvents(){
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
@@ -1100,10 +1277,11 @@ function registerAllEvents(){
     });
 
     var headers = changeLandingPageHeaderAccordingToLanguage();
+    var headers2 = changeLandingPageHeader2AccordingToLanguage();
   
     if (languageSet == 'es') {
     
-    landingPageReport  =  $('#landingPageReport').DataTable({
+    landingPageReport1  =  $('#landingPageReport1').DataTable({
         data: [],
         destroy: true,
         columns: [
@@ -1184,7 +1362,7 @@ function registerAllEvents(){
     );
     }
     else {
-        landingPageReport  =  $('#landingPageReport').DataTable({
+        landingPageReport1  =  $('#landingPageReport1').DataTable({
             data: [],
             destroy: true,
             columns: [
@@ -1256,9 +1434,9 @@ function registerAllEvents(){
             },
             success : function(data) {
                 var jsonData = $.parseJSON(data);
-                landingPageReport.clear().draw();
-                landingPageReport.rows.add(jsonData.levelOneData).draw();
-                landingPageReport.columns.adjust().draw();
+                landingPageReport1.clear().draw();
+                landingPageReport1.rows.add(jsonData.levelOneData).draw();
+                landingPageReport1.columns.adjust().draw();
             },
             error : function(e) {
                 console.log(e);
@@ -1266,6 +1444,147 @@ function registerAllEvents(){
         });
 
     });
+
+
+    if (languageSet == 'es') {
+    
+    landingPageReport2  =  $('#landingPageReport2').DataTable({
+        data: [],
+        destroy: true,
+        columns: [
+            { title: headers2['sid'] },
+            { title: headers2['sname']  },
+            { title: headers2['uname']  },
+            { title: headers2['problems']  },
+            { title: headers2['timeInMS']  },
+            { title: headers2['latestLogin']  },
+        ],
+        "bPaginate": false,
+        "bFilter": false,
+        "bLengthChange": false,
+        rowReorder: false,                
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+
+        "scrollX": true,
+        "bSort" : false,
+        "columnDefs": [
+            {
+                "width": "10%",
+                "targets": [ 0 ],
+                "visible": false
+
+            },{
+                "width": "10%",
+                "targets": [ 1 ],
+                "visible": true
+
+            },{
+                "width": "10%",
+                "targets": [ 2 ],
+                "visible": false
+
+            },
+            {
+                "width": "10%",
+                "targets": [ 3 ],
+                "visible": true
+
+            },
+            {
+                "targets": [ 4 ],
+                "width": "10%",
+                "visible": true
+            }, 
+            {
+                "targets": [ 5 ],
+                "width": "10%",
+                "visible": true
+            }
+                
+    	]
+    }    
+    );
+    }
+    else {
+        landingPageReport2  =  $('#landingPageReport2').DataTable({
+            data: [],
+            destroy: true,
+            columns: [
+                { title: headers2['sid'] },
+                { title: headers2['sname']  },
+                { title: headers2['uname']  },
+                { title: headers2['problems']  },
+                { title: headers2['timeInMS']  },
+                { title: headers2['latestLogin']  },
+            ],
+            "bPaginate": false,
+            "bFilter": false,
+            "bLengthChange": false,
+            rowReorder: false,                
+            "scrollX": true,
+            "bSort" : false,
+            "columnDefs": [
+                {
+                    "width": "10%",
+                    "targets": [ 0 ],
+                    "visible": false
+
+                },{
+                    "width": "10%",
+                    "targets": [ 1 ],
+                    "visible": true
+
+                },{
+                    "width": "10%",
+                    "targets": [ 2 ],
+                    "visible": false
+
+                },
+                {
+                    "width": "10%",
+                    "targets": [ 3 ],
+                    "visible": true
+
+                },
+                {
+                    "targets": [ 4 ],
+                    "width": "10%",
+                    "visible": true
+                }, 
+                {
+                    "targets": [ 5 ],
+                    "width": "10%",
+                    "visible": true
+                }
+                    
+        	]
+        }    
+        );    	
+    }
+    
 
     var classListSize = $('#classListSize').val();
     if(classListSize != 0){
@@ -1813,6 +2132,7 @@ function registerAllEvents(){
         var prePostIds = '${prepostIds}'.split("~~");		
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         $(document).ready(function () {
+        	generate_year_range(2020,2022);
             registerAllEvents();
             handleclickHandlers();
 
@@ -1932,6 +2252,40 @@ function registerAllEvents(){
     <script id="editStudentInformation">
 
     function editStudentInformation(id,fname,lname,uname,context){
+
+    	
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+            	classId: classID,
+                teacherId: teacherID,
+                reportType: 'teacherClassList',
+                lang: loc,
+                filter: "~"
+
+            },
+            success : function(data) {
+            	    if (data) {
+            	    	teacherClassSelections = "";
+            	    	$("#moveBtn").hide();
+            	    	var msg = "" + data;
+                       	var jsonData = $.parseJSON(data);
+       	                eachTeacherListData = jsonData.levelOneData;
+       	                eachTeacherListData.forEach(addToTeacherList);		           	             	
+       	             	document.getElementById("teacherList").innerHTML = "<ul>" + teacherClassSelections + "</ul>";
+                  	}
+                  	else {
+                  		alert("response data is null");
+                  	}
+            },
+            error : function(e) {
+            	alert("error");
+                console.log(e);
+            }
+        });
+	
+    	
     var tr = context.closest('tr')
     var row = $('#student_roster').DataTable().row( tr );
 
@@ -1970,16 +2324,19 @@ function registerAllEvents(){
             '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary"> <%= rb.getString("reset_password") %></button></div></form></div>';
 
 
-
-        var tabPanel = '<div style="width: 40%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-address-card-o" aria-hidden="true"></i> <%= rb.getString("update_student_information") %> </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <i class="fa fa-key" aria-hidden="true"></i> <%= rb.getString("reset_password_for_student") %> </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> </div> </div>';
+        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass">New Class</label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
+            
+        var tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
+            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
+            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
+            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
+            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="changeClass'+id+'">'+formHtmlChangeClass+'</div> </div> </div>';
 
         row.child(tabPanel).show();
       }
     }
     </script>
+    
         
     <script type="text/template" id="editStudentInfoDiv">
         <div style="width: 50%">
@@ -2052,7 +2409,7 @@ function registerAllEvents(){
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
-            <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
+<!--             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li> -->
             
              <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
@@ -2744,28 +3101,56 @@ function registerAllEvents(){
                                 <a id="reportOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportOne">
 				                    <%= rb.getString("recent_student_activities") %>
                                 </a>
-                                <button id="landingPageReportButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                                <button id="landingPageReportButton1" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div class="panel-body report_filters">                           
+                        <div class="panel-body report_filters">
+                        	<div id="lastXDays" class="row">                         
 							  <label class="report_filters" ><%= rb.getString("show_only_last") %></label>
 							  <input id="daysFilterLandingOne" style="width:32px" type="text" name="" value="7">   
 							  <label class="report_filters"><%= rb.getString("days") %>.  </label>
-
+							</div>  
 						</div>
                         <div id="classLandingReportOne" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <table id="landingPageReport" class="table table-striped table-bordered hover" width="100%"></table>
+                                <table id="landingPageReport1" class="table table-striped table-bordered hover" width="100%"></table>
                             </div>
 
                         </div>
-                        <div class="panel-body report_filters">                           
-							  <label class="report_filters" ><%= rb.getString("landing_report_note1") %></label>
-							  <label class="report_filters" ><%= rb.getString("landing_report_note2") %></label>
+                       <div class="panel-body report_note"">                           
+							  <label class="report_note"" ><%= rb.getString("landing_report_note1") %></label>
+							  <label class="report_note"" ><%= rb.getString("landing_report_note2") %></label>
 						</div>
+ 
                     </div>
                 </div>            
-             	<div>
+          	
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="reportTwo" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportTwo">
+				                    <%= rb.getString("landing_report2_title") %>
+                                </a>
+                                <button id="landingPageReportButton2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div class="panel-body report_filters">
+                        	<div id="chooseDateRange" class="row">
+                        		<div class="col-md-2 offset-md-1">                       
+				                	<button type="button" class="btn btn-primary" onclick="initCalendar();initCalendar_cal2();$('#calendarModalPopup').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+				                </div>
+ 							</div>  
+
+						</div>
+                        <div id="classLandingReportTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table id="landingPageReport2" class="table table-striped table-bordered hover" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>            
+			    <div>
                     <h3 class="tt-page-header">
                     <%= rb.getString("select_report_card_from_menu") %>
                     </h3>
@@ -2775,6 +3160,111 @@ function registerAllEvents(){
 </div>
 
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
+
+
+<!-- Modal For Mastery Trajecotory Report-->
+<div id="calendarModalPopup" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay" name="selectDay">
+   				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
+			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar" data-lang="en">
+			              <thead id="thead-month"></thead>
+			              <tbody id="calendar-body"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month" onchange="jump()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year" onchange="jump()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_cal2" name="selectDay_cal_2">
+				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
+			              <thead id="thead-month_cal2"></thead>
+			              <tbody id="calendar-body_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_cal2" onchange="jump_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_cal2" onchange="jump_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterLandingTwo();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+<!-- Modal -->
+
+
 
 <!-- Modal For Mastery Trajecotory Report-->
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
@@ -2920,5 +3410,7 @@ function registerAllEvents(){
 
 
 <!-- Modal -->
+    <script type="text/javascript" src="<c:url value="/js/calendar.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar2.js" />"></script>
 </body>
 </html>

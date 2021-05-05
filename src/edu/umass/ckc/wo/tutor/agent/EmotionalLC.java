@@ -20,6 +20,8 @@ import java.sql.SQLException;
  * Date: Jul 24, 2008
  * Time: 11:04:18 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	04-28-21	Issue #432R2 add video and example messages to 'incorrectStrategic' message set
  */
 public abstract class EmotionalLC extends BaseLearningCompanion
 {
@@ -110,9 +112,9 @@ public abstract class EmotionalLC extends BaseLearningCompanion
         "incorrect1",
         "incorrect2",
         "incorrect3",
-        "incorrect4"
-//        "example",
-//        "video"
+        "incorrect4",
+        "example",
+        "video"
     } ;
 
     public static final String[] incorrectNeutral = {

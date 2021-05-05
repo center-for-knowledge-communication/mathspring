@@ -223,7 +223,7 @@ renderCharts : function(problemList, c, containerId) {
 
             case "GIVEUP":
                 table.className ="giveupCard";
-                effortFeedback = languageSet == "es" ? "Abandonaste este problema" : "You gave up this problem.";
+                effortFeedback = languageSet == "es" ? "Abandonaste este problema" : "You gave up on this problem.";
                 cell.innerHTML="_";
                 break;
 

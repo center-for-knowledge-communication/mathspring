@@ -1173,7 +1173,7 @@ public class DbClass {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=? order by fname,lname,username";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classID);
             rs = stmt.executeQuery();

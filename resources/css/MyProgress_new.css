@@ -238,3 +238,12 @@ textarea:focus {
 .huy-button a {
     color: black !important;
 }
+
+.session-clock-item {
+  width:140px;
+}
+
+.nav-item a.session-clock-item:hover {
+	cursor: default;
+	background: transparent !important;
+}

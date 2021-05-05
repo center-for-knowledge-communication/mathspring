@@ -38,6 +38,8 @@ import java.util.List;
  * Frank 05-18-2020 issue #125 cast elapsedtime from (double) to (int) - fixes url parameter of 'Logou' selection.
  * Frank 08-12-2020 issue #194 Send along the first unsolved problem encountered for 'Practice Area' link
  * Frank 08-20-20	Issue #194 correction fetch current problem from smgr for Practice Area link 
+ * Kartik 04-22-21 Issue #390 Added session clock functionality
+
  */
 public class MyProgressHandler {
 
@@ -117,6 +119,7 @@ public class MyProgressHandler {
             request.setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
             request.setAttribute("mouseSaveInterval", smgr.getMouseSaveInterval());
             request.setAttribute("gritServletContext","gritms");
+            request.setAttribute("timeInSession", smgr.getTimeInSession());
             String servContext= request.getContextPath();
             if (servContext != null && servContext.length()>1)
                 servContext=servContext.substring(1);    // strip off the leading /
@@ -201,6 +204,7 @@ public class MyProgressHandler {
         request.setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
         request.setAttribute("mouseSaveInterval", smgr.getMouseSaveInterval());
         request.setAttribute("gritServletContext","gritms");
+        request.setAttribute("timeInSession", smgr.getTimeInSession());
         String servContext= request.getContextPath();
         if (servContext != null && servContext.length()>1)
             servContext=servContext.substring(1);    // strip off the leading /

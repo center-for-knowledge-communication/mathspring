@@ -452,6 +452,12 @@ background-color: #FF4766;
   	font-size: 16px;
 	
 }
+.report_note {
+	color: black;
+  	background-color: white;
+  	font-size: 16px;
+	
+}
 
 .modal-content {
   max-width: 1500px;
@@ -465,14 +471,15 @@ background-color: #FF4766;
 }
 
 .pspp-modal-dialog {
-          width: 200px;
-          height: 100px !important;
+          width: 500px;
+          height: 300px !important;
         }
 .pspp-modal-content {
     /* 80% of window height */
 
     height: 60%;
-    background-color:#DADADA;
+    background-color:white;
+    color:black;
 }        
 .pspp-modal-header {
 

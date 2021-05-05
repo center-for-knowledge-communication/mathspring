@@ -115,9 +115,20 @@ body {
   color: #003364;
 }
 
+.huytran-practice__navitem--clock {
+  text-decoration: none;
+  padding: 10px 15px;
+  color: #003364;
+}
+
+
 .huytran-practice__navitem:hover {
   background: #92DDA3;
   cursor: pointer;
+}
+
+.huytran-practice__navitem--clock:hover {
+  cursor: default;
 }
 
 .huytran-practice__navitem:active {
