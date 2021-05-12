@@ -35,6 +35,8 @@
 <!-- Frank 03-31-21  	Issue #418R4 add paging, padding and legend control -->
 <!-- Frank 03-31-21  	Issue #418 display problem nickname when column header is clicked -->
 <!-- Frank 05-01-21  	Hide survey selection and panel -->
+<!-- Frank 05-11-21  	Issue #463 add date filter to perStudent report -->
+<!-- Frank 05-11-21  	Implement multi-lingual chnique for cdn datatable utility using java resource bundle -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -73,6 +75,14 @@ System.out.println(loc.toString());
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
+ResourceBundle jc_rb = null;
+try {
+	jc_rb = ResourceBundle.getBundle("jchartML",loc);
 }
 catch (Exception e) {
 //	logger.error(e.getMessage());
@@ -158,7 +168,6 @@ System.out.println("msHost = " + msHost + msContext);
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
 
-<%= rb.getString("pct_students_gave_up")%>
 
 <script type="text/javascript">
 	var jan_name = "<%=rb.getString("January")%>";
@@ -226,6 +235,9 @@ var perClusterReportTable
 
 //Report4 variables
 var filterFour = "~~";
+
+//Report3 variables
+var filterThree = "~~";
 
 
 
@@ -298,7 +310,10 @@ function showLegend() {
     $("#hideLegendBtn").show();
     $("#perStudentPerProblemLegend").show();
 }
-function getStudentList() {
+
+
+
+function getStudentListSix() {
 	
     $.ajax({
         type : "POST",
@@ -308,7 +323,7 @@ function getStudentList() {
         },
         success : function(response) {
         	console.log(response);
-        	studentList = response;
+        	studentListSix = response;
         },
         error : function(e) {
             console.log(e);
@@ -317,30 +332,30 @@ function getStudentList() {
 	
 }
 
-var studentSelectionList = "";
+var studentSelectionListSix = "";
 function populateStudentSelectionListSix() {
 	
-	var studentsArr = studentList.split(",");	
+	var studentsArrSix = studentListSix.split(",");	
 
-	studentSelectionList = "<select name='students' id='studentsSix' size='5' style='width:220px' >"; 	
-	studentsArr.forEach(addStudent1);
-	studentsArr.forEach(addStudent2);
-	studentSelectionList += "</select>";
-	document.getElementById("studentSelectionListSix").innerHTML=studentSelectionList; 
+	studentSelectionListSix = "<select name='students' id='studentsSix' size='5' style='width:220px' >"; 	
+	studentsArrSix.forEach(addStudentSix1);
+	studentsArrSix.forEach(addStudentSix2);
+	studentSelectionListSix += "</select>";
+	document.getElementById("studentSelectionListSix").innerHTML=studentSelectionListSix; 
 
 }
 
-function addStudent1(item, index) {
+function addStudentSix1(item, index) {
 	var sArr = item.split("~");
 	if ((sArr[2].length + sArr[1].length) > 0) {
-		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
+		studentSelectionListSix += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
 	}
 }
 
-function addStudent2(item, index) {
+function addStudentSix2(item, index) {
 	var sArr = item.split("~");
 	if  ((sArr[2].length + sArr[1].length) == 0) {
-		studentSelectionList += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+		studentSelectionListSix += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
 	}
 }
 
@@ -564,6 +579,154 @@ function getFilterFour() {
 		}
 	}
 }
+
+
+
+function getStudentListThree() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListThree = response;
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+
+var studentSelectionListThree = "";
+function populateStudentSelectionListThree() {
+	
+	var studentsArrThree = studentListThree.split(",");	
+
+	studentSelectionListThree = "<select name='students' id='studentsThree' size='5' style='width:220px' >"; 	
+	studentsArrThree.forEach(addStudentThree1);
+	studentsArrThree.forEach(addStudentThree2);
+	studentSelectionListThree += "</select>";
+	document.getElementById("studentSelectionListThree").innerHTML=studentSelectionListThree; 
+
+}
+
+function addStudentThree1(item, index) {
+	var sArr = item.split("~");
+	if ((sArr[2].length + sArr[1].length) > 0) {
+		studentSelectionListThree += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
+	}
+}
+
+function addStudentThree2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionListThree += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+
+
+
+function getFilterThree() {
+	
+	document.getElementById("daysFilterThree").value = "";
+		
+	var showNamesState = "N";
+	if (document.getElementById("showNamesThree").checked == true) {
+		showNamesState = "Y";
+	}
+
+	var selectedStudent =  document.getElementById("studentsThree").value;
+
+	var d1 = parseInt(document.getElementById("selectDay_r3_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r3_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r3_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r3_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupThree').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r3_cal2").value + "/" +  document.getElementById("year_r3_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r3_cal1").value + "/" + document.getElementById("year_r3_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r3_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r3_cal2").value;
+			toDate = document.getElementById("selectDay_r3_cal1").value + "/" + m2 + "/" + document.getElementById("year_r3_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterThree").value = fromDate + " thru " + toDate;
+		filterThree = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterThree").value + "~" + showNamesState;
+		
+		if (selectedStudent.length > 0) {
+			filterThree += "~" + selectedStudent;	
+		}
+		
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadPerStudentReport?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterThree;
+		document.getElementById("downloadReportThreeStudentBtn").href = a_href;
+			
+		a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/downLoadStudentEmotions?teacherId=";
+		a_href = a_href + teacherID;
+		a_href = a_href + "&classId=";
+		a_href = a_href + ${classInfo.classid};
+		a_href = a_href + "&filter=";
+		a_href = a_href + filterThree;
+		document.getElementById("downloadReportThreeEmotionBtn").href = a_href;		
+		
+	}
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterThree").value = "";
+			filterThree = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterThree").value + "~" + showNamesState;
+
+			if (selectedStudent.length > 0) {
+				filterThree += "~" + selectedStudent;	
+			}
+			var a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadPerStudentReport?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterThree;
+			document.getElementById("downloadReportThreeStudentBtn").href = a_href;
+		
+			a_href = '${pageContext.request.contextPath}';
+			a_href = a_href + "/tt/tt/downLoadStudentEmotions?teacherId=";
+			a_href = a_href + teacherID;
+			a_href = a_href + "&classId=";
+			a_href = a_href + ${classInfo.classid};
+			a_href = a_href + "&filter=";
+			a_href = a_href + filterThree;
+			document.getElementById("downloadReportThreeEmotionBtn").href = a_href;
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		}
+	}
+	
+}
+
+
 
 function nicknameOpen(problemName) {
 
@@ -1052,54 +1215,11 @@ function registerAllEvents(){
         "ordering": false
     });
 
-if (languageSet == 'es') {
-    perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
-        data: [],
-        destroy: true,
-        columns: [
-            { title: "<%= rb.getString("student_id")%>" },
-            { title: "<%= rb.getString("student_name")%>" },
-            { title: "<%= rb.getString("username")%>" },
-            { title: "<%= rb.getString("nbr_problems_attempted")%>" },
-            { title: "<%= rb.getString("effchart")%>" },
-        ],
-        "bPaginate": false,
-        "bFilter": false,
-        "bLengthChange": false,
-        rowReorder: false,
-        "bSort" : false,
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        }
 
-    } );
-}
-else {
     perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
         data: [],
-        destroy: true,
-        columns: [
+        <%=jc_rb.getString("language_text")%>
+    	columns: [
             { title: "<%= rb.getString("student_id")%>" },
             { title: "<%= rb.getString("student_name")%>" },
             { title: "<%= rb.getString("username")%>" },
@@ -1114,13 +1234,11 @@ else {
 
     } );
 	
-}
     
-    if (languageSet == 'es') {
     perProblemReportTable = $('#perProblemReport').DataTable({
         data: [],
-        destroy: true,
-        columns: [
+        <%=jc_rb.getString("language_text")%>
+    	columns: [
             { title: "<%= rb.getString("problem_id")%>", data : "problemId" },
             { title: "<%= rb.getString("problem_name")%>", data : "problemName" },
             { title: "<%= rb.getString("nbr_students_seen_problem")%>", data : "noStudentsSeenProblem" },
@@ -1133,66 +1251,18 @@ else {
             { title: "<%= rb.getString("most_frequent_incorrect_response")%>", data : "mostIncorrectResponse" }
         ],
         "bPaginate": false,
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: false
 
     } );
-    }
-    else { 
-        perProblemReportTable = $('#perProblemReport').DataTable({
-            data: [],
-            destroy: true,
-            columns: [
-                { title: "<%= rb.getString("problem_id")%>", data : "problemId" },
-                { title: "<%= rb.getString("problem_name")%>", data : "problemName" },
-                { title: "<%= rb.getString("nbr_students_seen_problem")%>", data : "noStudentsSeenProblem" },
-                { title: "<%= rb.getString("nbr_students_solved_problem")%>", data : "getPercStudentsSolvedEventually" },
-                { title: "<%= rb.getString("nbr_students_solved_problem_first")%>", data : "getGetPercStudentsSolvedFirstTry" },
-                { title: "<%= rb.getString("nbr_students_solved_problem_second")%>", data : "getGetPercStudentsSolvedSecondTry" },
-                { title: "<%= rb.getString("nbr_students_repeated_problem")%>", data : "percStudentsRepeated" },
-                { title: "<%= rb.getString("nbr_students_skipped_problem")%>", data : "percStudentsSkipped" },
-                { title: "<%= rb.getString("nbr_students_gave_up")%>", data : "percStudentsGaveUp" },
-                { title: "<%= rb.getString("most_frequent_incorrect_response")%>", data : "mostIncorrectResponse" }
-            ],
-            "bPaginate": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            rowReorder: false
-
-        } );
     	
-    }
+    
     var cc_headers = changeReportFourHeaderAccordingToLanguage();
 
-    if (languageSet == 'es') {
     perClusterReportTable = $('#perClusterReport').DataTable({
         data: [],
-        destroy: true,
+        <%=jc_rb.getString("language_text")%>
         columns: [
             { title: cc_headers['cclusters'], data : "clusterName" },
             { title: cc_headers['problems'], data : "noOfProblemsInCluster" },
@@ -1200,65 +1270,20 @@ else {
             { title: cc_headers['avgratio'], data : "totalHintsViewedPerCluster" }
         ],
         "bPaginate": false,
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: false
 
     } );
-    }
-    else { 
-        perClusterReportTable = $('#perClusterReport').DataTable({
-            data: [],
-            destroy: true,
-            columns: [
-                { title: cc_headers['cclusters'], data : "clusterName" },
-                { title: cc_headers['problems'], data : "noOfProblemsInCluster" },
-                { title: cc_headers['fattempt'], data : "noOfProblemsonFirstAttempt" },
-                { title: cc_headers['avgratio'], data : "totalHintsViewedPerCluster" }
-            ],
-            "bPaginate": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            rowReorder: false
-
-        } );
-    	
-    }
-    
+	
     
     var headers = changeReportThreeHeaderAccordingToLanguage();
 
     
-    if (languageSet == 'es') {
-    
     perStudentReport  =  $('#perStudentReport').DataTable({
         data: [],
-        destroy: true,
-        columns: [
+        <%=jc_rb.getString("language_text")%>
+    	columns: [
             { title: headers['sid'] },
             { title: headers['sname']  },
             { title: headers['uname']  },
@@ -1270,31 +1295,6 @@ else {
         "bFilter": false,
         "bLengthChange": false,
         rowReorder: false,                
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
-
         "scrollX": true,
         "bSort" : false,
         "columnDefs": [
@@ -1365,23 +1365,7 @@ else {
                                 emotionComments += "</tbody></table>"
                                 commentsTable += emotionComments;
                             }
-
-                            var emo = "undefined";
-                                          
-                            if (key == "Frustration") {
-                            	emo = "Frustración";
-                            }
-                            if (key == "Confidence") {
-                            	emo = "Confianza";
-                            }
-                            if (key == "Excitement") {
-                            	emo = "Estusiasmo";
-                            }
-                            if (key == "Interest") {
-                            	emo = "Inters";
-                            }
-                            
-                            var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + emo + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
+                            var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + key + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
 
                             if (i == 0 || i == 1)
                                 divBlockOne += canvasTags;
@@ -1401,116 +1385,8 @@ else {
                 
     	]
     }    
-    );
-    }
-    else {
-        perStudentReport  =  $('#perStudentReport').DataTable({
-            data: [],
-            destroy: true,
-            columns: [
-                { title: headers['sid'] },
-                { title: headers['sname']  },
-                { title: headers['uname']  },
-                { title: headers['problems']  },
-                { title: headers['effchart']  },
-                { title: headers['emochart']  },
-            ],
-            "bPaginate": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            rowReorder: false,                
-            "scrollX": true,
-            "bSort" : false,
-            "columnDefs": [
-                {
-                    "width": "5%",
-                    "targets": [ 0 ],
-                    "visible": false
-
-                },{
-                    "width": "5%",
-                    "targets": [ 1 ],
-                    "visible": true
-
-                },{
-                    "width": "5%",
-                    "targets": [ 2 ],
-                    "visible": true
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 3 ],
-                    "visible": true,
-                    'className': 'dt-body-center',
-                    'render': function ( data, type, row ) {
-                        return '<label>'+data+'&nbsp&nbsp</lable><a  class="viewEachStudentDetail" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
-                    }
-
-                },
-                {
-                    "targets": [ 4 ],
-                    "width": "10%",
-                    'className': 'dt-body-center',
-                    'render': function ( data, type, row ) {
-                        var effortChartId = "effortChart"+row[0];
-                        var containerChart = "containerChart"+row[0];
-                        var legendChart = "legendChart"+row[0];
-                        var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
-                        return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
-                    }
-                }, {
-                    "targets": [ 5 ],
-                    "width": "70%",
-                    'className': 'dt-body-center',
-                    'render': function ( data, type, row ) {
-                        var studentEmotions = emotionMap[row[0]];
-                        var studentComments = commentsMap[row[0]];
-                        var emotionContainerChart = "emotionContainerChart"+row[0];
-                        var containerConvas = "<div id="+emotionContainerChart+" style='width:100%;display:none'>";
-                        if(jQuery.isEmptyObject(studentEmotions)) {
-                            var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
-                            var containerChartSelector = "#emotionContainerChart" +row[0];
-                             containerConvas += noEmotionReported;
-                        }else {
-                            var i = 0;
-                            var divBlockOne = "<div id='bloc1' style='margin: 1%; float: left;'>";
-                            var divBlockTwo = "<div id='bloc2' style='margin: 1%; float: left;'>";
-                            Object.keys(studentEmotions).forEach(function (key) {
-                                var eachEmotionComment = studentComments[key];
-                                var commentsTable = "";
-                                if (!jQuery.isEmptyObject(eachEmotionComment)) {
-                                    commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr><%= rb.getString("comments")%></tr></thead><tbody>"
-                                    var emotionComments = "";
-                                    eachEmotionComment.forEach(function (comments) {
-                                        if (comments != "")
-                                            emotionComments += "<tr><td>" + comments + "</td></tr>";
-                                    });
-                                    emotionComments += "</tbody></table>"
-                                    commentsTable += emotionComments;
-                                }
-                                var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + key + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
-
-                                if (i == 0 || i == 1)
-                                    divBlockOne += canvasTags;
-                                if (i == 2 || i == 3)
-                                    divBlockTwo += canvasTags;
-                                if (i == 3) {
-                                    divBlockOne += "</div>";
-                                    divBlockTwo += "</div>";
-                                }
-                                i++;
-                            });
-                            containerConvas = containerConvas + divBlockOne + divBlockTwo + "</div>"
-                        }
-                        return "<i id='emotioniconID"+row[0]+"' style='cursor:pointer;' class='fa fa-heart' aria-hidden='true' onclick='loadEmotionMap("+row[0]+");'></i>"+containerConvas;
-                    }
-                },
-                    
-        	]
-        }    
-        );    	
-    }
+    );    	
+    
     
     var myLineChart;
     $('body').on('click', 'div.getMastery-trajectory-for-problemset', function () {
@@ -1585,7 +1461,7 @@ else {
 
                 var  masteryTrajecotoryLegend = $('#masteryTrajecotoryLegend').DataTable({
                     data: perProblemSetLevelOneFullTemp,
-                    destroy: true,
+                    <%=jc_rb.getString("language_text")%>
                     "scrollCollapse": true,
                     "bInfo": false,
                     "columns" : columDvalues,
@@ -1663,16 +1539,14 @@ else {
         if (row.child.isShown()) {
             row.child.hide();
         } else {
-        	var tabPanel =  '<ul class="nav nav-tabs"> <li class="active"><a  href="#1" data-toggle="tab"><%= rb.getString("problems_solved_today")%></a></li> <li><a href="#2" data-toggle="tab"><%= rb.getString("problems_solved_most_recently")%></a> </li> <li><a href="#3" data-toggle="tab"><%= rb.getString("all_solved_problems")%></a> </li> </ul>';	
+        	        	
             var studentDataList = eachStudentData[rowID];
             var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
-            var outputStudentDataTodayList =[];
-            var outputStudentDataYesterdayList =[];
-            var firstHeader;
-            var secondHeader;
-            var thirdHeader;
 
-          
+            var allProblemsHeader;
+
+
+        	
             outputStudentDataList.sort(function(a,b) {
                 if(a[10] == 'Problem was not completed')
                     return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
@@ -1681,103 +1555,28 @@ else {
                 else
                     return new Date(b[10]).getTime() - new Date(a[10]).getTime();
             });
-            for ( var i=0; i< 3 ; i++ ) {
-                if(i == 0){
-                	
-                    var currentDate = new Date();
-                    var yr = currentDate.getFullYear();
-                    var mon = currentDate.getMonth() + 1;
-                    var day = currentDate.getDate();
-                    var today = yr + "-" + mon + "-" + day + " " + "00:00:00.0";       			
-        			var midnight = new Date(today);
-        			var cmpDate = midnight.getTime();
+                                      
+            //show all other problems
+            allProblemsHeader = '<table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
+            $.each(outputStudentDataList, function (i, obj) {
+                var correctHtml = "";
+                var imageURL = problem_imageURL+obj[11]+'.jpg';
+                var problemImgHTML = "<td> <a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + obj[0] + "</a></td>"
+                var effortLabelHTML = "<td> <a style='cursor:pointer' rel='popoverLabel' data-content='"+effortLabelMap[obj[8]]+"'>" + obj[8] + "</a></td>"
+                if ("1" == obj[4])
+                    correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/check.png'/></td>";
+                else
+                    correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/x.png'/></td>";
 
-                    outputStudentDataList.forEach(function(e){
-                    var tempDateHolder  = new Date(e[10]).getTime();
-                    if (tempDateHolder > cmpDate){
-                        outputStudentDataTodayList.push(e);                            
-   	                }
-                    });
-                  if(jQuery.isEmptyObject(outputStudentDataTodayList)) {
-                      secondHeader = '<div id=' + "panel1" + rowID + ' class="panel-body animated zoomOut"> <%= rb.getString("no_problems_done_today")%></div>'
-                  } else {
-                      secondHeader = '<div id='+"panel1"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
-                    $.each(outputStudentDataTodayList, function (i, obj) {
-                        var correctHtml = "";
-                        var imageURL = problem_imageURL+obj[11]+'.jpg';
-                        var problemImgHTML = "<td> <a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + obj[0] + "</a></td>"
-                        var effortLabelHTML = "<td> <a style='cursor:pointer' rel='popoverLabel' data-content='"+effortLabelMap[obj[8]]+"'>" + obj[8] + "</a></td>"
-                        if ("1" == obj[4])
-                            correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/check.png'/></td>";
-                        else
-                            correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/x.png'/></td>";
+                allProblemsHeader += "<tr>" + problemImgHTML + "<td>" + obj[1] + "</td><td>" +obj[10]+ "</td><td>" + obj[2] + "</td>" + correctHtml + "<td>" + obj[5] + "</td><td>" + obj[6] + "</td><td>" + obj[7] + "</td><td>" + obj[12] + "</td><td>" + obj[13] + "</td>"+effortLabelHTML+"</tr>";
 
-                        secondHeader += "<tr>" + problemImgHTML + "<td>" + obj[1] + "</td><td>" +obj[10]+ "</td><td>" + obj[2] + "</td>" + correctHtml + "<td>" + obj[5] + "</td><td>" + obj[6] + "</td><td>" + obj[7] + "</td><td>" + obj[12] + "</td><td>" + obj[13] + "</td>"+effortLabelHTML+"</tr>";
+            });
+            allProblemsHeader += "</tbody></table></div>"
 
-                    });
-                      secondHeader += "</tbody></table></div>"
-                }
-
-                }else if(i == 1){
-                    //Show only problems done yesterday
-                    var firstDate = 0;
-                    var latestDate;
-                    outputStudentDataList.forEach(function(e){
-                        if(firstDate == 0) {
-                            latestDate = new Date(e[10]).getDate();
-                            firstDate++;
-                        }
-                        var tempDateHolder  = new Date(e[10]).getDate();
-                        if(latestDate === tempDateHolder){
-                            outputStudentDataYesterdayList.push(e);
-                        }
-                    });
-                    if(jQuery.isEmptyObject(outputStudentDataYesterdayList)) {
-                        thirdHeader = '<div id=' + "panel2" + rowID + ' class="panel-body animated zoomOut"><%= rb.getString("no_problems_done_yesterday")%></div>'
-                    } else {
-                        thirdHeader = '<div id='+"panel2"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
-                        $.each(outputStudentDataYesterdayList, function (i, obj) {
-                            var correctHtml = "";
-                            var imageURL = problem_imageURL+obj[11]+'.jpg';
-                            var problemImgHTML = "<td> <a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + obj[0] + "</a></td>"
-                            var effortLabelHTML = "<td> <a style='cursor:pointer' rel='popoverLabel' data-content='"+effortLabelMap[obj[8]]+"'>" + obj[8] + "</a></td>"
-                            if ("1" == obj[4])
-                                correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/check.png'/></td>";
-                            else
-                                correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/x.png'/></td>";
-
-                            thirdHeader += "<tr>" + problemImgHTML + "<td>" + obj[1] + "</td><td>" +obj[10]+ "</td><td>" + obj[2] + "</td>" + correctHtml + "<td>" + obj[5] + "</td><td>" + obj[6] + "</td><td>" + obj[7] + "</td><td>" + obj[12] + "</td><td>" + obj[13] + "</td>"+effortLabelHTML+"</tr>";
-
-                        });
-                        thirdHeader += "</tbody></table></div>"
-                    }
-                }else{
-                    //show all other problems
-                    firstHeader = '<div id='+"panel"+rowID+' class="panel-body animated zoomOut"><table id='+rowID+' class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr><th> <%= rb.getString("problem")%></th><th> <%= rb.getString("problem_nickname")%></th><th> <%= rb.getString("problem_finished_on")%></th><th> <%= rb.getString("problem_description")%></th><th> <%= rb.getString("solved_correctly")%></th><th> <%= rb.getString("nbr_mistakes_made")%></th><th> <%= rb.getString("nbr_hints_seen")%></th><th> <%= rb.getString("nbr_attempts_made")%></th><th> <%= rb.getString("nbr_videos_seen")%></th><th> <%= rb.getString("nbr_examples_seen")%></th><th><%= rb.getString("effort")%></th></tr></thead><tbody>';
-                    $.each(outputStudentDataList, function (i, obj) {
-                        var correctHtml = "";
-                        var imageURL = problem_imageURL+obj[11]+'.jpg';
-                        var problemImgHTML = "<td> <a style='cursor:pointer' rel='popover' data-img='" + imageURL + "'>" + obj[0] + "</a></td>"
-                        var effortLabelHTML = "<td> <a style='cursor:pointer' rel='popoverLabel' data-content='"+effortLabelMap[obj[8]]+"'>" + obj[8] + "</a></td>"
-                        if ("1" == obj[4])
-                            correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/check.png'/></td>";
-                        else
-                            correctHtml = "<td><img style='width:15%;' src='"+servletContextPath+"/images/x.png'/></td>";
-
-                        firstHeader += "<tr>" + problemImgHTML + "<td>" + obj[1] + "</td><td>" +obj[10]+ "</td><td>" + obj[2] + "</td>" + correctHtml + "<td>" + obj[5] + "</td><td>" + obj[6] + "</td><td>" + obj[7] + "</td><td>" + obj[12] + "</td><td>" + obj[13] + "</td>"+effortLabelHTML+"</tr>";
-
-                    });
-                    firstHeader += "</tbody></table></div>"
-                }
-            }
-
-            var tabDetails = '<div class="tab-content "><div class="tab-pane active" id="1">'+secondHeader+'</div><div class="tab-pane" id="2">'+thirdHeader+'</div><div class="tab-pane" id="3">'+firstHeader+'</div></div>'
-            row.child(tabPanel+tabDetails).show();
-
-            $("#panel"+rowID).toggleClass('zoomIn zoomOut');
-            $("#panel1"+rowID).toggleClass('zoomIn zoomOut');
-            $("#panel2"+rowID).toggleClass('zoomIn zoomOut');
-
+            var tabDetails = '<div id="allProblemsPane" class="border border-2" >'+allProblemsHeader+'</div>'
+            row.child(tabDetails).show();
+  
+            
             $('a[rel=popover]').popover({
                 html: true,
                 trigger: 'hover',
@@ -1792,8 +1591,8 @@ else {
                 trigger: 'hover',
                 placement: 'left',
             });
-
         }
+        
 
     });
 var completeDataChart;
@@ -2062,64 +1861,10 @@ var completeDataChart;
                     $('#perStudentPerProblemSetReport').empty();
                 }
 
-                if (languageSet == "es") {
+
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
-                    destroy: true,
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },
-                    "columns": columDvalues,
-                    "columnDefs": columNvalues,
-                    "bPaginate": true,
-                    "language": {
-                            "sProcessing":     "Procesando...",
-                            "sLengthMenu":     "Mostrar _MENU_ registros",
-                            "sZeroRecords":    "No se encontraron resultados",
-                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                            "sInfoPostFix":    "",
-                            "sSearch":         "Buscar:",
-                            "sUrl":            "",
-                            "sInfoThousands":  ",",
-                            "sLoadingRecords": "Cargando...",
-                            "oPaginate": {
-                                "sFirst":    "Primero",
-                                "sLast":     "Último",
-                                "sNext":     "Siguiente",
-                                "sPrevious": "Anterior"
-                            },
-                            "oAria": {
-                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                            }
-                    },
-                    "scrollX": true,
-                    "bFilter": false,
-                    "bLengthChange": false,
-                    rowReorder: false,
-                    "bSort": false,
-                    "drawCallback": function () {
-                        $('a[rel=completeMasteryChartPopover]').popover({
-                            html: true,
-                            trigger: 'focus',
-                            placement: 'top',
-                            content: function () {
-                                return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
-                                    '<li><a style="cursor: pointer;" class="getCompleteMasteryByLatest"> <%= rb.getString("get_mastery_by_last_reported")%></a></li></ul>';
-                            }
-                        })
-                    }
-                });
-                }
-                else {
-                perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
-                    data: perProblemSetLevelOneFullTemp,
-                    destroy: true,
+                    <%=jc_rb.getString("language_text")%>
                     "fixedColumns": {
                         "leftColumns": 2,
                         "heightMatch": 'auto'                        
@@ -2145,9 +1890,6 @@ var completeDataChart;
                         })
                     }
                 });
-                }
-                
-                
                 
             }
         });
@@ -2323,10 +2065,9 @@ var completeDataChart;
                 	perStudentperProblemReport.destroy();
                     $('#perStudentPerProblemReport').empty();
                 }
-                if (languageSet == "es") {
                 	perStudentperProblemReport = $('#perStudentPerProblemReport').DataTable({
                     data: perStudentperProblemLevelOneFullTemp,
-                    destroy: true,
+                    <%=jc_rb.getString("language_text")%>
                     "fixedColumns": {
                         "leftColumns": 2,
                         "heightMatch": 'auto'                        
@@ -2335,30 +2076,6 @@ var completeDataChart;
                     "columnDefs": columNvalues,
                     "bPaginate": true,
                     "pageLength": 16,
-                    "language": {
-                            "sProcessing":     "Procesando...",
-                            "sLengthMenu":     "Mostrar _MENU_ registros",
-                            "sZeroRecords":    "No se encontraron resultados",
-                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                            "sInfoPostFix":    "",
-                            "sSearch":         "Buscar:",
-                            "sUrl":            "",
-                            "sInfoThousands":  ",",
-                            "sLoadingRecords": "Cargando...",
-                            "oPaginate": {
-                                "sFirst":    "Primero",
-                                "sLast":     "Último",
-                                "sNext":     "Siguiente",
-                                "sPrevious": "Anterior"
-                            },
-                            "oAria": {
-                                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                            }
-                    },
                     "scrollX": true,
                     "scrollY": "600px",
                     "scrollCollapse": true,                    
@@ -2400,61 +2117,7 @@ var completeDataChart;
 						}
                      }                    
                 });
-                }
-                else {
-                perStudentperProblemReport = $('#perStudentPerProblemReport').DataTable({
-                    data: perStudentperProblemLevelOneFullTemp,
-                    destroy: true,
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },
-                    "columns": columDvalues,
-                    "columnDefs": columNvalues,
-                    "bPaginate": true,
-                    "pageLength": 16,
-                    "scrollX": true,
-                    "scrollY": "600px",
-                    "scrollCollapse": true,                    
-                    "bFilter": false,
-                    "bLengthChange": false,
-                    rowReorder: false,
-                    "bSort": false,
-                    "drawCallback": function () {
-                        $('a[rel=popoverHeader]').popover({
-                        	html: true,
-                            container : 'body',
-                            trigger : 'hover',
-                            placement: 'bottom'
-                        });
-                        $('a[rel=popoverTop]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'top',
-                            content: function () {
-                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                        $('a[rel=popoverBottom]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'bottom',
-                            content: function () {
-                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                    },
-                     headerCallback: function headerCallback(thead, data, start, end, display) {
-						var str = thead.cells.length;
-						var i = 2;
-						for (i=2;i<thead.cells.length;i++) {
-							var inner = "" + thead.cells[i].innerText;
-							var t_html = "<div class='btn btn-primary btn-sm' onclick='nicknameOpen(\"" + inner + "\");' >" + inner + "</div>";
-							$(thead).find('th').eq(i).html(t_html);							
-						}
-                     }
-	            });
-                }
+                
             }
         });
 
@@ -2600,7 +2263,9 @@ var completeDataChart;
 
     });
 
-    $('#collapseThree').on('show.bs.collapse', function ()  {
+    $('#showReportThreeBtn').on('click', function ()  {    	
+        getFilterThree();
+        $('#collapseThreeLoader').show();
         $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2609,9 +2274,10 @@ var completeDataChart;
                 teacherId: teacherID,
                 reportType: 'perStudentReport',
                 lang: loc,
-                filter: ''
+                filter: filterThree
             },
             success : function(data) {
+                $('#collapseThreeLoader').hide();
                 var jsonData = $.parseJSON(data);
                 effortMap = jsonData.effortChartValues;
 //                var junk = JSON.stringify(effortmap);
@@ -2711,39 +2377,14 @@ var completeDataChart;
                     perClusterReportTable.destroy();
                     $('#perClusterReport').empty();
                 }
-                if (languageSet == 'es') {
 
                 perClusterReportTable = $('#perClusterReport').DataTable({
                     data: dataPerCluster,
-                    destroy: true,
+                    <%=jc_rb.getString("language_text")%>
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bFilter": false,
                     "bPaginate": false,                
-                    "language": {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix":    "",
-                        "sSearch":         "Buscar:",
-                        "sUrl":            "",
-                        "sInfoThousands":  ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
-                    },
                     "bLengthChange": false,
                     rowReorder: false,
                     "bSort": true,
@@ -2755,29 +2396,8 @@ var completeDataChart;
                             container: 'body',
                         });
                     }
-                });
-                }
-                else {
-                    perClusterReportTable = $('#perClusterReport').DataTable({
-                        data: dataPerCluster,
-                        destroy: true,
-                        "columns": columDvalues,
-                        "columnDefs": columNvalues,
-                        "bFilter": false,
-                        "bPaginate": false,                
-                        "bLengthChange": false,
-                        rowReorder: false,
-                        "bSort": true,
-                        "drawCallback": function () {
-                            $('a[rel=popoverCluster]').popover({
-                                html: false,
-                                trigger: 'hover',
-                                placement: 'top',
-                                container: 'body',
-                            });
-                        }
-                    });                	
-                }
+                });                	
+                
             }
         });
 
@@ -2821,59 +2441,21 @@ var completeDataChart;
                     surveyList.push([key]);
                     
                 });
-                if (languageSet == 'es') {
+
                 surveyReportTable = $('#surveyReport').DataTable({
                     data: surveyList,
-                    destroy: true,
-                    "columns": [ { title: "<%= rb.getString("survey_name")%>" , width: "30%"}],
+                    <%=jc_rb.getString("language_text")%>
+                	"columns": [ { title: "<%= rb.getString("survey_name")%>" , width: "30%"}],
                     "columnDefs": columNvalues,
                     "bFilter": false,
                     "bPaginate": false,
-                    "language": {
-                        "sProcessing":     "Procesando...",
-                        "sLengthMenu":     "Mostrar _MENU_ registros",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix":    "",
-                        "sSearch":         "Buscar:",
-                        "sUrl":            "",
-                        "sInfoThousands":  ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "Siguiente",
-                            "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
-                    },
                     "bLengthChange": false,
                     rowReorder: false,
                     "bSort": true,
                     
                 });
-                }
-                else {
-                    surveyReportTable = $('#surveyReport').DataTable({
-                        data: surveyList,
-                        destroy: true,
-                        "columns": [ { title: "<%= rb.getString("survey_name")%>" , width: "30%"}],
-                        "columnDefs": columNvalues,
-                        "bFilter": false,
-                        "bPaginate": false,
-                        "bLengthChange": false,
-                        rowReorder: false,
-                        "bSort": true,
-                        
-                    });
                 	
-                }
+                
                 
             },
             error : function(e) {
@@ -3180,10 +2762,14 @@ var completeDataChart;
             $("#content-conatiner").children().hide();
             $("#splash_page").show();
 
-            getStudentList();
             getFilterOne();
             getFilterFour();
-            getFilterSix();
+
+            getStudentListThree();           
+          	getFilterThree();
+            
+            getStudentListSix();           
+          	getFilterSix();
             
             $('#reorg_prob_sets_handler').css('background-color', '');
             $('#reorg_prob_sets_handler').css('color', '#dddddd');
@@ -3302,7 +2888,7 @@ var completeDataChart;
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            Report Card for class: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
         </h1>
 
 
@@ -3411,29 +2997,42 @@ var completeDataChart;
                                 <button id="threeButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
+
                         <div id="collapseThree" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <ul>
-                                    <li>
-                                        <label style="padding-right: 10px;"><%= rb.getString("download_student_data") %></label>
-                                        <a href="${pageContext.request.contextPath}/tt/tt/downLoadPerStudentReport?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                           data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                           class="downloadPerStudentReport" aria-expanded="true"
-                                           aria-controls="collapseThree">
-                                            <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <label style="padding-right: 10px;"><%= rb.getString("download_emotion_data") %>></label>
-                                        <a href="${pageContext.request.contextPath}/tt/tt/downloadStudentEmotions?teacherId=${teacherId}&classId=${classInfo.classid}"
-                                           data-toggle="tooltip" title="<%= rb.getString("download_this_report") %>"
-                                           class="downloadPerStudentReport" aria-expanded="true"
-                                           aria-controls="collapseThree">
-                                            <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                        </a>
-                                    </li>
-                                </ul>
+                           <div class="panel-body report_filters hidden">                           
+								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterThree();">
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_r3_cal1();initCalendar_r3_cal2();$('#calendarModalPopupThree').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysFilterThree" style="width:220px" type="text" name="" value="" >   
+					                </div>
+	 							</div>  
+	
+							</div>
+	                        <div class="panel-body report_filters">
+	                        	<div id="chooseStudents" class="row">
+	                        		<div class="col-md-2 offset-md-1">                       
+					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListThree();" ><%= rb.getString("choose_student") %></button>
+					                </div>
+	                        		<div id="studentSelectionListThree" name="studentSelectionListThree" class="col-md-5">                       
+					                </div>
+	 							</div>  
+	
+							</div>
+                            <div class="panel-body report_filters hidden">
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesThree" name="" value="Y"  onblur="getFilterThree();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportThreeBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								  <a id="downloadReportThreeStudentBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_student_data") %></a>
+								  <a id="downloadReportThreeEmotionBtn" class="btn btn-lg btn-primary" role="button"><%= rb.getString("download_emotion_data") %></a>
+                            </div>
+                            <div id="collapseThreeLoader" class="loader" style="display: none" ></div>
 
                             <div class="panel-body">
                                 <table id="perStudentReport" class="table table-striped table-bordered hover" width="100%"></table>
@@ -3971,6 +3570,110 @@ var completeDataChart;
 </div>	
 
 
+<div id="calendarModalPopupThree" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r3_cal1" name="selectDay_r3_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal1" onclick="previous_r3_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal1" onclick="next_r3_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal1" data-lang="en">
+			              <thead id="thead-month_r3_cal1"></thead>
+			              <tbody id="calendar-body_r3_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r3_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r3_cal1" onchange="jump_r3_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r3_cal1" onchange="jump_r3_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r3_cal2" name="selectDay_r3_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal2" onclick="previous_r3_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal2" onclick="next_r3_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal2" data-lang="en">
+			              <thead id="thead-month_r3_cal2"></thead>
+			              <tbody id="calendar-body_r3_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r3_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r3_cal2" onchange="jump_r3_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r3_cal2" onchange="jump_r3_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterThree();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupThree').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
+
+
+
 <div id="studentsModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
 
     <div class="modal-dialog modal-lg">
@@ -3986,6 +3689,40 @@ var completeDataChart;
 			          <div class="footer-container-calendar">
 			              <label for="studentsSix">Select Students: </label>
 						  <select name='students' id='studentsSix' size='5' multiple>;
+			              </select>
+     
+			          </div>
+			      </div>			      
+			    </div> 
+            </div>
+
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="alert('Hello');" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#studentsModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
+<div id="studentsModalPopupThree" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-students col-sm-6">
+			      <div class="container-calendar">
+			          
+			          <div class="footer-container-calendar">
+			              <label for="studentsThree">Select Students: </label>
+						  <select name='students' id='studentsThree' size='5' multiple>;
 			              </select>
      
 			          </div>
@@ -4155,6 +3892,8 @@ var completeDataChart;
     <script type="text/javascript" src="<c:url value="/js/calendar_r4_2.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r6_1.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r6_2.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r3_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r3_2.js" />"></script>
 </body>
 
 </html>

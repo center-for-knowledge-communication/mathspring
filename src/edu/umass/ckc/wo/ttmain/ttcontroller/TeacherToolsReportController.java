@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
  * Frank	08-15-20	Issue #148 added time period (days) filter for perStudentPerProblemSet report
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
+ * Frank	05-11-21	Issue #463 add report filters
 
  */
 @Controller
@@ -114,7 +115,7 @@ public class TeacherToolsReportController {
     }
 
     @RequestMapping(value = "/tt/downLoadPerStudentReport", method = RequestMethod.GET)
-       public ModelAndView downLoadPerStudentReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) {
+       public ModelAndView downLoadPerStudentReport(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 	    	try {
@@ -124,12 +125,12 @@ public class TeacherToolsReportController {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-        List<ClassStudents> classStudents =  reportService.generateClassReportPerStudent(teacherId, classId);
+        List<ClassStudents> classStudents =  reportService.generateClassReportPerStudent(teacherId, classId, filter);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("levelOneData",classStudents );
         Map<String,String> studentIdMap = classStudents.stream().collect( Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
-        map.addAttribute("levelTwoData",reportService.generateEfortMapValues(studentIdMap,classId));
+        map.addAttribute("levelTwoData",reportService.generateEfortMapValues(studentIdMap,classId,filter));
         map.addAttribute("reportType", "perStudentReportDownload");
         return new ModelAndView("teachersReport", map);
     }
@@ -197,18 +198,18 @@ public class TeacherToolsReportController {
 
     }
 
-    @RequestMapping(value = "/tt/downloadStudentEmotions", method = RequestMethod.GET)
-    public ModelAndView downloadStudentEmotions(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, HttpServletRequest request) throws TTCustomException {
+    @RequestMapping(value = "/tt/downLoadStudentEmotions", method = RequestMethod.GET)
+    public ModelAndView downLoadStudentEmotions(ModelMap map, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
 		HttpSession session = request.getSession();
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 	    	try {
-	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downloadStudentEmotions", "");
+	        	tLogger.logEntryWorker((int) request.getSession().getAttribute("teacherId"), 0, classId, "downLoadStudentEmotions", "");
 	    	}
 	    	catch (Exception e) {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-        Map<String, List<String[]>> perStdentReport =  reportService.generateEmotionsReportForDownload(teacherId,classId);
+        Map<String, List<String[]>> perStdentReport =  reportService.generateEmotionsReportForDownload(teacherId,classId, filter);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("reportType", "perStudentEmotion");
