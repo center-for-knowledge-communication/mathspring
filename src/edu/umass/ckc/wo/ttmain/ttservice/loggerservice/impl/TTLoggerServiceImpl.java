@@ -36,6 +36,7 @@ import edu.umass.ckc.wo.tutor.Settings;
 /**
  * Created by Frank 
  * Frank 	06-17-20	Issue #149
+ * Frank	05-11-21	Truncate action description to fit in db field size
  */
 @Service
 public class TTLoggerServiceImpl implements TTLoggerService {
@@ -89,6 +90,9 @@ public class TTLoggerServiceImpl implements TTLoggerService {
             
             ps.setString(3,classId);
 
+            if (action.length() > 45) {
+            	action = action.substring(0, 44);
+            }
             ps.setString(4,action);
             if (activityName == null) {
                 ps.setNull(5,Types.VARCHAR);

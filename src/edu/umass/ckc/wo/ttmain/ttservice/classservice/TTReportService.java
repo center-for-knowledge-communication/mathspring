@@ -32,15 +32,15 @@ import java.util.Set;
 public interface TTReportService {
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException;
 
-    public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException;
+    public Map<String,List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId, String filter) throws TTCustomException;
 
     public Map<String,PerClusterObjectBean> generatePerCommonCoreClusterReport(String teacherId, String classId, String filter, String teacherLoginType);
 
     Map<String, List<Document>> generateEmotionMapValues(Map<String, String> studentIds) throws TTCustomException;
 
-    public Map<String,Map<String, List<String>>> generateEfortMapValues(Map<String, String> studentIds, String classId);
+    public Map<String,Map<String, List<String>>> generateEfortMapValues(Map<String, String> studentIds, String classId, String filter);
 
-    public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId);
+    public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId, String filter);
 
     public Map<String,Object> generateClassReportPerStudentPerProblemSet(String teacherId, String classId, String filter, String teacherLoginType) throws TTCustomException;
 
