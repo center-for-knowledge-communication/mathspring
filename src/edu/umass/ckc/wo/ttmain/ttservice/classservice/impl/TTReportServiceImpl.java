@@ -935,7 +935,13 @@ public class TTReportServiceImpl implements TTReportService {
     	else {
    			tsFromDate = defaultFromDate();
    			tsToDate = defaultToDate();    		    			    		
-    	}    	
+    	}
+    	if (filters.length > 3) {
+    		selectedStudent = filters[3].trim();
+    	}
+    	else {
+    		selectedStudent = "";
+    	}
 //         SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
 
          Map<String, Object> studentFirstParams = new HashMap<String, Object>();
@@ -945,7 +951,15 @@ public class TTReportServiceImpl implements TTReportService {
          SqlParameterSource studentFirstParamsParameters = new MapSqlParameterSource(studentFirstParams);
          
          List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_FIRST, studentFirstParamsParameters, new ClassStudentsMapper());
-        return classStudents;
+                 
+         Iterator<ClassStudents> i = classStudents.iterator();
+         while (i.hasNext()) {
+        	 ClassStudents stud = i.next();
+        	 if (!stud.getStudentId().equals(selectedStudent)) {
+        		 i.remove();
+        	 }
+         }         
+         return classStudents;
     }
 
     @Override
