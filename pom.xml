@@ -261,6 +261,21 @@
 								<include>Versions.properties</include>
 							</includes>
 						</resource>
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>jchartML.properties</include>
+							</includes>
+						</resource>
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>jchartML_es.properties</include>
+							</includes>
+						</resource>
+
 					</webResources>
 					<archive>
 						<index>true</index>
