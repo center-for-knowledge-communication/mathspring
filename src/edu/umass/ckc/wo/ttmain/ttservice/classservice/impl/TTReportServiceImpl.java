@@ -952,13 +952,15 @@ public class TTReportServiceImpl implements TTReportService {
          
          List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_FIRST, studentFirstParamsParameters, new ClassStudentsMapper());
                  
-         Iterator<ClassStudents> i = classStudents.iterator();
-         while (i.hasNext()) {
-        	 ClassStudents stud = i.next();
-        	 if (!stud.getStudentId().equals(selectedStudent)) {
-        		 i.remove();
-        	 }
-         }         
+         if (selectedStudent.length() > 0) {
+	         Iterator<ClassStudents> i = classStudents.iterator();
+	         while (i.hasNext()) {
+	        	 ClassStudents stud = i.next();
+	        	 if (!stud.getStudentId().equals(selectedStudent)) {
+	        		 i.remove();
+	        	 }
+	         }         
+         }
          return classStudents;
     }
 
