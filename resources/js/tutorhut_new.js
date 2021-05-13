@@ -146,6 +146,7 @@ function getNewAnswer() {
 function setGlobalProblemInfo (activity) {
     globals.numHints = activity.numHints;
     globals.numHintsSeen = 0;
+    globals.standards = activity.standards;
 }
 
 
@@ -375,8 +376,23 @@ function showVideo (globals) {
 
 // TODO this should be changed to use a non-modal dialog
 function showFormulas (globals) {
-    //var formURL = "http://math2.org/math/geometry/areasvols.htm";
-    var formURL = "img/formulaMathSpring.pdf"
+	var formURL = "img/g6refsheet.PNG"
+	try {
+		var tstandard = globals.standards;
+		var grade = tstandard.substring(0,2);	
+		if (grade === "8.") {
+			formURL = "img/g8refsheet.PNG"
+		}
+		if (grade === "7.") {
+			formURL = "img/g7refsheet.PNG"
+		}
+		if (grade === "5.") {
+			formURL = "img/g5refsheet.PNG"
+		}
+	}
+	catch(err) {
+    	console.log(err.message);
+	} 	
     utilDialogOpen(formURL, "Formulas");
     sendSimpleNotificationEvent(globals,"ShowFormulas");
 //    window.open(formURL, "width=500, height=500");
