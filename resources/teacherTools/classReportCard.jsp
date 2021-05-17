@@ -37,6 +37,7 @@
 <!-- Frank 05-01-21  	Hide survey selection and panel -->
 <!-- Frank 05-11-21  	Issue #463 add date filter to perStudent report -->
 <!-- Frank 05-11-21  	Implement multi-lingual chnique for cdn datatable utility using java resource bundle -->
+<!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2754,14 +2755,23 @@ var completeDataChart;
         var pgContext = '${pageContext.request.contextPath}';
         var classID = '${classInfo.classid}';
         var teacherID = '${teacherId}';
+        var teacherLoginType = '${teacherLoginType}';
         var prePostIds = '${prepostIds}'.split("~~");		
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
+        
         $(document).ready(function () {
             registerAllEvents();
             handleclickHandlers();
             $("#content-conatiner").children().hide();
             $("#splash_page").show();
 
+			if (teacherLoginType === "Normal") {
+				$("#report_five_panel").hide();
+			}
+			else {
+				$("#report_five_panel").show();
+			}
+        
             getFilterOne();
             getFilterFour();
 
@@ -3220,7 +3230,7 @@ var completeDataChart;
 
 
 
-					<div class="panel panel-default hidden">
+					<div id="report_five_panel" class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_five" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
@@ -3258,7 +3268,7 @@ var completeDataChart;
              <div id="splash_page" style="display:none;width: 100%;">
              <div>
                     <h3 class="tt-page-header">
-                    Select activities from the menu on the left
+                    <%= rb.getString("select_activities_from_menu") %>
                     </h3>
                 </div>
              </div>

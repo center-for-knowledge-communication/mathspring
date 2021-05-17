@@ -42,6 +42,7 @@
 <!-- Frank 03-05-21  	Issue #388 Landing page report by date range -->
 <!-- Frank 03-15-21  	Issue #398 New feature to move student from one class to another -->
 <!-- Frank 05-01-21  	Hide survey selection -->
+<!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2154,14 +2155,16 @@ function registerAllEvents(){
             else if (currentSelection == "manage_class_handler") {
                 $('#manage_class_handler').click();
         	}            
-            else if (currentSelection == "resetSurveySettings_handler") {
-                $('#resetSurveySettings_handler').click();
-        	}            
             else if (currentSelection == "content_apply_handler") {
                 $('#content_apply_handler').click();
         	}            
+			if (teacherLoginType === "Normal") {
+            	$("#resetSurveySettings").hide();
+			}
+			else {
+            	$("#resetSurveySettings").show();    				
+			}
            
-            
             $('#grade').val("${classInfo.grade}").change();
             $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
             $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
@@ -2409,7 +2412,7 @@ function registerAllEvents(){
 
             <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
 
-<!--             <li><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li> -->
+             <li id="resetSurveySettings"><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
              <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
