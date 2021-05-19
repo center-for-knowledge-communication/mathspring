@@ -38,6 +38,7 @@
 <!-- Frank 05-11-21  	Issue #463 add date filter to perStudent report -->
 <!-- Frank 05-11-21  	Implement multi-lingual chnique for cdn datatable utility using java resource bundle -->
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
+<!-- Frank 05-19-21  	Issue #474 add max-width and max-height to collective effort problem image display -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -892,7 +893,8 @@ function loadEffortMap (rows,flag) {
         var imageURL = problem_imageURL+rows+'.jpg';
         var legendChart = "#lengendTable";
         $('#problemSnapshot').append('<span><strong><%= rb.getString("problem_id")%> :'+rows+'</strong></span>');
-        $('#problemSnapshot').append('<img src="'+imageURL +'"/>');
+        $('#problemSnapshot').append('<img  style="max-width:600px; max-height:600px;" src="'+imageURL +'"/>');
+               
         if(effortChartOnPopup) {
             effortChartOnPopup.destroy();
             $(legendChart).empty();
@@ -3766,7 +3768,7 @@ var completeDataChart;
                 <h4 class="modal-title"><%= rb.getString("collective_student_effort") %></h4>
             </div>
             <div class="modal-body" role="alert">
-                <div id="problemSnapshot"></div>
+                <div id="problemSnapshot" ></div>
                 <canvas id="studentEffortRecordedProblemCanvas" width='900' height='150'></canvas>
                 <div id="lengendTable"></div>
             </div>
