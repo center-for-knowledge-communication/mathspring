@@ -83,6 +83,7 @@ import java.text.SimpleDateFormat;
  * Frank 	03-31-21  	Issue #418R4 add paging, padding -->
  * Frank 	04-30-21  	Fix filter parsing
  *  Frank 	04-30-21  	Send problem nickname to perStudentPerproblem report
+ *  Frank 	05-11-21  	Issue #463 add report filters
  */
 
 
@@ -134,18 +135,52 @@ public class TTReportServiceImpl implements TTReportService {
     		
         	switch (reportType) {
                 case "perStudentReport":
+                	String logMsg = "";
+                	Timestamp tsFromDate = null;
+                	Timestamp tsToDate = null;
+                	
+                	String filters[] = filter.split("~");
+                	String modFilter = "%";
+                	if (filters.length > 0) {
+                		modFilter = filters[0].trim() + "%";
+                	}
+
+                	if (filters.length > 1) {
+                		if (filters[1].equals("")) {
+                   			tsFromDate = defaultFromDate();
+                   			tsToDate = defaultToDate();    		    			
+                		}
+                		else {
+            	    		String dateFilters[] = filters[1].split("thru");
+            	    		if (dateFilters[0].length() > 1) {
+            	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+            	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+            	    		}
+            	    		else {
+            	    			tsFromDate = defaultFromDate();
+            	    			tsToDate = defaultToDate();    		
+            	    		}
+            	    	}
+                       	logMsg = "{ \"dates\" : \"" +  filters[1].trim() + "\" }";     
+
+                	}
+                	else {
+               			tsFromDate = defaultFromDate();
+               			tsToDate = defaultToDate();    		    			    		
+                	}    	
+
             		if ("Normal".equals(teacherLoginType)) {
 	                	try {
-	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), "");
+	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), logMsg);
 	                	}
 	                	catch (Exception e) {
 	                		System.out.println("TeacherLogger error " + e.getMessage());
 	                	}
             		}
-                    List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
+                    List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId, filter);
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
                     Map<String, String> studentIdMap = classStudents.stream().collect(Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
-                    Map<String, Map<String, List<String>>> effortValues = generateEfortMapValues(studentIdMap, classId);
+                    Map<String, Map<String, List<String>>> effortValues = generateEfortMapValues(studentIdMap, classId, filter);
                     Map<String, List<Document>> genemotioMap   = generateEmotionMapValues(studentIdMap);
                     Map<String,Map<String,int[]>> fullstudentEmotionsMap = new HashMap<>();
                     Map<String,Map<String,List<String>>> fullstudentEmotionsComments = new HashMap<>();
@@ -471,12 +506,63 @@ public class TTReportServiceImpl implements TTReportService {
 	}
 
 	@Override
-    public Map<String, List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId) throws TTCustomException {
-        List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId);
+    public Map<String, List<String[]>> generateEmotionsReportForDownload(String teacherId, String classId, String filter) throws TTCustomException {
+
+    	String filters[] = filter.split("~");
+    	String modFilter = "%";
+    	String selectedStudent = "";
+    	
+    	if (filters.length > 0) {
+    		modFilter = filters[0].trim() + "%";
+    	}
+    	
+   		
+    	if (filters.length > 3) {
+    		selectedStudent = filters[3].trim();
+    	}
+    	else {
+    		selectedStudent = "";
+    	}
+    		
+		
+		List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId, filter);
         Map<String, List<String[]>> finalMapValues = new HashMap<>();
         classStudents.forEach( classStudent ->{
-            SqlParameterSource namedParameters = new MapSqlParameterSource("studId", classStudent.getStudentId());
-            List<String[]> emotionReportValues =   namedParameterJdbcTemplate.query(TTUtil.EMOTION_REPORT_DOWNLOAD, namedParameters, (ResultSet mappedrow) -> {
+        	Timestamp tsFromDate = null;
+        	Timestamp tsToDate = null;
+        	if (filters.length > 1) {
+        		if (filters[1].equals("")) {
+           			tsFromDate = defaultFromDate();
+           			tsToDate = defaultToDate();    		    			
+        		}
+        		else {
+    	    		String dateFilters[] = filters[1].split("thru");
+    	    		if (dateFilters[0].length() > 1) {
+    	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+    	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+    	    		}
+    	    		else {
+    	    			tsFromDate = defaultFromDate();
+    	    			tsToDate = defaultToDate();    		
+    	    		}
+    	    	}
+        	}
+        	else {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			    		
+        	}
+
+//       	SqlParameterSource namedParameters = new MapSqlParameterSource("studId", classStudent.getStudentId());
+ 
+            Map<String, Object> params = new HashMap<String, Object>();
+    
+            params.put("studId", classStudent.getStudentId());
+            params.put("tsFromDate", tsFromDate);
+            params.put("tsToDate",tsToDate);
+            SqlParameterSource namedParameters = new MapSqlParameterSource(params);        
+                  	
+        	
+        	List<String[]> emotionReportValues =   namedParameterJdbcTemplate.query(TTUtil.EMOTION_REPORT_DOWNLOAD, namedParameters, (ResultSet mappedrow) -> {
                 List<String[]> addList = new ArrayList<>();
                 while (mappedrow.next()) {
                     String[] finalValues = new String[13];
@@ -637,16 +723,51 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public Map<String, Map<String, List<String>>> generateEfortMapValues(Map<String, String> studentIds, String classId) {
-        Map<String, Map<String, List<String>>> completeDataMap = new LinkedHashMap<>();
+    public Map<String, Map<String, List<String>>> generateEfortMapValues(Map<String, String> studentIds, String classId, String filter) {
+
+    	
+    	String filters[] = filter.split("~");
+    	String modFilter = "%";
+    	
+    	Map<String, Map<String, List<String>>> completeDataMap = new LinkedHashMap<>();
         Map<String, List<String>> effortValues = new LinkedHashMap<String, List<String>>();
         studentIds.forEach((studentId, noOfProblems) -> {
+        	
+        	Timestamp tsFromDate = null;
+        	Timestamp tsToDate = null;
+
+
+        	if (filters.length > 1) {
+        		if (filters[1].equals("")) {
+           			tsFromDate = defaultFromDate();
+           			tsToDate = defaultToDate();    		    			
+        		}
+        		else {
+    	    		String dateFilters[] = filters[1].split("thru");
+    	    		if (dateFilters[0].length() > 1) {
+    	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+    	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+    	    		}
+    	    		else {
+    	    			tsFromDate = defaultFromDate();
+    	    			tsToDate = defaultToDate();    		
+    	    		}
+    	    	}
+        	}
+        	else {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			    		
+        	}    	
             String[] effortvalues = new String[9];
             Integer noOfProb = Integer.valueOf(noOfProblems.trim());
             int SKIP = 0, NOTR = 0, GIVEUP = 0, SOF = 0, SHINT = 0, SHELP = 0, ATT = 0, GUESS = 0, NODATA = 0;
-            Map<String, String> selectParams = new LinkedHashMap<String, String>();
+            Map<String, Object> selectParams = new LinkedHashMap<String, Object>();
             selectParams.put("classId", classId);
             selectParams.put("studId", studentId);
+            selectParams.put("tsFromDate", tsFromDate);
+            selectParams.put("tsToDate", tsToDate);
+
+            
             List<String> studentEfforts = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_SECOND, selectParams, new RowMapper<String>() {
                 @Override
                 public String mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -784,10 +905,63 @@ public class TTReportServiceImpl implements TTReportService {
     }
 
     @Override
-    public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
-        List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_FIRST, namedParameters, new ClassStudentsMapper());
-        return classStudents;
+    public List<ClassStudents> generateClassReportPerStudent(String teacherId, String classId, String filter) {
+    	Timestamp tsFromDate = null;
+    	Timestamp tsToDate = null;
+    	
+    	String filters[] = filter.split("~");
+    	String modFilter = "%";
+    	if (filters.length > 0) {
+    		modFilter = filters[0].trim() + "%";
+    	}
+
+    	if (filters.length > 1) {
+    		if (filters[1].equals("")) {
+       			tsFromDate = defaultFromDate();
+       			tsToDate = defaultToDate();    		    			
+    		}
+    		else {
+	    		String dateFilters[] = filters[1].split("thru");
+	    		if (dateFilters[0].length() > 1) {
+	    			tsFromDate = convertFromDate(dateFilters[0].trim());
+	    			tsToDate = convertToDate(dateFilters[1].trim());    			
+	    		}
+	    		else {
+	    			tsFromDate = defaultFromDate();
+	    			tsToDate = defaultToDate();    		
+	    		}
+	    	}
+    	}
+    	else {
+   			tsFromDate = defaultFromDate();
+   			tsToDate = defaultToDate();    		    			    		
+    	}
+    	if (filters.length > 3) {
+    		selectedStudent = filters[3].trim();
+    	}
+    	else {
+    		selectedStudent = "";
+    	}
+//         SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+
+         Map<String, Object> studentFirstParams = new HashMap<String, Object>();
+         studentFirstParams.put("classId", classId);
+         studentFirstParams.put("tsFromDate", tsFromDate);
+         studentFirstParams.put("tsToDate", tsToDate);
+         SqlParameterSource studentFirstParamsParameters = new MapSqlParameterSource(studentFirstParams);
+         
+         List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_FIRST, studentFirstParamsParameters, new ClassStudentsMapper());
+                 
+         if (selectedStudent.length() > 0) {
+	         Iterator<ClassStudents> i = classStudents.iterator();
+	         while (i.hasNext()) {
+	        	 ClassStudents stud = i.next();
+	        	 if (!stud.getStudentId().equals(selectedStudent)) {
+	        		 i.remove();
+	        	 }
+	         }         
+         }
+         return classStudents;
     }
 
     @Override

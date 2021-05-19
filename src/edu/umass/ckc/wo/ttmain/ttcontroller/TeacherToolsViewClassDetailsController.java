@@ -57,6 +57,7 @@ import javax.servlet.http.HttpSession;
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another - added changeStudentClass method
  * Frank 	04-01-21  	Issue #418 getStudentList()
+ * Frank 	05-17-21  	Issue #471 Pass teacherLoginType value in map to classReportCard
  */
 
 @Controller
@@ -226,6 +227,7 @@ public class TeacherToolsViewClassDetailsController {
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
         map.addAttribute("createClassForm", new CreateClassForm());
         map.addAttribute("teacherId", String.valueOf(sTeacherId));
+        map.addAttribute("teacherLoginType", (String) session.getAttribute("teacherLoginType"));
         session.setAttribute("classId",classId);
         return "teacherTools/classReportCard";
     }
