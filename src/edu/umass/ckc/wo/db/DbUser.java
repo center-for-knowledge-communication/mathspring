@@ -29,7 +29,8 @@ import java.util.ArrayList;
  * Frank 09-14-2020	issue #237 added pauseStudentUse coding
  * Frank 09-14-2020	issue #237 added 'exclude test users from pause'
  * Frank 09-29-2020	issue #237R3 added 'exclude test users from pause'
- * Frank 12-26-20	issue #329 use multi-lingual version of getAllTopics() 
+ * Frank 12-26-20	issue #329 use multi-lingual version of getAllTopics()
+ * Frank 05-19-21   issue #473 cropt lname to 2 characters 
  */
 public class DbUser {
 
@@ -392,6 +393,9 @@ public class DbUser {
         PreparedStatement ps;
         ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, fname);
+        if (lname.length() > 2) {
+        	lname = lname.substring(0, 1);
+        }
         ps.setString(2, lname);
         ps.setString(3, userName);
         ps.setString(4, email);
@@ -427,6 +431,9 @@ public class DbUser {
         PreparedStatement ps;
         ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, fname);
+        if (lname.length() > 2) {
+        	lname = lname.substring(0, 1);
+        }
         ps.setString(2, lname);
         ps.setString(3, userName);
         ps.setString(4, email);
