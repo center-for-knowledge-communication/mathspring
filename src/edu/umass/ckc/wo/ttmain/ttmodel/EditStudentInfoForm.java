@@ -2,6 +2,7 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
 
 /**
  * Created by nsmenon on 4/19/2017.
+ * Frank    05-20-21  	Issue #473 fix username update bug
  */
 public class EditStudentInfoForm {
 
@@ -9,14 +10,16 @@ public class EditStudentInfoForm {
     private String studentFname;
     private String studentLname;
     private String studentUsername;
+    private String origStudentUsername;
     private String className;
     private String classPassword;
 
-    public EditStudentInfoForm(Integer studentId, String studentFname, String studentLname, String studentUsername) {
+    public EditStudentInfoForm(Integer studentId, String studentFname, String studentLname, String studentUsername, String origStudentUsername) {
         this.studentId = studentId;
         this.studentFname = studentFname;
         this.studentLname = studentLname;
         this.studentUsername = studentUsername;
+        this.origStudentUsername = origStudentUsername;
     }
 
     public Integer getStudentId() {
@@ -49,6 +52,14 @@ public class EditStudentInfoForm {
 
     public void setStudentUsername(String studentUsername) {
         this.studentUsername = studentUsername;
+    }
+
+    public String getOrigStudentUsername() {
+        return origStudentUsername;
+    }
+
+    public void setOrigStudentUsername(String origStudentUsername) {
+        this.origStudentUsername = origStudentUsername;
     }
 
     public String getClassName() {

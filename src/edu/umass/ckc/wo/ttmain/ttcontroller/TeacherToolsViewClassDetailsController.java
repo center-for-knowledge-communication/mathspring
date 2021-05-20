@@ -58,6 +58,7 @@ import javax.servlet.http.HttpSession;
  * Frank 	03-15-21  	Issue #398 New feature to move student from one class to another - added changeStudentClass method
  * Frank 	04-01-21  	Issue #418 getStudentList()
  * Frank 	05-17-21  	Issue #471 Pass teacherLoginType value in map to classReportCard
+ * Frank    05-20-21  	Issue #473 fix username update bug
  */
 
 @Controller
@@ -380,7 +381,7 @@ public class TeacherToolsViewClassDetailsController {
     public @ResponseBody
     String editStudentInfo(@RequestParam(value = "studentId") String studentId,@RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
     	System.out.println("editStudentInfo");
-        return pvService.editStudentInfo(new EditStudentInfoForm(Integer.valueOf(studentId.trim()),formData[1].trim(),formData[2].trim(),formData[0].trim()),lang);
+        return pvService.editStudentInfo(new EditStudentInfoForm(Integer.valueOf(studentId.trim()),formData[1].trim(),formData[2].trim(),formData[0].trim(),formData[3].trim()),lang);
     }
 
 
