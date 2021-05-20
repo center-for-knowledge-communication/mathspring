@@ -43,6 +43,7 @@
 <!-- Frank 03-15-21  	Issue #398 New feature to move student from one class to another -->
 <!-- Frank 05-01-21  	Hide survey selection -->
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
+<!-- Frank 05-20-21  	Issue #473 crop lname -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2317,9 +2318,12 @@ function registerAllEvents(){
         var tempStudentUserName =  '<div class="form-group"><div class="input-group"><label for="studentUsername"><%= rb.getString("username") %></label></div><div class="input-group">'+
             '<input type="text" value='+uname+' id="studentUsername" class="form-control" name="studentUsername"/></div></div>';
 
+        var origStudentUserName =  '<div class="form-group"><div class="input-group"></div><div class="input-group hidden">'+
+            '<input type="text" value='+uname+' id="origstudentUsername" class="form-control" name="origstudentUsername"/></div></div>';
+
         var formHtml = '<div class="panel-body"><form id="edit_Student_Form'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="studentId"><%= rb.getString("user_id") %></label></div><div class="input-group">'+
             '<input type="text" value='+id+' id="studentId" class="form-control" name="studentId" disabled="disabled" /></div></div>'+tempStudentUserName
-            + tempStudentName + tempStudentLastName +
+            + tempStudentName + tempStudentLastName + origStudentUserName +
             '<div class="input-group"><button role="button" onclick="updateStudentInfo('+id+')" class="btn btn-primary"><%= rb.getString("update_information") %></button></div></form></div>';
 
         var formHtmlPassWord = '<div class="panel-body"><form id="resetPasswordfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newPassword"><%= rb.getString("new_password") %></label></div><div class="input-group">'+

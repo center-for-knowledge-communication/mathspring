@@ -305,7 +305,6 @@ public class DbUser {
         else return -1;
     }
 
-
     public static int getStudent(Connection conn, String userName, String password) throws Exception {
         String q = "select id, password, classId from Student where userName=?";
         PreparedStatement ps = conn.prepareStatement(q);
@@ -394,7 +393,7 @@ public class DbUser {
         ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, fname);
         if (lname.length() > 2) {
-        	lname = lname.substring(0, 1);
+        	lname = lname.substring(0, 2);
         }
         ps.setString(2, lname);
         ps.setString(3, userName);
@@ -432,7 +431,7 @@ public class DbUser {
         ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, fname);
         if (lname.length() > 2) {
-        	lname = lname.substring(0, 1);
+        	lname = lname.substring(0, 2);
         }
         ps.setString(2, lname);
         ps.setString(3, userName);
@@ -1032,6 +1031,9 @@ public class DbUser {
             String q = "update student set fname=?, lname=?  where id=?";
             stmt = conn.prepareStatement(q);
             stmt.setString(1, fname);
+            if (lini.length() > 2) {
+            	lini = lini.substring(0, 2);
+            }            
             stmt.setString(2, lini);
             stmt.setInt(3, studentId);
             return stmt.executeUpdate();
