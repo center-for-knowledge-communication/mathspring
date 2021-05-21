@@ -48,7 +48,12 @@ public class StudentName extends LoginInterventionSelector {
             	studentNameUrl = studentNameUrl + "?fname=none";            	
             }
             if (student.getLname().length() > 0) { 
-            	studentNameUrl = studentNameUrl + "&lname=" + student.getLname().substring(0, 1);
+                if (student.getLname().length() > 2) { 
+                	studentNameUrl = studentNameUrl + "&lname=" + student.getLname().substring(0, 2);
+                }
+                else {
+                	studentNameUrl = studentNameUrl + "&lname=" + student.getLname();                	
+                }
             }
             else {
             	studentNameUrl = studentNameUrl + "&lname=none";            	            	
