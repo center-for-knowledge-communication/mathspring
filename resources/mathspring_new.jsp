@@ -382,6 +382,13 @@ label {
 					id="formulas"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-magic" aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("formula") %></span>
+				</a> 
+				<a href="#"
+					class="huytran-sitenav__button huytran-sitenav__showmore-target"
+					id="glossary"> <span class="huytran-sitenav__icon"> <i
+						class="fa fa-sticky-note-o" aria-hidden="true"></i>
+				</span> <span class="huytran-sitenav__buttontitle">Gaze UI Tester</span>
+				</a>				
 				</a> <a class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					data-toggle="modal" data-target="#reportModal"> <span
 					class="huytran-sitenav__icon"> <i

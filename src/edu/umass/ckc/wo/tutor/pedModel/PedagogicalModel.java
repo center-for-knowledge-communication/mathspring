@@ -1,6 +1,7 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
 import edu.umass.ckc.servlet.servbase.BaseServlet;
+
 import edu.umass.ckc.email.Emailer;
 import edu.umass.ckc.wo.config.LessonXML;
 import edu.umass.ckc.wo.db.DbClass;
@@ -24,6 +25,7 @@ import edu.umass.ckc.wo.tutor.probSel.PedagogicalModelParameters;
 import edu.umass.ckc.wo.tutor.probSel.ReviewModeProblemSelector;
 import edu.umass.ckc.wo.tutor.response.HintResponse;
 import edu.umass.ckc.wo.event.internal.InternalEvent;
+import edu.umass.ckc.wo.event.tutorhut.GazeWanderingEvent;
 import edu.umass.ckc.wo.tutor.response.ProblemResponse;
 import edu.umass.ckc.wo.tutor.response.Response;
 import edu.umass.ckc.wo.tutormeta.*;
@@ -148,7 +150,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
      */
     @Override
     public Response processUserEvent(TutorHutEvent e) throws Exception {
-        Response r = null;
+    	Response r = null;
         StudentState state = smgr.getStudentState();
         // make sure probElapseTime is saved on each event containing one
         if (e instanceof IntraProblemEvent)
@@ -193,6 +195,11 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         }
         else if (e instanceof ShowVideoEvent) {
             r = processShowVideoRequest((ShowVideoEvent) e);
+            studentModel.save();
+            return r;
+        }
+        else if (e instanceof GazeWanderingEvent) {
+            r = processGazeWanderingRequest((GazeWanderingEvent) e);
             studentModel.save();
             return r;
         }
@@ -407,6 +414,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
     public abstract Response processShowVideoRequest (ShowVideoEvent e) throws Exception;
 
+    public abstract Response processGazeWanderingRequest (GazeWanderingEvent e) throws Exception;
     // results: ProblemResponse | InterventionResponse
     public abstract Response processNextProblemRequest (NextProblemEvent e) throws Exception;
 
@@ -541,6 +549,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
     }
 
     public abstract void newSession (int sessionId) throws SQLException;
+    
 
 
     /**
@@ -577,4 +586,5 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
 
     public abstract void addPedagogicalMoveListener(PedagogicalMoveListener pml);
+
 }

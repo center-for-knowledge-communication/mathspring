@@ -374,6 +374,23 @@ function showVideo (globals) {
     }
 }
 
+function showGazeWandering (globals,gazeData) {
+	
+	var yaw = 1;
+	var pitch = 2;
+	var roll = 3;
+	var duration = 2000;
+	var direction = "Down";
+	
+	//var gazeData = '{"yaw": "1", "pitch": "2", "roll": "3", "time_human": "4", "time_milli": "5", "duration": "6", "direction": "7"}';
+
+	var gazeData = '{"UpDegrees": "1", "DownDegrees": "2", "LeftDegrees": "3", "RightDegrees": "4", "tiltDegrees": "5", "modelConfidence": "6", "modelversionID": "7"}';
+	
+//	var gazeDataString = JSON.stringify(gazeData)};
+	alert(gazeData);
+    servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": gazeData },processGazeWandering);
+}
+
 // TODO this should be changed to use a non-modal dialog
 function showFormulas (globals) {
 	var formURL = "img/g6refsheet.PNG"
@@ -381,13 +398,13 @@ function showFormulas (globals) {
 		var tstandard = globals.standards;
 		var grade = tstandard.substring(0,2);	
 		if (grade === "8.") {
-			formURL = "img/g8refsheet.PNG"
+			formURL = "img/g8refsheet.PNG";
 		}
 		if (grade === "7.") {
-			formURL = "img/g7refsheet.PNG"
+			formURL = "img/g7refsheet.PNG";
 		}
 		if (grade === "5.") {
-			formURL = "img/g5refsheet.PNG"
+			formURL = "img/g5refsheet.PNG";
 		}
 	}
 	catch(err) {
@@ -448,7 +465,8 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 
 
 function processShowVideo (responseText, textStatus, XMLHttpRequest) {
-    checkError(responseText);
+
+	checkError(responseText);
     var activity = JSON.parse(responseText);
     var video = activity.video;
     // khanacademy won't play inside an iFrame because it sets X-Frame-Options to SAMEORIGIN.
@@ -462,6 +480,12 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     	alert(no_video_to_show);
     }
 }
+
+function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
+
+	alert(responseText);
+}
+
 
 function openExampleDialog(solution){
     if (solution != 'undefined' && solution != null) {
@@ -1198,7 +1222,7 @@ function clickHandling () {
         showFormulas(globals)
     });
     $("#glossary").click(function () {
-        showGlossary(globals)
+        showGazeWandering(globals)
     });
     $('#'+INSTRUCTIONS_DIALOG).dialog({
 //        autoOpen: ((globals.instructions == "") ? false : true),
