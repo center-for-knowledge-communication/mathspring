@@ -84,6 +84,7 @@ import java.text.SimpleDateFormat;
  * Frank 	04-30-21  	Fix filter parsing
  *  Frank 	04-30-21  	Send problem nickname to perStudentPerproblem report
  *  Frank 	05-11-21  	Issue #463 add report filters
+ * Frank    05-20-21  	Issue #473 fix username update bug
  */
 
 
@@ -2144,7 +2145,7 @@ public class TTReportServiceImpl implements TTReportService {
         List<EditStudentInfoForm> studentInfoList = namedParameterJdbcTemplate.query(TTUtil.GET_STUDENTS_INFO_FOR_CLASS, selectParams, new RowMapper<EditStudentInfoForm>() {
             @Override
             public EditStudentInfoForm mapRow(ResultSet resultSet, int i) throws SQLException {
-                EditStudentInfoForm editInfoForm = new EditStudentInfoForm(resultSet.getInt("id"),resultSet.getString("fname"),resultSet.getString("lname"),resultSet.getString("userName"));
+                EditStudentInfoForm editInfoForm = new EditStudentInfoForm(resultSet.getInt("id"),resultSet.getString("fname"),resultSet.getString("lname"),resultSet.getString("userName"),resultSet.getString("userName"));
                 editInfoForm.setClassName(resultSet.getString("name"));
                 editInfoForm.setClassPassword(studentPassword);
                 return editInfoForm;

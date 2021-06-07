@@ -18,6 +18,7 @@ import java.sql.SQLException;
  * Time: 3:37 PM
  * To change this template use File | Settings | File Templates.
  * Frank	09-01-20	Issue #230	Add params for fname & lname to login intervemtion
+ * Frank    05-20-21  	Issue #473 crop lname
  */
 public class StudentName extends LoginInterventionSelector {
 
@@ -47,7 +48,12 @@ public class StudentName extends LoginInterventionSelector {
             	studentNameUrl = studentNameUrl + "?fname=none";            	
             }
             if (student.getLname().length() > 0) { 
-            	studentNameUrl = studentNameUrl + "&lname=" + student.getLname().substring(0, 1);
+                if (student.getLname().length() > 2) { 
+                	studentNameUrl = studentNameUrl + "&lname=" + student.getLname().substring(0, 2);
+                }
+                else {
+                	studentNameUrl = studentNameUrl + "&lname=" + student.getLname();                	
+                }
             }
             else {
             	studentNameUrl = studentNameUrl + "&lname=none";            	            	
@@ -60,8 +66,8 @@ public class StudentName extends LoginInterventionSelector {
 
         String fname = params.getString(LoginParams.FNAME);
         String lini = params.getString(LoginParams.LINI);
-        if ((fname.length() > 0) && (lini.length() > 0)) {
-        	lini = lini.substring(0, 1);
+        if ((fname.length() > 0) && (lini.length() > 2)) {
+        	lini = lini.substring(0, 2);
         	DbUser.setUserNames(servletInfo.getConn(), smgr.getStudentId(), fname, lini);
         }
         return null;

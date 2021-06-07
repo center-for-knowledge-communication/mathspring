@@ -46,6 +46,7 @@ import edu.umass.ckc.wo.smgr.User;
  * Frank	01-16-21	Issue #368 Edit profile should not allow dups
  * Frank    03-15-21  	Issue #398 New feature to move student from one class to another
  * Frank    04-01-21  	Issue #418 getStudentList()
+ * Frank    05-20-21  	Issue #473 crop lname and fix username update bug
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -233,7 +234,10 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	rb = ResourceBundle.getBundle("MathSpring",loc);
 		String msg =  "";
         try {
-        	int id = DbUser.getStudent(connection.getConnection(), editStudentInfoForm.getStudentUsername());
+        	int id = 0;
+        	if (!editStudentInfoForm.getStudentUsername().equals(editStudentInfoForm.getOrigStudentUsername())) {
+            	id = DbUser.getStudent(connection.getConnection(), editStudentInfoForm.getStudentUsername());        		
+        	}
         	if (id > 0) {
         		msg =  "*** " + rb.getString("username_in_use") +  " ***";
             	return msg;
@@ -241,7 +245,11 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         	else {
 		        Map<String,Object> updateParams = new HashMap<String,Object>();
 		        updateParams.put("fname", editStudentInfoForm.getStudentFname());
-		        updateParams.put("lname", editStudentInfoForm.getStudentLname());
+		        String lname = editStudentInfoForm.getStudentLname();
+		        if (lname.length() > 2) {
+		        	lname = lname.substring(0, 2);
+		        }
+		        updateParams.put("lname",lname);
 		        updateParams.put("uname", editStudentInfoForm.getStudentUsername());
 		        updateParams.put("studentId", editStudentInfoForm.getStudentId());
 		        this.namedParameterJdbcTemplate.update(TTUtil.UPDATE_STUDENT_INFO,updateParams);
