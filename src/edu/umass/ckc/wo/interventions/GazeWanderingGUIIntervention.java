@@ -5,85 +5,37 @@ import net.sf.json.JSONObject;
 
 /**
  */
-public class GazeWanderingGUIIntervention extends InputResponseIntervention {
-    public static final String BEFORE="before";
-    public static final String AFTER="after";
-    public static final String SHOW="show";
-    public static final String HIDE="hide";
-    public static final String HIGHLIGHT="highlight";
+public class GazeWanderingGUIIntervention {
 
-    protected String when;
-    protected String dialogHTML;
-    protected String component; // the component of the GUI to change.
-    protected String action; // show/hide/highlight
-    protected String notify;
+    protected String flashScreen;
+    protected String flashBox;    
+    protected String playSound;
+    protected String LCompanion;
+    
 
-    public GazeWanderingGUIIntervention(String when, String dialogHTML, String notify, String component, String action) {
+    public GazeWanderingGUIIntervention(String flashScreen, String flashBox, String playSound, String LCompanion) {
         super();
-        this.isInputIntervention = true;
-        this.when = when;
-        this.dialogHTML = dialogHTML;
-        notify = notify;
-        this.component = component;
-        this.action = action;
-    }
-
-    public String getWhen() {
-        return when;
-    }
-
-    public void setWhen(String when) {
-        this.when = when;
-    }
-
-    public String getDialogHTML () {
-        String str = "<div>" + dialogHTML;
-        str+="</div>";
-        return str;
-    }
-
-    public String getType () {
-        return "ChangeGUIIntervention";
-    }
-
-    public void setDialogHTML(String dialogHTML) {
-        this.dialogHTML = dialogHTML;
-    }
-
-    public String getNotify() {
-        return notify;
-    }
-
-    public void setNotify(String notify) {
-        notify = notify;
-    }
-
-    public String getComponent() {
-        return component;
-    }
-
-    public void setComponent(String component) {
-    	component = component;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-    	action = action;
+        this.flashScreen = flashScreen;
+        this.flashBox = flashBox;
+        this.playSound= playSound;
+        this.LCompanion = LCompanion;
     }
 
 
-    
-    
-    public JSONObject buildJSON(JSONObject jo) {
-        jo.element("changeGUI",true);
-        jo.element("notify",this.notify);
-        jo.element("when",this.when);
-        jo.element("component", this.component);
-        jo.element("action", this.action);
-        return super.buildJSON(jo);
+    public String getFlashScreen() {
+        return flashScreen;
+    }
+
+    public String getFlashBox() {
+        return flashBox;
+    }
+
+    public String getPlaySound() {
+        return playSound;
+    }
+
+    public String getLCompanion() {
+        return LCompanion;
     }
 
 }

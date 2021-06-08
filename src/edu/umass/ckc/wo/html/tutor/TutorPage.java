@@ -123,6 +123,7 @@ public class TutorPage {
         info.getRequest().setAttribute("className",smgr.getClassName());
         info.getRequest().setAttribute("teacherName",smgr.getTeacherName());
         info.getRequest().setAttribute("timeInSession", smgr.getTimeInSession());
+        info.getRequest().setAttribute("gazeDetectionOn", smgr.getGazeDetectionOn());
 
         if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId()))
             info.getRequest().setAttribute("showAnswer", true);

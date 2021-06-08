@@ -31,6 +31,7 @@ import edu.umass.ckc.wo.tutor.probSel.*;
 import edu.umass.ckc.wo.tutor.response.*;
 import edu.umass.ckc.wo.tutor.vid.BaseVideoSelector;
 import edu.umass.ckc.wo.tutormeta.*;
+import edu.umass.ckc.wo.db.DbGaze;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.jdom.Element;
@@ -380,23 +381,23 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	logger.setLevel(Level.DEBUG);
     	logger.debug("processGazeWanderingRequest");
         smgr.getStudentState().setProblemIdleTime(0);
-        Problem p = ProblemMgr.getProblem(smgr.getStudentState().getCurProblem());
-
-        String gazeJSONData = e.getGazeJSONData();
+        
+        JSONObject gazeJSONData = e.getGazeJSONData();
         if (gazeJSONData == null) {
         	logger.debug("No gaze data");
         }
         else {
-        	logger.debug("gazeJSONData" + "=" + gazeJSONData);
-        	JSONObject pj = new JSONObject();
         	
+        	// test this here for now        	
+        	int gazeActive = DbGaze.getClassParams(smgr.getConnection(), smgr.getStudentClass(smgr.getStudentId()));
+      
         	// Update DB
-        	// Get student gaze params
+        	DbGaze.insertGazeWanderingEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(), gazeJSONData);        	
         }
         
         Response r;
-        r= new GazeWanderingResponse(null);
-
+        
+        r = new GazeWanderingResponse(smgr.getConnection(),smgr.getStudentId());
 //      if (learningCompanion != null )
 //         learningCompanion.processUncategorizedEvent(e,r);
 //      new TutorLogger(smgr).logShowVideoTransaction((ShowVideoEvent) e, r);

@@ -59,6 +59,9 @@ catch (Exception e) {
 	rel="stylesheet">
 <link href="css/mathspring_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
 
+<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/style.css">
 
 <%
 if (lang.equals("es")) {
@@ -130,7 +133,6 @@ else
 	var no_hints_seen_yet = "<%= rb.getString("no_hints_seen_yet") %>";
 </script>
 
-
 <script type="text/javascript" src="js/simple-slider.js"></script>
 <script type="text/javascript" src="js/tutorutils.js?ver=<%=versions.getString("js_version")%>"></script>
 <script type="text/javascript" src="js/tutorAnswer.js?ver=<%=versions.getString("js_version")%>"></script>
@@ -167,6 +169,7 @@ else
             studId : ${studId} ,
             className : "${className}" ,
             teacherName : "${teacherName}" ,
+            gazeDetectionOn: ${gazeDetectionOn},
             probType : '${probType}',
             exampleProbType : null,
             probId : ${probId},
@@ -310,6 +313,19 @@ label {
 </head>
 <body>
 
+	<video id="webcam" width="400" height="400" autoplay></video>
+	<canvas id="overlay" width="400" height="400"></canvas>
+
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script>
+<!-- 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.js"></script> -->
+  	<script src="js/face-api.js"></script>
+  	<script src="js/ui.js"></script>
+  	<script src="js/headmodel.js"></script>
+  	<script src="js/main.js"></script>
+  	<script src="js/calibration.js"></script>
+  	<script src="js/plain-overlay.min.js"></script>
+  	<script src="js/jquery.plainoverlay.min.js"></script>
 
 	<audio id='questionaudio' name='questionaudio'>
 		<source id='questionogg' src='' type='audio/ogg'>

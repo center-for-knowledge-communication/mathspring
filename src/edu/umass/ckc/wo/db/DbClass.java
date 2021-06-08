@@ -55,7 +55,7 @@ public class DbClass {
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language," +
                     "maxNumberProbsToShowPerTopic,minNumberProbsToShowPerTopic,maxTimeInTopic,minTimeInTopic," +
-                    "isActive from class c, classconfig f" +
+                    "isActive, f.gaze_detection_on from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -130,9 +130,10 @@ public class DbClass {
                 if(getPreSurvey == null || ("".equals(getPreSurvey)))
                     showPreSurvey = false;
                 int isActive = rs.getInt(29);
+                int gazeDetectionOn = rs.getInt(30);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade, isActive);
+                        studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -175,7 +176,7 @@ public class DbClass {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive,c.gaze_detection_on from class c, classconfig f" +
                     " where f.classid=c.id order by " + ( orderByTeacher ? "c.teacher" : "c.id");
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -204,9 +205,11 @@ public class DbClass {
                 boolean showPostSurvey = rs.getBoolean(22);
                 int classId = rs.getInt(23);
                 int isActive = rs.getInt(24);
+                int gazeDetectionOn = rs.getInt(25);
+                
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade,isActive);
+                        studentEmailPeriodDays,flashClient,grade,isActive,gazeDetectionOn);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -232,7 +235,7 @@ public class DbClass {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive from class c, classconfig f" +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive, c.gaze_detection_on from class c, classconfig f" +
                     " where f.classid=c.id and c.createTimeStamp > date_add(now(), interval -2 year) order by c.id desc";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -261,9 +264,10 @@ public class DbClass {
                 boolean showPostSurvey = rs.getBoolean(22);
                 int classId = rs.getInt(23);
                 int isActive = rs.getInt(24);
+                int gazeDetectionOn = rs.getInt(25);
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade, isActive);
+                        studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn);
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -640,8 +644,9 @@ public class DbClass {
                 int teacherId = rs.getInt(12);
                 String cl = rs.getString(13);
                 int isActive = rs.getInt(14);
+                int gazeDetectionOn = 0;
                 ClassInfo c = new ClassInfo(sch, yr, name, town, sec, id, teacherId, teacherName, propgroupid, pretestPoolId,
-                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive);
+                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn);
                 c.setFlashClient(cl);
                 return c;
             }

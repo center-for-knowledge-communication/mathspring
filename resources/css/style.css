@@ -1,0 +1,157 @@
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+#webcam, #overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#transbox {
+  position: fixed;
+  display: none;
+  top: 20%;
+  bottom: 20%;
+  left: 20%;
+  right: 20%;
+  width: 75%;
+  height: 75%;
+  background-color: rgba(0,0,0,0.1);
+  z-index: 2;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+@-webkit-keyframes flash {
+  from,
+  50%,
+  to {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0;
+  }
+}
+
+@keyframes flash {
+  from,
+  50%,
+  to {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0;
+  }
+}
+
+#info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24pt;
+  background-color: lightgreen;
+  padding: 1em;
+  border-radius: 10px;
+  max-width: 500px;
+  transition: all 1s;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+#info h3 {
+  margin: 0.2em 0;
+}
+
+#info.flash {
+  -webkit-animation-name: flash;
+  animation-name: flash;
+}
+
+#ok {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.buttonwrap {
+  text-align: center;
+}
+
+button {
+  position: relative;
+  z-index: 11;
+  cursor: pointer;
+  font-size: 10pt;
+  padding: 0.125em 0em;
+  margin: 0.1em;
+  width: 140px;
+  font-family: 'Source Code Pro', monospace;
+}
+
+/* Calibration button styling */
+.Calibration{
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  background-color: red;
+  opacity: 0.2;
+  border-color: black;
+  border-style: solid;
+  position:fixed;
+}
+
+/* Calibration point position */
+#Pt1{
+  top: 2vw;
+  left:2vw;
+}
+#Pt2{
+  top: 2vw;
+  left:50vw;
+}
+#Pt3{
+  top: 2vw;
+  right:2vw;
+}
+#Pt4{
+  top:50vh;
+  left:2vw;
+}
+#Pt5{
+  top: 50vh;
+  left: 50vw;
+}
+#Pt6{
+  top: 50vh;
+  right:2vw;
+}
+#Pt7{
+  bottom:2vw;
+  left: 2vw;
+}
+#Pt8{
+  bottom:2vw;
+  left:50vw;
+}
+#Pt9{
+  bottom:2vw;
+  right:2vw;
+}

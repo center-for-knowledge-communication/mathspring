@@ -384,10 +384,10 @@ function showGazeWandering (globals,gazeData) {
 	
 	//var gazeData = '{"yaw": "1", "pitch": "2", "roll": "3", "time_human": "4", "time_milli": "5", "duration": "6", "direction": "7"}';
 
-	var gazeData = '{"UpDegrees": "1", "DownDegrees": "2", "LeftDegrees": "3", "RightDegrees": "4", "tiltDegrees": "5", "modelConfidence": "6", "modelversionID": "7"}';
+	//var gazeData = '{"UpDegrees": "1", "DownDegrees": "2", "LeftDegrees": "3", "RightDegrees": "4", "tiltDegrees": "5", "modelConfidence": "6", "modelversionID": "7"}';
 	
 //	var gazeDataString = JSON.stringify(gazeData)};
-	alert(gazeData);
+//	alert(gazeData);
     servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": gazeData },processGazeWandering);
 }
 

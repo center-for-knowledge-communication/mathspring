@@ -94,7 +94,8 @@ public class SessionManager {
     private int collaboratingWith;
     private int eventCounter; // a counter that gets incremented on every tutor event (used to keep events ordered)
     private int mouseSaveInterval=0; // tells the client how often to save mouse coords to the server; <= 0 indicates no mouse tracking
-
+    private int gazeDetectionOn=0;
+    
     public SessionManager(Connection connection) {
         this.connection = connection;
         timeInSession = 0;
@@ -343,6 +344,7 @@ public class SessionManager {
    
         ClassInfo cl = DbClass.getClass(connection, this.classId);
         
+        this.gazeDetectionOn = cl.getGazeDetectionOn();
         String language = "en";
         language = cl.getClassLanguageCode();
         if (language.startsWith("es")) {
@@ -1017,4 +1019,7 @@ public class SessionManager {
     	return this.className;
     }
     
+    public int getGazeDetectionOn() {
+    	return this.gazeDetectionOn;
+    }
 }
