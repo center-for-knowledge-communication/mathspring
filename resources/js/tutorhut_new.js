@@ -374,6 +374,12 @@ function showVideo (globals) {
     }
 }
 
+function showGazeWandering (globals,gazeData) {
+	
+
+    servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": gazeData },processGazeWandering);
+}
+
 // TODO this should be changed to use a non-modal dialog
 function showFormulas (globals) {
 	var formURL = "img/g6refsheet.PNG"
@@ -381,13 +387,13 @@ function showFormulas (globals) {
 		var tstandard = globals.standards;
 		var grade = tstandard.substring(0,2);	
 		if (grade === "8.") {
-			formURL = "img/g8refsheet.PNG"
+			formURL = "img/g8refsheet.PNG";
 		}
 		if (grade === "7.") {
-			formURL = "img/g7refsheet.PNG"
+			formURL = "img/g7refsheet.PNG";
 		}
 		if (grade === "5.") {
-			formURL = "img/g5refsheet.PNG"
+			formURL = "img/g5refsheet.PNG";
 		}
 	}
 	catch(err) {
@@ -448,7 +454,8 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 
 
 function processShowVideo (responseText, textStatus, XMLHttpRequest) {
-    checkError(responseText);
+
+	checkError(responseText);
     var activity = JSON.parse(responseText);
     var video = activity.video;
     // khanacademy won't play inside an iFrame because it sets X-Frame-Options to SAMEORIGIN.
@@ -462,6 +469,55 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     	alert(no_video_to_show);
     }
 }
+
+function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
+
+	console.log(responseText);
+	
+	var gazeJSON = JSON.parse(responseText);
+
+	
+	
+	if (gazeJSON.params.playSound === 1) {
+		globals.gazeWanderingUI = "playSound";
+		var audio = new Audio('airport_sound.mp3');
+		audio.play();
+	}
+
+	if (gazeJSON.params.LCompanion === 1) {
+		globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename;
+		var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
+		loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+	}
+	
+	
+	if (gazeJSON.params.textBox === 1) {
+		globals.gazeWanderingUI = "textBox";
+		var theText = gazeJSON.params.textBoxChoice;
+		console.log(theText);
+
+		swal({
+			title: theText,
+			confirmButtonColor: "#DD6B55", 
+			confirmButtonText: "OK",
+			closeOnConfirm: true,
+		});
+	}
+	
+	if (gazeJSON.params.flashBox === 1) {
+		globals.gazeWanderingUI = "flashBox";		
+		$('body').plainOverlay('show')
+		setTimeout(function() { myFunction("Hey"); }, 3000);
+
+	}
+
+}
+
+function myFunction(value) {
+//	alert(value);
+	$('body').plainOverlay('hide')
+}
+
 
 function openExampleDialog(solution){
     if (solution != 'undefined' && solution != null) {
@@ -900,7 +956,7 @@ function learningCompanionDone () {
 
 // unused.  If lc were a simple div and not an iframe, we'd load it into the div like this.
 function loadLCFile (url) {
-    $("#learningCompanionContainer").load(url);
+    $("#Container").load(url);
 }
 
 // When a non-idle video is shown, we expand the LC window (in case it was shrunk or closed).
@@ -1196,9 +1252,6 @@ function clickHandling () {
     });
     $("#formulas").click(function () {
         showFormulas(globals)
-    });
-    $("#glossary").click(function () {
-        showGlossary(globals)
     });
     $('#'+INSTRUCTIONS_DIALOG).dialog({
 //        autoOpen: ((globals.instructions == "") ? false : true),

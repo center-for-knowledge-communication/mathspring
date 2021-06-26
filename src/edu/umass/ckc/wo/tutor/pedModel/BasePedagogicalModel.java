@@ -31,7 +31,9 @@ import edu.umass.ckc.wo.tutor.probSel.*;
 import edu.umass.ckc.wo.tutor.response.*;
 import edu.umass.ckc.wo.tutor.vid.BaseVideoSelector;
 import edu.umass.ckc.wo.tutormeta.*;
+import edu.umass.ckc.wo.db.DbGaze;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.jdom.Element;
 
 import java.lang.reflect.Constructor;
@@ -40,12 +42,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.json.JSONObject;
+
 /**
  * The core of the tutor.
  * User: marshall
  * Date: 11/14/13
  * Time: 12:59 PM
  * To change this template use File | Settings | File Templates.
+ * Frank	06-26-2021	added support for gaze detection
  */
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 
@@ -56,6 +61,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 
 
     public BasePedagogicalModel() {
+    	logger.setLevel(Level.DEBUG);
     }
 
 
@@ -371,6 +377,35 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         return r;
     }
 
+    @Override
+    public Response processGazeWanderingRequest(GazeWanderingEvent e) throws Exception {
+    	logger.setLevel(Level.DEBUG);
+    	logger.debug("processGazeWanderingRequest");
+        smgr.getStudentState().setProblemIdleTime(0);
+        
+        JSONObject gazeJSONData = e.getGazeJSONData();
+        if (gazeJSONData == null) {
+        	logger.debug("No gaze data");
+        }
+        else {
+        	
+        	// test this here for now        	
+        	int gazeActive = DbGaze.getClassGazeDetectionOn(smgr.getConnection(), smgr.getStudentClass(smgr.getStudentId()));
+      
+        	// Update DB
+        	DbGaze.insertGazeWanderingEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(), gazeJSONData);        	
+        }
+        
+        Response r;
+        
+        r = new GazeWanderingResponse(smgr.getConnection(),smgr.getStudentId(),smgr.getClassID());
+//      if (learningCompanion != null )
+//         learningCompanion.processUncategorizedEvent(e,r);
+//      new TutorLogger(smgr).logShowVideoTransaction((ShowVideoEvent) e, r);
+
+        return r;
+    }
+        
     protected InterventionResponse getNextProblemIntervention (NextProblemEvent e) throws Exception {
         NextProblemIntervention intervention = (NextProblemIntervention) interventionGroup.selectIntervention(smgr,e,"NextProblem");
         if (intervention != null) {

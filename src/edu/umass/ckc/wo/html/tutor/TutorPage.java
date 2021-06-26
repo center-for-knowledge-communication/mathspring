@@ -23,6 +23,7 @@ import javax.servlet.RequestDispatcher;
  * To change this template use File | Settings | File Templates.
  * Frank	10-07-20  Issue #261 change problem header
  * Kartik 04-22-21 Issue #390 Added session clock functionality
+ * Frank	06-26-21	Added support for gaze detection
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)
@@ -123,6 +124,8 @@ public class TutorPage {
         info.getRequest().setAttribute("className",smgr.getClassName());
         info.getRequest().setAttribute("teacherName",smgr.getTeacherName());
         info.getRequest().setAttribute("timeInSession", smgr.getTimeInSession());
+        info.getRequest().setAttribute("gazeDetectionOn", smgr.getGazeDetectionOn());
+        info.getRequest().setAttribute("gazeParamsJSON", smgr.getGazeParamsJSON());
 
         if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId()))
             info.getRequest().setAttribute("showAnswer", true);

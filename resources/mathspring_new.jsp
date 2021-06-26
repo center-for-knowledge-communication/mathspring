@@ -59,6 +59,9 @@ catch (Exception e) {
 	rel="stylesheet">
 <link href="css/mathspring_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
 
+<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
+<link rel="stylesheet" href="css/normalize.css?ver=<%=versions.getString("css_version")%>">
+<link rel="stylesheet" href="css/style.css?ver=<%=versions.getString("css_version")%>">
 
 <%
 if (lang.equals("es")) {
@@ -131,6 +134,7 @@ else
 </script>
 
 
+
 <script type="text/javascript" src="js/simple-slider.js"></script>
 <script type="text/javascript" src="js/tutorutils.js?ver=<%=versions.getString("js_version")%>"></script>
 <script type="text/javascript" src="js/tutorAnswer.js?ver=<%=versions.getString("js_version")%>"></script>
@@ -144,6 +148,8 @@ else
 
 
 <script type="text/javascript">
+
+
         var globals = {
             lastProbType: '${lastProbType}',
             isBeginningOfSession: ${isBeginningOfSession},
@@ -167,6 +173,9 @@ else
             studId : ${studId} ,
             className : "${className}" ,
             teacherName : "${teacherName}" ,
+            gazeDetectionOn: ${gazeDetectionOn},
+            gazeParamsJSON: ${gazeParamsJSON},
+            gazeWanderingUI: "",
             probType : '${probType}',
             exampleProbType : null,
             probId : ${probId},
@@ -310,6 +319,27 @@ label {
 </head>
 <body>
 
+	<video id="webcam" width="180" height="180" autoplay></video>
+	<canvas id="overlay" width="180" height="180"></canvas>
+	<div id="monitorBox" width="240px" height="150px">
+		<span id="p1"></span>
+		<span id="gazeMonitor1"></span>
+		<span id="gazeMonitor2"></span>
+		<span id="gazeMonitor3"></span>
+		<span id="gazeMonitor4"></span>
+		<span id="gazeMonitor5"></span>
+	</div>
+
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script>
+<!-- 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.js"></script> -->
+  	<script src="js/face-api.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/ui.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/headmodel.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/main.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/calibration.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/plain-overlay.min.js"></script>
+  	<script src="js/jquery.plainoverlay.min.js"></script>
 
 	<audio id='questionaudio' name='questionaudio'>
 		<source id='questionogg' src='' type='audio/ogg'>
@@ -835,6 +865,21 @@ label {
     }
 
     $(document).ready(function() {
+	    if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
+	    	document.getElementById("webcam").style.zIndex = "3";    	
+	    	document.getElementById("monitorBox").style.visibility = "visible";	    
+	    	document.getElementById("monitorBox").style.zIndex = "3";    	
+	    	document.getElementById("gazeMonitor2").innerHTML = "";
+	    	document.getElementById("gazeMonitor3").innerHTML = "";
+	    	document.getElementById("gazeMonitor4").innerHTML = "";
+	    	document.getElementById("gazeMonitor5").innerHTML = "";
+	    }
+	    else {
+	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
+	    }
+    });
+    
+    $(document).ready(function() {
         $('#report-form').submit(function (event) {
             var formData = {
                 'sessionId': globals.sessionId,
@@ -870,6 +915,7 @@ label {
 
     });
 </script>
+
 
 
 	<div style="z-index: 100;" id="instructionsDialog" title="Instructions">
