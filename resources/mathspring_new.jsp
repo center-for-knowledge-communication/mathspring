@@ -873,6 +873,7 @@ label {
 	    	document.getElementById("gazeMonitor3").innerHTML = "";
 	    	document.getElementById("gazeMonitor4").innerHTML = "";
 	    	document.getElementById("gazeMonitor5").innerHTML = "";
+	    	document.getElementById("gazeMonitor6").innerHTML = "";
 	    }
 	    else {
 	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
