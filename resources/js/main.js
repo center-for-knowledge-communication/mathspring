@@ -40,7 +40,7 @@ async function appGaze() {
 }
 
 function stop() {
-    this.video.pause();
+    //this.video.pause();
     cancelAnimationFrame(this.timer);
 }
 

@@ -328,6 +328,7 @@ label {
 		<span id="gazeMonitor3"></span>
 		<span id="gazeMonitor4"></span>
 		<span id="gazeMonitor5"></span>
+		<span id="gazeMonitor6"></span>
 	</div>
 
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

@@ -479,20 +479,20 @@ function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
 	
 	
 	if (gazeJSON.params.playSound === 1) {
-		globals.gazeWanderingUI = "playSound";
+		globals.gazeWanderingUI = "playSound<br>";
 		var audio = new Audio('airport_sound.mp3');
 		audio.play();
 	}
 
 	if (gazeJSON.params.LCompanion === 1) {
-		globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename;
+		globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename + "<br>";
 		var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
 		loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
 	}
 	
 	
 	if (gazeJSON.params.textBox === 1) {
-		globals.gazeWanderingUI = "textBox";
+		globals.gazeWanderingUI = "textBox<br>";
 		var theText = gazeJSON.params.textBoxChoice;
 		console.log(theText);
 
@@ -505,7 +505,7 @@ function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
 	}
 	
 	if (gazeJSON.params.flashBox === 1) {
-		globals.gazeWanderingUI = "flashBox";		
+		globals.gazeWanderingUI = "flashBox<br>";		
 		$('body').plainOverlay('show')
 		setTimeout(function() { myFunction("Hey"); }, 3000);
 

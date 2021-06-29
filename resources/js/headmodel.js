@@ -17,6 +17,7 @@ window.headmodel = {
     rightthreshold: globals.gazeParamsJSON.gazwndr_right_degrees,
     duration:  globals.gazeParamsJSON.gazwndr_sec,
     nextmsg_min: globals.gazeParamsJSON.gazwndr_nextmsg_min * 60000, 
+    free_passes: globals.gazeParamsJSON.gazwndr_free_passes, 
     up: -1,
     down: -1,
     left: -1,
@@ -65,6 +66,7 @@ window.headmodel = {
     	    	document.getElementById("gazeMonitor2").innerHTML = "  Yaw: " + yaw.toString().substring(0,6) + "<br>";
     	    	document.getElementById("gazeMonitor3").innerHTML = "Pitch: " + pitch.toString().substring(0,6) + "<br>";
     	    	document.getElementById("gazeMonitor5").innerHTML = globals.gazeWanderingUI;
+    	    	document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
     	    }
         	if (headmodel.downthreshold > 0)
         		headmodel.downthreshold = headmodel.downthreshold * -1;
@@ -107,13 +109,21 @@ window.headmodel = {
 							}
 							
 							if (now > (last_sent + headmodel.nextmsg_min)) { 
-								var temp = JSON.stringify(dataString);
-								temp = temp.replace("{","%7B");
-								temp = temp.replace("}","%7D");							
-								showGazeWandering (globals,temp);
-								last_sent = now;
+								if (headmodel.free_passes <= 0) {
+									var temp = JSON.stringify(dataString);
+									temp = temp.replace("{","%7B");
+									temp = temp.replace("}","%7D");							
+									showGazeWandering (globals,temp);
+									headmodel.wanderingMsg = "Yes - Intervention";
+								}
+								else {
+									last_sent = last_sent + headmodel.nextmsg_min;
+									headmodel.wanderingMsg = "Yes - Free pass";
+									headmodel.free_passes = headmodel.free_passes - 1;
+    	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
+								}
 								queue_head_right.splice(0);
-								headmodel.wanderingMsg = "Yes - Intervention";
+								last_sent = now;
 								headmodel.right = -1;
 							}
 							else {
@@ -166,15 +176,24 @@ window.headmodel = {
 							}
 								
 							if (now > (last_sent + headmodel.nextmsg_min)) { 
-								var temp = JSON.stringify(dataString);
-								temp = temp.replace("{","%7B");
-								temp = temp.replace("}","%7D");							
-								showGazeWandering (globals,temp);
-								last_sent = now;
+								if (headmodel.free_passes <= 0) {
+									var temp = JSON.stringify(dataString);
+									temp = temp.replace("{","%7B");
+									temp = temp.replace("}","%7D");							
+									showGazeWandering (globals,temp);
+									headmodel.wanderingMsg = "Yes - Intervention";
+								}
+								else {
+									last_sent = last_sent + headmodel.nextmsg_min;
+									headmodel.wanderingMsg = "Yes - Free pass";
+									headmodel.free_passes = headmodel.free_passes - 1;
+    	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
+								}
 								queue_head_left.splice(0);
-								headmodel.wanderingMsg = "Yes - Intervention";
+								last_sent = now;
 								headmodel.left = -1;
 							}
+
 							else {
 								if (left_duration > headmodel.duration) {
 									headmodel.wanderingMsg = "Yes - Paused";
@@ -229,15 +248,24 @@ window.headmodel = {
 						}
 	
 						if (now > (last_sent + headmodel.nextmsg_min)) { 
-							var temp = JSON.stringify(dataString);
-							temp = temp.replace("{","%7B");
-							temp = temp.replace("}","%7D");							
-							showGazeWandering (globals,temp);
-							last_sent = now;
+							if (headmodel.free_passes <= 0) {
+								var temp = JSON.stringify(dataString);
+								temp = temp.replace("{","%7B");
+								temp = temp.replace("}","%7D");							
+								showGazeWandering (globals,temp);
+								headmodel.wanderingMsg = "Yes - Intervention";
+							}
+							else {
+								last_sent = last_sent + headmodel.nextmsg_min;
+								headmodel.wanderingMsg = "Yes - Free pass";
+								headmodel.free_passes = headmodel.free_passes - 1;
+	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
+							}
 							queue_head_up.splice(0);
-							headmodel.wanderingMsg = "Yes - Intervention";
+							last_sent = now;
 							headmodel.up = -1;
 						}
+
 						else {
 							if (up_duration > headmodel.duration) {
 								headmodel.wanderingMsg = "Yes - Paused";
@@ -284,20 +312,29 @@ window.headmodel = {
 						
 						queue_head_down.push(dataString);
 						console.log("Length of the queue_down: " + queue_head_down.length);
-						if (queue_head_down.length > 0) {
+						if (queue_head_down.length <= 0) {
 							console.log("Peeking front of the queue_down: " + queue_head_down[0]);
 						}
 						
-						if (now > (last_sent + headmodel.nextmsg_min)) {
-							var temp = JSON.stringify(dataString);
-							temp = temp.replace("{","%7B");
-							temp = temp.replace("}","%7D");							
-							showGazeWandering (globals,temp);
-							last_sent = now;
+						if (now > (last_sent + headmodel.nextmsg_min)) { 
+							if (headmodel.free_passes <= 0) {
+								var temp = JSON.stringify(dataString);
+								temp = temp.replace("{","%7B");
+								temp = temp.replace("}","%7D");							
+								showGazeWandering (globals,temp);
+								headmodel.wanderingMsg = "Yes - Intervention";
+							}
+							else {
+								last_sent = last_sent + headmodel.nextmsg_min;
+								headmodel.wanderingMsg = "Yes - Free pass";
+								headmodel.free_passes = headmodel.free_passes - 1;
+	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
+							}
 							queue_head_down.splice(0);
-							headmodel.wanderingMsg = "Yes - Intervention";
+							last_sent = now;
 							headmodel.down = -1;
 						}
+
 						else {
 							if (down_duration > headmodel.duration) {
 								headmodel.wanderingMsg = "Yes - Paused";

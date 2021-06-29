@@ -58,14 +58,19 @@ The results of this go into out/artifacts/MathSpring_exploded
     options are wodbcadmium for cadmium db or wodblocal for db on localhost -->
     <context-param>
         <param-name>wodb.datasource</param-name>
-        <!--<param-value>jdbc/wodbrose</param-value>-->
-        <param-value>jdbc/wodblocal</param-value>
-    </context-param>
+     <param-value>jdbc/wodbrose</param-value>
+   </context-param>
+        
+        <!-- choose one -->
+        <!-- DEV   <param-value>jdbc/wodblocalDEV</param-value> -->
+        <!-- LOCAL <param-value>jdbc/wodblocal</param-value> -->
+        <!-- ???   <param-value>jdbc/wodbaws</param-value> -->
+        <!-- PROD  <param-value>jdbc/wodbrose</param-value> -->
 
     <context-param>
         <param-name>host</param-name>
         <param-value>localhost</param-value>
-        <!--<param-value>cadmium.cs.umass.edu</param-value>-->
+        <!-- <param-value>rose.cs.umass.edu</param-value> -->
     </context-param>
     <context-param>
         <param-name>servletPort</param-name>
@@ -74,8 +79,12 @@ The results of this go into out/artifacts/MathSpring_exploded
 
 	<context-param>
 		<param-name>webContentPath</param-name>
-		<param-value>http://tutor.mathspring.org/mathspring/mscontent/</param-value>
-		<!--param-value>http://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value> -->
+		<!-- <param-value>http://tutor.mathspring.org/mathspring/mscontent/</param-value> -->
+		
+		<!-- <param-value>http://msadmin-prod/mscontent/</param-value> -->
+
+		<!-- <param-value>http://rose.cs.umass.edu/mathspring/mscontent/</param-value> -->
+		<param-value>https://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
 	</context-param>
   <context-param>
     <param-name>probplayerPath</param-name>
@@ -227,7 +236,6 @@ The results of this go into out/artifacts/MathSpring_exploded
         </init-param>
         <!--<load-on-startup>1</load-on-startup>-->
     </servlet>
-
 
     <servlet>
         <servlet-name>MathspringSubSessionServlet</servlet-name>
