@@ -12,6 +12,7 @@
 // Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
 // Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
 // Kartik 04-22-21 Issue #390 Added session clock functionality
+// Frank	06-29-21 Added gaze functionality
 
 ResourceBundle versions = null; 
 try {
