@@ -6,6 +6,7 @@
  * To change this template use File | Settings | File Templates.
 
 * Kartik 04-22-21 Issue #390 Added session clock functionality
+* Frank	07-03-21  gitServletPost - change error response from alert to debugAlert
  */
 
 function debugAlert(msg) {
@@ -79,7 +80,7 @@ function gritServletPost(action, data) {
         crossDomain: false,
         data: data ,
         error: function (xhr, textStatus, errorThrown) {
-            alert("Failure to post mouse data " + textStatus + errorThrown);
+        	debugAlert("Failure to post mouse data " + textStatus + errorThrown);
         }
     });
 }

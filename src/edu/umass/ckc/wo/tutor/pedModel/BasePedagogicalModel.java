@@ -51,6 +51,7 @@ import net.sf.json.JSONObject;
  * Time: 12:59 PM
  * To change this template use File | Settings | File Templates.
  * Frank	06-26-2021	added support for gaze detection
+ * Frank	07-03-21	added logging to evemtLog and updating gazewanderingevents with reciprocal links
  */
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 
@@ -381,28 +382,37 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     public Response processGazeWanderingRequest(GazeWanderingEvent e) throws Exception {
     	logger.setLevel(Level.DEBUG);
     	logger.debug("processGazeWanderingRequest");
-        smgr.getStudentState().setProblemIdleTime(0);
-        
+
+        Response r = null;
+
+    	int newGazeEventId = 0;
+    	smgr.getStudentState().setProblemIdleTime(0);
+    	       
         JSONObject gazeJSONData = e.getGazeJSONData();
         if (gazeJSONData == null) {
         	logger.debug("No gaze data");
         }
         else {
         	
-        	// test this here for now        	
-        	int gazeActive = DbGaze.getClassGazeDetectionOn(smgr.getConnection(), smgr.getStudentClass(smgr.getStudentId()));
-      
-        	// Update DB
-        	DbGaze.insertGazeWanderingEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(), gazeJSONData);        	
-        }
-        
-        Response r;
-        
-        r = new GazeWanderingResponse(smgr.getConnection(),smgr.getStudentId(),smgr.getClassID());
-//      if (learningCompanion != null )
-//         learningCompanion.processUncategorizedEvent(e,r);
-//      new TutorLogger(smgr).logShowVideoTransaction((ShowVideoEvent) e, r);
+            // insert gazeWanderingEvent
+        	newGazeEventId = DbGaze.insertGazeWanderingEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(), smgr.getStudentState().getCurProblem(),  gazeJSONData);        	
+           	r = new GazeWanderingResponse(smgr.getConnection(),smgr.getStudentId(),smgr.getClassID(),gazeJSONData, newGazeEventId);     
+           	
+           	String action = gazeJSONData.getString("action");
+        	if (action.equals("Intervention")) {
+           	
+	           	// insert eventLog event (includes gazeWandering event Id)
+	           	int newId = new TutorLogger(smgr).logGazeWanderingEvent((GazeWanderingEvent) e, r);
+	
+	            // update GazeWanderingEvent with eventLog eventId
+	           	DbGaze.updateGazeWanderingEvent (smgr.getConnection(), newId, newGazeEventId);
 
+           	}
+        	else {
+        		r = null;
+        	}
+        	
+        }
         return r;
     }
         

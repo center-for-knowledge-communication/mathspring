@@ -7,6 +7,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -17,6 +18,7 @@ import java.util.Iterator;
  * Written by: Frank Sylvia
  * Date: Jun 26, 2021
  * Frank	006-26-21	Support for gaze detection
+ * Frank	07-03-21	Add update function for eventLogId
  */
 public class DbGaze {
 
@@ -175,8 +177,10 @@ public class DbGaze {
 		return result;
 	}
 	
-    public static void insertGazeWanderingEvent (Connection conn, int studentId, int sessionId, JSONObject inGazeDataJSONObject) throws SQLException {
+    public static int insertGazeWanderingEvent (Connection conn, int studentId, int sessionId, int problemId,  JSONObject inGazeDataJSONObject) throws SQLException {
 
+        ResultSet rs = null;
+        int newId = 0;
         PreparedStatement ps = null;
         PreparedStatement metadata_ps = null;
         try {
@@ -184,6 +188,7 @@ public class DbGaze {
 	    	JSONObject gazeEventJsonObject = inGazeDataJSONObject;    	
 	    	gazeEventJsonObject.putIfAbsent("studentID", String.valueOf(studentId));
 	    	gazeEventJsonObject.putIfAbsent("sessionID", String.valueOf(sessionId));
+	    	gazeEventJsonObject.putIfAbsent("problemID", String.valueOf(problemId));
 
 	    	int count = 1;
 	        boolean insertComma = false;
@@ -225,13 +230,16 @@ public class DbGaze {
 	
 	        
             String query =  query_p1 + query_p2 + query_p3;
-            ps = conn.prepareStatement(query);
+            ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             Iterator<?> valueIterator = gazeEventJsonObject.keys();
             while (valueIterator.hasNext()) {        	        
                 String key = (String)valueIterator.next();
                 Object valueObj = gazeEventJsonObject.get(key);
                 String colType = columTypes.get(key);
+                if (colType == null) {
+                	colType = "";
+                }
                 switch (colType) {
                 	case "timestamp":
                 		// Don't set - it defaults to CURRENT_TIMESTAMP
@@ -247,6 +255,30 @@ public class DbGaze {
                 }
             }
          
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            rs.next();
+            newId = rs.getInt(1);
+            ps.close();
+        } finally {
+            if (ps != null)
+                ps.close();
+        }
+        return newId;
+    }
+
+    public static void updateGazeWanderingEvent (Connection conn, int eventLogId, int gazeEventId) throws SQLException {
+
+        ResultSet rs = null;
+        int newId = 0;
+        PreparedStatement ps = null;
+        try {
+        	        		        
+            String query =  "update GazeWanderingEvents set eventLogId = ? where id = ?";
+
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, eventLogId);
+            ps.setInt(2, gazeEventId);
             ps.executeUpdate();
             ps.close();
         } finally {

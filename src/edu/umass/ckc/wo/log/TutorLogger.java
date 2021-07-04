@@ -24,6 +24,7 @@ import java.util.List;
  * 
  * Frank	09-23-20	issue #237 added logStudentAccess() 
  * Frank	09-29-20	issue #237R3 added logStudentAccess() 
+ * Frank	07-03-21	added logGazeWanderingEvent
  */
 public class TutorLogger {
     private SessionManager smgr;
@@ -270,6 +271,14 @@ public class TutorLogger {
         insertLogEntry(RequestActions.SHOW_VIDEO,null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),
                 e.getProbElapsedTime(),
                 null,-1,r.getCharacterControl(),r.logEventName(),getTopic(), e.getClickTime());
+    }
+
+    public int logGazeWanderingEvent(GazeWanderingEvent e, Response r) throws Exception {
+    	int newId = 0;
+    	newId = insertLogEntry("GazeWandering",null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),
+                e.getProbElapsedTime(),
+                null,-1,r.getCharacterControl(),r.logEventName(),getTopic(), e.getClickTime());
+        return newId;
     }
 
     public void logShowSolveProblem(ShowSolveProblemEvent e, HintSequenceResponse hr) throws Exception {

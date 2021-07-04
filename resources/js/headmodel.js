@@ -1,3 +1,6 @@
+// Frank	07-03-21	v1.0.1	added logging of Wandering state with sample_rate 4000ms
+// Frank	07-03-21	v1..0.1 comment out excessive console logging
+
 var queue_head_up = [];
 var queue_head_down = [];
 var queue_head_right = [];
@@ -17,7 +20,9 @@ window.headmodel = {
     rightthreshold: globals.gazeParamsJSON.gazwndr_right_degrees,
     duration:  globals.gazeParamsJSON.gazwndr_sec,
     nextmsg_min: globals.gazeParamsJSON.gazwndr_nextmsg_min * 60000, 
-    free_passes: globals.gazeParamsJSON.gazwndr_free_passes, 
+    free_passes: globals.gazeParamsJSON.gazwndr_free_passes,
+    modelConfidence: 0,
+    action: "",
     up: -1,
     down: -1,
     left: -1,
@@ -25,6 +30,8 @@ window.headmodel = {
     calibrated: false,
     calibratePoints: {},
     last_sent: -1,
+    last_sample: -1,
+    sample_rate: 10000,
     wanderingMsg: "No",
     WanderingAxis: "",
     value: null,
@@ -54,7 +61,7 @@ window.headmodel = {
         let yaw = (pred1[0][0] + pred2[0][0] + pred3[0][0]) / 3;
         let pitch = (pred1[0][1] + pred2[0][1] + pred3[0][1]) / 3;
         let roll = (pred1[0][2] + pred2[0][2] + pred3[0][2]) / 3;
-        console.log(yaw, pitch, roll);
+        //console.log(yaw, pitch, roll);
         headmodel.value = [pitch, yaw];
         headmodel.duration  = globals.gazeParamsJSON.gazwndr_sec * 1000;
 
@@ -93,46 +100,58 @@ window.headmodel = {
 	                    if (right_duration > headmodel.duration) {
 	            	    	globals.gazeWanderingUI = "";
 	            	    	document.getElementById("gazeMonitor5").innerHTML = "";
-							console.log("===== Looking away - right =====");
-							console.log("Right duration: " + (Date.now() - headmodel.right).toString());
-							console.log("Score_right: " + Math.abs(yaw - headmodel.rightthreshold).toString());
+							//console.log("Right duration: " + (Date.now() - headmodel.right).toString());
+							//console.log("Score_right: " + Math.abs(yaw - headmodel.rightthreshold).toString());
 							
 							var d = new Date();
-							
-							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
-											  "duration": right_duration.toString(), "direction": "Right"};
-									
-							queue_head_right.push(dataString);
-							console.log("Length of the queue_right: " + queue_head_right.length);
-							if (queue_head_right.length > 0) {
-								console.log("Peeking front of the queue_right: " + queue_head_right[0]);
-							}
+																
 							
 							if (now > (last_sent + headmodel.nextmsg_min)) { 
 								if (headmodel.free_passes <= 0) {
-									var temp = JSON.stringify(dataString);
-									temp = temp.replace("{","%7B");
-									temp = temp.replace("}","%7D");							
-									showGazeWandering (globals,temp);
+									headmodel.action = "Intervention";
 									headmodel.wanderingMsg = "Yes - Intervention";
 								}
 								else {
+									headmodel.action = "FreePass";
 									last_sent = last_sent + headmodel.nextmsg_min;
 									headmodel.wanderingMsg = "Yes - Free pass";
 									headmodel.free_passes = headmodel.free_passes - 1;
     	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
 								}
+								var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+										  "duration": right_duration.toString(), "direction": "Right", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+								//var temp = JSON.stringify(dataString);
+								queue_head_right.push(dataString);
+								console.log("Length of the queue_right: " + queue_head_right.length);
+								if (queue_head_right.length > 0) {
+									console.log("Peeking front of the queue_right: " + queue_head_right[0]);
+								}
+								showGazeWandering (globals,JSON.stringify(dataString));
 								queue_head_right.splice(0);
 								last_sent = now;
 								headmodel.right = -1;
 							}
 							else {
-								if (right_duration > headmodel.duration) {
+								if (right_duration < headmodel.nextmsg_min) {
 									headmodel.wanderingMsg = "Yes - Paused";
+									headmodel.action = "Wandering - Paused";
 								}
 			                	else {
 			                		headmodel.wanderingMsg = "Yes";
+									headmodel.action = "Wandering";
 			                	}                	
+								var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+										  "duration": right_duration.toString(), "direction": "Right", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+								//var temp = JSON.stringify(dataString);
+								queue_head_right.push(dataString);
+								console.log("Length of the queue_right: " + queue_head_right.length);
+								if (queue_head_right.length <= 0) {
+									console.log("Peeking front of the queue_right: " + queue_head_right[0]);
+								}
+								if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+								    showGazeWandering (globals,JSON.stringify(dataString));
+								    headmodel.last_sample = now;
+								}
 							}
 	                    }
 	                	else {
@@ -159,48 +178,59 @@ window.headmodel = {
 	                    if (left_duration > headmodel.duration) {
 	            	    	globals.gazeWanderingUI = "";
 	            	    	document.getElementById("gazeMonitor5").innerHTML = "";
-							console.log("===== Looking away - Left =====");
-							console.log("Left duration: " + (Date.now() - headmodel.left).toString());
-							console.log("Score_left: " + Math.abs(yaw - headmodel.leftthreshold).toString());
+							//console.log("Left duration: " + (Date.now() - headmodel.left).toString());
+							//console.log("Score_left: " + Math.abs(yaw - headmodel.leftthreshold).toString());
 							
 							var d = new Date();
 							
-							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
-											  "duration": left_duration.toString(), "direction": "Left"};
-									
-							
-							queue_head_left.push(dataString);
-							console.log("Length of the queue_left: " + queue_head_left.length);
-							if (queue_head_left.length > 0) {
-								console.log("Peeking front of the queue_left: " + queue_head_left[0]);
-							}
 								
 							if (now > (last_sent + headmodel.nextmsg_min)) { 
 								if (headmodel.free_passes <= 0) {
-									var temp = JSON.stringify(dataString);
-									temp = temp.replace("{","%7B");
-									temp = temp.replace("}","%7D");							
-									showGazeWandering (globals,temp);
+									headmodel.action = "Intervention";
 									headmodel.wanderingMsg = "Yes - Intervention";
 								}
 								else {
+									headmodel.action = "FreePass";
 									last_sent = last_sent + headmodel.nextmsg_min;
 									headmodel.wanderingMsg = "Yes - Free pass";
 									headmodel.free_passes = headmodel.free_passes - 1;
     	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
 								}
+								var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+										  "duration": left_duration.toString(), "direction": "Left", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+								queue_head_left.push(dataString);
+								console.log("Length of the queue_left: " + queue_head_left.length);
+								if (queue_head_left.length > 0) {
+									console.log("Peeking front of the queue_left: " + queue_head_left[0]);
+								}
+								//var temp = JSON.stringify(dataString);
+								showGazeWandering (globals,JSON.stringify(dataString));
 								queue_head_left.splice(0);
 								last_sent = now;
 								headmodel.left = -1;
 							}
 
 							else {
-								if (left_duration > headmodel.duration) {
+								if (left_duration < headmodel.nextmsg_min) {
 									headmodel.wanderingMsg = "Yes - Paused";
+									headmodel.action = "Wandering - Paused";
 								}
 			                	else {
 			                		headmodel.wanderingMsg = "Yes";
+									headmodel.action = "Wandering";
 			                	}                	
+								var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+										  "duration": left_duration.toString(), "direction": "Left", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+								//var temp = JSON.stringify(dataString);
+								queue_head_left.push(dataString);
+								console.log("Length of the queue_left: " + queue_head_left.length);
+								if (queue_head_left.length <= 0) {
+									console.log("Peeking front of the queue_left: " + queue_head_left[0]);
+								}
+								if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+								    showGazeWandering (globals,JSON.stringify(dataString));
+								    headmodel.last_sample = now;
+								}
 							}
 	                    }
 	                	else {
@@ -231,48 +261,59 @@ window.headmodel = {
 	                if (up_duration > headmodel.duration) {
 	        	    	globals.gazeWanderingUI = "";
 	        	    	document.getElementById("gazeMonitor5").innerHTML = "";
-						console.log("===== Looking away - Up =====");
-						console.log("Up duration: " + (Date.now() - headmodel.up).toString());
-						console.log("Score_up: " + Math.abs(pitch - headmodel.upthreshold).toString());
-	
+						//console.log("Up duration: " + (Date.now() - headmodel.up).toString());
+						//console.log("Score_up: " + Math.abs(pitch - headmodel.upthreshold).toString());
 						
 						var d = new Date();
 	
-						var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
-										  "duration": up_duration.toString(), "direction": "Up"};
-						
-						queue_head_up.push(dataString);
-						console.log("Length of the queue_up: " + queue_head_up.length);
-						if (queue_head_up.length > 0) {
-							console.log("Peeking front of the queue_up: " + queue_head_up[0]);
-						}
-	
 						if (now > (last_sent + headmodel.nextmsg_min)) { 
 							if (headmodel.free_passes <= 0) {
-								var temp = JSON.stringify(dataString);
-								temp = temp.replace("{","%7B");
-								temp = temp.replace("}","%7D");							
-								showGazeWandering (globals,temp);
+								headmodel.action = "Intervention";
 								headmodel.wanderingMsg = "Yes - Intervention";
 							}
 							else {
+								headmodel.action = "FreePass";
 								last_sent = last_sent + headmodel.nextmsg_min;
 								headmodel.wanderingMsg = "Yes - Free pass";
 								headmodel.free_passes = headmodel.free_passes - 1;
 	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
 							}
+							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+									  "duration": up_duration.toString(), "direction": "Up", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+							queue_head_up.push(dataString);
+							console.log("Length of the queue_up: " + queue_head_up.length);
+							if (queue_head_up.length > 0) {
+								console.log("Peeking front of the queue_up: " + queue_head_up[0]);
+							}
+		
+							//var temp = JSON.stringify(dataString);
+							showGazeWandering (globals,JSON.stringify(dataString));
 							queue_head_up.splice(0);
 							last_sent = now;
 							headmodel.up = -1;
 						}
 
 						else {
-							if (up_duration > headmodel.duration) {
+							if (up_duration < headmodel.nextmsg_min) {
 								headmodel.wanderingMsg = "Yes - Paused";
+								headmodel.action = "Wandering - Paused";
 							}
 		                	else {
 		                		headmodel.wanderingMsg = "Yes";
+								headmodel.action = "Wandering";
 		                	}                	
+							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+									  "duration": up_duration.toString(), "direction": "Up", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+							//var temp = JSON.stringify(dataString);
+							queue_head_up.push(dataString);
+							console.log("Length of the queue_down: " + queue_head_up.length);
+							if (queue_head_up.length <= 0) {
+								console.log("Peeking front of the queue_up: " + queue_head_up[0]);
+							}
+							if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+							    showGazeWandering (globals,JSON.stringify(dataString));
+							    headmodel.last_sample = now;
+							}
 						}
 
 	                }
@@ -299,49 +340,59 @@ window.headmodel = {
 	                if (down_duration > headmodel.duration) {
 	        	    	globals.gazeWanderingUI = "";
 	        	    	document.getElementById("gazeMonitor5").innerHTML = "";
-						console.log("===== Looking away - Down =====");
-						console.log("Down duration: " + (Date.now() - headmodel.down).toString());
-						console.log("Score_down: " + Math.abs(pitch - headmodel.downthreshold).toString());
+						//console.log("Down duration: " + (Date.now() - headmodel.down).toString());
+						//console.log("Score_down: " + Math.abs(pitch - headmodel.downthreshold).toString());
 						
 						var d = new Date();
-						//var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll), "time": Date.now().toString(), "direction": "Down"};
-						var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
-										  "duration": down_duration.toString(), "direction": "Down"};
 						
-						//var start_down = (queue_head_down.length > 0) ? (queue_head_down.length - 1) : 0;
-						
-						queue_head_down.push(dataString);
-						console.log("Length of the queue_down: " + queue_head_down.length);
-						if (queue_head_down.length <= 0) {
-							console.log("Peeking front of the queue_down: " + queue_head_down[0]);
-						}
 						
 						if (now > (last_sent + headmodel.nextmsg_min)) { 
 							if (headmodel.free_passes <= 0) {
-								var temp = JSON.stringify(dataString);
-								temp = temp.replace("{","%7B");
-								temp = temp.replace("}","%7D");							
-								showGazeWandering (globals,temp);
+								headmodel.action = "Intervention";
 								headmodel.wanderingMsg = "Yes - Intervention";
 							}
 							else {
+								headmodel.action = "FreePass";
 								last_sent = last_sent + headmodel.nextmsg_min;
 								headmodel.wanderingMsg = "Yes - Free pass";
 								headmodel.free_passes = headmodel.free_passes - 1;
 	    	                    document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
 							}
+							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+									  "duration": down_duration.toString(), "direction": "Down", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+							queue_head_down.push(dataString);
+							console.log("Length of the queue_down: " + queue_head_down.length);
+							if (queue_head_down.length <= 0) {
+								console.log("Peeking front of the queue_down: " + queue_head_down[0]);
+							}
+							//var temp = JSON.stringify(dataString);
+							showGazeWandering (globals,JSON.stringify(dataString));
 							queue_head_down.splice(0);
 							last_sent = now;
 							headmodel.down = -1;
 						}
 
 						else {
-							if (down_duration > headmodel.duration) {
+							if (down_duration < headmodel.nextmsg_min) {
 								headmodel.wanderingMsg = "Yes - Paused";
+								headmodel.action = "Wandering - Paused";
 							}
 		                	else {
 		                		headmodel.wanderingMsg = "Yes";
+								headmodel.action = "Wandering";
 		                	}                	
+							var dataString = {"yaw": String(yaw), "pitch": String(pitch), "roll": String(roll),  
+									  "duration": down_duration.toString(), "direction": "Down", "modelConfidence": String(headmodel.modelConfidence), "action": String(headmodel.action) };
+							//var temp = JSON.stringify(dataString);
+							queue_head_down.push(dataString);
+							console.log("Length of the queue_down: " + queue_head_down.length);
+							if (queue_head_down.length <= 0) {
+								console.log("Peeking front of the queue_down: " + queue_head_down[0]);
+							}
+							if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+							    showGazeWandering (globals,JSON.stringify(dataString));
+							    headmodel.last_sample = now;
+							}
 						}
 	                }
 	            	else {

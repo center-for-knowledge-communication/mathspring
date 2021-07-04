@@ -13,6 +13,7 @@ import java.lang.Math;
 /**
  * User: Frank
  * Date: May 25, 2021
+ * Frank	07-03-21	handle confidence and action fields
  */
 public class GazeWanderingEvent extends IntraProblemEvent {
 
@@ -64,9 +65,10 @@ public class GazeWanderingEvent extends IntraProblemEvent {
 	    	int roll = Integer.parseInt(strRoll);
 	    	dbGazeEventJsonObject.putIfAbsent("tiltDegrees",  String.valueOf(roll));
 	    	
-			dbGazeEventJsonObject.putIfAbsent("modelConfidence", "0");
-	//		dbGazeEventJsonObject.putIfAbsent("modelConfidence", inGazeEventJsonObject.getString("modelConfidence"));
-	
+			dbGazeEventJsonObject.putIfAbsent("modelConfidence", inGazeEventJsonObject.getString("modelConfidence"));
+
+			dbGazeEventJsonObject.putIfAbsent("action", inGazeEventJsonObject.getString("action"));
+			
 	    	dbGazeEventJsonObject.putIfAbsent("modelversionID", "1.0.0");
 	//    	dbGazeEventJsonObject.putIfAbsent("modelversionID", inGazeEventJsonObject.getString("model_version"));
 	

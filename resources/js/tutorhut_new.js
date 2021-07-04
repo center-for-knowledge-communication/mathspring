@@ -7,6 +7,7 @@
 // Frank 01-13-21 Issue #354 fix topicName formatting
 // Frank 01-16-21 Issue #357 fix topicName formatting
 // Kartik 04-22-21 Issue #390 Removed previous display of current time in the problems screen
+// Frank	07-03-21	v1..0.1 processGazeWandering ignore empty reposnse messages
 
 var globals;
 var sysGlobals;
@@ -375,9 +376,12 @@ function showVideo (globals) {
 }
 
 function showGazeWandering (globals,gazeData) {
-	
+				
+	var tgazeData = gazeData;
+	tgazeData = tgazeData.replaceAll("{","%7B");
+	tgazeData = tgazeData.replaceAll("}","%7D");							
 
-    servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": gazeData },processGazeWandering);
+    servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": tgazeData },processGazeWandering);
 }
 
 // TODO this should be changed to use a non-modal dialog
@@ -472,49 +476,51 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
 
 function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
 
-	console.log(responseText);
-	
-	var gazeJSON = JSON.parse(responseText);
+
+	if (!(responseText === "")) {
 
 	
+		console.log(responseText);
+		
+		var gazeJSON = JSON.parse(responseText);
 	
-	if (gazeJSON.params.playSound === 1) {
-		globals.gazeWanderingUI = "playSound<br>";
-		var audio = new Audio('airport_sound.mp3');
-		audio.play();
+		
+		
+		if (gazeJSON.params.playSound === 1) {
+			globals.gazeWanderingUI = "playSound<br>";
+			var audio = new Audio('airport_sound.mp3');
+			audio.play();
+		}
+	
+		if (gazeJSON.params.LCompanion === 1) {
+			globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename + "<br>";
+			var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
+			loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+		}
+		
+		
+		if (gazeJSON.params.textBox === 1) {
+			globals.gazeWanderingUI = "textBox<br>";
+			var theText = gazeJSON.params.textBoxChoice;
+			console.log(theText);
+	
+			swal({
+				title: theText,
+				confirmButtonColor: "#DD6B55", 
+				confirmButtonText: "OK",
+				closeOnConfirm: true,
+			});
+		}
+		
+		if (gazeJSON.params.flashBox === 1) {
+			globals.gazeWanderingUI = "flashBox<br>";		
+			$('body').plainOverlay('show')
+			setTimeout(function() { afterFlash("Hey"); }, 5000);
+		}
 	}
-
-	if (gazeJSON.params.LCompanion === 1) {
-		globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename + "<br>";
-		var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
-		loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
-	}
-	
-	
-	if (gazeJSON.params.textBox === 1) {
-		globals.gazeWanderingUI = "textBox<br>";
-		var theText = gazeJSON.params.textBoxChoice;
-		console.log(theText);
-
-		swal({
-			title: theText,
-			confirmButtonColor: "#DD6B55", 
-			confirmButtonText: "OK",
-			closeOnConfirm: true,
-		});
-	}
-	
-	if (gazeJSON.params.flashBox === 1) {
-		globals.gazeWanderingUI = "flashBox<br>";		
-		$('body').plainOverlay('show')
-		setTimeout(function() { myFunction("Hey"); }, 3000);
-
-	}
-
 }
 
-function myFunction(value) {
-//	alert(value);
+function afterFlash(value) {
 	$('body').plainOverlay('hide')
 }
 
