@@ -124,9 +124,11 @@ public class DbGaze {
     	while (s.hasNext()) {
     		String skey = (String) s.next();
     		Object obj = targetJsonObject.get(skey);
-    		Object r = targetJsonObject.putIfAbsent(skey, obj);
+			if (obj == null) {
+				Object tobj = sourceJsonObject.get(skey);
+				Object r = targetJsonObject.put(skey, tobj);
+			}   		
     	}
-
     	result = targetJsonObject.toString();
 		return result;
 	}

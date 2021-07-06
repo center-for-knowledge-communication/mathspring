@@ -21,6 +21,7 @@ window.headmodel = {
     duration:  globals.gazeParamsJSON.gazwndr_sec,
     nextmsg_min: globals.gazeParamsJSON.gazwndr_nextmsg_min * 60000, 
     free_passes: globals.gazeParamsJSON.gazwndr_free_passes,
+    sample_rate: globals.gazeParamsJSON.gazwndr_sample_rate * 1000,
     modelConfidence: 0,
     action: "",
     up: -1,
@@ -31,7 +32,6 @@ window.headmodel = {
     calibratePoints: {},
     last_sent: -1,
     last_sample: -1,
-    sample_rate: 10000,
     wanderingMsg: "No",
     WanderingAxis: "",
     value: null,
@@ -148,7 +148,7 @@ window.headmodel = {
 								if (queue_head_right.length <= 0) {
 									console.log("Peeking front of the queue_right: " + queue_head_right[0]);
 								}
-								if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+								if ((headmodel.sample_rate > 0) && (now > (headmodel.last_sample + headmodel.sample_rate))) {
 								    showGazeWandering (globals,JSON.stringify(dataString));
 								    headmodel.last_sample = now;
 								}
@@ -227,7 +227,7 @@ window.headmodel = {
 								if (queue_head_left.length <= 0) {
 									console.log("Peeking front of the queue_left: " + queue_head_left[0]);
 								}
-								if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+								if ((headmodel.sample_rate > 0) && (now > (headmodel.last_sample + headmodel.sample_rate))) {
 								    showGazeWandering (globals,JSON.stringify(dataString));
 								    headmodel.last_sample = now;
 								}
@@ -310,7 +310,7 @@ window.headmodel = {
 							if (queue_head_up.length <= 0) {
 								console.log("Peeking front of the queue_up: " + queue_head_up[0]);
 							}
-							if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+							if ((headmodel.sample_rate > 0) && (now > (headmodel.last_sample + headmodel.sample_rate))) {
 							    showGazeWandering (globals,JSON.stringify(dataString));
 							    headmodel.last_sample = now;
 							}
@@ -389,7 +389,7 @@ window.headmodel = {
 							if (queue_head_down.length <= 0) {
 								console.log("Peeking front of the queue_down: " + queue_head_down[0]);
 							}
-							if (now > (headmodel.last_sample + headmodel.sample_rate)) {
+							if ((headmodel.sample_rate > 0) && (now > (headmodel.last_sample + headmodel.sample_rate))) {
 							    showGazeWandering (globals,JSON.stringify(dataString));
 							    headmodel.last_sample = now;
 							}
