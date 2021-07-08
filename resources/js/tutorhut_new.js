@@ -483,45 +483,96 @@ function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
 		console.log(responseText);
 		
 		var gazeJSON = JSON.parse(responseText);
-	
+
+		/* How algorithm this works:
+		 * 	pauseDuration is used to keep track of what each intervention's pause should be from the start of the function
+		 *    playSound if selected, has no pause duration and tells the next ibtervention to pause for at least 5000ms.
+		 *    LCompanion if selected, has no pause if there was no sound selected, and a 5000ms pause if sound was selected, and it adds 5000 to the accumated puase for the next intervemtion
+		 *    flashBox if selected has a pause for the accumulated intervention pauses so far, and adds 5000ms to the start-pause for this intervention and 5000 more for the end-pause, resuting in a 5000ms screen flash
+		 *    texBox if selected has a pause for the accumulated intervention pauses so far, and puts up the confirmation box
+		 */
 		
-		
+		var pauseDuration = 0;
 		if (gazeJSON.params.playSound === 1) {
 			globals.gazeWanderingUI = "playSound<br>";
 			var audio = new Audio('airport_sound.mp3');
 			audio.play();
+			pauseDuration = 5000;
 		}
 	
 		if (gazeJSON.params.LCompanion === 1) {
 			globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename + "<br>";
 			var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
-			loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+			if (pauseDuration > 0) {
+				var tpause = pauseDuration;
+				pauseDuration = pauseDuration + 8000;
+				setTimeout(function() { doLC(lc_url); }, tpause);			
+			}
+			else {
+				pauseDuration = pauseDuration + 8000;
+				loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+			}
 		}
 		
+		if (gazeJSON.params.flashBox === 1) {
+			if (pauseDuration > 0) {
+				var tpause = pauseDuration;
+				pauseDuration = pauseDuration + 5000;			
+				setTimeout(function() { doBeforeFlash(); }, tpause);			
+			}
+			else {
+				pauseDuration = pauseDuration + 5000;			
+				globals.gazeWanderingUI = "flashBox<br>";		
+				$('body').plainOverlay('show')
+				setTimeout(function() { afterFlash("Hey"); }, 5000);
+			}
+		}
 		
 		if (gazeJSON.params.textBox === 1) {
 			globals.gazeWanderingUI = "textBox<br>";
 			var theText = gazeJSON.params.textBoxChoice;
 			console.log(theText);
+			if (pauseDuration > 0) {
+				setTimeout(function() { doTextBox(theText); }, pauseDuration);			
+			}
+			else {
 	
-			swal({
-				title: theText,
-				confirmButtonColor: "#DD6B55", 
-				confirmButtonText: "OK",
-				closeOnConfirm: true,
-			});
+				swal({
+					title: theText,
+					confirmButtonColor: "#DD6B55", 
+					confirmButtonText: "OK",
+					closeOnConfirm: true,
+				});
+			}
 		}
 		
-		if (gazeJSON.params.flashBox === 1) {
-			globals.gazeWanderingUI = "flashBox<br>";		
-			$('body').plainOverlay('show')
-			setTimeout(function() { afterFlash("Hey"); }, 5000);
-		}
 	}
 }
 
-function afterFlash(value) {
-	$('body').plainOverlay('hide')
+function doBeforeFlash() {
+	globals.gazeWanderingUI = "flashBox<br>";		
+	$('body').plainOverlay('show');
+	setTimeout(function() { afterFlash("Hey"); }, 5000);	
+}
+
+function afterFlash() {
+	$('body').plainOverlay('hide');
+	pauseDuration = 0;
+}
+
+function doLC(lc_url) {
+	loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+	pauseDuration = 8000;
+}
+
+function doTextBox(theText) {
+
+	swal({
+		title: theText,
+		confirmButtonColor: "#DD6B55", 
+		confirmButtonText: "OK",
+		closeOnConfirm: true,
+	});
 }
 
 
