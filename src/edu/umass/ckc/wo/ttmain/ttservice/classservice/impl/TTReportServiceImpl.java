@@ -1979,7 +1979,7 @@ public class TTReportServiceImpl implements TTReportService {
                 selectParams.put("problemId", problemID);
                 int SKIPO = 0, NOTRO = 0, GIVEUPO = 0, SOFO = 0, SHINTO = 0, SHELPO = 0, ATTO = 0, GUESSO = 0, NODATAO = 0;
                 List<PerProblemReportBean> perProblemReportBeans = namedParameterJdbcTemplate.query(TTUtil.PER_PROBLEM_QUERY_FOURTH, selectParams, new RowMapper<PerProblemReportBean>() {
-                    int SKIP = 0, GIVEUP = 0, SOF = 0;
+                    int SKIP = 0, GIVEUP = 0, SOF = 0, ATT = 0;
                     @Override
                     public PerProblemReportBean mapRow(ResultSet resultSet, int i) throws SQLException {
                         perProblemReportBeanObj.nStudsSeen++;
@@ -1994,6 +1994,10 @@ public class TTReportServiceImpl implements TTReportService {
                                 SOF++;
                                 perProblemReportBeanObj.setGetGetPercStudentsSolvedFirstTry(SOF);
                                 break;
+                            case "ATT":
+                                ATT++;
+                                perProblemReportBeanObj.setGetGetPercStudentsSolvedSecondTry(ATT);
+                                break;
                             case "GIVEUP":
                                 GIVEUP++;
                                 perProblemReportBeanObj.setPercStudentsGaveUp(GIVEUP);
@@ -2005,6 +2009,7 @@ public class TTReportServiceImpl implements TTReportService {
                     }
                 });
                 perProblemReportBeanObj.setGetGetPercStudentsSolvedFirstTry((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getGetGetPercStudentsSolvedFirstTry()));
+                perProblemReportBeanObj.setGetGetPercStudentsSolvedSecondTry((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getGetGetPercStudentsSolvedSecondTry()));
                 perProblemReportBeanObj.setPercStudentsSkipped((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getPercStudentsSkipped()));
                 perProblemReportBeanObj.setPercStudentsGaveUp((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getPercStudentsGaveUp()));
                 List<String> combinedStudentEffortsOnProblem = namedParameterJdbcTemplate.query(TTUtil.PER_PROBLEM_QUERY_THIRD, selectParams, new RowMapper<String>() {
