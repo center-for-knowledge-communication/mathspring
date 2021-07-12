@@ -44,6 +44,7 @@
 <!-- Frank 05-01-21  	Hide survey selection -->
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 <!-- Frank 05-20-21  	Issue #473 crop lname -->
+<!-- Frank 07-11-21  	Issue #77 remove obsolete report header - common core report now in classReportCard.jsp-->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2206,26 +2207,6 @@ function registerAllEvents(){
             });
         });
 
-    </script>
-    <script type="text/template"  id="child_table_perCluster">
-        <table class="table table-striped table-bordered hover">
-            <thead>
-            <tr>
-                <th><%= rb.getString("perClustercol0") %></th>
-                <th><%= rb.getString("perClustercol1") %></th>
-                <th><%= rb.getString("perClustercol2") %></th>
-                <th><%= rb.getString("perClustercol3") %></th>
-                <th><%= rb.getString("perClustercol4") %></th>
-                <th><%= rb.getString("perClustercol5") %></th>
-                <th><%= rb.getString("perClustercol6") %></th>
-                <th><%= rb.getString("perClustercol7") %></th>
-                <th><%= rb.getString("perClustercol8") %></th>
-                <th><%= rb.getString("perClustercol9") %></th>
-                <th><%= rb.getString("perClustercol10") %></th>
-                <th><%= rb.getString("perClustercol11") %></th>
-            </tr>
-            </thead>
-        </table>
     </script>
     
     <script type="text/template"  id="student_table_Survey">
