@@ -49,7 +49,7 @@ catch (Exception e) {
         var $userLoginForm = $('.user-login-form');
         var $userLoginFormUsername = $('.user-login-form-username');
         var $loginSubmitBtn = $('.js-login-btn');
-
+/*
         $("#forgotPasswordBtn").hide();
         
         $userSwitcher.change(function() {
@@ -66,7 +66,7 @@ catch (Exception e) {
             }
         });
     });
-           
+*/           
         function signup() {
             location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
         }
