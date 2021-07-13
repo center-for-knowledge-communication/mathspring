@@ -12,6 +12,7 @@
 // Frank 12-26-20 Issue #329 added lang variable for tutorhut_new.jsp to access current language for topic name
 // Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
 // Kartik 04-22-21 Issue #390 Added session clock functionality
+// Frank	06-29-21 Added gaze functionality
 
 ResourceBundle versions = null; 
 try {
@@ -59,6 +60,9 @@ catch (Exception e) {
 	rel="stylesheet">
 <link href="css/mathspring_new.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet" type="text/css"/>
 
+<link href="https://fonts.googleapis.com/css?family=Roboto|Source+Code+Pro" rel="stylesheet">
+<link rel="stylesheet" href="css/normalize.css?ver=<%=versions.getString("css_version")%>">
+<link rel="stylesheet" href="css/style.css?ver=<%=versions.getString("css_version")%>">
 
 <%
 if (lang.equals("es")) {
@@ -128,7 +132,17 @@ else
 	var yes_choice = "<%= rb.getString("yes") %>";	
 	var no_choice = "<%= rb.getString("no") %>";
 	var no_hints_seen_yet = "<%= rb.getString("no_hints_seen_yet") %>";
+	var work_with_a_partner = "<%= rb.getString("work_with_a_partner") %>";
+	var continue_waiting = "<%= rb.getString("continue_waiting") %>";
+	var answering_rapidly = "<%= rb.getString("answering_rapidly") %>";
+	var making_a_change = "<%= rb.getString("making_a_change") %>";
+	var switching_topics = "<%= rb.getString("switching_topics") %>";
+	var how_are_you_doing = "<%= rb.getString("how_are_you_doing") %>";
+	var what_are_your_goals = "<%= rb.getString("what_are_your_goals") %>";
+	var lets_see_our_progress = "<%= rb.getString("lets_see_our_progress") %>";
+	var waiting_for_partner = "<%= rb.getString("waiting_for_partner") %>";
 </script>
+
 
 
 <script type="text/javascript" src="js/simple-slider.js"></script>
@@ -144,6 +158,8 @@ else
 
 
 <script type="text/javascript">
+
+
         var globals = {
             lastProbType: '${lastProbType}',
             isBeginningOfSession: ${isBeginningOfSession},
@@ -167,6 +183,9 @@ else
             studId : ${studId} ,
             className : "${className}" ,
             teacherName : "${teacherName}" ,
+            gazeDetectionOn: ${gazeDetectionOn},
+            gazeParamsJSON: ${gazeParamsJSON},
+            gazeWanderingUI: "",
             probType : '${probType}',
             exampleProbType : null,
             probId : ${probId},
@@ -310,6 +329,28 @@ label {
 </head>
 <body>
 
+	<video id="webcam" width="180" height="180" autoplay></video>
+	<canvas id="overlay" width="180" height="180"></canvas>
+	<div id="monitorBox" width="240px" height="150px">
+		<span id="p1"></span>
+		<span id="gazeMonitor1"></span>
+		<span id="gazeMonitor2"></span>
+		<span id="gazeMonitor3"></span>
+		<span id="gazeMonitor4"></span>
+		<span id="gazeMonitor5"></span>
+		<span id="gazeMonitor6"></span>
+	</div>
+
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script>
+<!-- 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.js"></script> -->
+  	<script src="js/face-api.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/ui.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/headmodel.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/main.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/calibration.js?ver=<%=versions.getString("js_version")%>"></script>
+  	<script src="js/plain-overlay.min.js"></script>
+  	<script src="js/jquery.plainoverlay.min.js"></script>
 
 	<audio id='questionaudio' name='questionaudio'>
 		<source id='questionogg' src='' type='audio/ogg'>
@@ -835,6 +876,22 @@ label {
     }
 
     $(document).ready(function() {
+	    if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
+	    	document.getElementById("webcam").style.zIndex = "3";    	
+	    	document.getElementById("monitorBox").style.visibility = "visible";	    
+	    	document.getElementById("monitorBox").style.zIndex = "3";    	
+	    	document.getElementById("gazeMonitor2").innerHTML = "";
+	    	document.getElementById("gazeMonitor3").innerHTML = "";
+	    	document.getElementById("gazeMonitor4").innerHTML = "";
+	    	document.getElementById("gazeMonitor5").innerHTML = "";
+	    	document.getElementById("gazeMonitor6").innerHTML = "";
+	    }
+	    else {
+	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
+	    }
+    });
+    
+    $(document).ready(function() {
         $('#report-form').submit(function (event) {
             var formData = {
                 'sessionId': globals.sessionId,
@@ -870,6 +927,7 @@ label {
 
     });
 </script>
+
 
 
 	<div style="z-index: 100;" id="instructionsDialog" title="Instructions">
