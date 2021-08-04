@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Random;
@@ -43,6 +44,9 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
 import edu.umass.ckc.wo.ttmain.ttservice.loginservice.TTLoginService;
 import edu.umass.ckc.wo.tutor.Settings;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
 
 /**
@@ -60,6 +64,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank 	11-12-20	issue #276 handle interface change for remembering type of login
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  * Frank	02-14-21	issue #383R1 added logFeedback method
+ * Frank	08-03-21	Issue 150 pass along the list of class name/id pairs
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -111,7 +116,31 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
             model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
+           
+            JSONArray classNameIdArray = new JSONArray();
+	        try {
+	            if (classInfoListLatest.size() > 0) {
+	            	classInfoListLatest.stream().forEach(element ->
+	                {
+	                    JSONObject nameIdJson = new JSONObject();
+	                    nameIdJson.put("name", element.getName());
+	                    nameIdJson.put("Id", element.getClassid());
+	                    classNameIdArray.add(nameIdJson);                   
+	                });
+	            }
+	            else {
+                    JSONObject nameIdJson = new JSONObject();
+                    nameIdJson.put("name", "dummyClass");
+                    nameIdJson.put("Id", 0);
+                    classNameIdArray.add(nameIdJson);                   	            	
+	            }
+	        } catch (JSONException e1) {
+	                // TODO Auto-generated catch block
+	              e1.printStackTrace();
+	        }
             
+           	String classNameIdArrayStr = classNameIdArray.toString();
+
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
                 ClassInfo classInfo = DbClass.getClass(connection.getConnection(), classId);
@@ -122,8 +151,10 @@ public class TTLoginServiceImpl implements TTLoginService {
                 model.addAttribute("classInfo", classInfo);
                 model.addAttribute("noClass", false);
                 model.addAttribute("classList", classes);
+                model.addAttribute("classNameIdArrayStr", classNameIdArrayStr);
                 return "teacherTools/teacherToolsMain";
             } else {
+                model.addAttribute("classNameIdArrayStr", classNameIdArrayStr);
                 model.addAttribute("noClass", true);
                 return "teacherTools/teacherToolsMain";
             }
@@ -217,5 +248,4 @@ public class TTLoginServiceImpl implements TTLoginService {
             return 2;
         }
     }
-
 }
