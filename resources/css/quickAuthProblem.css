@@ -211,6 +211,18 @@ body {
     display: none;
     z-index: 3;
 }
+.circle{
+    position: absolute;
+    left: 17px;
+    margin-top: -8px;
+    width: 43px;
+    height: 43px;
+    background-image: url(../images/circle.png);
+    background-size: 100% 100%;
+    display: none;
+    z-index: 3;
+}
+
 #ShortAnswerBox{
     margin: 0 auto 10px auto;
     display: table;

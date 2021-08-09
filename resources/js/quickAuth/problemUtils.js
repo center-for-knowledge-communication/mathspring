@@ -34,14 +34,53 @@ m.initialize = function(multiChoice) {
     isMultiChoice = multiChoice;
 }
 
-function answerClicked(doc, buttonName) {
-    window.parent.tutorhut_answerChosen(doc, buttonName);
+function answerClicked(doc) {
+	var buttonName = checkCircledAnswer(doc);
+	
+	if (buttonName != "none"){
+		window.parent.tutorhut_answerChosen(doc, buttonName);
+	}
+}
+
+// #421 circle answer
+function checkCircledAnswer(doc){
+	var allButtons = doc.getElementsByClassName('circle');
+	var buttonName = "none";
+	for (var i = 0; i < allButtons.length; i++){
+		checkButton = allButtons[i];
+		try{
+			if(checkButton.style.display == "initial"){
+			buttonName = checkButton.id[0];
+		} 
+		
+		}catch (error){
+			console.log(error);
+		}
+	}
+	
+	return buttonName;
+}
+
+function answerCircled(doc, answerChosen){
+	var circledButton = checkCircledAnswer(doc);
+	
+	if (circledButton == "none"){
+		doc.getElementById(answerChosen+'Circle').style.display = "initial";
+
+	} else if (circledButton[0] == answerChosen){
+		doc.getElementById(answerChosen+'Circle').style.display = "none";
+	}
 }
 
 m.addMultiChoiceClickListener = function(doc, letter) {
-    var listener = function() { answerClicked(doc, letter); };
+    var listener = function() { answerCircled(doc, letter); };
     clickListeners[letter] = listener;
     doc.getElementById(letter + "Button").addEventListener("click", listener);
+}
+
+m.addMultiChoiceSubmitListener = function(doc) {
+	var listener = function() { answerClicked(doc)}
+	doc.getElementById("multiSubmitButton").addEventListener("click", listener);
 }
 
 m.prob_gradeAnswer = function(doc, answerChosen, isCorrect, showHint) {
@@ -49,15 +88,20 @@ m.prob_gradeAnswer = function(doc, answerChosen, isCorrect, showHint) {
         answerChosen = answerChosen.toUpperCase();
         if (isCorrect) {
             var answers = doc.getElementsByClassName("answer-row");
-            for(var i = 0; i < answers.length; i++) {
+
+			// length - 1 here to avoid the problem in the last row, which is the submit button
+            for(var i = 0; i < answers.length - 1; i++) {
                 var letter = answers[i].dataset.letter;
                 doc.getElementById(letter + "X").style.display = "none";
+				doc.getElementById(letter+'Circle').style.display = "none";
+
                 doc.getElementById(letter + "Button").removeEventListener("click", clickListeners[letter]);
                 delete clickListeners[letter];
             }
             doc.getElementById(answerChosen+'Check').style.display = "initial";
         } else {
             doc.getElementById(answerChosen+"X").style.display = "initial";
+			doc.getElementById(answerChosen+"Circle").style.display = "none";
         }
     } else {
         if (isCorrect) {
@@ -68,6 +112,12 @@ m.prob_gradeAnswer = function(doc, answerChosen, isCorrect, showHint) {
             doc.getElementById("Grade_X").style.display="inline-block";
         }
     }
+}
+
+// #421 circle answer
+
+m.circleProb = function(doc, answerChosen){
+	doc.getElementById(answerChosen+'Circle').style.display = "initial";
 }
 
 m.processShortAnswer = function(doc, ans) {

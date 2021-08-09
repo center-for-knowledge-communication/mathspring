@@ -90,6 +90,8 @@ String ctx = request.getContextPath();
                 <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
+                <div id="Grade_Circle" class="short_answer_circle"></div>
+                
             </div>
         </div>
     </div>
