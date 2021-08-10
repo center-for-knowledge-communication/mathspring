@@ -1,6 +1,7 @@
 <%--
-  User: kartik
-  To change this template use File | Settings | File Templates.
+  Author: kartik
+  
+  Frank 08-03-21 Issues 150 AND 487 class message and worksheet location 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.Locale"%>
@@ -21,6 +22,12 @@ catch (Exception e) {
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div>
+
+		<label for="messageFromTeacher"><%= rb.getString("todays_messages")%>:</label>
+		<br>
+		<textarea readonly id="messageFromTeacher" name="messageFromTeacher" rows="4" cols="90">
+ 		</textarea>
+
     <form method="post" name="login"
           action="${pageContext.request.contextPath}/WoLoginServlet">
         <input type="hidden" name="var" value="b"/>
@@ -28,18 +35,18 @@ catch (Exception e) {
         <input type="hidden" name="sessionId" value="${sessionId}"/>
         <input type="hidden" name="action" value="LoginInterventionInput"/>
         <input type="hidden" name="interventionClass" value="${interventionClass}"/>
-        <p><%= rb.getString("want_to_work_with")%></p>
+ 
+         <h4><%= rb.getString("want_to_work_with")%></h4>
 		<c:forEach items="${lcprofile}" var="lcompanion" varStatus="loop">
 			<c:if test="${(loop.index == 0 || loop.index%3  == 0)}">
 				<c:set var="terminator" value="${loop.index + 2}"/>
 			<div class="row">	
 			</c:if>
-			<div class="col-md-4">
-			    
+			<div class="col-md-4">			    
        			<label class="radio-inline">
-          			<input type="radio" name="optLC" id="LC" value="${lcompanion.key}" required>
+          			<input type="radio" name="optLC" id="LC${loop.index}" value="${lcompanion.key}" required ${lcompanion.value[2]}>
           			<c:if test="${lcompanion.value[1] != 'NoLC'}">
-          				<img src="${url}/${lcompanion.value[1]}/character.png" width="180px" height="226px">
+          				<img src="${url}/${lcompanion.value[1]}/character.png" width="150px" height="188px">
           			</c:if>
           			<span style="display:block; text-align: center;">${lcompanion.value[0]}</span>
          		</label>
@@ -51,9 +58,35 @@ catch (Exception e) {
 		    </div>
 		    </c:if>
 		</c:forEach>
+
+        <div id="workSheetDiv">
+ 	       <hr>
+        	<h4><%= rb.getString("where_i_keep_worksheet")%>:</h4>
+			<div class="row">	
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optLocation" id="optLeft" value="Left">
+	          			<span style="display:block; text-align: center;"><%= rb.getString("to_the_left")%></span>
+	         		</label>
+	       		</div>
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optLocation" id="optCenter" value="Center">
+	          			<span style="display:block; text-align: center;"><%= rb.getString("in_the_center")%></span>
+	         		</label>
+	       		</div>
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optLocation" id="optRight" value="Right">
+	          			<span style="display:block; text-align: center;"><%= rb.getString("to_the_right")%></span>
+	         		</label>
+	       		</div>
+			</div>
+		</div>
+        
 		
 		<div class="row">
-			<input class="btn btn-success" type="submit" value="Submit" style="
+			<input class="btn btn-success" type="submit" value="<%= rb.getString("lets_get_started")%>" style="
 			    display: block;margin: auto;margin-top: 20px;">
 		</div>
     </form>

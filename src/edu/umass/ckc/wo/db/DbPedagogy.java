@@ -37,6 +37,9 @@ import edu.umass.ckc.wo.xml.JDOMUtils;
  * Date: 11/18/15
  * Time: 5:44 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	08-03-21	Issue 150 and 487 - Remember LCProfile selection on login page
+ * Frank	08-03-21	Issue 150 and 487 - Remove "No Companion" option from LCGetProfiles()
  */
 public class DbPedagogy {
 
@@ -397,19 +400,27 @@ public class DbPedagogy {
 
     }
 
-    public static Map<Integer, List<String>> getLCprofiles(Connection conn, int classId) throws SQLException {
+    public static Map<Integer, List<String>> getLCprofiles(Connection conn, int classId, int currStudentPedId) throws SQLException {
 		Map<Integer, List<String>> LCprofiles = new HashMap<Integer, List<String>>();
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select cp.pedagogyId, p.name, p.shortName from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?\r\n" + 
-        			"UNION\r\n" + 
-        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
+        	String q = "select cp.pedagogyId, p.name, p.shortName from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+//        			"UNION\r\n" + 
+//        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classId);
             rs = stmt.executeQuery();
+            String checked = " ";
             while (rs.next()) {
-            	LCprofiles.put(rs.getInt(1), new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3))));
+            	int pedId = rs.getInt(1);
+            	if (pedId == currStudentPedId) {
+            		checked = " checked='checked' ";
+            	}
+            	else {
+            		checked = " ";           		
+            	}
+            	LCprofiles.put(pedId, new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3), checked)));
             }
         } finally {
             if (stmt != null)

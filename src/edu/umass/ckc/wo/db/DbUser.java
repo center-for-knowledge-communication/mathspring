@@ -30,7 +30,8 @@ import java.util.ArrayList;
  * Frank 09-14-2020	issue #237 added 'exclude test users from pause'
  * Frank 09-29-2020	issue #237R3 added 'exclude test users from pause'
  * Frank 12-26-20	issue #329 use multi-lingual version of getAllTopics()
- * Frank 05-19-21   issue #473 cropt lname to 2 characters 
+ * Frank 05-19-21   issue #473 cropt lname to 2 characters
+ * Frank 08-03-21	Issus 150 and 487 set and get worksheet location 
  */
 public class DbUser {
 
@@ -133,6 +134,54 @@ public class DbUser {
         }
     }
 
+    /**
+     * returns a worksheet location.  Left, Right, or Center
+     * @param conn
+     * @param studId
+     * @return
+     * @throws SQLException
+     */
+    public static String getStudentWorksheetLocation(Connection conn, int studId) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String worksheetLocation = "error";
+        try {
+            String q = "select worksheet_location from student where id=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, studId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+            	worksheetLocation = rs.getString(1);
+                if (rs.wasNull())
+                    return "";
+                else return worksheetLocation;
+            }
+            return worksheetLocation;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }  
+    
+    public static int setStudentWorksheetLocation(Connection conn, int studId, String WorksheetLocation) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            String q = "update student set worksheet_location=? where id=?";
+            ps = conn.prepareStatement(q);
+            ps.setString(1, WorksheetLocation);
+            ps.setInt(2, studId);
+            return ps.executeUpdate();
+        } finally {
+
+            if (ps != null)
+                ps.close();
+        }
+    }
+
+    
     public static int getStudentPedagogy(Connection conn, int studId) throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;

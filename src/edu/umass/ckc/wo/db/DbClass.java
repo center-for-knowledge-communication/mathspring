@@ -37,7 +37,8 @@ import java.util.List;
  * Frank	10-31-20	Issue #293 added advanced settings to ClassConfig
  * Kartik	11-02-20	issue #292 test users to be created on class creation
  * Frank	11-10-20	issue #293R3 validate classconfig fields after fetching them
- * Frank	006-26-21	Added gaze_detction_on handling
+ * Frank	06-26-21	Added gaze_detction_on handling
+ * Frank	08-03021	Issues 150 and 487
  */
 public class DbClass {
 
@@ -866,6 +867,29 @@ public class DbClass {
             if (rs.next()) {
                 int givePretest = rs.getInt(1);
                 return givePretest;
+            }
+            return -1;  // never should reach this line.
+        } finally {
+            if (s != null)
+                s.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public static int getGazeDetectionOn(Connection conn, int classId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement s = null;
+
+        try {
+            String q;
+            q = "select gaze_detection_on from ClassConfig where classId=?";
+            s = conn.prepareStatement(q);
+            s.setInt(1, classId);
+            rs = s.executeQuery();
+            if (rs.next()) {
+                int gazeDetectionOn = rs.getInt(1);
+                return gazeDetectionOn;
             }
             return -1;  // never should reach this line.
         } finally {
@@ -1787,4 +1811,52 @@ public class DbClass {
     	
     	return result;
     }
+    
+    public static int insertClassMessage(Connection conn, Timestamp startDate, Timestamp endDate, String msg, int classId) throws SQLException {
+ 
+    	int result = 0;
+		try {
+            String q = "insert into classmessages (start_date,end_date,msg,classId) values (?,?,?,?)";
+            PreparedStatement stmt = conn.prepareStatement(q);
+            stmt.setTimestamp(1, startDate);
+            stmt.setTimestamp(2, endDate);
+            stmt.setString(3, msg);
+            stmt.setInt(4, classId);
+            stmt.executeUpdate();
+            return 0;
+        }
+        catch (SQLException e) {
+            System.out.println(e.getErrorCode());
+            return -1;
+        }
+    }
+
+    public static List<String> getClassMessages(Connection conn, int classId) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        List<String> result = new ArrayList<String>();
+        try {
+            String q = "select msg from classmessages where classId=? and ( CURDATE() >= start_date and CURDATE() <= end_date )";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                String msg = rs.getString(1);
+                result.add(msg);
+            }
+            return result;
+        }
+        catch (SQLException e) {
+            System.out.println(e.getErrorCode());
+            return result;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+    
 }
