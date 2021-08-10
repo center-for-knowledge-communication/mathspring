@@ -181,6 +181,12 @@ m.build = function(activity, previewMode) {
                         problemUtils.addMultiChoiceClickListener(document, letter.toUpperCase());
                     }
                 }
+
+				// add the submit answer button
+				var multiSubmitButton = buildMultiSubmit();
+				multi_answers.appendChild(multiSubmitButton);
+				problemUtils.addMultiChoiceSubmitListener(document);
+				
             }
             if (mode !== "demo" && mode !== "example") {
             	if(multiSelect) {
@@ -265,6 +271,19 @@ m.build = function(activity, previewMode) {
 	}
 }
 
+function buildMultiSubmit(){
+	var answer_row = document.createElement("div");
+    answer_row.className = "answer-row";
+    answer_row.dataset.letter = "submitButton";
+    var answer_button = 
+        `<div id="multiSubmitButton">
+            <input class="btn btn-success" type="submit" value="Submit" style="display: block;margin: auto;margin-left: 3px;">
+        </div>
+        `;
+    answer_row.innerHTML = answer_button + `<div id="Answer$" class="answer_text"></div>`;
+    return answer_row;
+}
+
 function buildAnswerRow(multiSelect, letter, answer_html) {
     var answer_row = document.createElement("div");
     answer_row.className = "answer-row";
@@ -275,6 +294,7 @@ function buildAnswerRow(multiSelect, letter, answer_html) {
         <div id="${letter}Button" class="button">
             <div id="${letter}Check" class="check"></div>
             <div id="${letter}X" class="x"></div>
+            <div id="${letter}Circle" class="circle"></div>
             <div id="${letter}Text" class="button_text">${letter}</div>
             <div id="${letter}Ellipse" class="ellipse"></div>
         </div>

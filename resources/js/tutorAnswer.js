@@ -77,6 +77,8 @@ tutorhut_answerChosen = function (selectedButton, choice) {
     }
 };
 
+
+
 // In HTML problems the server returns the grade and a possible intervention.
 // In the future it might make sense to not show the grading until processAttemptIntervention runs.   Perhaps
 // the intervention should contain a flag doGrade=true/false that determines this.
