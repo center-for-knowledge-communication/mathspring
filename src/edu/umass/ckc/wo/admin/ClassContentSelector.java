@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
  * To change this template use File | Settings | File Templates.
  * 
  * Frank	08-08-20	issue #51 don't show active topics which have ZERO problems 
- * Kartik   09-20-20    issue #232 setting only one topic to be activated on class creation 
+ * Kartik   09-20-20    issue #232 setting only one topic to be activated on class creation
+ * Frank	08-10-21    issue #491 change default LCs to 1 & 2 (i.e. Jane Learning Companion and Jake Learning Companion) 
  * 
  */
 public class ClassContentSelector {
@@ -103,7 +104,7 @@ public class ClassContentSelector {
                 p = getPedagogyByName("Jane Learning Companion");
             // if they want both, given them Jane semi and Jake full empathy
             else if (simpleLC.equals("both")) {
-                p = getPedagogyByName("Jane Semi Empathy");
+                p = getPedagogyByName("Jane Learning Companion");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
                 p = getPedagogyByName("Jake Learning Companion");
             }
