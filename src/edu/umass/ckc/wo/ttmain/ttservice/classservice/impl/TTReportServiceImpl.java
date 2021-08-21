@@ -8,6 +8,7 @@ import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
+import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
@@ -19,7 +20,9 @@ import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportStudentsMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLiveDashboardMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportEvents;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportEventsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
@@ -51,6 +54,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -87,6 +92,7 @@ import java.text.SimpleDateFormat;
  *  Frank 	05-11-21  	Issue #463 add report filters
  * Frank    05-20-21  	Issue #473 fix username update bug
  * Frank	08-03-21	Issue 150 added class message retrieval
+ * Frank	08-20-21	Issue 496 added live dashboard support
  */
 
 
@@ -395,6 +401,12 @@ public class TTReportServiceImpl implements TTReportService {
                     Map<String, Object> clsMap = new HashMap<>();
                     clsMap.put("levelOneData", clsData);
                     return clsMapper.writeValueAsString(clsMap);       
+
+                case "classLiveDashboard":
+
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+            		ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
+                    return classLiveDashboard.getProblemsSolved();       
 
                 case "classMessage":
                 	
@@ -2280,6 +2292,88 @@ public class TTReportServiceImpl implements TTReportService {
         SqlParameterSource namedParameters = new MapSqlParameterSource("teacherId", teacherId);
         List<TeacherClassListEntry> teacherClassListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_CLASSLIST_QUERY, namedParameters, new TeacherClassListEntryMapper());
         return teacherClassListEntries;
+    }
+
+    
+    
+    public List<User> getClassStudentIDs(Connection conn, int classID) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classID);
+            rs = stmt.executeQuery();
+            List<User> res = new ArrayList<User>();
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String fname = rs.getString(2);
+                String lname = rs.getString(3);
+                String uname = rs.getString(4);
+                String email = rs.getString(5);
+                String pw = rs.getString(6);
+                int strategyId = rs.getInt(7);  // can be NULL
+                if (rs.wasNull())
+                    strategyId = -1;
+                User u = new User(fname, lname, uname, email, pw, id);
+                if (strategyId != -1)
+                    u.setStrategyId(strategyId);
+                res.add(u);
+            }
+            return res;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+    public int getProblemsSolved(Connection conn, int studentId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int count = 0;
+        try {
+            String q = "select count(*) from studentproblemhistory where studId=? and isSolved = 1";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, studentId);
+            rs = stmt.executeQuery();
+            List<User> res = new ArrayList<User>();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+            return count;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+    
+    @Override
+    public ClassLiveDashboard generateLiveDashboard(String classId, String filter) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter.
+
+    	int total = 0;
+    	List<User> students = null;
+		ClassLiveDashboard testDashboard = new ClassLiveDashboard();
+		if (filter.equals("ProblemsSolved")) {
+			try {
+				students = getClassStudentIDs(connection.getConnection(), Integer.valueOf(classId));
+				for (int i=0;i< students.size();i++ ) {
+					total = total + getProblemsSolved(connection.getConnection(),students.get(i).getId());
+				}
+			}
+			catch (Exception e) {
+				
+			}
+    		testDashboard.setProblemsSolved(String.valueOf(total));
+    	}
+        return testDashboard;
+        
     }
 
     private Timestamp xDaysAgoToDate(String filter) {
