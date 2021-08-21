@@ -40,6 +40,7 @@
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 <!-- Frank 05-19-21  	Issue #474 add max-width and max-height to collective effort problem image display -->
 <!-- Frank 07-11-21  	Issue #77 changes to Common Core Problem Detail Report -->
+<!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2679,7 +2680,8 @@ var completeDataChart;
                         responsive: true,
                         "columns": columDvalues,
                         "columnDefs": columNvalues,
-                        "bPaginate": false,
+                        "bPaginate": true,
+                        "pageLength": 16,
                         "bFilter": false,
                         "bLengthChange": false,
                         rowReorder: false,
