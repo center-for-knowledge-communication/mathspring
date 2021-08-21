@@ -502,6 +502,20 @@ background-color: #FF4766;
   border-bottom: 1px solid #eee;
 }
 
+.tt-live-dashboard-content {
+  text-align: center;
+  font-size: xxx-large;
+  font-weight: bold; 
+  color:#0000c6;	
+  background-color: #ffff71;
+  padding: 40px 40px
+}
+
+.tt-live-dashboard-box {
+  background-color: #faff91;
+  margin: 40px 400px 40px 400px;
+  border: 8px solid #000000;
+}
 /* Tab Navigation */
 .nav-tabs {
   margin: 0;

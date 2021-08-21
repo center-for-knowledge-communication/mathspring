@@ -45,6 +45,10 @@
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 <!-- Frank 05-20-21  	Issue #473 crop lname -->
 <!-- Frank 07-11-21  	Issue #77 remove obsolete report header - common core report now in classReportCard.jsp-->
+<!-- Frank 08-20-21  	Issue #496 live dashboard -->
+<!-- Frank 08-20-21  	Swap positions of Landing Report 1 & 2 -->
+<!-- Frank 08-20-21  	Move class code from page title to logout dropdown -->
+
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -232,7 +236,6 @@ var perStudentperProblemReport;
 var perStudentperProblemLevelOne;
 var perStudentPerProblemColumnNamesMap;
 var perStudentPerProblemXrefMap;
-
 
 //Report5 Varribales
 var landingPageReport1;
@@ -536,7 +539,56 @@ function verifyTimeMinMax() {
 	      document.getElementById('minTime').value = ${classInfo.minTime};
 		  document.getElementById('maxTime').focus();
 	  }
-	}
+	
+}
+
+var liveDashboardTotal = 0;
+
+function liveDashboardPopulate() {
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+        	classId: classID,
+            teacherId: teacherID,
+            reportType: 'classLiveDashboard',
+            lang: loc,
+            filter: "ProblemsSolved"
+
+        },
+        success : function(data) {
+        	    if (data) {
+        	    	liveDashboardTotal = "" + data;
+        	    	document.getElementById('live-dashboard-content').innerHTML = '<h1 class="tt-live-dashboard-content">' + liveDashboardTotal + '</h1>';
+        	    	document.getElementById("live-dashboard").style.visibility = 'visible';
+        	    	liveDashboardLoop();
+        	    }
+              	else {
+              		console.log("response data is null");
+              	}
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+
+
+}
+
+function liveDashboardLoop() {
+
+	setTimeout(function() {
+		liveDashboardPopulate();
+	}, 5000);	
+	 
+}
+
+function liveDashboardStart() {
+
+	liveDashboardPopulate();
+	$("#live-dashboard").show();
+}
 
 var resetStudentDataTitle = "";
 var resetStudentDataId = "";
@@ -1167,6 +1219,14 @@ function handleclickHandlers() {
 
         $("#content-conatiner").children().hide();
         $("#content_apply_handle").show();
+    });
+
+    $("#live-dashboard_handler").click(function () {
+        $('#content_apply_handler').css('background-color', '');
+        $('#content_apply_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        liveDashboardStart();
     });
 
     $('a[rel=initialPopover]').popover({
@@ -2142,7 +2202,7 @@ function registerAllEvents(){
             $("#content-conatiner").children().hide();
 
             if (currentSelection == "classHomePage") {
-                $("#splash_page").show();            	
+            	$("#splash_page").show();            	
             	$("#classLandingReportOne").collapse('show');
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
@@ -2166,7 +2226,7 @@ function registerAllEvents(){
 			else {
             	$("#resetSurveySettings").show();    				
 			}
-           
+			
             $('#grade').val("${classInfo.grade}").change();
             $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
             $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
@@ -2370,8 +2430,11 @@ function registerAllEvents(){
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
+                        <a <i class="fa fa-fw fa-info-circle"></i>> <%= rb.getString("class_code") %>: ${classInfo.classid}</a>
+                    </li>
+                    <li>
                         <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
-                                class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
+                                class="fa fa-fw fa-power-off"></i> <%= rb.getString("log_out") %></a>
                     </li>
                 </ul>
             </li>
@@ -2401,13 +2464,15 @@ function registerAllEvents(){
             
              <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
+             <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
+
         </ul>
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
 
         <h1 class="page-header">
-            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong>
         </h1>
 
         <div id="content-conatiner" class="container-fluid">
@@ -3076,6 +3141,23 @@ function registerAllEvents(){
                 </div>
              </div>
 
+             <div id="live-dashboard" style="display:none;width: 100%;">
+             <div>
+                    <h3 class="tt-page-header">
+                        <h2><%= rb.getString("number_problems_class_solved") %></h2>
+                        <br>
+                        <h3><%= rb.getString("with_or_without_hints") %></h3>
+                    </h3>
+                    <div>
+                        <div id="classTotalProblems" class="tt-live-dashboard-box">
+                        	<div id="live-dashboard-content" >
+								<h1 class="tt-live-dashboard-content"></h1>
+							</div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+
              <div id="splash_page" style="display:none;width: 100%;">
              	<div>
                     <h3 class="tt-page-header">
@@ -3085,12 +3167,36 @@ function registerAllEvents(){
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title">
+                            <h3 class="panel-title">
+                                <a id="reportTwo" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportTwo">
+				                    <%= rb.getString("landing_report2_title") %>
+                                </a>
+                                <button id="landingPageReportButton2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h3>
+                        </div>
+                        <div class="panel-body report_filters">
+                        	<div id="chooseDateRange" class="row">
+                        		<div class="col-md-2 offset-md-1">                       
+				                	<button type="button" class="btn btn-primary" onclick="initCalendar();initCalendar_cal2();$('#calendarModalPopup').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+				                </div>
+ 							</div>  
+
+						</div>
+                        <div id="classLandingReportTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table id="landingPageReport2" class="table table-striped table-bordered hover" width="100%"></table>
+                            </div>
+
+                        </div>
+                    </div>                    
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
                                 <a id="reportOne" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportOne">
 				                    <%= rb.getString("recent_student_activities") %>
                                 </a>
                                 <button id="landingPageReportButton1" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
+                            </h3>
                         </div>
                         <div class="panel-body report_filters">
                         	<div id="lastXDays" class="row">                         
@@ -3113,30 +3219,7 @@ function registerAllEvents(){
                     </div>
                 </div>            
           	
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="reportTwo" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#classLandingReportTwo">
-				                    <%= rb.getString("landing_report2_title") %>
-                                </a>
-                                <button id="landingPageReportButton2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-                        <div class="panel-body report_filters">
-                        	<div id="chooseDateRange" class="row">
-                        		<div class="col-md-2 offset-md-1">                       
-				                	<button type="button" class="btn btn-primary" onclick="initCalendar();initCalendar_cal2();$('#calendarModalPopup').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-				                </div>
- 							</div>  
 
-						</div>
-                        <div id="classLandingReportTwo" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <table id="landingPageReport2" class="table table-striped table-bordered hover" width="100%"></table>
-                            </div>
-
-                        </div>
-                    </div>
                 </div>            
 			    <div>
                     <h3 class="tt-page-header">
