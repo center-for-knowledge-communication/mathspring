@@ -69,6 +69,9 @@ function answerCircled(doc, answerChosen){
 
 	} else if (circledButton[0] == answerChosen){
 		doc.getElementById(answerChosen+'Circle').style.display = "none";
+	} else{
+		doc.getElementById(answerChosen+'Circle').style.display = "initial";
+		doc.getElementById(circledButton[0]+'Circle').style.display = "none";
 	}
 }
 
