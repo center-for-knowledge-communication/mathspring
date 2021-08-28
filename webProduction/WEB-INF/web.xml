@@ -245,4 +245,7 @@
     <extension>jpg</extension>
     <mime-type>image/jpeg</mime-type>
   </mime-mapping>
+    <welcome-file-list>
+  	<welcome-file>welcome.html</welcome-file>
+  </welcome-file-list>
 </web-app>
