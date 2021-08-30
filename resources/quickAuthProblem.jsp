@@ -7,6 +7,7 @@
 * Frank 01-16-21 Issue #378 added correct answers element
 * Frank 01-16-21 Issue #378R2 move correct answers element to top
 * Frank 02-17-21 Issue #383R2 get context for buildProblems.js
+* Boming 08-30-21 Issue #421 Circle answer before submission
 */
 ResourceBundle versions = null; 
 try {

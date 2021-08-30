@@ -6,6 +6,7 @@
 // Frank 09-08-20 Touch this file to force build error
 // Frank 01-26-21 Added 'correct answers' to preview page
 // Frank 02-17-21 Added div for comment button
+// Boming 08-30-21 issue #421 circle answer before submit
 
 var quickAuthBuildProblem = (function() {
 
