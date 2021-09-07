@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
  * Frank	09-23-20	issue #237 added event logging
  * Frank	09-29-20	issue #237R3 added event logging
  * Frank	10-07-20  	Issue #261 change problem header
+ * Frank	06-26-21	Added gaze detection support
  */
 
 public class SessionManager {
@@ -94,7 +95,9 @@ public class SessionManager {
     private int collaboratingWith;
     private int eventCounter; // a counter that gets incremented on every tutor event (used to keep events ordered)
     private int mouseSaveInterval=0; // tells the client how often to save mouse coords to the server; <= 0 indicates no mouse tracking
-
+    private int gazeDetectionOn=0;
+    private String gazeParamsJSON="";
+    
     public SessionManager(Connection connection) {
         this.connection = connection;
         timeInSession = 0;
@@ -343,6 +346,9 @@ public class SessionManager {
    
         ClassInfo cl = DbClass.getClass(connection, this.classId);
         
+        this.gazeDetectionOn = cl.getGazeDetectionOn();
+        this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId);
+
         String language = "en";
         language = cl.getClassLanguageCode();
         if (language.startsWith("es")) {
@@ -1017,4 +1023,12 @@ public class SessionManager {
     	return this.className;
     }
     
+    public int getGazeDetectionOn() {
+    	return this.gazeDetectionOn;
+    }
+    
+    public String getGazeParamsJSON() {
+    	return this.gazeParamsJSON;
+    }
+
 }

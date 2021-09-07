@@ -1,10 +1,17 @@
 package edu.umass.ckc.wo.login.interv;
 
+/* Author: Kartik
+ * 
+ * Frank	08-03-21	Issue 150 and 487 Added test for gaze, Worksheet location and class Messages
+ */
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import edu.umass.ckc.servlet.servbase.ServletParams;
+import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.db.DbPedagogy;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.event.SessionEvent;
@@ -22,7 +29,6 @@ public class StudentPedagogy extends LoginInterventionSelector {
 		super(smgr);
 	}
 	
-
     public Intervention selectIntervention (SessionEvent e) throws Exception {
         long shownTime = this.interventionState.getTimeOfLastIntervention();
         if ( shownTime > 0)
@@ -30,8 +36,34 @@ public class StudentPedagogy extends LoginInterventionSelector {
         else {
             super.selectIntervention(e);
         	String studentPedagogyUrl = JSP_NEW;
-        	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), smgr.getClassID());
-            LoginIntervention li = new LoginIntervention(studentPedagogyUrl);
+        	int classId = smgr.getClassID();
+        	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
+        	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+
+        	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
+        	if (gazeDetectionOn > 0) {
+            	studentPedagogyUrl = studentPedagogyUrl + "?resource=gazeOn";
+        	}
+        	else {
+            	studentPedagogyUrl = studentPedagogyUrl + "?resource=gazeOff";
+        	}
+
+        	String worsheetLocation = DbUser.getStudentWorksheetLocation(smgr.getConnection(),smgr.getStudentId());
+        	studentPedagogyUrl = studentPedagogyUrl + "&location=opt" + worsheetLocation;
+        	
+        	List<String> messagesFromTeacher = DbClass.getClassMessages(smgr.getConnection(),classId);
+        	
+        	if (messagesFromTeacher.size() > 0 ) {
+            	studentPedagogyUrl = studentPedagogyUrl + "&messageFromTeacher=";
+	        	for(String message:messagesFromTeacher) {
+	            	studentPedagogyUrl = studentPedagogyUrl + message + "... ";
+	            }
+        	}
+        	
+            //String messageFromTeacher = "Let's try reading the first hint on each problem. The textarea tag defines a multi-line text input control.  The element is often used in a form, to collect user inputs like comments or reviews.";
+        	//studentPedagogyUrl = studentPedagogyUrl + "&messageFromTeacher=" + messageFromTeacher;
+
+        	LoginIntervention li = new LoginIntervention(studentPedagogyUrl);
             li.setUrl(Settings.webContentPath + "LearningCompanion");
             li.setLCprofile(lcprofile);
         	return li;                    
@@ -44,6 +76,8 @@ public class StudentPedagogy extends LoginInterventionSelector {
     		learningCompanion = "2";
         int lcIntValue = Integer.parseInt(learningCompanion);
         DbUser.setStudentPedagogy(conn, smgr.getStudentId(), lcIntValue);
+    	String WorksheetLocation = params.getString(LoginParams.WORKSHEET_LOCATION);
+        DbUser.setStudentWorksheetLocation(conn, smgr.getStudentId(), WorksheetLocation);
         new TutorLogger(smgr).logChoosePedagogy(learningCompanion);
         return null;
     }

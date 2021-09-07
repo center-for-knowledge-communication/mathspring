@@ -1,5 +1,6 @@
 <%--
   Frank	09-01-20	Issue #230 and IDs to form fields to allow initialization
+  Frank	08-03-21	Added suppport for worksheet location and class message
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -54,6 +55,7 @@ catch (Exception e) {
     <script type="text/javascript" src="js/login_new.js"></script>
     <script type="text/javascript">
 
+    
         var huygui=true;
         // Unfortunately the back button will run this function too which means that it can generate a BeginExternalActivity
         $(document).ready(function() {
@@ -62,6 +64,11 @@ catch (Exception e) {
         });
 
         </script>
+<style>
+    textarea:read-only {
+      background-color: lightblue;
+    }
+</style>
 </head>
 <body>
 
@@ -85,6 +92,7 @@ catch (Exception e) {
 
     <script type="text/javascript">
         $(document).ready(function() {
+        	
         	var inner = "${innerjsp}";
         	if (inner.indexOf('studentName_new.jsp?') >= 0) {
         		var urlSplitter = inner.split("?");
@@ -100,6 +108,34 @@ catch (Exception e) {
         		   	}
         		}
         	}
+        	
+        	if (inner.indexOf('studentPedagogy_new.jsp?') >= 0) {
+        		var urlSplitter = inner.split("?");
+        		if (urlSplitter[1].indexOf("&") >= 0) {
+	        		var paramListArr = urlSplitter[1].split("&");
+					for (var i=0; i < paramListArr.length; i = i + 1) {
+		        		var paramArr = paramListArr[i].split("=");
+						if (paramArr[0] === "resource") {
+			       			var worksheet = document.getElementById("workSheetDiv");
+				           	if (paramArr[1] === "gazeOn") {
+				           		worksheet.style.visibility = 'visible';  		     	
+				           	}
+					        else {
+				           		worksheet.style.visibility = 'hidden';
+					        }
+        				}
+						if (paramArr[0] === "location") {
+			       			var optLoc = document.getElementById(paramArr[1]);
+				           	optLoc.checked = 'checked';
+        				}
+						if (paramArr[0] === "messageFromTeacher") {
+							document.getElementById("messageFromTeacher").value = paramArr[1];
+        				}
+					}
+        		}
+        	}
+
+        
         });
     </script>        	
 

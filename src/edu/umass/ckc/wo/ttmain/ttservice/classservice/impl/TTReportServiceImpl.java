@@ -6,7 +6,9 @@ import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
+import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
@@ -18,7 +20,9 @@ import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportStudentsMapper;
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLiveDashboardMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportEvents;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportEventsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
@@ -50,6 +54,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -85,6 +91,8 @@ import java.text.SimpleDateFormat;
  *  Frank 	04-30-21  	Send problem nickname to perStudentPerproblem report
  *  Frank 	05-11-21  	Issue #463 add report filters
  * Frank    05-20-21  	Issue #473 fix username update bug
+ * Frank	08-03-21	Issue 150 added class message retrieval
+ * Frank	08-20-21	Issue 496 added live dashboard support
  */
 
 
@@ -120,7 +128,7 @@ public class TTReportServiceImpl implements TTReportService {
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
         	// Hack - using classId to hold 'Target teacher ID' for teacher activities reports so use URL param not session variable
-        	if ( (!reportType.equals("teacherList")) && (!reportType.equals("perTeacherReport")) ) {
+        	if ( (!reportType.equals("teacherList")) && (!reportType.equals("perTeacherReport")) && (!reportType.equals("classMessage"))) {
         		try {
     	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),Integer.valueOf(teacherId))) {
     	    			return ("FAIL - Invalid Request");
@@ -394,7 +402,92 @@ public class TTReportServiceImpl implements TTReportService {
                     clsMap.put("levelOneData", clsData);
                     return clsMapper.writeValueAsString(clsMap);       
 
+                case "classLiveDashboard":
 
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+            		ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
+                    return classLiveDashboard.getProblemsSolved();       
+
+                case "classMessage":
+                	
+                	String fields[] = filter.split("~~~");
+                	
+                	String startDate = fields[0];
+                	String duration = fields[1];
+                	String classesBundle = fields[2];
+                	String msg = fields[3];
+                	String errorMsg = "";
+                	Timestamp startTimestamp = null;
+                	Timestamp endTimestamp = null;
+                	
+                	if (lang.equals("es")) {
+                		loc = new Locale("es","AR");	
+                	}
+                	else {
+                		loc = new Locale("en","US");	
+                	}	
+                	
+                	ResourceBundle rb = null;
+                	try {
+                		rb = ResourceBundle.getBundle("MathSpring",loc);
+                	}
+                	catch (Exception e) {
+                		logger.error(e.getMessage());	
+                	}
+                	
+                	
+                    try {
+	                	if (startDate.length() == 0) {
+	                		errorMsg += "You must select a date.  Choose date range again.  ";    		
+	                	}
+
+	                	int intDuration = 0;
+	                	
+	                	if (duration.length() == 0) {
+	                		duration = "1";
+	                	}
+	                	try {
+	                		intDuration = Integer.parseInt(duration);
+		                	if (intDuration < 1) {
+		                		errorMsg += "duration must be a positive number of days.  Choose date range again.  ";    		
+		                	}
+	                	}
+	                	catch (Exception e) {
+	                		errorMsg += "duration must be a number of days.  Choose date range again. ";
+	                	}
+	                	if (msg.length() == 0) {
+	                		errorMsg += "You must enter a message for the students. ";
+	                	}
+	                	if (classesBundle.length() == 0) {
+	                		errorMsg += "You must select class(es) ";
+	                	}
+	                	if (errorMsg.length() == 0) {           	
+	                        Timestamp startDateTimestamp = convertStartDate(startDate);
+	                        Timestamp endDateTimestamp = xDaysFromStartDate(startDateTimestamp,intDuration);
+	                        int dbResult = DbClass.insertClassMessage(connection.getConnection(), startDateTimestamp, endDateTimestamp, msg, 1619);
+	                    	switch (dbResult) {
+	                    	case 0:
+	                    		break;
+	                    	case -1:
+	                    		errorMsg = "DB error";
+	                    		break;
+	                    	}
+	                	}
+	                	else {
+	                		errorMsg = "Entry error:  " + errorMsg;
+	                	}
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error(e.getMessage());
+                    }
+
+                    if (errorMsg.length() > 0) {
+                    	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
+                    }
+                    else {
+                    	String successMsg = "Message will be displayed at student login";
+                    	return "{\"status\": \"success\", \"message\" : \"" + successMsg + "\"}";                    	
+                    }
         	}
         } catch (IOException e) {
            logger.error(e.getMessage());
@@ -1979,7 +2072,7 @@ public class TTReportServiceImpl implements TTReportService {
                 selectParams.put("problemId", problemID);
                 int SKIPO = 0, NOTRO = 0, GIVEUPO = 0, SOFO = 0, SHINTO = 0, SHELPO = 0, ATTO = 0, GUESSO = 0, NODATAO = 0;
                 List<PerProblemReportBean> perProblemReportBeans = namedParameterJdbcTemplate.query(TTUtil.PER_PROBLEM_QUERY_FOURTH, selectParams, new RowMapper<PerProblemReportBean>() {
-                    int SKIP = 0, GIVEUP = 0, SOF = 0;
+                    int SKIP = 0, GIVEUP = 0, SOF = 0, ATT = 0;
                     @Override
                     public PerProblemReportBean mapRow(ResultSet resultSet, int i) throws SQLException {
                         perProblemReportBeanObj.nStudsSeen++;
@@ -1994,6 +2087,10 @@ public class TTReportServiceImpl implements TTReportService {
                                 SOF++;
                                 perProblemReportBeanObj.setGetGetPercStudentsSolvedFirstTry(SOF);
                                 break;
+                            case "ATT":
+                                ATT++;
+                                perProblemReportBeanObj.setGetGetPercStudentsSolvedSecondTry(ATT);
+                                break;
                             case "GIVEUP":
                                 GIVEUP++;
                                 perProblemReportBeanObj.setPercStudentsGaveUp(GIVEUP);
@@ -2005,6 +2102,7 @@ public class TTReportServiceImpl implements TTReportService {
                     }
                 });
                 perProblemReportBeanObj.setGetGetPercStudentsSolvedFirstTry((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getGetGetPercStudentsSolvedFirstTry()));
+                perProblemReportBeanObj.setGetGetPercStudentsSolvedSecondTry((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getGetGetPercStudentsSolvedSecondTry()));
                 perProblemReportBeanObj.setPercStudentsSkipped((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getPercStudentsSkipped()));
                 perProblemReportBeanObj.setPercStudentsGaveUp((int)Math.round(100.0 / perProblemReportBeanObj.nStudsSeen * perProblemReportBeanObj.getPercStudentsGaveUp()));
                 List<String> combinedStudentEffortsOnProblem = namedParameterJdbcTemplate.query(TTUtil.PER_PROBLEM_QUERY_THIRD, selectParams, new RowMapper<String>() {
@@ -2196,6 +2294,88 @@ public class TTReportServiceImpl implements TTReportService {
         return teacherClassListEntries;
     }
 
+    
+    
+    public List<User> getClassStudentIDs(Connection conn, int classID) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classID);
+            rs = stmt.executeQuery();
+            List<User> res = new ArrayList<User>();
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String fname = rs.getString(2);
+                String lname = rs.getString(3);
+                String uname = rs.getString(4);
+                String email = rs.getString(5);
+                String pw = rs.getString(6);
+                int strategyId = rs.getInt(7);  // can be NULL
+                if (rs.wasNull())
+                    strategyId = -1;
+                User u = new User(fname, lname, uname, email, pw, id);
+                if (strategyId != -1)
+                    u.setStrategyId(strategyId);
+                res.add(u);
+            }
+            return res;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+    public int getProblemsSolved(Connection conn, int studentId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int count = 0;
+        try {
+            String q = "select count(*) from studentproblemhistory where studId=? and isSolved = 1";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, studentId);
+            rs = stmt.executeQuery();
+            List<User> res = new ArrayList<User>();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+            return count;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+    
+    @Override
+    public ClassLiveDashboard generateLiveDashboard(String classId, String filter) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter.
+
+    	int total = 0;
+    	List<User> students = null;
+		ClassLiveDashboard testDashboard = new ClassLiveDashboard();
+		if (filter.equals("ProblemsSolved")) {
+			try {
+				students = getClassStudentIDs(connection.getConnection(), Integer.valueOf(classId));
+				for (int i=0;i< students.size();i++ ) {
+					total = total + getProblemsSolved(connection.getConnection(),students.get(i).getId());
+				}
+			}
+			catch (Exception e) {
+				
+			}
+    		testDashboard.setProblemsSolved(String.valueOf(total));
+    	}
+        return testDashboard;
+        
+    }
+
     private Timestamp xDaysAgoToDate(String filter) {
 		Timestamp ts = null;
 
@@ -2214,6 +2394,26 @@ public class TTReportServiceImpl implements TTReportService {
 		Calendar c = Calendar.getInstance();
 		c.setTime(currentDate);
 		c.add(Calendar.DAY_OF_MONTH, (xDays * -1));
+		c.set(Calendar.HOUR_OF_DAY, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 1);
+		// convert calendar to date
+		Date xDate = c.getTime();
+		ts = new Timestamp(xDate.getTime());
+		return ts;
+    }
+
+    private Timestamp xDaysFromStartDate(Timestamp startDateTimestamp, int xDays) {
+		Timestamp ts = null;
+
+		if (xDays == 0) {
+			xDays = 365;
+		}
+		Date currentDate = startDateTimestamp;
+		// convert date to calendar
+		Calendar c = Calendar.getInstance();
+		c.setTime(currentDate);
+		c.add(Calendar.DAY_OF_MONTH, xDays);
 		c.set(Calendar.HOUR_OF_DAY, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 1);
@@ -2299,6 +2499,25 @@ public class TTReportServiceImpl implements TTReportService {
 		return ts;
     }
 
+    private Timestamp convertStartDate(String filter) {
+		Timestamp ts = null;
+
+		try {
+			Date fDate=new SimpleDateFormat("MM/dd/yyyy").parse(filter);
+			Calendar c = Calendar.getInstance();
+			c.setTime(fDate);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			// convert calendar to date
+			Date xDate = c.getTime();
+			ts = new Timestamp(xDate.getTime());
+		}
+		catch (Exception e) {
+			
+		}
+		return ts;
+    }
 
     
 }

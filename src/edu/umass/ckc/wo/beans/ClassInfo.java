@@ -5,6 +5,7 @@ import edu.umass.ckc.wo.woreports.Report;
 /**
  * Frank	07-08-20	issue #156 added isActive flag
  * Frank	10-31-20	issue #293 added advanced settings
+ * Frank	06-26-21	Added gaze_detection_on handling
  */
 
 public class ClassInfo {
@@ -40,11 +41,12 @@ public class ClassInfo {
     private String minTime;
     private boolean isDefaultClass;
     private int isActive;
+    private int gazeDetectionOn; // <= 0 indicates gaze detection off in client.
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
                      int logType, int emailStatusInterval, int statusReportPeriodDays, int studentEmailIntervalDays,
-                     int studentReportPeriodDays, String grade, int isActive) {
+                     int studentReportPeriodDays, String grade, int isActive, int gazeDetectionOn) {
         this.school = school;
         this.schoolYear = schoolYear;
         this.name = name;
@@ -63,22 +65,22 @@ public class ClassInfo {
         this.studentEmailPeriodDays =studentReportPeriodDays;
         this.grade= grade;
         this.isActive= isActive;
+        this.gazeDetectionOn = gazeDetectionOn;
 
     }
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive) {
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive, int gazeDetectionOn) {
         this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive);
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive, gazeDetectionOn);
     }
 
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays,
-                     int studentReportPeriodDays, String flashClient, String grade, int isActive) {
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, String flashClient, String grade, int isActive, int gazeDetectionOn) {
         this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive);
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive, gazeDetectionOn);
         this.flashClient = flashClient;
     }
 
@@ -304,5 +306,13 @@ public class ClassInfo {
     public void setMinTime(String minTime) {
         this.minTime = minTime;
     }
-	
+
+    public int getGazeDetectionOn() {
+        return gazeDetectionOn;
+    }
+
+    public void setGazeDetectionOn(int gazeDetectionOn) {
+        this.gazeDetectionOn = gazeDetectionOn;
+    }
+    
 }

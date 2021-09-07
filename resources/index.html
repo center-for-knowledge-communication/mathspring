@@ -1,13 +1,16 @@
 <html>
-The URLS below will start the tutor using <b>sugaree as the server</b>.
+<head>
+<script>
+function load()
+{
+document.frm1.submit()
+}
+</script>
+</head>
 
-<body>
-<a href="http://localhost:8080/mt/WoLoginServlet?action=LoginAdult_1">College version</a>
-<br>
-<a href="http://localhost:8080/mt/WoLoginServlet?action=LoginK12_1">K12 version</a>
-<br>
-<a href="http://localhost:8080/mt/WoAdmin">Teacher Tools</a>
-<br>
-<a href="http://localhost:8080/mt/WoAdmin?action=AdminLogin">Admin Tools (old teacher tools)</a>
+<body onload="load()">
+<form action="welcome.jsp?start=yes" id="frm1" name="frm1">
+<input hidden type="text" value="" />
+</form>
 </body>
-</html>
+</html> 
