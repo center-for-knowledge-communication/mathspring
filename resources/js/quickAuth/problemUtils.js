@@ -19,6 +19,7 @@
  */
 
 // Frank 10-22-19 issue #14 translation
+// Boming 08-30-21 issue #421 circle answer before submission 
 
 //Module pattern for better scoping
 var problemUtils = (function() {
@@ -69,6 +70,9 @@ function answerCircled(doc, answerChosen){
 
 	} else if (circledButton[0] == answerChosen){
 		doc.getElementById(answerChosen+'Circle').style.display = "none";
+	} else{
+		doc.getElementById(answerChosen+'Circle').style.display = "initial";
+		doc.getElementById(circledButton[0]+'Circle').style.display = "none";
 	}
 }
 
