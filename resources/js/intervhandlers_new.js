@@ -21,7 +21,7 @@ function processTopicSwitchIntervention(html) {
     // input response handling took care of processing an EndProblem event for the last problem in the previous topic.
 
     globals.lastProbType = '';
-    interventionDialogOpenAsConfirm("Switching Topics", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
+    interventionDialogOpenAsConfirm(switching_topics, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
 
 
 }
@@ -29,7 +29,7 @@ function processTopicSwitchIntervention(html) {
 function processAskEmotionIntervention(html) {
     //alert("Switching topics because " + reason);
 //    interventionDialogOpen("How are you doing", html, NEXT_PROBLEM_INTERVENTION );
-    interventionDialogOpenAsConfirm("How are you doing", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick, 550 );
+    interventionDialogOpenAsConfirm(how_are_you_doing, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick, 550 );
 
 }
 
@@ -37,7 +37,7 @@ function processAskEmotionIntervention(html) {
 function processAskGoalsIntervention(html) {
     //alert("Switching topics because " + reason);
 //    interventionDialogOpen("How are you doing", html, NEXT_PROBLEM_INTERVENTION );
-    interventionDialogOpenAsConfirm("What are your goals", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick, 550 );
+    interventionDialogOpenAsConfirm(what_are_your_goals, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick, 550 );
 
 }
 
@@ -47,14 +47,14 @@ function processShowMPPIntervention () {
 
 function processMyProgressNavIntervention (html) {
 //    interventionDialogOpen("Let's see our progress!", html, NEXT_PROBLEM_INTERVENTION);
-    interventionDialogOpenAsConfirm("Let's see our progress!", html, NEXT_PROBLEM_INTERVENTION,myprogress );
+    interventionDialogOpenAsConfirm(lets_see_our_progress, html, NEXT_PROBLEM_INTERVENTION,myprogress );
 
 
 }
 
 function processMyProgressNavAskIntervention (html) {
 //    interventionDialogOpen("Let's see our progress!", html, NEXT_PROBLEM_INTERVENTION);
-    interventionDialogOpenAsYesNo("Let's see our progress!", html, NEXT_PROBLEM_INTERVENTION,myprogress,interventionDialogNoClick );
+    interventionDialogOpenAsYesNo(lets_see_our_progress, html, NEXT_PROBLEM_INTERVENTION,myprogress,interventionDialogNoClick );
 }
 
 
@@ -74,7 +74,7 @@ function processCollaborationPartnerIntervention(html, timeoutwait) {
     timewaited = 0;
     tmoutwait = timeoutwait;
     // Open the dialog with no buttons and a timeout function
-    interventionDialogOpenNoButtons("Work with a partner", html, NEXT_PROBLEM_INTERVENTION, function(){
+    interventionDialogOpenNoButtons(work_with_a_partner, html, NEXT_PROBLEM_INTERVENTION, function(){
             servletGet("InterventionTimeout", {probElapsedTime: globals.probElapsedTime, destination: globals.destinationInterventionSelector, timeWaiting: timewaited + tmoutwait}, processInterventionTimeoutResult);}
             , timeoutwait);
         }
@@ -85,7 +85,7 @@ function processCollaborationConfirmationIntervention(html) {
     // TODO this could be changed to ...OpenAsYesNo function call instead of Confirm.  We'd have to change the html so it doesn't have inputs and
     // just says "Do you want to work with a partner?".  The yes/no buttons would then be all that needed to be clicked and functions would send back
     // those responses to the server
-    interventionDialogOpenAsConfirm("Work with a partner", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
+    interventionDialogOpenAsConfirm(work_with_a_partner, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
 }
 
 // When the originator is waiting for a partner this checks the server every 5 seconds to see if the partner is available to work
@@ -95,7 +95,7 @@ function processCollaborationOriginatorIntervention(html, timeoutwait) {
     timewaited = 0;
     tmoutwait = timeoutwait;
     // Open the intervention dialog with no buttons and timeout handling
-        interventionDialogOpenNoButtons("Waiting for a partner", html, NEXT_PROBLEM_INTERVENTION, function(){
+        interventionDialogOpenNoButtons(waiting_for_partner, html, NEXT_PROBLEM_INTERVENTION, function(){
             servletGet("InterventionTimeout", {probElapsedTime: globals.probElapsedTime, destination: globals.destinationInterventionSelector, timeWaiting: timewaited+tmoutwait}, processInterventionTimeoutResult);}
             , timeoutwait);
 }
@@ -117,19 +117,19 @@ function processCollaborationTimedoutIntervention(html) {
     globals.destinationInterventionSelector = "edu.umass.ckc.wo.tutor.intervSel2.CollaborationOriginatorIS";
 //    interventionDialogOpen("Continue Waiting?", html, NEXT_PROBLEM_INTERVENTION );
     //  TODO This could be turned into a Yes/No dialog call
-    interventionDialogOpenAsConfirm("Continue Waiting?", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
+    interventionDialogOpenAsConfirm(continue_waiting, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
 }
 
 function processCollaborationOptionIntervention(html) {
     globals.destinationInterventionSelector = "edu.umass.ckc.wo.tutor.intervSel2.CollaborationOriginatorIS";
 //    interventionDialogOpen("Work with a partner?", html, NEXT_PROBLEM_INTERVENTION);
-    interventionDialogOpenAsConfirm("Work with a partner?", html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
+    interventionDialogOpenAsConfirm(work_with_a_partner, html, NEXT_PROBLEM_INTERVENTION,interventionDialogOKClick );
 }
 
 
 function processRapidAttemptIntervention (html) {
 //    interventionDialogOpen("Answering Rapidly", html, ATTEMPT_INTERVENTION );
-    interventionDialogOpenAsConfirm("Answering Rapidly", html, ATTEMPT_INTERVENTION,interventionDialogOKClick );
+    interventionDialogOpenAsConfirm(answering_rapidly, html, ATTEMPT_INTERVENTION,interventionDialogOKClick );
 
 }
 
@@ -155,13 +155,13 @@ function processChangeGUIIntervention (activity) {
     else if (when === 'before')  {
         transients.component = component;
         transients.componentAction = action;
-        interventionDialogOpenAsConfirm("Making a change!", html, NEXT_PROBLEM_INTERVENTION, guiChanger );
+        interventionDialogOpenAsConfirm(making_a_change, html, NEXT_PROBLEM_INTERVENTION, guiChanger );
     }
     // Notify after changing the GUI
     else if (when === 'after') {
         doGUIChange(component,action);
         // the noopHandler does nothing when the dialog is closed.
-        interventionDialogOpenAsConfirm("Making a change!", html, NEXT_PROBLEM_INTERVENTION, noopHandler );
+        interventionDialogOpenAsConfirm(making_a_change, html, NEXT_PROBLEM_INTERVENTION, noopHandler );
     }
 
 }

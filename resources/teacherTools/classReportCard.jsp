@@ -39,6 +39,8 @@
 <!-- Frank 05-11-21  	Implement multi-lingual chnique for cdn datatable utility using java resource bundle -->
 <!-- Frank 05-17-21  	Issue #471 Show survey selection if logged on as Master-->
 <!-- Frank 05-19-21  	Issue #474 add max-width and max-height to collective effort problem image display -->
+<!-- Frank 07-11-21  	Issue #77 changes to Common Core Problem Detail Report -->
+<!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -2176,6 +2178,8 @@ var completeDataChart;
                         return "<a style='cursor:pointer' rel='popoverstandard' title='"+standardSplitter[1]+"'  data-content='" + standardSplitter[2]+ "'>" + standardSplitter[0] + "</a>";
                     }},
                     { "title": "<%= rb.getString("nbr_students_seen_problem")%>", "name" : "noStudentsSeenProblem","targets" : [3] },
+                    
+                    
                     { "title": "<%= rb.getString("pct_students_solved_problem_first")%>", "name" : "getGetPercStudentsSolvedFirstTry","targets" : [4] ,"render": function ( data, type, full, meta ) {
                         return data+" %";
                     },"createdCell": function (td, cellData, rowData, row, col) {
@@ -2569,9 +2573,22 @@ var completeDataChart;
                     });
                     var columNvalues = [
 
-                    	{"title": "<%= rb.getString("problem_id")%>", "name": "problemId", "targets": [0]},
+                    	{"title": "<%= rb.getString("perClustercol0")%>", 
+                    		"name": "problemId", 
+                    		"targets": [0],
+                            "width": "10%",
+                            'className': 'dt-body-center',
+                            'render': function ( data, type, row ) {
+                                var effortChartId = "effortChart"+row['problemId'];
+                                var containerChart = "containerChart"+row['problemId'];
+                                var legendChart = "legendChart"+row['problemId'];
+                                //var dataContent = "<div id="+containerChart+" style='width:900px;height:300px;display:none'><div class='panel panel-default'><div class='panel-heading'>Effort Chart</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                                return "<i id='iconID"+row['problemId']+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row['problemId']+",false);'></i>";
+                            }
+
+                    	},
                         {
-                            "title": "<%= rb.getString("problem_name")%>",
+                            "title": "<%= rb.getString("perClustercol1")%>",
                             "name": "problemName",
                             "targets": [1],
                             "render": function (data, type, full, meta) {
@@ -2583,7 +2600,7 @@ var completeDataChart;
                             }
                         },
                         {
-                            "title": "<%= rb.getString("cc_standard")%>",
+                            "title": "<%= rb.getString("perClustercol2")%>",
                             "name": "problemStandardAndDescription",
                             "targets": [2],
                             "render": function (data, type, full, meta) {
@@ -2591,94 +2608,66 @@ var completeDataChart;
                                 return "<a style='cursor:pointer' rel='popoverstandard' title='"+standardSplitter[1]+"'  data-content='" + standardSplitter[2]+ "'>" + standardSplitter[0] + "</a>";
                             }
                         },
-                        {"title": "<%= rb.getString("nbr_students_seen_problem")%>", "name": "noStudentsSeenProblem", "targets": [3]},
+                        {	"title": "<%= rb.getString("perClustercol3")%>", 
+                        	"name": "noStudentsSeenProblem", 
+                        	"targets": [3],
+			                "render": function ( data, type, full, meta ) {
+			                    return data;
+			                }
+                		},
                         {
-                            "title": "<%= rb.getString("pct_students_solved_problem_first")%>",
+                            "title": "<%= rb.getString("perClustercol4")%>",
                             "name": "getGetPercStudentsSolvedFirstTry",
                             "targets": [4],
-                            "createdCell": function (td, cellData, rowData, row, col) {
-                                if(cellData >= 80 && rowData['noStudentsSeenProblem'] > 5){
-                                    $(td).html(cellData +"&nbsp;&nbsp;<i class='fa fa-thumbs-up' aria-hidden='true'></i>");
-                                }else if(cellData <= 20 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-danger-layer-one');
-                                }else if(cellData >= 20 && cellData <= 40 && rowData['noStudentsSeenProblem'] > 5 ){
-                                    $(td).addClass('span-warning-layer-one');
-                                }
-                            },"render": function ( data, type, full, meta ) {
-                            return data+" %";
-                        }
+							"render": function ( data, type, full, meta ) {
+                            	return data+" %";
+                        	}
                         },
                         {
-                            "title": "<%= rb.getString("nbr_students_solved_problem_second")%>",
+                            "title": "<%= rb.getString("perClustercol5")%>",
                             "name": "getGetPercStudentsSolvedSecondTry",
                             "targets": [5],
-                            visible: false
-                        },
-                        {
-                            "title": "<%= rb.getString("pct_students_repeated_problem")%>",
-                            "name": "percStudentsRepeated",
-                            "targets": [6],
                             "render": function ( data, type, full, meta ) {
-                            return data+" %";
-                        }
+                                return data+" %";
+                            }
                         },
                         {
-                            "title": "<%= rb.getString("pct_students_skipped_problem")%>",
-                            "name": "percStudentsSkipped",
-                            "targets": [7],
+                        	"title": "<%= rb.getString("perClustercol6")%>", 
+                        	"name": "mostIncorrectResponse", 
+                        	"targets": [6],
                             "render": function ( data, type, full, meta ) {
-                            return data+" %";
-                        }
+                                return data;
+                            }
                         },
                         {
-                            "title": "<%= rb.getString("pct_students_gave_up")%>",
-                            "name": "percStudentsGaveUp",
-                            "targets": [8],
-                            "render": function ( data, type, full, meta ) {
-                            return data+" %";
-                        }
-                        },
-                        {"title": "<%= rb.getString("most_frequent_incorrect_response")%>", "name": "mostIncorrectResponse", "targets": [9]},
-                        {
-                            "title": "<%= rb.getString("similar_problems")%>",
+                            "title": "<%= rb.getString("perClustercol7")%>",
                             "name": "similarproblems",
-                            "targets": [10],"render": function ( data, type, full, meta ) {
+                            "targets": [7],"render": function ( data, type, full, meta ) {
                                 var gradeIdCode = full['problemStandardAndDescription'].split(":")[0];
                                 var grade = gradeIdCode.split(".")[0];
-                                var strandValue = "Mathematics."+gradeIdCode.split(".")[0]+"."+gradeIdCode.split(".")[1];
-                                var standardValue = "Mathematics."+full['problemStandardAndDescription'].split(":")[0];
-                                return '<a href="http://www.doe.mass.edu/MCAS/SEarch/default.aspx?YearCode=%25&GradeID='+grade+'&QuestionTypeCode=%25&QuestionSetID=All&FrameworkCode=Mathematics&Strand='+strandValue+'&Standard='+standardValue+'&KeywordVal=&ReportingCategoryCode=&ShowReportingCategory=&originalpage=1&allowCalculator=&page=1&mode=&answers=&questionanswer=&removeQuestionID=&unreleased=no&intro=no&FormSubmitted=yes" target="_blank" ><i class="fa fa-question" aria-hidden="true"></i></a>';
+//                                var strandValue = "Mathematics."+gradeIdCode.split(".")[0]+"."+gradeIdCode.split(".")[1];
+//                                var standardValue = "Mathematics."+full['problemStandardAndDescription'].split(":")[0];
+                                return '<a href="https://www.doe.mass.edu/mcas/2019/release/gr' + grade + '-math.pdf" target="_blank" ><%= rb.getString("grade")%>:&nbsp' + grade + '</a>';
 
                             }
-                        },{
-                            "title": "<%= rb.getString("collective_effort_on_problem")%>",
-                            "name": "collectiveEffortOnProblem",
-                            "targets": [ 11 ],
-                            "width": "10%",
-                            'className': 'dt-body-center',
-                            'render': function ( data, type, row ) {
-                                var effortChartId = "effortChart"+row['problemId'];
-                                var containerChart = "containerChart"+row['problemId'];
-                                var legendChart = "legendChart"+row['problemId'];
-                                //var dataContent = "<div id="+containerChart+" style='width:900px;height:300px;display:none'><div class='panel panel-default'><div class='panel-heading'>Effort Chart</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
-                                return "<i id='iconID"+row['problemId']+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row['problemId']+",false);'></i>";
-                            }
-                        }                    
+                        },
+                        {
+                            "title": "<%= rb.getString("perClustercol8")%>",
+                            "name": "ProblemId",
+                            "targets": [8]
+                        }            
                     ];
 
                     var columDvalues = [
-                        {width: "10%", data: "problemId"},
+                        {width: "10%", data: "collectiveEffortOnProblem"},
                         {width: "10%", data: "problemName"},
                         {width: "10%", data: "problemStandardAndDescription"},
                         {width: "10%", data: "noStudentsSeenProblem"},
                         {width: "10%", data: "getGetPercStudentsSolvedFirstTry"},
-                        {width: "5%", data: "getGetPercStudentsSolvedSecondTry"},
-                        {width: "10%", data: "percStudentsRepeated"},
-                        {width: "10%", data: "percStudentsSkipped"},
-                        {width: "10%", data: "percStudentsGaveUp"},
+                        {width: "10%", data: "getGetPercStudentsSolvedSecondTry"},
                         {width: "10%", data: "mostIncorrectResponse"},
-                        {width: "5%", data: "similarproblems"},
-                        {width: "5%", data: "collectiveEffortOnProblem"},
+                        {width: "10%", data: "similarproblems"},
+                        {width: "10%", data: "problemId"},
                     ];
 
 
@@ -2689,9 +2678,10 @@ var completeDataChart;
                         data: perProblemSetLevelOneFullTemp,
                         destroy: true,
                         responsive: true,
-                        columns: columDvalues,
+                        "columns": columDvalues,
                         "columnDefs": columNvalues,
-                        "bPaginate": false,
+                        "bPaginate": true,
+                        "pageLength": 16,
                         "bFilter": false,
                         "bLengthChange": false,
                         rowReorder: false,
@@ -2722,10 +2712,7 @@ var completeDataChart;
 
                         },
                         headerCallback: function headerCallback(thead, data, start, end, display) {
-                            $(thead).find('th').eq(5).html('<%= rb.getString("pct_students_repeated_problem")%> &nbsp;&nbsp;<a rel="popoverHeader"  data-content="<%= rb.getString("students_repeated_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(6).html('<%= rb.getString("pct_students_skipped_problem")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_skipped_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(7).html('<%= rb.getString("pct_students_gave_up")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("students_gave_up_problem_popover")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
-                            $(thead).find('th').eq(9).html('<%= rb.getString("see_similar_problems")%> &nbsp;&nbsp;<a rel="popoverHeader" data-content="<%= rb.getString("click_to_see_similar_problems")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
+                            $(thead).find('th').eq(7).html('<%= rb.getString("perClustercol7")%> &nbsp;&nbsp;<a rel="popoverstandard" data-content="<%= rb.getString("click_to_see_similar_problems")%>"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a>');
 
                         }
                     });
@@ -2841,9 +2828,6 @@ var completeDataChart;
                 <th><%= rb.getString("perClustercol6") %></th>
                 <th><%= rb.getString("perClustercol7") %></th>
                 <th><%= rb.getString("perClustercol8") %></th>
-                <th><%= rb.getString("perClustercol9") %></th>
-                <th><%= rb.getString("perClustercol10") %></th>
-                <th><%= rb.getString("perClustercol11") %></th>
             </tr>
             </thead>
         </table>

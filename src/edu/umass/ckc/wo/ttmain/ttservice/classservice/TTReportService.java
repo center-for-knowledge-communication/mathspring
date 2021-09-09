@@ -5,6 +5,7 @@ import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherClassListEntry;
@@ -67,5 +68,7 @@ public interface TTReportService {
     public List<TeacherListEntry> generateTeacherList(String targetId);
 
     public List<TeacherClassListEntry> generateTeacherClassList(String targetId);
+    
+    public ClassLiveDashboard generateLiveDashboard(String classId, String filter);
     
 }

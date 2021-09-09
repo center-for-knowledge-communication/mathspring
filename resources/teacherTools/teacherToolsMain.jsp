@@ -25,6 +25,7 @@
  *  Frank 	01-05-21  	Issue #302 teacher username only alpha and numeric characters
  *  Frank 	02-14-21  	Issue #303R1 added teacher feedback on teacher tools
  *  Frank 	05-04-21  	ms-fixes-042921 - removed onclick event from create class submit button
+ *  Frank 	08-03-21  	ms-fixes-150-487 classMessage and worksheet location
 */
 
  System.out.println("teacherToolsMain starting");
@@ -77,6 +78,7 @@ catch (Exception e) {
     <link rel="stylesheet" href="<c:url value="/js/bootstrap/css/bootstrap.min.css" />"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/calendar.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.0/css/bootstrapValidator.min.css"
           rel="stylesheet"/>
     <!-- Datatables Css Files -->
@@ -123,6 +125,30 @@ catch (Exception e) {
     <jsp:useBean id="random" class="java.util.Random" scope="application"/>
 
 
+<script type="text/javascript">
+	var jan_name = "<%=rb.getString("January")%>";
+	var feb_name = "<%=rb.getString("February")%>";
+	var mar_name = "<%=rb.getString("March")%>";
+	var apr_name = "<%=rb.getString("April")%>";
+	var may_name = "<%=rb.getString("May")%>";
+	var jun_name = "<%=rb.getString("June")%>";
+	var jul_name = "<%=rb.getString("July")%>";
+	var aug_name = "<%=rb.getString("August")%>";
+	var sep_name = "<%=rb.getString("September")%>";
+	var oct_name = "<%=rb.getString("October")%>";
+	var nov_name = "<%=rb.getString("November")%>";
+	var dec_name = "<%=rb.getString("December")%>";
+
+	var sun_name = "<%=rb.getString("Sun")%>";
+	var mon_name = "<%=rb.getString("Mon")%>";
+	var tue_name = "<%=rb.getString("Tue")%>";
+	var wed_name = "<%=rb.getString("Wed")%>";
+	var thu_name = "<%=rb.getString("Thu")%>";
+	var fri_name = "<%=rb.getString("Fri")%>";
+	var sat_name = "<%=rb.getString("Sat")%>";
+	
+	</script>
+	
 <style>
 
  .nobull {
@@ -268,6 +294,11 @@ catch (Exception e) {
         var teacherID = '';
         var targetTeacherID = "";
         var targetTeacherName = "";
+        var classNameIdArr = null;
+    	var messageStartDate = "";
+    	var classesBundle = "";
+
+        
         
         $(document).ready(function () {
             $('#wrapper').toggleClass('toggled');
@@ -276,7 +307,15 @@ catch (Exception e) {
             $("#teacher-activities-wrapper").hide();
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
-            $("#edit-teacher-wrapper").hide();          
+            $("#message-wrapper").hide();
+            $("#edit-teacher-wrapper").hide();
+            
+                               
+            classNameIdArr = ${classNameIdArrayStr};
+			if (classNameIdArr[0].Id == 0) {
+	          	var x = document.getElementById("li_class_message_handler");
+        		x.style.display = "none";
+			}
             var pause = ${teacherPauseStudentUse};
             if (pause == "1")
             	$("#pause-status").show();            
@@ -286,6 +325,125 @@ catch (Exception e) {
             handleclickHandlers();
         });
 
+        function createMessageClassList() {
+        	
+        	var messageClassListContent = '<label class="control-label col-sm-8" for="msgClassList"><%= rb.getString("select_classes_to_receive_message") %>:</label><br/>';
+            messageClassListContent = messageClassListContent  +  '<select class="form-control" id="msgClassList" name="msgClassList" multiple onBlur="bundleThem();">';		
+
+            for (var i = 0; i < classNameIdArr.length; i++) {
+    	        messageClassListContent = messageClassListContent + '<option id="' + classNameIdArr[i].Id + '" value="' + classNameIdArr[i].Id + '">' + classNameIdArr[i].name + '</option>';	        	
+            }
+            messageClassListContent = messageClassListContent + '</select>';
+            document.getElementById('messageClassList').innerHTML = messageClassListContent;
+        }
+
+        function bundleThem() {
+
+        	bundle = "";
+            for (var i = 0; i < classNameIdArr.length; i++) {
+            	if (document.getElementById(classNameIdArr[i].Id).selected == true) {
+            		if (bundle == "") {
+    	        		bundle = classNameIdArr[i].Id;	        			
+            		}
+            		else {
+    	        		bundle = bundle + "," + classNameIdArr[i].Id;	        			
+            		}
+            	}
+            		
+            }
+            classesBundle = bundle;
+        }
+        
+        function getDatesMsg() {
+        	       	
+        	document.getElementById("daysSelectedMsg").value = "";
+
+        	var d2 =  parseInt(document.getElementById("selectDay_m1_cal1").value);
+        	var m2 =  parseInt(document.getElementById("month_m1_cal1").value) + 1;
+        	
+       		$('#calendarModalPopupMsg').modal('hide');
+
+       		messageStartDate = m2 + "/" + document.getElementById("selectDay_m1_cal1").value + "/" + document.getElementById("year_m1_cal1").value;
+
+       		if (languageSet == "es") {
+       			messageStartDate = document.getElementById("selectDay_m1_cal1").value + "/" + m2 + "/" + document.getElementById("year_m1_cal1").value;
+       		}   		
+       		
+       		document.getElementById("daysSelectedMsg").value = "<%= rb.getString("begin") %> " + messageStartDate + ". <%= rb.getString("display_for") %> " + document.getElementById("messageDuration").value + " <%= rb.getString("days") %>";
+        }
+
+        
+        function closeClassMessage() {
+            $("#message-wrapper").hide();        	
+        }
+
+        
+        function submitClassMessage() {
+        	
+        	bundleThem();
+        	document.getElementById("daysSelectedMsg").value = "";
+
+
+       		
+    		var d2 =  parseInt(document.getElementById("selectDay_m1_cal1").value);
+    		var m2 =  parseInt(document.getElementById("month_m1_cal1").value) + 1;
+    	
+    		$('#calendarModalPopupMsg').modal('hide');
+
+    		messageStartDate = m2 + "/" + document.getElementById("selectDay_m1_cal1").value + "/" + document.getElementById("year_m1_cal1").value;
+
+    		if (languageSet == "es") {
+    			messageStartDate = document.getElementById("selectDay_m1_cal1").value + "/" + m2 + "/" + document.getElementById("year_m1_cal1").value;
+    		}
+
+    		var duration = document.getElementById("messageDuration").value;
+    		var msg = document.getElementById("msg").value;
+    		
+    		
+       		document.getElementById("daysSelectedMsg").value = "<%= rb.getString("begin") %> " + messageStartDate + ". <%= rb.getString("display_for") %> " + document.getElementById("messageDuration").value + " <%= rb.getString("days") %>";
+
+			var filter = messageStartDate + "~~~" + duration + "~~~" + classesBundle + "~~~" + msg;
+	        $.ajax({
+	            type : "POST",
+	            url : pgContext+"/tt/tt/getTeacherReports",
+	            dataType: "json",
+	            async: false,
+	            data : {
+	                classId: 0,
+	                teacherId: teacherID,
+	                reportType: 'classMessage',
+	                lang: loc,
+	                filter: filter
+	            },
+	
+	            complete : function(response) {
+	        	    if (response) {
+	               		console.log(response.status);
+	               		console.log(response.responseText);
+	               		var rspStr = response.responseText;
+	               		var rspJSON = JSON.parse(rspStr);
+	               		var status = rspJSON.status;
+	               		console.log(rspJSON.status + " " + rspJSON.message);
+						if (status === "fail") {
+		                    document.getElementById('dangerMessageBar').innerHTML = rspJSON.message;
+		                    document.getElementById('dangerMessageBar').style.visibility = 'visible';
+		                    document.getElementById('successMessageBar').style.visibility = 'hidden';
+						}
+						else {
+		                    document.getElementById('successMessageBar').innerHTML = rspJSON.message;
+		                    document.getElementById('successMessageBar').style.visibility = 'visible';							
+		                    document.getElementById('dangerMessageBar').style.visibility = 'Hidden';
+						}
+	              	}
+	              	else {
+	              		alert("response data is null");
+	              	}
+	        	}
+	        });
+
+        }
+        
+        
         function verifyProbMinMax() {
 
 
@@ -505,15 +663,28 @@ catch (Exception e) {
                 $("#teacher-activities-wrapper").hide();
                 $("#panel-wrapper").hide();
                 $("#edit-teacher-wrapper").hide();
+                $("#message-wrapper").hide();
                 $("#form-wrapper").show();
             });
 
+            $("#class_message_handler").click(function () {
+                $("#report-wrapper").hide();
+                $("#report-wrapper2").hide();
+                $("#teacher-activities-wrapper").hide();
+                $("#panel-wrapper").hide();
+                $("#edit-teacher-wrapper").hide();
+                $("#form-wrapper").hide();               
+                createMessageClassList();
+                $("#message-wrapper").show();
+            });
+                        
             $("#editTeacher_handler").click(function () {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#teacher-activities-wrapper").hide();
                 $("#panel-wrapper").hide();
                 $("#form-wrapper").hide();
+                $("#message-wrapper").hide();
                 $("#edit-teacher-wrapper").show();
             });
             
@@ -525,6 +696,7 @@ catch (Exception e) {
                 $("#teacher-activities-wrapper").hide();
                 $("#panel-wrapper").hide();
                 $("#form-wrapper").hide();
+                $("#message-wrapper").hide();
                 $("#edit-teacher-wrapper").hide();
             });
             
@@ -532,6 +704,7 @@ catch (Exception e) {
                 $("#report-wrapper").hide();
                 $("#report-wrapper2").hide();
                 $("#form-wrapper").hide();
+                $("#message-wrapper").hide();
                 $("#edit-teacher-wrapper").hide();
                 $("#teacher-activities-wrapper").show();
                 $("#teacher-activities-input").show();
@@ -910,6 +1083,9 @@ function registerAllEvents(){
             <li>
                 <a href="#" id="createClass_handler"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_new_class") %></a>
             </li>
+            <li id="li_class_message_handler" >
+                <a id="class_message_handler"><i class="fa fa-fw fa-sticky-note-o"></i><%= rb.getString("messages_for_classes") %></a>
+            </li>
             <li>
                 <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_surveys_and_math_problems") %></a>
             </li>
@@ -1199,6 +1375,55 @@ function registerAllEvents(){
             </div>
 		</div>
 
+        <div id="message-wrapper" style="display: none;">
+		    <div class="feedback-form vertical-center">
+		        <div class="col-sm-8 col-sm-offset-2 registration-box">
+	                <div id="dangerMessageBar" class="alert alert-danger msg-bar" style="visibility: hidden" role="alert"></div>
+	                <div id="successMessageBar" class="alert alert-success msg-bar" style="visibility: hidden" role="alert"></div>
+		            <h3 class="text-center form-label form-title">Provide timely information to your classes.</h3>
+		            <hr>
+		            <form
+		                    class="form-horizontal"
+		                    method="post"
+		            >		
+		                
+	                        <div class="panel-body">
+	                        	<div id="chooseDateRange" class="row">
+	                        		<div class="col-md-2 offset-md-2">                       
+					                	<button type="button" class="btn btn-primary" onclick="initCalendar_m1_cal1();$('#calendarModalPopupMsg').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+					                </div>
+	                        		<div class="col-md-3">                       
+									    <input id="daysSelectedMsg" style="width:240px" type="text" name="" value="" >   
+					                </div>
+	 							</div>  
+	
+							</div>
+		                
+		                <div class="form-group">
+		                    <label id="msgLabel" class="control-label col-sm-8" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
+		                    <div class="col-sm-8">
+		                    	<textarea id="msg" name="msg" class="form-control" rows="6" cols="60" required ></textarea>
+		                    </div>
+		                </div><!-- form-group -->
+		
+		                <div class="form-group">
+		                    <div id="messageClassList" class="col-sm-6">
+		                    </div>
+		                </div>
+		                <div class="form-group row">
+		                    <div class="col-sm-offset-4 col-sm-2">
+		                        <button type="button" value="submit" class="btn btn-success pull-right btn-block" onclick="submitClassMessage()";><%= rb.getString("submit")%></button>
+		                    </div>
+		                    <div class="col-sm-2">
+            				<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><button type="button" value="reset" class="btn btn-danger pull-right btn-block" ><%= rb.getString("close")%></button></a>
+
+		                    </div>
+		                </div><!-- form-group -->
+		            </form>
+		            <hr>
+		        </div>
+		        </div>   	
+        </div>
 
         <div id="form-wrapper" style="display: none;">
             <div class="col-lg-12">
@@ -1508,9 +1733,77 @@ function registerAllEvents(){
 
     <!--#page-container ends-->
 </div>
+<div id="calendarModalPopupMsg" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_m1_cal1" name="selectDay_m1_cal1">
+   				      <div><h3><%= rb.getString("starting_date")%>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_m1_cal1" onclick="previous_m1_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_m1_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_m1_cal1" onclick="next_m1_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_m1_cal1" data-lang="en">
+			              <thead id="thead-month_m1_cal1"></thead>
+			              <tbody id="calendar-body_m1_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_m1_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_m1_cal1" onchange="jump_m1_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_m1_cal1" onchange="jump_m1_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			        <div class="container-calendar">
+				        <div><h3><%= rb.getString("for_how_many_days")%> :</h3></div>			            
+                        <input id="messageDuration" name="messageDuration">
+            	    </div>
+                </div>
+           </div>
+           </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getDatesMsg();$('#calendarModalPopupMsg').modal('hide');" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupMsg').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
 <!--#page-content-wrapper ends-->
 
 <!--Wrapper!-->
+    <script type="text/javascript" src="<c:url value="/js/calendar_m1_1.js" />"></script>
 
 </body>
 </html>

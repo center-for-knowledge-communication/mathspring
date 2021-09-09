@@ -7,6 +7,7 @@
 * Frank 01-16-21 Issue #378 added correct answers element
 * Frank 01-16-21 Issue #378R2 move correct answers element to top
 * Frank 02-17-21 Issue #383R2 get context for buildProblems.js
+* Boming 08-30-21 Issue #421 Circle answer before submission
 */
 ResourceBundle versions = null; 
 try {
@@ -90,6 +91,8 @@ String ctx = request.getContextPath();
                 <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
+                <div id="Grade_Circle" class="short_answer_circle"></div>
+                
             </div>
         </div>
     </div>

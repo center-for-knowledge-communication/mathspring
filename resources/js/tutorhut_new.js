@@ -7,6 +7,7 @@
 // Frank 01-13-21 Issue #354 fix topicName formatting
 // Frank 01-16-21 Issue #357 fix topicName formatting
 // Kartik 04-22-21 Issue #390 Removed previous display of current time in the problems screen
+// Frank	07-03-21	v1..0.1 processGazeWandering ignore empty reposnse messages
 
 var globals;
 var sysGlobals;
@@ -374,6 +375,15 @@ function showVideo (globals) {
     }
 }
 
+function showGazeWandering (globals,gazeData) {
+				
+	var tgazeData = gazeData;
+	tgazeData = tgazeData.replaceAll("{","%7B");
+	tgazeData = tgazeData.replaceAll("}","%7D");							
+
+    servletGet("GazeWandering",{probElapsedTime: globals.probElapsedTime, "gazeJSONData": tgazeData },processGazeWandering);
+}
+
 // TODO this should be changed to use a non-modal dialog
 function showFormulas (globals) {
 	var formURL = "img/g6refsheet.PNG"
@@ -381,13 +391,13 @@ function showFormulas (globals) {
 		var tstandard = globals.standards;
 		var grade = tstandard.substring(0,2);	
 		if (grade === "8.") {
-			formURL = "img/g8refsheet.PNG"
+			formURL = "img/g8refsheet.PNG";
 		}
 		if (grade === "7.") {
-			formURL = "img/g7refsheet.PNG"
+			formURL = "img/g7refsheet.PNG";
 		}
 		if (grade === "5.") {
-			formURL = "img/g5refsheet.PNG"
+			formURL = "img/g5refsheet.PNG";
 		}
 	}
 	catch(err) {
@@ -448,7 +458,8 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 
 
 function processShowVideo (responseText, textStatus, XMLHttpRequest) {
-    checkError(responseText);
+
+	checkError(responseText);
     var activity = JSON.parse(responseText);
     var video = activity.video;
     // khanacademy won't play inside an iFrame because it sets X-Frame-Options to SAMEORIGIN.
@@ -462,6 +473,108 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     	alert(no_video_to_show);
     }
 }
+
+function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
+
+
+	if (!(responseText === "")) {
+
+	
+		console.log(responseText);
+		
+		var gazeJSON = JSON.parse(responseText);
+
+		/* How algorithm this works:
+		 * 	pauseDuration is used to keep track of what each intervention's pause should be from the start of the function
+		 *    playSound if selected, has no pause duration and tells the next ibtervention to pause for at least 5000ms.
+		 *    LCompanion if selected, has no pause if there was no sound selected, and a 5000ms pause if sound was selected, and it adds 5000 to the accumated puase for the next intervemtion
+		 *    flashBox if selected has a pause for the accumulated intervention pauses so far, and adds 5000ms to the start-pause for this intervention and 5000 more for the end-pause, resuting in a 5000ms screen flash
+		 *    texBox if selected has a pause for the accumulated intervention pauses so far, and puts up the confirmation box
+		 */
+		
+		var pauseDuration = 0;
+		if (gazeJSON.params.playSound === 1) {
+			globals.gazeWanderingUI = "playSound<br>";
+			var audio = new Audio('airport_sound.mp3');
+			audio.play();
+			pauseDuration = 5000;
+		}
+	
+		if (gazeJSON.params.LCompanion === 1) {
+			globals.gazeWanderingUI = "LC: " + gazeJSON.params.LCFilename + "<br>";
+			var lc_url = sysGlobals.webContentPath + "LearningCompanion/" + globals.learningCompanion + "/" + gazeJSON.params.LCFilename + ".html";
+			if (pauseDuration > 0) {
+				var tpause = pauseDuration;
+				pauseDuration = pauseDuration + 8000;
+				setTimeout(function() { doLC(lc_url); }, tpause);			
+			}
+			else {
+				pauseDuration = pauseDuration + 8000;
+				loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+			}
+		}
+		
+		if (gazeJSON.params.flashBox === 1) {
+			if (pauseDuration > 0) {
+				var tpause = pauseDuration;
+				pauseDuration = pauseDuration + 5000;			
+				setTimeout(function() { doBeforeFlash(); }, tpause);			
+			}
+			else {
+				pauseDuration = pauseDuration + 5000;			
+				globals.gazeWanderingUI = "flashBox<br>";		
+				$('body').plainOverlay('show')
+				setTimeout(function() { afterFlash("Hey"); }, 5000);
+			}
+		}
+		
+		if (gazeJSON.params.textBox === 1) {
+			globals.gazeWanderingUI = "textBox<br>";
+			var theText = gazeJSON.params.textBoxChoice;
+			console.log(theText);
+			if (pauseDuration > 0) {
+				setTimeout(function() { doTextBox(theText); }, pauseDuration);			
+			}
+			else {
+	
+				swal({
+					title: theText,
+					confirmButtonColor: "#DD6B55", 
+					confirmButtonText: "OK",
+					closeOnConfirm: true,
+				});
+			}
+		}
+		
+	}
+}
+
+function doBeforeFlash() {
+	globals.gazeWanderingUI = "flashBox<br>";		
+	$('body').plainOverlay('show');
+	setTimeout(function() { afterFlash("Hey"); }, 5000);	
+}
+
+function afterFlash() {
+	$('body').plainOverlay('hide');
+	pauseDuration = 0;
+}
+
+function doLC(lc_url) {
+	loadIframe(LEARNING_COMPANION_WINDOW_ID, lc_url);
+	pauseDuration = 8000;
+}
+
+function doTextBox(theText) {
+
+	swal({
+		title: theText,
+		confirmButtonColor: "#DD6B55", 
+		confirmButtonText: "OK",
+		closeOnConfirm: true,
+	});
+}
+
 
 function openExampleDialog(solution){
     if (solution != 'undefined' && solution != null) {
@@ -900,7 +1013,7 @@ function learningCompanionDone () {
 
 // unused.  If lc were a simple div and not an iframe, we'd load it into the div like this.
 function loadLCFile (url) {
-    $("#learningCompanionContainer").load(url);
+    $("#Container").load(url);
 }
 
 // When a non-idle video is shown, we expand the LC window (in case it was shrunk or closed).
@@ -1196,9 +1309,6 @@ function clickHandling () {
     });
     $("#formulas").click(function () {
         showFormulas(globals)
-    });
-    $("#glossary").click(function () {
-        showGlossary(globals)
     });
     $('#'+INSTRUCTIONS_DIALOG).dialog({
 //        autoOpen: ((globals.instructions == "") ? false : true),
