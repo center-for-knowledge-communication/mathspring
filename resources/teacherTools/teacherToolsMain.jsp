@@ -1391,8 +1391,9 @@ function registerAllEvents(){
 	                        	<div id="chooseDateRange" class="row">
 	                        		<div class="col-md-2 offset-md-2">                       
 					                	<button type="button" class="btn btn-primary" onclick="initCalendar_m1_cal1();$('#calendarModalPopupMsg').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-					                </div>
-	                        		<div class="col-md-3">                       
+					                </div>					             
+	                        		<div class="col-md-3">
+	                        			&nbsp;&nbsp;&nbsp;                       
 									    <input id="daysSelectedMsg" style="width:240px" type="text" name="" value="" >   
 					                </div>
 	 							</div>  
