@@ -410,13 +410,19 @@ public class TTReportServiceImpl implements TTReportService {
 
                 case "classMessage":
                 	
+                	String errorMsg = "";
                 	String fields[] = filter.split("~~~");
+                	
+                	if (fields.length < 4) {
+                		errorMsg += "You must complete all fields.  Please try again.  ";
+                    	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
+
+                	}
                 	
                 	String startDate = fields[0];
                 	String duration = fields[1];
                 	String classesBundle = fields[2];
                 	String msg = fields[3];
-                	String errorMsg = "";
                 	Timestamp startTimestamp = null;
                 	Timestamp endTimestamp = null;
                 	
@@ -461,17 +467,20 @@ public class TTReportServiceImpl implements TTReportService {
 	                	if (classesBundle.length() == 0) {
 	                		errorMsg += "You must select class(es) ";
 	                	}
-	                	if (errorMsg.length() == 0) {           	
-	                        Timestamp startDateTimestamp = convertStartDate(startDate);
-	                        Timestamp endDateTimestamp = xDaysFromStartDate(startDateTimestamp,intDuration);
-	                        int dbResult = DbClass.insertClassMessage(connection.getConnection(), startDateTimestamp, endDateTimestamp, msg, 1619);
-	                    	switch (dbResult) {
-	                    	case 0:
-	                    		break;
-	                    	case -1:
-	                    		errorMsg = "DB error";
-	                    		break;
-	                    	}
+	                	if (errorMsg.length() == 0) {
+	                		String[] splitter = classesBundle.split(",");
+	                		for (int i=0;i<splitter.length;i++) {
+	                			Timestamp startDateTimestamp = convertStartDate(startDate);
+	                			Timestamp endDateTimestamp = xDaysFromStartDate(startDateTimestamp,intDuration);
+	                			int dbResult = DbClass.insertClassMessage(connection.getConnection(), startDateTimestamp, endDateTimestamp, msg, Integer.valueOf(splitter[i]));
+		                    	switch (dbResult) {
+		                    	case 0:
+		                    		break;
+		                    	case -1:
+		                    		errorMsg = "DB error";
+		                    		break;
+		                    	}
+	                		}
 	                	}
 	                	else {
 	                		errorMsg = "Entry error:  " + errorMsg;
