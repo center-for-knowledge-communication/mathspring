@@ -40,6 +40,7 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
         	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
 
+/*        	
         	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
         	if (gazeDetectionOn > 0) {
             	studentPedagogyUrl = studentPedagogyUrl + "?resource=gazeOn";
@@ -47,8 +48,14 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	else {
             	studentPedagogyUrl = studentPedagogyUrl + "?resource=gazeOff";
         	}
+*/
 
+        	studentPedagogyUrl = studentPedagogyUrl + "?resource=gazeOn";
+        	
         	String worsheetLocation = DbUser.getStudentWorksheetLocation(smgr.getConnection(),smgr.getStudentId());
+        	if ((worsheetLocation == null) || (worsheetLocation.length() == 0)) {
+        		worsheetLocation = "Center";
+        	}
         	studentPedagogyUrl = studentPedagogyUrl + "&location=opt" + worsheetLocation;
         	
         	List<String> messagesFromTeacher = DbClass.getClassMessages(smgr.getConnection(),classId);
