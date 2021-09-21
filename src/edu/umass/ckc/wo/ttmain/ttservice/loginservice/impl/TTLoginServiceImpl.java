@@ -23,6 +23,8 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
+
 import java.util.Date;
 import java.util.Properties;
 
@@ -89,9 +91,12 @@ public class TTLoginServiceImpl implements TTLoginService {
     }
 
     @Override
-    public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException {
+    public String populateClassInfoForTeacher(ModelMap model, int teacherId, String teacherLoginType) throws TTCustomException {
         try {
 
+        	if (teacherLoginType.equals("Researcher")) {
+        		return "teacherTools/researcher";
+        	}
             if (!ProblemMgr.isLoaded()) {
                 ProblemMgr.loadProbs(connection.getConnection());
                 Settings.lessonMap = DbPedagogy.buildAllLessons(connection.getConnection());

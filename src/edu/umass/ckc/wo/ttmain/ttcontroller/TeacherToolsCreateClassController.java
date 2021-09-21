@@ -48,6 +48,9 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/ttCreateClass", method = RequestMethod.POST)
     public String createNewClass( HttpServletRequest request, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
 
+		HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+		
         //Basic Class Setup
         int newClassId = createClassAssistService.createNewClass(classForm, teacherId);
         //Set Default Pedagogy
@@ -65,14 +68,13 @@ public class TeacherToolsCreateClassController {
         
         createClassAssistService.changeDefaultProblemSets(model, newClassId);
         //Control Back to DashBoard with new Class visible
-        loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
+        loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), teacherLoginType);
         model.addAttribute("createClassForm", new CreateClassForm());
 
     	int intTeacherId = Integer.valueOf(teacherId);
     	String strNewClassId = String.valueOf(newClassId);
 
-		HttpSession session = request.getSession();
-		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {    	
+		if ("Normal".equals(teacherLoginType)) {    	
 			tLogger.logEntryWorker(intTeacherId, 0, strNewClassId, "createClass", "");
 		}
 		
@@ -83,6 +85,9 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/ttEditClass", method = RequestMethod.POST)
     public String editClass( HttpServletRequest request, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
 
+		HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+		
     	int intClassId = Integer.valueOf(classId.trim());
 
         //Basic Class Setup
@@ -94,12 +99,11 @@ public class TeacherToolsCreateClassController {
         }
         createClassAssistService.changeDefaultProblemSets(model, intClassId);
         //Control Back to DashBoard with new Class visible
-        loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
+        loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId),teacherLoginType);
         model.addAttribute("createClassForm", new CreateClassForm());
 
     	int intTeacherId = Integer.valueOf(teacherId);
-		HttpSession session = request.getSession();
-		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {    	
+		if ("Normal".equals(teacherLoginType)) {    	
 			tLogger.logEntryWorker(intTeacherId, 0, classId, "editClass", "");
 		}
  		return "teacherTools/teacherToolsMain";
@@ -112,7 +116,7 @@ public class TeacherToolsCreateClassController {
     public String cloneExistingClass(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
         createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
-        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
+        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), "Normal");
 
     }
 
@@ -123,15 +127,19 @@ public class TeacherToolsCreateClassController {
          createClassAssistService.restSurveySettings(Integer.valueOf(classId.trim()), classForm);
      	int intTeacherId = Integer.valueOf(teacherId);
 		HttpSession session = request.getSession();
-		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {    	
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+		if ("Normal".equals(teacherLoginType)) {    	
 			tLogger.logEntryWorker(intTeacherId, 0, classId, "resetSurvey", "");
 		}
-        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
+        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId),teacherLoginType);
 
     }
 
     @RequestMapping(value = "/tt/setClassActiveFlag", method = RequestMethod.GET)
     String setClassActiveFlag(HttpServletRequest request, @RequestParam(value = "teacherId") String teacherId, @RequestParam("classId") String classId, @RequestParam("activeFlag") String activeFlag, ModelMap model) throws TTCustomException {
+		HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+		
   		createClassAssistService.setClassActiveFlag(Integer.valueOf(teacherId), Integer.valueOf(classId), activeFlag);
     	int intTeacherId = Integer.valueOf(teacherId);
     	String cmd = "deactivate";
@@ -140,11 +148,10 @@ public class TeacherToolsCreateClassController {
     	}
     	String logMsg = "{ \"cmd\" : \"" + cmd + "\" }";
     			
-		HttpSession session = request.getSession();
-		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {    	
+		if ("Normal".equals(teacherLoginType)) {    	
 			tLogger.logEntryWorker(intTeacherId, 0, classId, "setClassActiveStatus", logMsg);
 		}
-        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId));
+        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId),teacherLoginType);
        
     }
 

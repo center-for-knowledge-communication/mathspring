@@ -392,8 +392,11 @@ public class TeacherToolsViewClassDetailsController {
     	for (int i=0;i<formData.length;i++ ) {
         	System.out.println(formData[i].trim());    		
     	}
+    	HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+
     	String message =  pvService.createAdditionalIdForClass(formData,lang);
-        loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()));
+        loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()),teacherLoginType);
 		HttpSession MySession = request.getSession();
 		int teacherId = (int) MySession.getAttribute("teacherId");
        return message;

@@ -83,23 +83,47 @@ public class DbTeacher {
                 return result;
             }
             else {
-            	String query = "select Administrator from globalsettings where id_shouldBe1 = ?";
-                PreparedStatement ps2 = conn.prepareStatement(query);
-                ps2.setString(1,"1");
-                ResultSet rs2 = ps2.executeQuery();
-                if (rs2.next()) {                	            	
-                    String admin =  rs2.getString(1);
+            	String query_admin = "select Administrator from globalsettings where id_shouldBe1 = ?";
+                PreparedStatement ps_admin = conn.prepareStatement(query_admin);
+                ps_admin.setString(1,"1");
+                ResultSet rs_admin = ps_admin.executeQuery();
+                if (rs_admin.next()) {                	            	
+                    String admin =  rs_admin.getString(1);
 	                ps.setString(1,admin);
-	                ResultSet rs3 = ps.executeQuery();
-	                if (rs3.next()) {
-	                    token = rs3.getString("password");
+	                ResultSet rs_admin2 = ps.executeQuery();
+	                if (rs_admin2.next()) {
+	                    token = rs_admin2.getString("password");
 	                    m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
 	                    if (m) {
 	                    	result = String.valueOf(id) + "~Master";
 	                    	return result;
 	                    }
-	                    else 
-	                    	return result;
+	                    else {
+	                    	String query_researcher = "select Researcher from globalsettings where id_shouldBe1 = ?";
+	                        PreparedStatement ps_researcher = conn.prepareStatement(query_researcher);
+	                        ps_researcher.setString(1,"1");
+	                        ResultSet rs_researcher = ps_researcher.executeQuery();
+	                        if (rs_researcher.next()) {                	            	
+	                            String researcher =  rs_researcher.getString(1);
+	        	                ps.setString(1,researcher);
+	        	                ResultSet rs_researcher2 = ps.executeQuery();
+	        	                if (rs_researcher2.next()) {
+	        	                    token = rs_researcher2.getString("password");
+	        	                    m = PasswordAuthentication.getInstance().authenticate(pw.toCharArray(),token);
+	        	                    if (m) {
+	        	                    	result = String.valueOf(id) + "~Researcher";
+	        	                    	return result;
+	        	                    }
+	        	                    else {
+	        	                    	return result;
+	        	                    }
+	        	                }
+	        	                else {
+	        	                	return result;
+	        	                }
+	                        }	                    		                    
+		                	return result;
+	                    }
 	                }
 	                else
 	                	return result;
