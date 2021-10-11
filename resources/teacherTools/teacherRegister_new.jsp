@@ -1,3 +1,5 @@
+<!-- Frank 10-09-21  	Issue #526 Improve form validation -->
+
 <%@ include file="partials/teacherRegister-header.jsp" %>
 
 <%@ include file="partials/teacherRegister-nav.jsp" %>
@@ -13,18 +15,19 @@
             <form
                     class="form-horizontal"
                     method="post"
-                    action="${pageContext.request.contextPath}/WoAdmin?action=AdminTeacherRegistration"
+                    action="${pageContext.request.contextPath}/WoAdmin"
             >
+            	<input type="text" name="action" class="form-control hidden" id="action" value="AdminTeacherRegistration" >
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="first_name"><%= rb.getString("first_name")%>:</label>
                     <div class="col-sm-6">
-                        <input type="text" name="fname" class="form-control" id="first_name" placeholder="">
+                        <input type="text" name="fname" class="form-control" id="first_name" onblur="verifyFName()" placeholder="">
                     </div>
                 </div><!-- form-group -->
                 <div class="form-group">
                     <label class="control-label col-sm-4" for="last_name"><%= rb.getString("last_name")%>:</label>
                     <div class="col-sm-6">
-                        <input type="text" name="lname" class="form-control" id="last_name" placeholder="">
+                        <input type="text" name="lname" class="form-control" id="last_name" onblur="verifyLName()" placeholder="">
                     </div>
                 </div><!-- form-group -->
                 <div class="form-group">
@@ -68,17 +71,39 @@
 </html>
 
 <script type="text/javascript">
+function verifyFName() {
+
+	var fname_input = document.getElementById('first_name').value;
+	var message = "";
+	if (fname_input.search(/[^A-Za-z_\s]/) != -1) {
+		alert("Invalid character.  Only letters and _ allowed.  Please try again.");
+		document.getElementById('first_name').value = "";
+		document.getElementById('first_name').focus();
+	}
+}
+
+function verifyLName() {
+
+	var lname_input = document.getElementById('last_name').value;
+	var message = "";
+	if (lname_input.search(/[^A-Za-z_\s]/) != -1) {
+		alert("Invalid character.  Only letters and _ allowed.  Please try again.");
+		document.getElementById('last_name').value = "";
+		document.getElementById('last_name').focus();
+	}
+}
+
     function verifyUsername() {
 
     	var username_input = document.getElementById('username').value;
     	var message = "";
-    	if (username_input.search(/[^0-9A-Za-z\s]/) != -1) {
-			alert("<%= rb.getString("invalid_username_character")%>");
+    	if (username_input.search(/[^0-9A-Za-z_\s]/) != -1) {
+			alert("Invalid character.  Only letters, numbers and _ allowed.  Please try again.");
 			document.getElementById('username').value = "";
 			document.getElementById('username').focus();
     	}
     } 
-    
+       
     function removeSingleQuote() {
 
     	var password_input = document.getElementById('password').value;
@@ -87,5 +112,6 @@
 	    	document.getElementById('password').value = "";
     	}
     }    
+    
 </script>
 

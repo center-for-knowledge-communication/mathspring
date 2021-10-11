@@ -32,7 +32,8 @@ import java.util.ArrayList;
  * Frank 12-26-20	issue #329 use multi-lingual version of getAllTopics()
  * Frank 05-19-21   issue #473 cropt lname to 2 characters
  * Frank 08-03-21	Issus 150 and 487 set and get worksheet location 
- */
+ * Frank 10-09-2021	issue #523 username prefix validator 
+  */
 public class DbUser {
 
 
@@ -402,6 +403,29 @@ public class DbUser {
             return -1;
     }
 
+    public static int isStudentPrefixInUse(Connection conn, String[] formValues) throws Exception {
+    	
+    	int result = 0;
+    	String prefix = formValues[0].trim();   	
+    	int classId = Integer.valueOf(formValues[4].trim());
+    	int teacherId = Integer.valueOf(formValues[2].trim());
+
+    	prefix = prefix + "-%";
+        SqlQuery q = new SqlQuery();
+        String s = "select count(*) from student where userName like ? and not classId = ?";
+        PreparedStatement ps = conn.prepareStatement(s);
+        ps.setString(1, prefix);
+        ps.setInt(2, classId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+        	result = rs.getInt(1);
+        }
+        rs.close();
+        ps.close();
+        return result;
+    }
+    
+    
     public static int getStudentClass(Connection conn, int studId) throws SQLException {
         SqlQuery q = new SqlQuery();
         String s = "select classId from Student where id=?";
