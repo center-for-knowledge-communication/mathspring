@@ -69,11 +69,15 @@ window.headmodel = {
         
         if (headmodel.calibrated) {
     	    if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
+    	    	document.getElementById("monitorBox").style.visibility = "visible";	    
     	    	document.getElementById("gazeMonitor1").innerHTML = "Gaze on Screen<br>";
     	    	document.getElementById("gazeMonitor2").innerHTML = "  Yaw: " + yaw.toString().substring(0,6) + "<br>";
     	    	document.getElementById("gazeMonitor3").innerHTML = "Pitch: " + pitch.toString().substring(0,6) + "<br>";
     	    	document.getElementById("gazeMonitor5").innerHTML = globals.gazeWanderingUI;
     	    	document.getElementById("gazeMonitor6").innerHTML = "Free passes left: " + headmodel.free_passes + " of " + globals.gazeParamsJSON.gazwndr_free_passes;
+    	    }
+    	    else {
+    	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
     	    }
         	if (headmodel.downthreshold > 0)
         		headmodel.downthreshold = headmodel.downthreshold * -1;

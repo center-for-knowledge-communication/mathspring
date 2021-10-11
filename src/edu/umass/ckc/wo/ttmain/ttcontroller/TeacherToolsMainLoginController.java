@@ -36,7 +36,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	07-28-20	issue #74 get teacherID from session attribute 
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
- * Franjk	02-27-21	issue #383 logFeeaback
+ * Frank	02-27-21	issue #383 logFeeaback
+ * Frank  	1o-09-2021	issue #528 Research Tool 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -99,7 +100,7 @@ public class TeacherToolsMainLoginController {
         		if (teacherLoginType.equals("Normal"))
         			tLogger.logEntryWorker(loginId, 0, "login", "");
 
-                return loginService.populateClassInfoForTeacher(model,loginId);
+                return loginService.populateClassInfoForTeacher(model,loginId,teacherLoginType);
             }
     }
 
@@ -107,9 +108,10 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.GET)
     public String homePage(ModelMap model, HttpServletRequest request) throws TTCustomException {
     	HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
     	int sTeacherId = (int) session.getAttribute("teacherId");
     	session.removeAttribute("classId");
-        return loginService.populateClassInfoForTeacher(model,sTeacherId);
+        return loginService.populateClassInfoForTeacher(model,sTeacherId,teacherLoginType);
     }
 
     @RequestMapping(value = "/tt/logout", method = RequestMethod.GET)

@@ -464,6 +464,15 @@ public class TTReportServiceImpl implements TTReportService {
 	                	if (msg.length() == 0) {
 	                		errorMsg += "You must enter a message for the students. ";
 	                	}
+	                	else {
+	                		if (hasBadCharacters(msg)) {
+		                		errorMsg += "Please use only letters, numbers and the following punctuation marks ( .,;?! ). ";	                			
+	                		}
+	                		else {
+	                			System.out.println(msg + " - Message validated!");
+	                		}
+	                		
+	                	}
 	                	if (classesBundle.length() == 0) {
 	                		errorMsg += "You must select class(es) ";
 	                	}
@@ -510,7 +519,24 @@ public class TTReportServiceImpl implements TTReportService {
         return null;
     }
 
-    
+    public boolean hasBadCharacters(String msg)
+    {
+  
+    	// Look for bad characters
+    	
+    	String badCharacters = "<>'";
+         
+        if (msg == null) {
+            return true;
+        }
+    	for (int i=0;i<badCharacters.length();i++) {
+    		if (msg.contains(badCharacters.substring(i,i+1))) {
+    			return true;
+    		}
+        }
+       	return false;
+    }
+
     @Override
     public Map<String, Map<Integer, StudentDetails>> generateSurveyReport(String classId){
 		

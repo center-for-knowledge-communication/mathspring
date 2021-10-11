@@ -59,6 +59,7 @@ import javax.servlet.http.HttpSession;
  * Frank 	04-01-21  	Issue #418 getStudentList()
  * Frank 	05-17-21  	Issue #471 Pass teacherLoginType value in map to classReportCard
  * Frank    05-20-21  	Issue #473 fix username update bug
+ * Frank   10-09-2021	issue #528 Research Tool 
  */
 
 @Controller
@@ -384,7 +385,17 @@ public class TeacherToolsViewClassDetailsController {
         return pvService.editStudentInfo(new EditStudentInfoForm(Integer.valueOf(studentId.trim()),formData[1].trim(),formData[2].trim(),formData[0].trim(),formData[3].trim()),lang);
     }
 
+    @RequestMapping(value = "/tt/isStudentPrefixInUse", method = RequestMethod.POST)
+    public @ResponseBody
+    String isStudentPrefixInUse(ModelMap map,  HttpServletRequest request, @RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
+    	System.out.println("isStudentPrefixInUse");
+       	System.out.println(formData[0].trim());    		
 
+    	String message =  pvService.isStudentPrefixInUse(formData,lang);
+       return message;
+    }
+
+    
     @RequestMapping(value = "/tt/createMoreStudentIds", method = RequestMethod.POST)
     public @ResponseBody
     String createMoreStudentIds(ModelMap map,  HttpServletRequest request, @RequestParam(value = "formData[]") String[] formData,  @RequestParam("lang") String lang) throws TTCustomException {
@@ -392,8 +403,11 @@ public class TeacherToolsViewClassDetailsController {
     	for (int i=0;i<formData.length;i++ ) {
         	System.out.println(formData[i].trim());    		
     	}
+    	HttpSession session = request.getSession();
+		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
+
     	String message =  pvService.createAdditionalIdForClass(formData,lang);
-        loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()));
+        loginService.populateClassInfoForTeacher(map,Integer.valueOf(formData[3].trim()),teacherLoginType);
 		HttpSession MySession = request.getSession();
 		int teacherId = (int) MySession.getAttribute("teacherId");
        return message;
