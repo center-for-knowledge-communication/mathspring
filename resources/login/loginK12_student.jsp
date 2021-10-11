@@ -49,28 +49,12 @@ catch (Exception e) {
         var $userLoginForm = $('.user-login-form');
         var $userLoginFormUsername = $('.user-login-form-username');
         var $loginSubmitBtn = $('.js-login-btn');
-/*
-        $("#forgotPasswordBtn").hide();
-        
-        $userSwitcher.change(function() {
-            if ($(this).is(':checked')) {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/tt/tt/ttMain');
-                $userLoginFormUsername.attr('name', 'userName');
-                $loginSubmitBtn.attr('name', 'login');
-                $loginSubmitBtn.attr('value', 'Login');
-                $("#forgotPasswordBtn").show();
-            } else {
-                $userLoginForm.attr('action', '${pageContext.request.contextPath}/WoLoginServlet');
-                $userLoginFormUsername.attr('name', 'uname');
-                $("#forgotPasswordBtn").hide();
-            }
-        });
     });
-*/           
-        function signup() {
-            location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
-        }
-
+           
+    function signup() {
+        location.href = '${pageContext.request.contextPath}/WoAdmin?action=UserRegistrationStart&var=b&startPage=${startPage}&classId=0';
+    }
+	
     </script>
 
 </head>
