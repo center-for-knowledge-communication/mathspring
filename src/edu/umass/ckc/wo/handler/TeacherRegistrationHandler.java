@@ -86,22 +86,48 @@ public class TeacherRegistrationHandler {
     	String regexEmail = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 // /^[a-zA-Z0-9_\-\.]+$/    	
     	// if passwords aren't same, gripe
-        if (event.getFname() == null || event.getLname() == null || event.getPw1() == null || event.getPw2() == null || event.getEmail() == null ||
-        		isNotValidField(event.getFname(),"^[A-Za-z]\\w{3,30}$") 
-        		|| isNotValidField(event.getLname(),"^[A-Za-z]\\w{3,30}$") 
-        		|| isNotValidField(event.getPw1(),regexPwd) 
-        		|| isNotValidField(event.getPw2(),regexPwd) 
-        		|| isNotValidField(event.getEmail(),regexEmail) )
+        if (event.getFname() == null || event.getLname() == null || event.getPw1() == null || event.getPw2() == null || event.getEmail() == null )
         {
-        	if (isNotValidField(event.getPw1(),regexPwd)) {
-        		req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");        		
-        	}
-        	else {
-        		req.setAttribute("message",rb.getString("you_must_supply_values_for_required_fields"));
-        	}
+       		req.setAttribute("message",rb.getString("you_must_supply_values_for_required_fields"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher(Settings.useNewGUI()
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getFname(),"^[A-Za-z]\\w{3,30}$"))
+        {
+            req.setAttribute("message","Names must use letters or _");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getLname(),"^[A-Za-z]\\w{3,30}$"))
+        {
+            req.setAttribute("message","Names must use letters or _");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getEmail(),regexEmail))
+        {
+            req.setAttribute("message","Email address not formatted correctly");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getPw1(),regexPwd))
+        {
+            req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
                     ? "/teacherTools/teacherRegister_new.jsp"
                     : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }
