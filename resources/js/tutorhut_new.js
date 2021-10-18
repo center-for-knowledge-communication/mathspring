@@ -8,6 +8,7 @@
 // Frank 01-16-21 Issue #357 fix topicName formatting
 // Kartik 04-22-21 Issue #390 Removed previous display of current time in the problems screen
 // Frank	07-03-21	v1..0.1 processGazeWandering ignore empty reposnse messages
+// Frank	10-18-21	Fix Example window going off screen when window is less than 768 in height
 
 var globals;
 var sysGlobals;
@@ -1366,12 +1367,12 @@ function clickHandling () {
 
         modal:true,
         width:715,
-        height:675,
+        height:500,
 		position: ['center',0],
         open: function (event, ui) {
             $(".ui-dialog-titlebar-close", this.parentNode).hide();
             sysGlobals.exampleWindowActive = true;
-            $(EXAMPLE_CONTAINER_DIV_ID).css('overflow', 'hidden'); //this line does the actual hiding
+            $(EXAMPLE_CONTAINER_DIV_ID).css('overflow', 'scroll');
             var id_exists = document.getElementById('play_button');
             if (id_exists)  {
                 document.getElementById('play_button').id = 'pulsate_play_button';
@@ -1386,7 +1387,6 @@ function clickHandling () {
     			top: '6%',
     			left: '43%'
 			});
-		    
         },
         close: function () { exampleDialogCloseHandler(); } ,
         buttons: [
