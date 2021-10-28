@@ -2903,6 +2903,11 @@ function registerAllEvents(){
 	                        <small><%= rb.getString("manage_student_info") %></small>
 	                    </h3>
 	                </div>
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("students_password_will_be") %>:</small>&nbsp${classInfo.classid}
+	                    </h3>
+	                </div>
                 </div>
                 <div class="loader" style="display: none" ></div>               
                 <div class="panel-group">
