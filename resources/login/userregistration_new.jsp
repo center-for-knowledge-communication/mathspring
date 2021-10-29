@@ -8,6 +8,7 @@
 * Frank	07-17-20	Issue #122 modified for distance learning option
 * Frank	09-10-20	Issue #221 Gender and email changes
 * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
+* Frank 10-29-21 Issue #526 validate user input fields
 */
 ResourceBundle versions = null; 
 try {
@@ -172,17 +173,41 @@ catch (Exception e) {
             var messageBar = $('.msg-bar');
             $('.student-registration-form').on('submit', function(event) {
                 event.preventDefault();
-                $.ajax({
-                    url: "${pageContext.request.contextPath}/WoAdmin"
-                    + "?action=UserRegistrationValidateUsername"
-                    + "&userName=" + $('#username').val()
-                    + "&classId=" + $('#classId').val(),
+                $.ajax('${pageContext.request.contextPath}/WoAdmin', {
+                    type: 'POST',  // http method
+                    data: { 
+                        action: 'UserRegistrationValidateUsername',
+                        userName : $('#username').val(),
+                        classId: $('#classId').val(),
+                        firstName: $('#first_name').val(),
+                        lastName: $('#last_name').val(),
+                        password: $('#password').val(),
+                        age: $('#age').val()
+                    },  // data to submit
+
+//                            + "&classId=" + $('#classId').val()
+//                            + "&fname=" + $('#first_name').val()
+//                            + "&lname=" + $('#last_name').val()
+//                            + "&password=" + $('#password').val()
+//                            + "&age=" + $('#age').val(),
+//                    success: function (data, status, xhr) {
+//                        $('p').append('status: ' + status + ', data: ' + data);
+//                    },
+//                    error: function (jqXhr, textStatus, errorMessage) {
+//                            $('p').append('Error' + errorMessage);
+//                    }
+//                });
+//                $.ajax({
+//                    url: "${pageContext.request.contextPath}/WoAdmin"
+//                    + "?action=UserRegistrationValidateUsername"
+//                    + "&userName=" + $('#username').val()
+//                    + "&classId=" + $('#classId').val()
+//                    + "&fname=" + $('#first_name').val()
+//                    + "&lname=" + $('#last_name').val()
+//                    + "&password=" + $('#password').val()
+//                    + "&age=" + $('#age').val(),
                     success: function(responseText) {
-                        if ($('#password').val() === '') {
-                            messageBar.removeClass('hidden');
-                            messageBar.text("Please provide a password");
-                            passwordInput.addClass('has-error');
-                        } else if (responseText === "") {
+                        if (responseText === "") {
                             var fname = $('#first_name').val();
                             var lname = $('#last_name').val();
                             var uname = $('#username').val();
