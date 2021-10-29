@@ -33,6 +33,8 @@ import java.util.List;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Handles all events for creating a user.
@@ -42,6 +44,7 @@ import java.util.ResourceBundle;
  * Frank	09-01-20	Issue #221 change email param handling
  * Frank	09-13-20 	issue #242
  * Frank    09-15-20    issue #242 fix test for valid email address 
+ * Frank	10-29-21	issue #526 validate user entry fields
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -103,23 +106,61 @@ public class UserRegistrationHandler {
         else
             return null; // should never reach
     }
+    
+    // Function to validate the username
+    public boolean isNotValidField(String name, String regex)
+    {
+  
+        // Regex to check valid username.
+//        String regex = "^[A-Za-z]\\w{3,30}$";
+        
+         
+        // Compile the ReGex
+        Pattern p = Pattern.compile(regex);
+  
+        // If the username is empty
+        // return false
+        if (name == null) {
+            return true;
+        }
+  
+        // Pattern class contains matcher() method
+        // to find matching between given username
+        // and regular expression.
+        Matcher m = p.matcher(name);
+  
+        // Return if the username
+        // matched the ReGex
+        return (!m.matches());
+    }
+     
+
+
 
     public View validateRequest (Connection conn, UserRegistrationValidateUsernameEvent e) throws Exception {
 
-    	String userResult = validateUser(conn, (UserRegistrationValidateUsernameEvent) e);
-    	String classResult = validateClass(conn, (UserRegistrationValidateUsernameEvent) e);
-    
+    	String infoResult = validateInfo(conn, (UserRegistrationValidateUsernameEvent) e);
+    	String userResult = "";
+    	String classResult = "";
+    	if (infoResult.length() == 0) {
+    		userResult = validateUser(conn, (UserRegistrationValidateUsernameEvent) e);
+    		classResult = validateClass(conn, (UserRegistrationValidateUsernameEvent) e);
+    	}
+    		
+    	String result = infoResult + userResult + classResult ;
+    	
     	System.out.println(userResult);
     	System.out.println(classResult);
+    	System.out.println(infoResult);
     	
-    	int len = userResult.length() + classResult.length();
+    	int len = userResult.length() + classResult.length() + infoResult.length();
     	if (len == 0) {
  //       if  ((userResult.length() > 0) || (classResult.length() > 0)) {
             return null;
         }
         else return new View() {
             public String getView () {
-                return userResult + classResult;
+                return result;
             }
         };
     }
@@ -131,7 +172,7 @@ public class UserRegistrationHandler {
         if (id == -1)
             return "";
         else 
-            return uName + " " + rb.getString("already_exists_try_another_username") + "\n\n";
+            return "Username: " + uName + " " + rb.getString("already_exists_try_another_username");
 
 
     }
@@ -149,7 +190,7 @@ public class UserRegistrationHandler {
     		int intClassId = Integer.parseInt(strClassId);
     		ClassInfo ci = DbClass.getClass(conn, intClassId);	
     		if (ci == null)
-    			return strClassId + rb.getString("already_exists_try_another_username") + "\n\n" + rb.getString("unsure_of_classcode_instructions") + "\n";
+    			return "Class id " + strClassId + " " + "was not found." + rb.getString("unsure_of_classcode_instructions");
     		else 
     			return "";
     	}
@@ -159,7 +200,46 @@ public class UserRegistrationHandler {
     	}
     }
 
+    public String validateInfo (Connection conn, UserRegistrationValidateUsernameEvent e) throws Exception {
 
+    	String errorResult = "";
+    	
+    	if ((e.getFirstName().length() == 0) || (isNotValidField(e.getFirstName(),"^[A-Za-z]\\w{1,30}$"))) {
+        	errorResult += " " + "[First Name]";
+    		
+    	}
+    	
+    	if ((e.getLastName().length() == 0) || (isNotValidField(e.getLastName(),"^[A-Za-z]\\w{2,30}$"))) {
+        	errorResult += " " + "[Last Name]";
+    		
+    	}
+    	
+    	if ((e.getAge().length() == 0) || (isNotValidField(e.getAge(),"^[0-9]\\w{1,3}$"))) {
+        	errorResult += " " + "[Age]";
+    		
+    	}
+
+    	if ((e.getUserName().length() == 0) || (isNotValidField(e.getUserName(),"^[A-Za-z0-9]\\w{3,16}$"))) {
+        	errorResult += " " + "[Username]";
+    		
+    	}
+    	
+    	if ((e.getPassword().length() == 0) || (isNotValidField(e.getPassword(),"^[a-zA-Z0-9]+$"))) {
+        	errorResult += " " + "[Password]";
+    		
+    	}
+
+    	if ((e.getClassId().length() > 0) && (isNotValidField(e.getClassId(),"^[0-9]\\w{1,4}$"))) {
+        	errorResult += " " + "[Class ID]";
+    		
+    	}
+
+
+    	if (errorResult.length() > 0) {
+    		errorResult = "  The following fields have invalid data: " + errorResult;
+    	}
+    	return errorResult;
+    }    	
     /**
      * Generate the inputs that collect the user name, email address, password, etc.
      *

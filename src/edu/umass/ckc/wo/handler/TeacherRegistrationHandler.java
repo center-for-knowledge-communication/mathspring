@@ -30,6 +30,7 @@ import java.util.regex.*;
  * Time: 4:13:23 PM
  * Frank 09-13-20 issue #242
  * Frank 10-09-2021 Issue 526 xss patch
+ * Frank 10-29-2021 Issue 526 change password valiation to only numbers and letters
  */
 public class TeacherRegistrationHandler {
 
@@ -82,7 +83,8 @@ public class TeacherRegistrationHandler {
     	}
     	    			
 
-    	String regexPwd = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";    	
+    	String regexPwd = "^[a-zA-Z0-9!]+$";    	
+//    	String regexPwd = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";    	
     	String regexEmail = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 // /^[a-zA-Z0-9_\-\.]+$/    	
     	// if passwords aren't same, gripe
@@ -124,7 +126,8 @@ public class TeacherRegistrationHandler {
         }
         else if (isNotValidField(event.getPw1(),regexPwd))
         {
-            req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");
+            req.setAttribute("message","Password must contain only letters and numbers");
+//            req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher("b".equals(req.getParameter("var"))
