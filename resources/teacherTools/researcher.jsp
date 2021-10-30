@@ -181,9 +181,9 @@ var cohortWeeks = [];
 
 var currentTeachersArr = [];
 
-var trendDate = '12';
+var trendDate = '7';
 var trendUnit = "week";
-var trendNumberOfUnits = 4;
+var trendNumberOfUnits = "1";
 
 const currentTeacher = new Object();
 var currentClass = "";
@@ -193,8 +193,15 @@ var currentWeek = 1;
 var filterOne = "";
 var headers = "";
 
+var plot2 = null;
+var plot2b = null;
+var plot2c = null;
+var plot3 = null;
+var plot_tcp = null;
+var plot_tcs = null;
 var plot5 = null;
-
+var p1_plot6 = null;
+var p2_plot6 = null;
 
 
 function addDays(date, days) {
@@ -456,15 +463,20 @@ function handleCohortSelect(event) {
     var value = selectElement.value;
     var splitValue = value.split("~");
     
+    var currentWeekRaw = 1;
     currentCohortIndex = Number(splitValue[0]);
     currentCohortId = Number(splitValue[1]);
 	const msToday = Date.now();        	
    	var msStartDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
-   	currentWeek = ((msToday - msStartDate)  / 7);
-   	currentWeek = (currentWeek / (1000 * 3600 * 24)) + 1;
+   	currentWeekRaw = ((msToday - msStartDate)  / 7);
+   	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24)) + 1;
+   	currentWeek = Math.trunc(currentWeekRaw);
+   	
    	console.log("currentWeek = " + currentWeek);
    	
 	document.getElementById('chartsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
+	document.getElementById('trendsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
+	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + "</h3>";
       
     showTeachers();
 }
@@ -638,7 +650,7 @@ function showReport1() {
     
 }
 
-
+/*
 function rptTeacherClassesCount() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
@@ -672,7 +684,7 @@ function rptTeacherClassesCount() {
         		series.push(row);
                 // var ticks = ['Paul', 'John', 'George', 'Ringo'];
 
-                var plot2 = $.jqplot('chart2b_canvas', series, {
+                var plot2b = $.jqplot('chart2b_canvas', series, {
                     seriesDefaults: {
                         renderer:$.jqplot.BarRenderer,
                         // Show point labels to the right ('e'ast) of each bar.
@@ -717,10 +729,16 @@ function rptTeacherClassesCount() {
     });
 
 }
-
+*/
 function showReport2() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
+
+	if (plot2 != null) {
+		plot2.destroy();
+		plot2 = null;
+	}	
+	
 
 	
     $.ajax({
@@ -737,7 +755,7 @@ function showReport2() {
             	var jsonData = $.parseJSON(data);
             	console.log(data);
             	var ticks = [];
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             		ticks.push(jsonData[i].username);
             	}
             	var theSeries = [];
@@ -745,7 +763,7 @@ function showReport2() {
             	var row2 = [];
             	var row3 = [];
              
-            	for (var i=0;i<10;i = i + 1) {            	
+            	for (var i=0;i<jsonData.length;i = i + 1) {            	
             		var element1 = [];
             		var element2 = [];
             		var element3 = [];
@@ -764,7 +782,7 @@ function showReport2() {
             	theSeries.push(row2);
             	theSeries.push(row3);
 
-            	var plot2 = $.jqplot('chart2_canvas', theSeries, {
+            	plot2 = $.jqplot('chart2_canvas', theSeries, {
 
                     seriesDefaults: {
                         renderer:$.jqplot.BarRenderer,
@@ -792,8 +810,8 @@ function showReport2() {
 
                     axes: {
                         yaxis: {
-                            renderer: $.jqplot.CategoryAxisRenderer,
-                            ticks: ticks            
+                        	renderer: $.jqplot.CategoryAxisRenderer,
+                        	ticks: ticks            
              			}
                     }
             	});
@@ -818,6 +836,11 @@ function showReport2b() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
+	if (plot2b != null) {
+		plot2b.destroy();
+		plot2b = null;
+	}	
+	
 	
     $.ajax({
         type : "POST",
@@ -832,17 +855,17 @@ function showReport2b() {
         	if (data) {
             	var jsonData = $.parseJSON(data);
             	var ticks = [];
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             		ticks.push(jsonData[i].lname);
             	}
             	var s1 = [];
 
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             		s1.push(jsonData[i].logins);
             	}
                 // var ticks = ['Paul', 'John', 'George', 'Ringo'];
 
-                var plot2 = $.jqplot('chart2b_canvas', [s1], {
+                plot2b = $.jqplot('chart2b_canvas', [s1], {
             	    seriesDefaults:{
             	        renderer:$.jqplot.BarRenderer,
             	        rendererOptions: {
@@ -895,6 +918,11 @@ function showReport2c() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
+	if (plot2c != null) {
+		plot2c.destroy();
+		plot2c = null;
+	}	
+	
 	
     $.ajax({
         type : "POST",
@@ -915,12 +943,12 @@ function showReport2c() {
         		var s1 = [];
         		var ticks = [];
         		
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             		ticks.push(jsonData[i].lname);
             	}
 //            	var series = [];
 
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             	
 
             		var currentDate = new Date();
@@ -938,7 +966,7 @@ function showReport2c() {
             		//series.push(element);
             	}
 
-                var plot2 = $.jqplot('chart2c_canvas', [s1], {
+                plot2c = $.jqplot('chart2c_canvas', [s1], {
             	    seriesDefaults:{
             	        renderer:$.jqplot.BarRenderer,
             	        rendererOptions: {
@@ -1024,7 +1052,12 @@ function countTeachersClasses() {
 
 function showReport3() {
 
+	if (plot3 != null) {
+		plot3.destroy();
+		plot3 = null;
+	}	
 	
+		
 	countTeachersClasses();
 	
 	var s1 = [];
@@ -1046,7 +1079,7 @@ function showReport3() {
 	// Ticks should match up one for each y value (category) in the series.
 //	var ticks = ['May', 'June', 'July', 'August'];
 	
-	var plot1 = $.jqplot('chart3_canvas', [s1], {
+	plot3 = $.jqplot('chart3_canvas', [s1], {
 	    // The "seriesDefaults" option is an options object that will
 	    // be applied to all series in the chart.
 	    seriesDefaults:{
@@ -1096,6 +1129,10 @@ function showReport3() {
 function showReport_tcp() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
+	if (plot_tcp != null) {
+		plot_tcp.destroy();
+		plot_tcp = null;
+	}	
 
 	
     $.ajax({
@@ -1112,7 +1149,7 @@ function showReport_tcp() {
             	var jsonData = $.parseJSON(data);
             	console.log(data);
             	var ticks = [];
-            	for (var i=0;i<10;i = i + 1) {
+            	for (var i=0;i<jsonData.length;i = i + 1) {
             		
             		var className = jsonData[i].username + ":" + jsonData[i].classId;
             		ticks.push(className);
@@ -1122,7 +1159,7 @@ function showReport_tcp() {
             	var row2 = [];
             	var row3 = [];
              
-            	for (var i=0;i<10;i = i + 1) {            	
+            	for (var i=0;i<jsonData.length;i = i + 1) {            	
             		var element1 = [];
             		var element2 = [];
             		var element3 = [];
@@ -1141,7 +1178,7 @@ function showReport_tcp() {
             	theSeries.push(row2);
             	theSeries.push(row1);
 
-            	var plot2 = $.jqplot('tcp_canvas', theSeries, {
+            	plot_tcp = $.jqplot('tcp_canvas', theSeries, {
 
                     seriesDefaults: {
                         renderer:$.jqplot.BarRenderer,
@@ -1157,11 +1194,118 @@ function showReport_tcp() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#66ff66', '#999966'],
+                    seriesColors:['#ff0066', '#66ccff'],
             	    series:[
 //            	        {label:'Skipped'},
             	        {label:'Solved'},
             	        {label:'Seen'}
+            	    ],
+            	    legend: {
+            	        show: true,
+            	        placement: 'outsideGrid'
+            	    },                
+
+                    axes: {
+                        yaxis: {
+                            renderer: $.jqplot.CategoryAxisRenderer,
+                            ticks: ticks            
+             			}
+                    }
+            	});
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+	// For horizontal bar charts, x an y values must will be "flipped"
+    // from their vertical bar counterpart.
+    
+
+}
+
+
+function showReport_tcs() {
+
+	
+	var tcsFilter = '' + currentWeek;
+	
+	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
+	if (plot_tcs != null) {
+		plot_tcs.destroy();
+		plot_tcs = null;
+	}	
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'teacherClassActiveStudentCount',
+            lang: loc,
+            filter: tcsFilter
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);
+            	console.log(data);
+            	var ticks = [];
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		
+            		var className = jsonData[i].username + ":" + jsonData[i].classId;
+            		ticks.push(className);
+            	}
+            	var theSeries = [];
+            	var row1 = [];
+//            	var row2 = [];
+//            	var row3 = [];
+             
+            	for (var i=0;i<jsonData.length;i = i + 1) {            	
+            		var element1 = [];
+//            		var element2 = [];
+//            		var element3 = [];
+            		element1.push(jsonData[i].nbr_active_students);
+            		element1.push(i+1);
+            		row1.push(element1);
+//            		element2.push(jsonData[i].nbr_problems_solved);
+//            		element2.push(i+1);
+//            		row2.push(element2);
+//            		var element3 = [];
+//            		element3.push(jsonData[i].nbr_problems_skipped);
+//            		element3.push(i+1);
+//            		row3.push(element3);
+            	}
+//            	theSeries.push(row3);
+//            	theSeries.push(row2);
+            	theSeries.push(row1);
+
+            	plot_tcs = $.jqplot('tcs_canvas', theSeries, {
+
+                    seriesDefaults: {
+                        renderer:$.jqplot.BarRenderer,
+                        // Show point labels to the right ('e'ast) of each bar.
+                        // edgeTolerance of -15 allows labels flow outside the grid
+                        // up to 15 pixels.  If they flow out more than that, they 
+                        // will be hidden.
+                        pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
+                        // Rotate the bar shadow as if bar is lit from top right.
+                        shadowAngle: 135,
+                        // Here's where we tell the chart it is oriented horizontally.
+                        rendererOptions: {
+                            barDirection: 'horizontal'
+                        }
+                    },
+                    seriesColors:['#66ccff'],
+            	    series:[
+//            	        {label:'Skipped'},
+//            	        {label:'Solved'},
+            	        {label:'Active Students'}
             	    ],
             	    legend: {
             	        show: true,
@@ -1250,38 +1394,68 @@ function showReport5() {
 		plot5 = null;
 	}	
 	
-	
-    const rbf = document.querySelectorAll('input[name="optRadioFilter"]');
+	var rpt5Weeks = "";
+    const rb5weeks = document.querySelectorAll('input[name="optRadio5Weeks"]');
 
-    if (document.getElementById('priorWeeks').value != "") { 
-   		trendNumberOfUnits = document.getElementById('priorWeeks').value;
+    for (const rb5w of rb5weeks) {
+        if (rb5w.checked) {
+        	rpt5Weeks = rb5w.value;
+            break;
+        }
+    }
+	
+	
+    if (document.getElementById('rpt5PriorWeeks').value != "") { 
+   		trendNumberOfUnits = document.getElementById('rpt5PriorWeeks').value;
     }
     else {
    		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
     }
-	
-	var trendFilter = trendDate + "~" + trendUnit + "~" + trendNumberOfUnits;
+    
+	var startWeek = currentWeek;
+    var intNumberOfUnits = Number(trendNumberOfUnits);
+    if (intNumberOfUnits < 1) {
+    	intNumberOfUnits = 1;
+    }
+    if (intNumberOfUnits > 1) {
+    	startWeek = currentWeek - intNumberOfUnits;
+    }
+    else {
+    	intNumberOfUnits = intNumberOfUnits - 1;
+    }
+    	
+	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
 	
 	var dateArr = [];
 	dateArr.push("");
-	var startDate = new Date(trendDate);
+	var startDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
+	var temp = startWeek * 7;
+	var startDate = new Date(addDays(startDate,(temp)));
 	var startDateStr = startDate.toLocaleDateString();
+/*	
+	if (intNumberOfUnits > 1) {
+		for (var i = 1; i <= currentWeek-intNumberOfUnits; i++) {
+			var tdate = new Date(addDays(startDate,(7*i)));
+			startDateStr = tdate.toLocaleDateString();
+		}
+	}
+*/
 	var endDateStr = "";
-	dateArr.push();
+	dateArr.push(startDateStr);
 	
-	for (var i = 1; i <= trendNumberOfUnits; i++) {
-		var tdate = new Date(addDays(trendDate,(7*i)));
+	for (var i = 1; i <= intNumberOfUnits; i++) {
+		var tdate = new Date(addDays(startDate,(7*i)));
 		var dateStr = tdate.toLocaleDateString();
 		dateArr.push(dateStr);
 		endDateStr = dateStr;
 	}
 
 	var rpt5Content = "";
-    const rbs = document.querySelectorAll('input[name="optRadio"]');
+    const rb5Content = document.querySelectorAll('input[name="optRadio5Content"]');
 
-    for (const rb of rbs) {
-        if (rb.checked) {
-        	rpt5Content = rb.value;
+    for (const rb5c of rb5Content) {
+        if (rb5c.checked) {
+        	rpt5Content = rb5c.value;
             break;
         }
     }
@@ -1310,13 +1484,14 @@ function showReport5() {
         url : pgContext+"/tt/tt/cohortAdmin",
         data : {
             cohortId: currentCohortId,
-            command: 'getCohortRangeSlices',
+            command: 'getCohortRangeActivitySlices',
             lang: loc,
             filter: trendFilter
         },
         success : function(data) {
         	document.getElementById('trendLoader').visibility = "hidden";
-        	if (data) {
+        	
+        	if (data && (data.charAt(0) == '[')) {
             	//alert(data);
             	jsonRangeData = $.parseJSON(data);
             	var jsonWeekArr = [];
@@ -1367,33 +1542,15 @@ function showReport5() {
     							endDateStr  = week_date;
     						}
      		  		  	    var index = getUsernameIndex(username);
-    				  		teachers[index].push([week_date, count]);
+     		  		  	    if (index >= 0) {
+    				  			teachers[index].push([week_date, count]);
+    						}
+    						else {
+    							console.log("index = -1");
+    						}
     				  }
     			  }        		  
         	  }
-/*        	  
-			  if ((jsonWeekArr.length > 0) && (jsonWeekArr[0]["Week1"].length > 0)) {
-				  for (i=0;i < jsonWeekArr[0]["Week1"].length; i++) {
-					  	var count = 0;
-				  		switch(rpt5Content) {
-				  		case "Logouts":
-				  			count = jsonWeekArr[0]["Week1"][i].logouts;
-				  			break;
-				  		case "Actions":
-				  			count = jsonWeekArr[0]["Week1"][i].actions;
-							break;
-						default:
-				  			count = jsonWeekArr[0]["Week1"][i].logins;							
-				  		}
-						var username = jsonWeekArr[0]["Week1"][i].username;
-						var week_date = jsonWeekArr[0]["Week1"][i].week_date;
-						startDateStr = week_date;
-						endDateStr  = week_date;
- 		  		  	    var index = getUsernameIndex(username);
-				  		teachers[index].push([week_date, count]);
-				  }
-			  }		  
-*/
 			  for (var t = 0; t<usernameXref.length; t++) {
 				  teachersFound.push(teachers[t]);
 			  }
@@ -1454,64 +1611,70 @@ function showReport5() {
         	          {
         	            // Change our line width and use a diamond shaped marker.
         	            label: usernameStrXref[0],
-        	            lineWidth:2, 
+        	            lineWidth:3, 
         	            markerOptions: { style:'circle' }
         	          }, 
         	          {
         	            // Don't show a line, just show markers.
         	            // Make the markers 7 pixels with an 'x' style
         	            label: usernameStrXref[1],
-        	            lineWidth:2, 
+        	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
         	            // Use (open) circlular markers.
         	            label: usernameStrXref[2],
-        	            lineWidth:2, 
+        	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          }, 
         	          {
         	            // Use a thicker, 5 pixel line and 10 pixel
         	            // filled square markers.
         	            label: usernameStrXref[3],
-        	            lineWidth:2, 
+        	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
           	            // Use (open) circlular markers.
         	            label: usernameStrXref[4],
-          	            lineWidth:2, 
+          	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: usernameStrXref[5],
-          	            lineWidth:2, 
+          	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: usernameStrXref[6],
-          	            lineWidth:2, 
+          	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: usernameStrXref[7],
-          	            lineWidth:2, 
+          	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
-          	          }
+          	          },
+        	          { 
+            	            // Use (open) circlular markers.
+          	            label: usernameStrXref[8],
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          }
         	          
         	      ]
         	    }
         	  );
         	}
         	else {
-        		alert("response data is null");
+        		alert("Data unavailable.");
         	}
         },
         error : function(e) {
-        	alert("error");
+        	alert("Communication error!");
             console.log(e);
         }
     });
@@ -1520,6 +1683,412 @@ function showReport5() {
 	   	
 }
 
+function showReport6() {
+
+	usernameXref = [];
+	usernameStrXref = [];
+	var trendUnit = 7; 
+
+	
+	if (p1_plot6 != null) {
+		p1_plot6.destroy();
+		p1_plot6 = null;
+	}	
+	
+	if (p2_plot6 != null) {
+		p2_plot6.destroy();
+		p2_plot6 = null;
+	}	
+	
+
+	
+	var rpt6Weeks = "";
+    const rb6Weeks = document.querySelectorAll('input[name="optRadio6Weeks"]');
+
+    for (const rb6w of rb6Weeks) {
+        if (rb6w.checked) {
+        	rpt6Weeks = rb6w.value;
+            break;
+        }
+    }
+	
+	
+    if (document.getElementById('rpt6PriorWeeks').value != "") { 
+   		trendNumberOfUnits = document.getElementById('rpt6PriorWeeks').value;
+    }
+    else {
+   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
+    }
+    
+	var startWeek = currentWeek;
+    var intNumberOfUnits = Number(trendNumberOfUnits);
+    if (intNumberOfUnits < 1) {
+    	intNumberOfUnits = 1;
+    }
+    if (intNumberOfUnits > 1) {
+    	startWeek = currentWeek - intNumberOfUnits;
+    }
+    else {
+    	intNumberOfUnits = intNumberOfUnits - 1;
+    }
+    	
+	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
+	
+	var dateArr = [];
+	dateArr.push("");
+	var startDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
+	var temp = startWeek * 7;
+	var startDate = new Date(addDays(startDate,(temp)));
+	var startDateStr = startDate.toLocaleDateString();
+/*	
+	if (intNumberOfUnits > 1) {
+		for (var i = 1; i <= currentWeek-intNumberOfUnits; i++) {
+			var tdate = new Date(addDays(startDate,(7*i)));
+			startDateStr = tdate.toLocaleDateString();
+		}
+	}
+*/
+	var endDateStr = "";
+	dateArr.push(startDateStr);
+	
+	for (var i = 1; i <= intNumberOfUnits; i++) {
+		var tdate = new Date(addDays(startDate,(7*i)));
+		var dateStr = tdate.toLocaleDateString();
+		dateArr.push(dateStr);
+		endDateStr = dateStr;
+	}
+
+	var rpt6Content = "";
+    const rb6Content = document.querySelectorAll('input[name="optRadio6Content"]');
+
+    for (const rb6c of rb6Content) {
+        if (rb6c.checked) {
+        	rpt6Content = rb6c.value;
+            break;
+        }
+    }
+
+	
+	document.getElementById('trendLoader').visibility = "visible";
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'getCohortRangeTeacherClassSlices',
+            lang: loc,
+            filter: trendFilter
+        },
+        success : function(data) {
+        	document.getElementById('trendLoader').visibility = "hidden";
+        	if (data && (data.charAt(0) == '[')) {
+            	//alert(data);
+            	jsonRangeData = $.parseJSON(data);
+            	var jsonWeekArr = [];
+				
+            	for (var j=0; j<jsonRangeData.length;j++ ) {
+                	jsonWeekArr.push(jsonRangeData[j]);
+            	
+            	}
+            	
+        	  var p1_teacher0 = [];
+        	  var p1_teacher1 = [];
+        	  var p1_teacher2 = [];
+        	  var p1_teacher3 = [];
+        	  var p1_teacher4 = [];
+        	  var p1_teacher5 = [];
+        	  var p1_teacher6 = [];
+        	  var p1_teacher7 = [];
+        	  var p1_teacher8 = [];
+        	  var p1_teacher9 = [];
+
+
+        	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9];
+        	  var p1_teachersFound = [];
+
+        	  var p2_teacher0 = [];
+        	  var p2_teacher1 = [];
+        	  var p2_teacher2 = [];
+        	  var p2_teacher3 = [];
+        	  var p2_teacher4 = [];
+        	  var p2_teacher5 = [];
+        	  var p2_teacher6 = [];
+        	  var p2_teacher7 = [];
+        	  var p2_teacher8 = [];
+        	  var p2_teacher9 = [];
+
+
+        	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9];
+        	  var p2_teachersFound = [];
+        	  
+        	  for (var w=0; w < jsonWeekArr.length; w++ ) {
+        		  
+        	  	  var weekName = "Week" + (w+1);
+        	  	  
+    			  if ((jsonWeekArr.length > w) && (jsonWeekArr[w][weekName].length > 0)) {
+    				  for (i=0;i < jsonWeekArr[w][weekName].length; i++) {
+    						var username = jsonWeekArr[w][weekName][i].username;
+    						var week_date = jsonWeekArr[w][weekName][i].week_date;
+    						if (w == 0) {
+    							startDateStr = week_date;
+    						}
+    						else {
+    							endDateStr  = week_date;
+    						}
+     		  		  	    var index = getUsernameIndex(username);
+     		  		  	    if (index >= 0) {
+    				  			p1_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_seen]);
+    				  			p2_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_solved]);
+    						}
+    						else {
+    							console.log("index = -1");
+    						}
+    				  }
+    			  }        		  
+        	  }
+
+        	  for (var t = 0; t<usernameXref.length; t++) {
+				  p1_teachersFound.push(p1_teachers[t]);
+				  p2_teachersFound.push(p2_teachers[t]);
+			  }
+			  var canvas_width = jsonWeekArr.length * 80;
+			  if (canvas_width > 1200) {
+				  canvas_width =  1200;
+			  }
+			  if (canvas_width < 320) {
+				  canvas_width = 320;
+			  }
+			  document.getElementById("chart6_canvas1").style.width = "" + canvas_width + "px";      	  			  
+			  document.getElementById("chart6_canvas2").style.width = "" + canvas_width + "px";      	  			  
+        	  
+        	  p1_plot6 = $.jqplot('chart6_canvas1', p1_teachersFound, 
+        	    { 
+        	      title: 'Weekly - Math Problems Seen', 
+        	      // Set default options on all series, turn on smoothing.
+        	      seriesDefaults: {
+        	          rendererOptions: {
+        	              smooth: true
+        	          }
+        	      },
+        	      axes: {
+        	          xaxis:{  	         
+	           	        renderer:$.jqplot.DateAxisRenderer, 
+        	            min:startDateStr, 
+        	            max:endDateStr, 
+        	            tickInterval:'1 week',
+                        rendererOptions:{
+                            tickRenderer:$.jqplot.CanvasAxisTickRenderer
+                        },
+                    	tickOptions: { 
+                        	angle: 30
+                    	} 
+        	          },
+        	          yaxis: {
+        	              labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+        	              labelOptions:{
+        	                  fontFamily:'Helvetica'
+        	                  //fontSize: '14pt'
+        	              },
+        	              min: 0,  
+        	              tickInterval: 20, 
+        	              tickOptions: { 
+        	                      formatString: '%d' 
+        	              }, 
+        	              label: 'Number of Problems Seen'
+        	          }
+        	      },
+        	      
+        	      legend: {
+        	    	  show: true,
+        	    	  placement: 'outsideGrid'
+        	    	},
+        	      // Series options are specified as an array of objects, one object
+        	      // for each series.
+        	      series:[ 
+        	          {
+        	            // Change our line width and use a diamond shaped marker.
+        	            label: usernameStrXref[0],
+        	            lineWidth:3, 
+        	            markerOptions: { style:'circle' }
+        	          }, 
+        	          {
+        	            // Don't show a line, just show markers.
+        	            // Make the markers 7 pixels with an 'x' style
+        	            label: usernameStrXref[1],
+        	            lineWidth:3, 
+        	            markerOptions: { style:"circle" }
+        	          },
+        	          { 
+        	            // Use (open) circlular markers.
+        	            label: usernameStrXref[2],
+        	            lineWidth:3, 
+        	            markerOptions: { style:"circle" }
+        	          }, 
+        	          {
+        	            // Use a thicker, 5 pixel line and 10 pixel
+        	            // filled square markers.
+        	            label: usernameStrXref[3],
+        	            lineWidth:3, 
+        	            markerOptions: { style:"circle" }
+        	          },
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: usernameStrXref[4],
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }, 
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: usernameStrXref[5],
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }, 
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: usernameStrXref[6],
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }, 
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: usernameStrXref[7],
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          },
+        	          { 
+            	            // Use (open) circlular markers.
+          	            label: usernameStrXref[8],
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          }
+        	          
+        	      ]
+        	    }
+        	  );
+
+        	  
+        	  p2_plot6 = $.jqplot('chart6_canvas2', p2_teachersFound, 
+              	    { 
+              	      title: 'Weekly - Math Problems Solved', 
+              	      // Set default options on all series, turn on smoothing.
+              	      seriesDefaults: {
+              	          rendererOptions: {
+              	              smooth: true
+              	          }
+              	      },
+              	      axes: {
+              	          xaxis:{  	         
+      	           	        renderer:$.jqplot.DateAxisRenderer, 
+              	            min:startDateStr, 
+              	            max:endDateStr, 
+              	            tickInterval:'1 week',
+                              rendererOptions:{
+                                  tickRenderer:$.jqplot.CanvasAxisTickRenderer
+                              },
+                          	tickOptions: { 
+                              	angle: 30
+                          	} 
+              	          },
+              	          yaxis: {
+              	              labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+              	              labelOptions:{
+              	                  fontFamily:'Helvetica'
+              	                  //fontSize: '14pt'
+              	              },
+              	              min: 0,  
+              	              tickInterval: 20, 
+              	              tickOptions: { 
+              	                      formatString: '%d' 
+              	              }, 
+              	              label: 'Number of Problems Solved'
+              	          }
+              	      },
+              	      
+              	      legend: {
+              	    	  show: true,
+              	    	  placement: 'outsideGrid'
+              	    	},
+              	      // Series options are specified as an array of objects, one object
+              	      // for each series.
+              	      series:[ 
+              	          {
+              	            // Change our line width and use a diamond shaped marker.
+              	            label: usernameStrXref[0],
+              	            lineWidth:3, 
+              	            markerOptions: { style:'circle' }
+              	          }, 
+              	          {
+              	            // Don't show a line, just show markers.
+              	            // Make the markers 7 pixels with an 'x' style
+              	            label: usernameStrXref[1],
+              	            lineWidth:3, 
+              	            markerOptions: { style:"circle" }
+              	          },
+              	          { 
+              	            // Use (open) circlular markers.
+              	            label: usernameStrXref[2],
+              	            lineWidth:3, 
+              	            markerOptions: { style:"circle" }
+              	          }, 
+              	          {
+              	            // Use a thicker, 5 pixel line and 10 pixel
+              	            // filled square markers.
+              	            label: usernameStrXref[3],
+              	            lineWidth:3, 
+              	            markerOptions: { style:"circle" }
+              	          },
+              	          { 
+                	            // Use (open) circlular markers.
+              	            label: usernameStrXref[4],
+                	            lineWidth:3, 
+                	            markerOptions: { style:"circle" }
+                	          }, 
+              	          { 
+                	            // Use (open) circlular markers.
+              	            label: usernameStrXref[5],
+                	            lineWidth:3, 
+                	            markerOptions: { style:"circle" }
+                	          }, 
+              	          { 
+                	            // Use (open) circlular markers.
+              	            label: usernameStrXref[6],
+                	            lineWidth:3, 
+                	            markerOptions: { style:"circle" }
+                	          }, 
+              	          { 
+                	            // Use (open) circlular markers.
+              	            label: usernameStrXref[7],
+                	            lineWidth:3, 
+                	            markerOptions: { style:"circle" }
+                	          },
+              	          { 
+                  	            // Use (open) circlular markers.
+                	            label: usernameStrXref[8],
+                  	            lineWidth:3, 
+                  	            markerOptions: { style:"circle" }
+                  	          }
+              	          
+              	      ]
+              	    }
+              	  );
+
+        	  
+        	  
+        	}
+        	else {
+        		alert("Data unavailable.");
+        	}
+        },
+        error : function(e) {
+        	alert("Communication error!");
+            console.log(e);
+        }
+    });
+    
+    
+	   	
+}
 
 function createCohortSlice() {
 
@@ -1552,33 +2121,6 @@ function createCohortSlice() {
 function updateCohortSlice() {
 
 
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: currentCohortId,
-            command: 'updateCohortSliceTeacherActivity',
-            lang: loc,
-            filter: '2021~11'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
-}
-
-function updateAllCohortSlices() {
-
 
     $.ajax({
         type : "POST",
@@ -1587,7 +2129,7 @@ function updateAllCohortSlices() {
             cohortId: currentCohortId,
             command: 'updateAllCohortSlicesTeacherActivity',
             lang: loc,
-            filter: '08/02/2020~7~44'
+            filter: '09/05/2021~7~8'
         },
         success : function(data) {
         	if (data) {
@@ -1611,7 +2153,107 @@ function updateAllCohortSlices() {
             cohortId: currentCohortId,
             command: 'updateAllCohortClassStudentSlices',
             lang: loc,
-            filter: '08/02/2020~7~44'
+            filter: '09/05/2021~7~8'
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+    
+}
+
+function updateAllCohortSlices() {
+
+
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: 1,
+            command: 'updateAllCohortSlicesTeacherActivity',
+            lang: loc,
+            filter: '08/04/2020~7~34'
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: 1,
+            command: 'updateAllCohortClassStudentSlices',
+            lang: loc,
+            filter: '08/04/2020~7~34'
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: 2,
+            command: 'updateAllCohortSlicesTeacherActivity',
+            lang: loc,
+            filter: '09/05/2021~7~9'
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: 2,
+            command: 'updateAllCohortClassStudentSlices',
+            lang: loc,
+            filter: '09/05/2021~7~9'
         },
         success : function(data) {
         	if (data) {
@@ -1730,10 +2372,10 @@ function updateAllCohortSlices() {
            	<div class="row">
 				<div class="form-group">
 				    <div class="offset-md-1 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optradioFilter">Show from beginning.</label>
+						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks">Show from beginning.</label>
 				    </div>
 				    <div class="offset-md-2 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optradioFilter" checked>Show [X] prior weeks.</label>
+						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked>Show [X] prior weeks.</label>
 				    </div>
 				    <div class="offset-md-1 col-md-2 pull-left">
 						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="settingsPriorWeeks">
@@ -1742,7 +2384,7 @@ function updateAllCohortSlices() {
 			</div>			
 			<br>
 			<br>
-			<div class="row"  style="display: visible;">
+			<div class="row"  style="display: none;">
 	           	<div id="chooseDateRange">
 	                 <div class="col-md-2 offset-md-1">                       
 	             		<button type="button" class="btn btn-primary" onclick="initCalendar_r1_cal1();initCalendar_r1_cal2();$('#calendarModalPopupOne').modal('show');" ><%= rb.getString("choose_date_range") %></button>
@@ -1768,6 +2410,7 @@ function updateAllCohortSlices() {
 			<div id="chartsCohortWeeks">				
 			</div>
 		</div>			
+<!--
 		<div class="row"  style="display: visible;">
            	<div id="chooseDateRange">
                  <div class="col-md-2 offset-md-1">                       
@@ -1779,10 +2422,26 @@ function updateAllCohortSlices() {
 			</div>  
 		</div>	
 		<br>
+-->		
         <h1 class="page-header">
             Teacher Activity Reports
             <br>
         </h1>
+
+        <div class="row">                           
+			<div class="form-group  report_filters">
+			    <div class="offset-md-1 col-md-3 pull-left">
+					<label class="radio-inline"><input id="radioChartsWeeksAll"  value="all"  type="radio" name="optRadioChartsWeeks">Show from beginning.</label>
+			    </div>
+			    <div class="offset-md-2 col-md-3 pull-left">
+					<label class="radio-inline"><input id="radioChartsWeekSelect"  value="select"  type="radio" name="optRadioChartsWeeks" checked>Show [X] prior weeks.</label>
+			    </div>
+			    <div class="offset-md-1 col-md-2 pull-left">
+					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="chartsPriorWeeks">
+			    </div>
+			</div>
+		</div>
+		<br>
 
         <div id="content-container" class="container-fluid">
 
@@ -1916,7 +2575,7 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_tcp" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTCP">
-                                    Teacher Class Problems
+                                    Teacher Class Problem Solving
                                 </a>
                                	<button id="ButtonTCP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -1933,6 +2592,27 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_tcs" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTCS">
+                                    Active Students This Week
+                                </a>
+                               	<button id="ButtonTCS" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartTCS" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="<%= rb.getString("show_report") %>">
+                            </div>
+ 
+                            <div class="panel-body">
+				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
+                            </div>
+
+                        </div>
+                    </div>
+
             	</div>
         	</div>
 		</div>
@@ -1942,6 +2622,8 @@ function updateAllCohortSlices() {
     <div id="Trends" class="col-sm-12 tab-pane fade container">
 		<div class="row">
 			<div id="trendsCohortName">				
+			</div>
+			<div id="trendsCohortWeeks">				
 			</div>
 		</div>
         <h1 class="page-header">
@@ -1953,10 +2635,10 @@ function updateAllCohortSlices() {
 			<br>
 			<div class="form-group">
 			    <div class="offset-md-1 col-md-3 pull-left">
-					<label class="radio-inline"><input type="radio" name="optradioFilter">Show from beginning.</label>
+					<label class="radio-inline"><input type="radio" name="optRadioWeeks">Show from beginning.</label>
 			    </div>
 			    <div class="offset-md-2 col-md-3 pull-left">
-					<label class="radio-inline"><input type="radio" name="optradioFilter" checked>Show [X] prior weeks.</label>
+					<label class="radio-inline"><input type="radio" name="optRadioWeeks" checked>Show [X] prior weeks.</label>
 			    </div>
 			    <div class="offset-md-1 col-md-2 pull-left">
 					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="priorWeeks">
@@ -2000,22 +2682,22 @@ function updateAllCohortSlices() {
                             	<div class="row">                           
 								<div class="form-group">
 								    <div class="offset-md-1 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optradioFilter">Show from beginning.</label>
+										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks">Show from beginning.</label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optradioFilter" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked>Show [X] prior weeks.</label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="priorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt5PriorWeeks">
 								    </div>
 								</div>
 								</div>
 								<br>
                             	<div class="row">                           
 								<div class="form-group">
-									<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio" checked>Logins</label>
-									<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio">Actions</label>
-									<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio">Logouts</label>
+									<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
+									<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
+									<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
 								</div>
 								</div>
                             </div>
@@ -2030,6 +2712,52 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
+                    
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_5" class="accordion-toggle" data-toggle="collapse" data-parent="#trendsGroup" href="#chartSix">
+                                    Teacher Class Problem Solving Results - Weekly Counts
+                                </a>
+                               	<button id="Button6" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartSix" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">
+                            	<div class="row">                           
+								<div class="form-group">
+								    <div class="offset-md-1 col-md-3 pull-left">
+										<label class="radio-inline"><input id="radio6WeeksAll"  value="all"  type="radio" name="optRadio6Weeks">Show from beginning.</label>
+								    </div>
+								    <div class="offset-md-2 col-md-3 pull-left">
+										<label class="radio-inline"><input id="radio6WeekSelect"  value="select"  type="radio" name="optRadio6Weeks" checked>Show [X] prior weeks.</label>
+								    </div>
+								    <div class="offset-md-1 col-md-2 pull-left">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt6PriorWeeks">
+								    </div>
+								</div>
+								</div>
+								<br>
+                            	<div class="row">                           
+								<div class="form-group hidden">
+									<label class="radio-inline"><input id="radioProblemsSeen"  value="ProblemsSeen" type="radio" name="optRadio6Content" checked>Problems Seen</label>
+									<label class="radio-inline"><input id="radioProblemsSolved" value="ProblemsSolved" type="radio" name="optRadio6Content">Problems Solved</label>
+								</div>
+								</div>
+                            </div>
+                            <div class="panel-body report_filters">                           
+								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="<%= rb.getString("show_report") %>">
+                            </div>
+
+
+                            <div  class="panel-body">
+			            		<div id="chart6_canvas1" style="width:1200px; height:400px;overflow-x: auto;"></div>
+			            		<br>
+			            		<div id="chart6_canvas2" style="width:1200px; height:400px;overflow-x: auto;"></div>
+                            </div>
+
+                        </div>
+                    </div>
             	</div>
         	</div>
 		</div>
@@ -2053,43 +2781,20 @@ function updateAllCohortSlices() {
 			</div>
     </div>
     <div id="AdminTools" class="col-sm-12 tab-pane fade container">
-      <h3>Admin Tools</h3>
-
 		<div class="row">
-			<div id="trendsCohortName">				
+			<div id="adminCohortName">				
 			</div>
 		</div>			
-		<div class="form-group">
-			<div class="row">
-				<div class="col-md-12">
-					<div class=" offset-md-2 col-md-4">					
-						<label class="radio"><input type="radio" name="optradio" checked>Show data for [X] prior weeks.</label>
-						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="priorWeeks">
-					</div>
-				</div>
-			</div>
-			<br>
-			<div class="row">
-				<div class="col-md-12">
-					<div class=" offset-md-2 col-md-2">
-						<label class="radio"><input type="radio" name="optradio">Show from beginning.</label>
-					</div>				
-				</div>				
-			</div>
-		</div>
 		<br>
         <h1 class="page-header">
             Researcher Admin Tools
-            
         </h1>
 
-
-        <div id="admin-container" class="container-fluid">
+        <div id="admin-container" class="container-fluid hidden">
 
             <div id="admin-wrapper" class="row" width: 100%;">
 
                 <div class="panel-group" id="adminCommands">
-                  
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
