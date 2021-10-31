@@ -220,7 +220,7 @@ public class SendEM {
           // Setup mail server
           props.put("mail.smtp.host", host);
           props.put("mail.smtp.auth", "true");
-          props.put("mail.smtp.port", "587"); 
+          props.put("mail.smtp.port", "465"); 
 
           	if (filenames.length > 0)
               {
