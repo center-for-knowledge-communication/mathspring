@@ -17,15 +17,50 @@ import java.util.Random;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+
+
+import java.util.regex.*;
+
+
+  
 /**
  * Copyright (c) University of Massachusetts
  * Written by: David Marshall
  * Date: Jan 31, 2006
  * Time: 4:13:23 PM
  * Frank 09-13-20 issue #242
+ * Frank 10-09-2021 Issue 526 xss patch
+ * Frank 10-29-2021 Issue 526 change password valiation to only numbers and letters
  */
 public class TeacherRegistrationHandler {
 
+    // Function to validate the username
+    public boolean isNotValidField(String name, String regex)
+    {
+  
+        // Regex to check valid username.
+//        String regex = "^[A-Za-z]\\w{3,30}$";
+        
+         
+        // Compile the ReGex
+        Pattern p = Pattern.compile(regex);
+  
+        // If the username is empty
+        // return false
+        if (name == null) {
+            return true;
+        }
+  
+        // Pattern class contains matcher() method
+        // to find matching between given username
+        // and regular expression.
+        Matcher m = p.matcher(name);
+  
+        // Return if the username
+        // matched the ReGex
+        return (!m.matches());
+    }
+     
 
     public void handleEvent(Connection conn, AdminTeacherRegistrationEvent event, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
@@ -47,15 +82,55 @@ public class TeacherRegistrationHandler {
 //    		logger.error(e.getMessage());	
     	}
     	    			
-    			
+
+    	String regexPwd = "^[a-zA-Z0-9!]+$";    	
+//    	String regexPwd = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";    	
+    	String regexEmail = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+// /^[a-zA-Z0-9_\-\.]+$/    	
     	// if passwords aren't same, gripe
-        if (event.getFname() == null || event.getLname() == null || event.getPw1() == null || event.getPw2() == null || event.getEmail() == null ||
-                event.getFname().equals("") || event.getLname().equals("") || event.getPw1().equals("") || event.getPw2().equals("") || event.getEmail().equals(""))
+        if (event.getFname() == null || event.getLname() == null || event.getPw1() == null || event.getPw2() == null || event.getEmail() == null )
         {
-            req.setAttribute("message",rb.getString("you_must_supply_values_for_required_fields"));
+       		req.setAttribute("message",rb.getString("you_must_supply_values_for_required_fields"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher(Settings.useNewGUI()
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getFname(),"^[A-Za-z]\\w{3,30}$"))
+        {
+            req.setAttribute("message","Names must use letters or _");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getLname(),"^[A-Za-z]\\w{3,30}$"))
+        {
+            req.setAttribute("message","Names must use letters or _");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getEmail(),regexEmail))
+        {
+            req.setAttribute("message","Email address not formatted correctly");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
+                    ? "/teacherTools/teacherRegister_new.jsp"
+                    : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
+        }
+        else if (isNotValidField(event.getPw1(),regexPwd))
+        {
+            req.setAttribute("message","Password must contain only letters and numbers");
+//            req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");
+            Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
+            req.setAttribute("isAdmin",adminId != null ? true : false);
+            req.getRequestDispatcher("b".equals(req.getParameter("var"))
                     ? "/teacherTools/teacherRegister_new.jsp"
                     : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }

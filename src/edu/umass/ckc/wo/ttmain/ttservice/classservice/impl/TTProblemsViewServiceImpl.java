@@ -47,6 +47,7 @@ import edu.umass.ckc.wo.smgr.User;
  * Frank    03-15-21  	Issue #398 New feature to move student from one class to another
  * Frank    04-01-21  	Issue #418 getStudentList()
  * Frank    05-20-21  	Issue #473 crop lname and fix username update bug
+ * Frank 	10-09-2021	issue #523 username prefix validation 
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -272,6 +273,34 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     }
 
     @Override
+    public String isStudentPrefixInUse(String[] formValues, String lang) throws TTCustomException {
+    	
+    	int result = 0;
+    	// Multi=lingual enhancement
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+		rb = ResourceBundle.getBundle("MathSpring",loc);        
+        String msg = "";
+
+        try {
+            result = DbUser.isStudentPrefixInUse(connection.getConnection(),formValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            
+        }
+        if (result > 0) {
+        	return "inuse";
+	    }
+	    else {
+        	return "available";
+	    }
+    }
+    
+    @Override
     public String createAdditionalIdForClass(String[] formValues, String lang) throws TTCustomException {
     	
 		// Multi=lingual enhancement
@@ -284,7 +313,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 
         try {
             ClassInfo info = DbClass.getClass(connection.getConnection(),Integer.valueOf(formValues[4]));
-            String prefix = formValues[0].trim() + "-" + formValues[4];
+            String prefix = formValues[0].trim() + "-";
             DbClass.createStudentRoster(connection.getConnection(),info,prefix,formValues[4].trim(),Integer.valueOf(formValues[2]));
             msg = "{ ";
         	msg += "\"student ids created\" : \"" + formValues[2] + "\"";

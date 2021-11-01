@@ -23,6 +23,8 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
+
 import java.util.Date;
 import java.util.Properties;
 
@@ -65,6 +67,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  * Frank	02-14-21	issue #383R1 added logFeedback method
  * Frank	08-03-21	Issue 150 pass along the list of class name/id pairs
+ * Frank    10-09-2021	issue #528 Research Tool 
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -89,9 +92,12 @@ public class TTLoginServiceImpl implements TTLoginService {
     }
 
     @Override
-    public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException {
+    public String populateClassInfoForTeacher(ModelMap model, int teacherId, String teacherLoginType) throws TTCustomException {
         try {
 
+        	if (teacherLoginType.equals("Researcher")) {
+        		return "teacherTools/researcher";
+        	}
             if (!ProblemMgr.isLoaded()) {
                 ProblemMgr.loadProbs(connection.getConnection());
                 Settings.lessonMap = DbPedagogy.buildAllLessons(connection.getConnection());

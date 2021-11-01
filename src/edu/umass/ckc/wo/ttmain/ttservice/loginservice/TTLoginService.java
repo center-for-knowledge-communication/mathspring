@@ -15,7 +15,7 @@ public interface TTLoginService{
 
     public String loginAssist(String uname,String password);
 
-    public String populateClassInfoForTeacher(ModelMap model, int teacherId) throws TTCustomException;
+    public String populateClassInfoForTeacher(ModelMap model, int teacherId, String teacherLoginType) throws TTCustomException;
 
     public int resetPassword(String uname,String email);
 

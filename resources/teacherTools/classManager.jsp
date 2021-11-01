@@ -48,6 +48,8 @@
 <!-- Frank 08-20-21  	Issue #496 live dashboard -->
 <!-- Frank 08-20-21  	Swap positions of Landing Report 1 & 2 -->
 <!-- Frank 08-20-21  	Move class code from page title to logout dropdown -->
+<!-- Frank 10-09-21  	Issue #526 Improve form validation -->
+<!-- Frank 10-09-21  	Issue # 523 Add user prefix lookup -->
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -260,7 +262,7 @@ var filterLandingTwo = "~0";
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
-var emsg_className_invalid = 'Class name must only include letters,numbers or . _ - characters';
+var emsg_field_invalid   = 'Field must only include letters,numbers or . _ - characters';
 var emsg_classGrade      = 'Class grade is mandatory field';
 var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
 var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
@@ -290,7 +292,7 @@ if (languagePreference.includes("en")) {
 	loc = "es-Ar";
 	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
 	emsg_className       = 'El nombre de la clase es obligatorio';
-	var emsg_className_invalid = 'El nombre de la clase solo debe incluir letras, números o . _ - ';
+	emsg_field_invalid   = 'El nombre solo debe incluir letras, números o . _ - ';
 	emsg_classGrade      = 'El grado de la clase es obligatorio';
 	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
 	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
@@ -495,6 +497,37 @@ $('#edit_class_form').submit(function() {
 	  }
 });
 */
+
+function userPrefixLookup() {
+	
+	var dataForm = $("#create_Student_id").serializeArray();
+    var values=[];
+    $.each(dataForm, function(i, field){
+        values[i] = field.value;
+    });
+    $('#student_roster_out').find('.loader').show();
+    $.ajax({
+        type: "POST",
+        url: pgContext + "/tt/tt/isStudentPrefixInUse",
+        data: {
+            formData: values,
+            lang: loc
+        },
+        success: function (data) {
+            $('#student_roster_out').find('.loader').hide();
+            if (data.includes("inuse")) {
+            	document.getElementById('userPrefix').value = "";
+                $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
+                $('#errorMsgModelPopup').modal('show');
+            }
+        }
+    });
+
+}
+
+
+
+
 function verifyProbMinMax() {
 
 
@@ -962,7 +995,7 @@ function handleclickHandlers() {
                     },
 			        regexp: {
             			regexp: /^[a-zA-Z0-9_\-\.]+$/,
-                        message: emsg_className_invalid
+                        message: emsg_field_invalid
         			}        
                 }
             },
@@ -990,13 +1023,23 @@ function handleclickHandlers() {
                     notEmpty: {
                         message: emsg_town
                     }
-                }
+                },
+		        regexp: {
+        			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+                    message: emsg_field_invalid
+    			}        
+                
             }, schoolName: {
                 validators: {
                     notEmpty: {
                         message: emsg_schoolName
                     }
-                }
+                },
+		        regexp: {
+        			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+                    message: emsg_field_invalid
+    			}        
+                
             }, schoolYear: {
                 validators: {
 
@@ -1014,7 +1057,11 @@ function handleclickHandlers() {
                 validators: {
                     notEmpty: {
                         message: emsg_gradeSection
-                    }
+                    },
+			        regexp: {
+            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+                        message: emsg_field_invalid
+        			}                            
                 }
             }, maxProb: {
                 validators: {
@@ -2785,7 +2832,7 @@ function registerAllEvents(){
 				                                    <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
 				                                    <div class="input-group">
 				                                        <springForm:input path="userPrefix" id="userPrefix" name="userPrefix" value="Math"
-				                                                          placeholder="Math" class="form-control" type="text"/>
+				                                                          placeholder="Math" class="form-control" type="text" onblur="userPrefixLookup()"/>
 				                                    </div>
 				                                </div>
 				                                <div class="form-group hidden">
@@ -2854,6 +2901,11 @@ function registerAllEvents(){
 	                <div class="col-md-10">
 	                    <h3 class="tt-page-header">
 	                        <small><%= rb.getString("manage_student_info") %></small>
+	                    </h3>
+	                </div>
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("students_password_will_be") %>:</small>&nbsp${classInfo.classid}
 	                    </h3>
 	                </div>
                 </div>

@@ -45,6 +45,7 @@ import java.util.Properties;
  * @version 1.0
  * 
  * Frank	06-18-2020	issue #135 added method sendHelpEmail
+ * Frank 	10-31-2021	fixed
  */
 
 @Service
@@ -219,7 +220,7 @@ public class SendEM {
           // Setup mail server
           props.put("mail.smtp.host", host);
           props.put("mail.smtp.auth", "true");
-          props.put("mail.smtp.port", "25"); // default port 25
+          props.put("mail.smtp.port", "465"); 
 
           	if (filenames.length > 0)
               {
