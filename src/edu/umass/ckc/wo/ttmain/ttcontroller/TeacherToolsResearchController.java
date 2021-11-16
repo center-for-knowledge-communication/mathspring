@@ -1,13 +1,11 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
-import edu.umass.ckc.wo.beans.StudentDetails;
 
+import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
-import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
-import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
-import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
-import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
-import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
+import edu.umass.ckc.wo.ttmain.ttmodel.CreateClassForm;
+
+import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTCreateClassAssistService;
 import edu.umass.ckc.wo.ttmain.ttservice.miscservice.TTMiscService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
 
@@ -18,11 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -35,9 +31,16 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class TeacherToolsResearchController {
 
+	
+    @Autowired
+    private TTConfiguration connection;
+
     @Autowired
     private TTMiscService miscService;
-   
+
+    @Autowired
+    private TTCreateClassAssistService ccService;
+
     @Autowired
     private TeacherLogger tLogger;
 
@@ -74,4 +77,37 @@ public class TeacherToolsResearchController {
     	return miscService.cohortAdmin(cohortId, command, lang, filter);
     }
 
+    
+    @RequestMapping(value = "/tt/researcherViewClassReportCard", method = RequestMethod.GET)
+    public String researcherViewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("teacherId") String teacherId,  @RequestParam("classId") String classId  ) throws TTCustomException {
+
+    	Locale loc = request.getLocale(); 
+    	String lang = loc.getLanguage();
+
+    	if (lang.equals("es")) {
+    		loc = new Locale("es","AR");	
+    	}
+    	else {
+    		loc = new Locale("en","US");	
+    	}	
+    	
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+    	HttpSession session = request.getSession();
+    	session.setAttribute("teacherId",Integer.valueOf(teacherId));
+        map.addAttribute("teacherId", teacherId);
+        map.addAttribute("teacherLoginType", (String) session.getAttribute("teacherLoginType"));
+    	ccService.setTeacherInfo(map,teacherId,classId);
+        map.addAttribute("createClassForm", new CreateClassForm()); 
+        session.setAttribute("classId",classId);
+        return "teacherTools/researcherClassReportCard";
+    }
+    
+    
 }

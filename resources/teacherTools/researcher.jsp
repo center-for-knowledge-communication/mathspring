@@ -178,6 +178,7 @@ var currentCohortId = 0;
 var currentCohortIndex = 0;
 var currentCohortWeeks = {};
 var cohortWeeks = [];
+var currentCohortDateArr = [];
 
 var currentTeachersArr = [];
 
@@ -209,6 +210,29 @@ function addDays(date, days) {
 	  result.setDate(result.getDate() + days);
 	  return result;
 	}
+
+function launchReportCard() {
+
+	var isValid = true;
+	
+	if (currentTeacher.id == null) {
+		alert("Must select a teacher on the settings page");
+		isValid = false;
+	}
+	if ((currentClass == null) || (currentClass == "")) {
+		alert("Must select a class on the settings page");
+		isValid = false;
+	}
+	if (isValid) {
+		var a_href = '${pageContext.request.contextPath}';
+		a_href = a_href + "/tt/tt/researcherViewClassReportCard?teacherId=";
+		a_href = a_href + currentTeacher.id;
+		a_href = a_href + "&classId=";
+		a_href = a_href + currentClass;
+		document.getElementById("reportCardLink").href = a_href;
+		document.getElementById("reportCardLink").click();
+	}
+}
 
 $(document).ready(function () {
 	
@@ -394,25 +418,51 @@ $(document).ready(function () {
 });
 
 function openSettingsPane() {
-//	showCohorts();
-// 	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
-//    document.getElementById('classSelect').visibility = "hidden";
+
     clearSettings();
 }
 	
-function clearSettings() {
-		var cohortsDiv = '<label for="cohortList">Select cohort</label> <select name="cohortList" id="cohortList" class="form-control selectpicker" onblur="handleCohortSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;"></select>';  				
-       	document.getElementById('cohortSelect').innerHTML = cohortsDiv;
 	
-     	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
-        document.getElementById('teacherSelect').innerHTML = teachersDiv;
+	
+function clearSettings() {
+	var cohortsDiv = '<label for="cohortList">Select cohort</label> <select name="cohortList" id="cohortList" class="form-control selectpicker" onblur="handleCohortSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;"></select>';  				
+	document.getElementById('cohortSelect').innerHTML = cohortsDiv;
+	currentCohortId = -1;
+	
+ 	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+    document.getElementById('teacherSelect').innerHTML = teachersDiv;
 
-     	var classesDiv = '<label for="classList">Select class</label>';  
-        document.getElementById('classSelect').innerHTML = classesDiv;
+ 	var classesDiv = '<label for="classList">Select class</label>';  
+    document.getElementById('classSelect').innerHTML = classesDiv;
 
-        document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
 
-        showCohorts();
+    showCohorts();
+}
+
+function clearTeachers() {
+
+	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+    document.getElementById('teacherSelect').innerHTML = teachersDiv;
+
+ 	var classesDiv = '<label for="classList">Select class</label>';  
+    document.getElementById('classSelect').innerHTML = classesDiv;
+
+    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+}
+
+
+function gotoSettingsPane() {
+
+ 	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+    document.getElementById('teacherSelect').innerHTML = teachersDiv;
+
+ 	var classesDiv = '<label for="classList">Select class</label>';  
+    document.getElementById('classSelect').innerHTML = classesDiv;
+
+    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+
+    showCohorts();
 }
 
 
@@ -429,7 +479,7 @@ function showCohorts() {
         success : function(data) {
         	cohortsArr = $.parseJSON(data);
         	
-			var cohortIdChecked = 0;
+			var cohortIdCheckedIndex = -1;
         	
         	var cohortsDiv = '<label for="cohortList">Select cohort</label> <select name="cohortList" id="cohortList" class="form-control selectpicker" onblur="handleCohortSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
         	for (var i=0;i<cohortsArr.length;i++) {
@@ -437,24 +487,41 @@ function showCohorts() {
 				var name = "" + cohortsArr[i].cohortName; 
 				var cohortStr = "";
 				if (currentCohortId == cohortsArr[i].cohortId) {
-					cohortIdChecked = cohortsArr[i].cohortId;
+					cohortIdCheckedIndex = i;
 				}
-           		cohortStr = '<option id="cohort' + id + '" value="' + i + "~" + id + '">' + name + '</option>';
+           		cohortStr = '<option id="cohort' + id + '" value="' + i + "~" + id + '" onblur="clearTeachers();">' + name + '</option>';
                	cohortsDiv = cohortsDiv + cohortStr;
             }
 		    cohortsDiv = cohortsDiv + '</select>';  				
            	document.getElementById('cohortSelect').innerHTML = cohortsDiv;
-           	if (cohortIdChecked > 0) {
-           		var foo = "cohort" + cohortIdChecked;
-           		$( "#foo" ).click();
+           	if (cohortIdCheckedIndex >= 0) {
+           		document.getElementById('cohortList').options[cohortIdCheckedIndex].selected = true;  
            	}
-           	
         }
     });
 }   
     
+var tempCohortDateArr = [];
 
-    
+function buildCurrentCohortDateArr() {
+	
+	tempCohortDateArr = [];
+	tempCohortDateArr.push("");
+	var startDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
+//	var temp = startWeek * 7;
+//	var startDate = new Date(addDays(startDate,(temp)));
+	var startDateStr = startDate.toLocaleDateString();
+	tempCohortDateArr.push(startDateStr);
+	
+	for (var i = 1; i < 52; i++) {
+		var tdate = new Date(addDays(startDate,(7*i)));
+		var dateStr = tdate.toLocaleDateString();
+		tempCohortDateArr.push(dateStr);
+	}
+	return tempCohortDateArr;
+	
+}
+  
 
 
 function handleCohortSelect(event) {
@@ -470,7 +537,7 @@ function handleCohortSelect(event) {
    	var msStartDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
    	currentWeekRaw = ((msToday - msStartDate)  / 7);
    	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24)) + 1;
-   	currentWeek = Math.trunc(currentWeekRaw);
+   	currentWeek = Math.ceil(currentWeekRaw);
    	
    	console.log("currentWeek = " + currentWeek);
    	
@@ -479,7 +546,14 @@ function handleCohortSelect(event) {
 	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + "</h3>";
       
     showTeachers();
+
+    currentCohortDateArr = [];
+   	currentCohortDateArr = buildCurrentCohortDateArr();
+
+    
 }
+
+
 
 function showTeachers() {
 	
@@ -1403,25 +1477,28 @@ function showReport5() {
             break;
         }
     }
-	
-	
-    if (document.getElementById('rpt5PriorWeeks').value != "") { 
-   		trendNumberOfUnits = document.getElementById('rpt5PriorWeeks').value;
-    }
-    else {
-   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
-    }
     
-	var startWeek = currentWeek;
+	if (rpt5Weeks == "all") {
+		trendNumberOfUnits = currentWeek - 1;
+		document.getElementById('rpt5PriorWeeks').value = "";
+	}
+	else {     
+	    if (document.getElementById('rpt5PriorWeeks').value != "") { 
+	   		trendNumberOfUnits = document.getElementById('rpt5PriorWeeks').value;
+	    }
+	    else {
+	   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
+	   		document.getElementById('rpt5PriorWeeks').value = document.getElementById('settingsPriorWeeks').value;
+	    }
+	}
+    
+	var startWeek = currentWeek - 1;
     var intNumberOfUnits = Number(trendNumberOfUnits);
     if (intNumberOfUnits < 1) {
     	intNumberOfUnits = 1;
     }
     if (intNumberOfUnits > 1) {
-    	startWeek = currentWeek - intNumberOfUnits;
-    }
-    else {
-    	intNumberOfUnits = intNumberOfUnits - 1;
+    	startWeek = startWeek - intNumberOfUnits;
     }
     	
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
@@ -1700,8 +1777,6 @@ function showReport6() {
 		p2_plot6 = null;
 	}	
 	
-
-	
 	var rpt6Weeks = "";
     const rb6Weeks = document.querySelectorAll('input[name="optRadio6Weeks"]');
 
@@ -1712,24 +1787,27 @@ function showReport6() {
         }
     }
 	
-	
-    if (document.getElementById('rpt6PriorWeeks').value != "") { 
-   		trendNumberOfUnits = document.getElementById('rpt6PriorWeeks').value;
-    }
-    else {
-   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
-    }
+	if (rpt6Weeks == "all") {
+		trendNumberOfUnits = currentWeek - 1;
+		document.getElementById('rpt6PriorWeeks').value = "";
+	}
+	else { 
+	    if (document.getElementById('rpt6PriorWeeks').value != "") { 
+	   		trendNumberOfUnits = document.getElementById('rpt6PriorWeeks').value;
+	    }
+	    else {
+	   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
+	   		trendNumberOfUnits = document.getElementById('rpt6PriorWeeks').value = document.getElementById('settingsPriorWeeks').value;
+	    }
+	}
     
-	var startWeek = currentWeek;
+	var startWeek = currentWeek - 1;
     var intNumberOfUnits = Number(trendNumberOfUnits);
     if (intNumberOfUnits < 1) {
     	intNumberOfUnits = 1;
     }
     if (intNumberOfUnits > 1) {
-    	startWeek = currentWeek - intNumberOfUnits;
-    }
-    else {
-    	intNumberOfUnits = intNumberOfUnits - 1;
+    	startWeek = startWeek - intNumberOfUnits;
     }
     	
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
@@ -2120,16 +2198,16 @@ function createCohortSlice() {
 
 function updateCohortSlice() {
 
-
-
-    $.ajax({
+	var updateCohortFilter = currentCohortDateArr[currentWeek] + "~7~1"
+	
+	$.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
         data : {
             cohortId: currentCohortId,
             command: 'updateAllCohortSlicesTeacherActivity',
             lang: loc,
-            filter: '09/05/2021~7~8'
+            filter: updateCohortFilter
         },
         success : function(data) {
         	if (data) {
@@ -2144,8 +2222,7 @@ function updateCohortSlice() {
             console.log(e);
         }
     });
-    
-
+ 
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
@@ -2153,7 +2230,7 @@ function updateCohortSlice() {
             cohortId: currentCohortId,
             command: 'updateAllCohortClassStudentSlices',
             lang: loc,
-            filter: '09/05/2021~7~8'
+            filter: updateCohortFilter
         },
         success : function(data) {
         	if (data) {
@@ -2167,9 +2244,7 @@ function updateCohortSlice() {
         	alert("error");
             console.log(e);
         }
-    });
-    
-    
+    });    
 }
 
 function updateAllCohortSlices() {
@@ -2222,6 +2297,9 @@ function updateAllCohortSlices() {
         }
     });
     
+
+	var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
+    
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
@@ -2229,7 +2307,7 @@ function updateAllCohortSlices() {
             cohortId: 2,
             command: 'updateAllCohortSlicesTeacherActivity',
             lang: loc,
-            filter: '09/05/2021~7~9'
+            filter: '09/05/2021~7~11'
         },
         success : function(data) {
         	if (data) {
@@ -2253,7 +2331,7 @@ function updateAllCohortSlices() {
             cohortId: 2,
             command: 'updateAllCohortClassStudentSlices',
             lang: loc,
-            filter: '09/05/2021~7~9'
+            filter: '09/05/2021~7~11'
         },
         success : function(data) {
         	if (data) {
@@ -2332,10 +2410,11 @@ function updateAllCohortSlices() {
   <h2>Researcher Workbench</h2>
 
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
-    <li><a data-toggle="tab" href="#Settings" onclick="openSettingsPane();">Settings</a></li>
+    <li class="active"><a data-toggle="tab" href="#home" onclick="openSettingsPane();">Home</a></li>
+    <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();">Settings</a></li>
     <li><a data-toggle="tab" href="#Charts">Charts</a></li>
     <li><a data-toggle="tab" href="#Trends">Trends</a></li>
+    <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" >Class Report Cards</a></li>
     <li><a data-toggle="tab" href="#Tables">Tables</a></li>
     <li><a data-toggle="tab" href="#AdminTools">Admin Tools</a></li>
     <li>
@@ -2398,9 +2477,11 @@ function updateAllCohortSlices() {
 		</div>
 		<br>
 		<div class="row">
+<!--		
 			<button type="recall" class="btn btn-primary col-sm-2 col-sm-offset-2">Recall Settings</button>
 			<button type="save" class="btn btn-primary col-sm-2 col-sm-offset-1">Save Settings</button>
-			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-1" onclick="clearSettings()";">Clear Settings</button>
+-->			
+			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-4" onclick="clearSettings()";">Clear Settings</button>
 		</div>
 	</div>
     <div id="Charts" class="col-sm-12 tab-pane fade">
@@ -2428,7 +2509,7 @@ function updateAllCohortSlices() {
             <br>
         </h1>
 
-        <div class="row">                           
+        <div class="row hidden">                           
 			<div class="form-group  report_filters">
 			    <div class="offset-md-1 col-md-3 pull-left">
 					<label class="radio-inline"><input id="radioChartsWeeksAll"  value="all"  type="radio" name="optRadioChartsWeeks">Show from beginning.</label>
@@ -2763,8 +2844,6 @@ function updateAllCohortSlices() {
 		</div>
     </div>
 
-
-
     <div id="Tables" class="col-sm-12 tab-pane fade">
       <h3>Tables</h3>
       <p>Tabular formats for export</p>
@@ -2780,6 +2859,9 @@ function updateAllCohortSlices() {
 			  </ul>
 			</div>
     </div>
+
+
+
     <div id="AdminTools" class="col-sm-12 tab-pane fade container">
 		<div class="row">
 			<div id="adminCohortName">				
@@ -2790,13 +2872,13 @@ function updateAllCohortSlices() {
             Researcher Admin Tools
         </h1>
 
-        <div id="admin-container" class="container-fluid hidden">
+        <div id="admin-container" class="container-fluid">
 
             <div id="admin-wrapper" class="row" width: 100%;">
 
                 <div class="panel-group" id="adminCommands">
 
-                    <div class="panel panel-default">
+                    <div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
@@ -2817,7 +2899,7 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
+                    <div id="updateWeeklySlices" class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="admin_two" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin2">
@@ -2838,7 +2920,7 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
                     
-                    <div class="panel panel-default">
+                    <div  id="updateAllSlices" class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
@@ -2878,7 +2960,22 @@ function updateAllCohortSlices() {
 		  </div>
 		</div>
     </div>
+
+    <div id="classViews" class="col-sm-12 tab-pane fade">
+      <h3>Tables</h3>
+      <p>View report card</p>
+			<div class="dropdown">
+			  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select View
+			  <span class="caret"></span></button>
+			  <ul class="dropdown-menu">
+			    <li onclick="launchReportCard();"><a id="reportCardLink"</a>Class Report Card</li>
+			  </ul>
+			</div>
+    </div>
+
   </div>
+
+
 </div>
 
 <div id="calendarModalPopupOne" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
