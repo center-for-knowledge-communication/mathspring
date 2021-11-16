@@ -1122,9 +1122,9 @@ public class TTMiscServiceImpl implements TTMiscService {
                	int nbr_problems_seen = getClassProblemsSeen(conn, classId, tsFromDate,tsToDate);
                	int nbr_problems_solved = getClassProblemsSolved(conn, classId, tsFromDate,tsToDate);
                	int nbr_active_students = getClassActiveStudentCount(conn, classId, tsFromDate,tsToDate);
-               	if ((nbr_problems_seen + nbr_problems_solved) > 0) {
+//               	if ((nbr_problems_seen + nbr_problems_solved) > 0) {
                		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, classId, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students);
-               	}
+//               	}
 	            tsFromDate=xDaysFromStartDate(tsFromDate,intDuration);    	
 		        tsToDate=xDaysFromStartDate(tsFromDate,intDuration);    	
 
@@ -1288,7 +1288,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 //    	for (int week_nbr = startWeek;week_nbr<=(startWeek+weeksToReport);week_nbr++) {
 //       	for (int week_nbr = weeksToReport;week_nbr>0;week_nbr--) {
     	
-       	for (int week_nbr = startWeek; week_nbr <= startWeek+weeksToReport;week_nbr++) {
+       	for (int week_nbr = startWeek; week_nbr < startWeek+weeksToReport;week_nbr++) {
     		    	
 	    	ResultSet rs = null;
 	        PreparedStatement stmt = null;
@@ -1351,7 +1351,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 //    	for (int week_nbr = startWeek;week_nbr<=(startWeek+weeksToReport);week_nbr++) {
 //       	for (int week_nbr = weeksToReport;week_nbr>0;week_nbr--) {
     	
-       	for (int week_nbr = startWeek; week_nbr <= startWeek+weeksToReport;week_nbr++) {
+       	for (int week_nbr = startWeek; week_nbr < startWeek+weeksToReport;week_nbr++) {
     		    	
 	    	ResultSet rs = null;
 	        PreparedStatement stmt = null;
