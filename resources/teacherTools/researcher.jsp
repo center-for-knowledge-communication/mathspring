@@ -9,7 +9,7 @@
 
 
 
-I think we are most likely to want to see the last 1,2,3 or 4 weeks (or month), but also "from the start" (or maybe "all semester").
+I think we are most likely to want to see the last 1,2,3 or 4 weeks (or month), but also "from the start"currentCohortId (or maybe "all semester").
 That seems better than picking a date. So I would suggest  [ ] Show for prior _____ weeks, or [ ] Show from beginning.
 Where the "[ ]" is a check box you select, and the "_______" is a multi-choice (or type in?) with numbers 1...10 
 
@@ -186,7 +186,7 @@ var trendDate = '7';
 var trendUnit = "week";
 var trendNumberOfUnits = "1";
 
-const currentTeacher = new Object();
+var currentTeacher = new Object();
 var currentClass = "";
 
 var currentWeek = 1;
@@ -449,6 +449,10 @@ function clearTeachers() {
     document.getElementById('classSelect').innerHTML = classesDiv;
 
     document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('trendsTeacherName').innerHTML = "";
+    
+    document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
+
 }
 
 
@@ -461,6 +465,7 @@ function gotoSettingsPane() {
     document.getElementById('classSelect').innerHTML = classesDiv;
 
     document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('trendsTeacherName').innerHTML = "";
 
     showCohorts();
 }
@@ -557,6 +562,8 @@ function handleCohortSelect(event) {
 
 function showTeachers() {
 	
+    currentTeacher.id = "0";
+    currentTeacher.username = "";
 	var teacherArr = allCohortsArr[currentCohortIndex];    	
  	var teachersDiv = '<label for="teacherList">Select teacher</label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
 
@@ -572,7 +579,7 @@ function showTeachers() {
 	}
    	teachersDiv = teachersDiv + '</select>';  				
     document.getElementById('teacherSelect').innerHTML = teachersDiv;
-//    document.getElementById('teacherSelect').visibility = "visible";
+    document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
         	
 }
 
@@ -584,7 +591,9 @@ function handleTeacherSelect(event) {
     currentTeacher.id = splitter[0];
     currentTeacher.username = splitter[1];
     document.getElementById('chartUsername').innerHTML = "<h3>" + currentTeacher.username + "</h3>";
-
+    document.getElementById('trendsTeacherName').innerHTML = "<h3>" + currentTeacher.username + "</h3>";
+    document.getElementById('rpt5PopulateSelect').style.visibility = 'visible';
+    
     showClasses();
 }
 
@@ -608,7 +617,7 @@ function showClasses() {
 	}
     classesDiv = classesDiv + '</select>';  				
     document.getElementById('classSelect').innerHTML = classesDiv;
-//    document.getElementById('classSelect').visibility = "visible";
+//    document.getElementById('classSelect').style.visibility = "visible";
         	
     console.log(classesDiv);
 }
@@ -1416,25 +1425,25 @@ function showReport_tcs() {
 
 
 
-var usernameXref = [];
-var usernameStrXref = [];
+var rpt5usernameXref = [];
+var rpt5usernameStrXref = [];
 
-function mapUsernameIndex(index,username){
+function rpt5mapUsernameIndex(index,username){
 
-	if (usernameXref.length == 0) {
-		usernameXref.push(index);
-		usernameStrXref.push(username);
+	if (rpt5usernameXref.length == 0) {
+		rpt5usernameXref.push(index);
+		rpt5usernameStrXref.push(username);
 		return 0;
 	}
 	else {
-		for (var i=0; i<usernameXref.length; i++) {
-			if (usernameXref[i] == index) {
+		for (var i=0; i<rpt5usernameXref.length; i++) {
+			if (rpt5usernameXref[i] == index) {
 				return i;
 			}
 			else {
-				if (i == (usernameXref.length - 1))	{			
-					usernameXref.push(index);
-					usernameStrXref.push(username);
+				if (i == (rpt5usernameXref.length - 1))	{			
+					rpt5usernameXref.push(index);
+					rpt5usernameStrXref.push(username);
 					return (i+1);
 				}
 			}
@@ -1442,24 +1451,79 @@ function mapUsernameIndex(index,username){
 	}
 }
 
-function getUsernameIndex(username) {
+function rpt5getUsernameIndex(username) {
 
 	var teacherArr = allCohortsArr[currentCohortIndex].cohortArr;    	
 
 	for (var i=0;i<teacherArr.length;i++) {
+
 		if (teacherArr[i].userName === username) {			
-			return mapUsernameIndex(i,username);
+			return rpt5mapUsernameIndex(i,username);
 		}
 	}
 	return -1;
 	
 }
 
+var rpt5Populate = "ShowAll";
+
+function rpt5getUsernameDisplay(index) {
+
+	if (rpt5Populate == "showSingleWithAnonymous") {
+		for (var i=0;i<8;i++) {		
+			if (rpt5usernameStrXref[index] === currentTeacher.username) {
+				
+				rpt5Colors[index] = msTeacherColors[index];
+				return currentTeacher.username;
+			}
+		}
+		return("XXXXXXXX");
+	}
+	else {
+		return rpt5usernameStrXref[index];
+	}
+	
+}
+
+var msTeacherColors = ['#FF0000','#FFFF00','#0000FF','#999966','#008B8B','#FFA500','#4B0082','#008000','#ff99cc','#00ffcc'];
+
+var greyTeacherColors = ['#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
+
+var rpt5Colors = [];
+
+function getrpt5Colors() {
+	return rpt5Colors;
+}
+
+
 
 function showReport5() {
 
-	usernameXref = [];
-	usernameStrXref = [];
+	rpt5Colors = [];
+
+    const rb5Populate = document.querySelectorAll('input[name="optRadio5Populate"]');
+
+    for (const rb5p of rb5Populate) {
+        if (rb5p.checked) {
+        	rpt5Populate = rb5p.value;
+            break;
+        }
+    }
+	
+	switch(rpt5Populate) {
+		case "showSingleWithAnonymous":
+			rpt5Colors = Array.from(greyTeacherColors);
+			break;
+		case "showSingleOnly":
+			rpt5Colors = Array.from(msTeacherColors);		
+			break;
+		default:
+			rpt5Colors = Array.from(msTeacherColors);		
+		}
+	
+	
+	rpt5usernameXref = [];
+	rpt5usernameStrXref = [];
 	var trendUnit = 7; 
 
 	
@@ -1502,7 +1566,12 @@ function showReport5() {
     }
     	
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
-	
+	var teacherFilter = "";
+	if (!(currentTeacher.id === "0")) {
+		trendFilter += "~" + currentTeacher.id;
+		trendFilter += "~" + rpt5Populate;
+	}
+
 	var dateArr = [];
 	dateArr.push("");
 	var startDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
@@ -1550,11 +1619,6 @@ function showReport5() {
 			rpt5Title = 'Weekly Teachers Logins'							
   		}
 	
-	//	var date = addDays(trendDate,7);
-	
-//	alert(trendFilter);
-	
-	document.getElementById('trendLoader').visibility = "visible";
 
     $.ajax({
         type : "POST",
@@ -1566,7 +1630,6 @@ function showReport5() {
             filter: trendFilter
         },
         success : function(data) {
-        	document.getElementById('trendLoader').visibility = "hidden";
         	
         	if (data && (data.charAt(0) == '[')) {
             	//alert(data);
@@ -1588,9 +1651,10 @@ function showReport5() {
         	  var teacher7 = [];
         	  var teacher8 = [];
         	  var teacher9 = [];
+        	  var teacher10 = [];
 
 
-        	  var teachers = [teacher0, teacher1, teacher2, teacher3, teacher4, teacher5, teacher6, teacher7, teacher8, teacher9];
+        	  var teachers = [teacher0, teacher1, teacher2, teacher3, teacher4, teacher5, teacher6, teacher7, teacher8, teacher9, teacher10];
         	  var teachersFound = [];
         	  
         	  for (var w=0; w < jsonWeekArr.length; w++ ) {
@@ -1610,7 +1674,7 @@ function showReport5() {
     						default:
     				  			count = jsonWeekArr[w][weekName][i].logins;							
     				  		}
-    						var username = jsonWeekArr[w][weekName][i].username;
+    				  		var username = jsonWeekArr[w][weekName][i].username;
     						var week_date = jsonWeekArr[w][weekName][i].week_date;
     						if (w == 0) {
     							startDateStr = week_date;
@@ -1618,7 +1682,7 @@ function showReport5() {
     						else {
     							endDateStr  = week_date;
     						}
-     		  		  	    var index = getUsernameIndex(username);
+     		  		  	    var index = rpt5getUsernameIndex(username);
      		  		  	    if (index >= 0) {
     				  			teachers[index].push([week_date, count]);
     						}
@@ -1628,7 +1692,7 @@ function showReport5() {
     				  }
     			  }        		  
         	  }
-			  for (var t = 0; t<usernameXref.length; t++) {
+			  for (var t = 0; t<rpt5usernameXref.length; t++) {
 				  teachersFound.push(teachers[t]);
 			  }
 			  var canvas_width = jsonWeekArr.length * 80;
@@ -1684,63 +1748,70 @@ function showReport5() {
         	    	},
         	      // Series options are specified as an array of objects, one object
         	      // for each series.
+				  seriesColors: getrpt5Colors(),
         	      series:[ 
         	          {
         	            // Change our line width and use a diamond shaped marker.
-        	            label: usernameStrXref[0],
+        	            label: rpt5getUsernameDisplay(0),
         	            lineWidth:3, 
         	            markerOptions: { style:'circle' }
         	          }, 
         	          {
         	            // Don't show a line, just show markers.
         	            // Make the markers 7 pixels with an 'x' style
-        	            label: usernameStrXref[1],
+        	            label: rpt5getUsernameDisplay(1),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
         	            // Use (open) circlular markers.
-        	            label: usernameStrXref[2],
+        	            label: rpt5getUsernameDisplay(2),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          }, 
         	          {
         	            // Use a thicker, 5 pixel line and 10 pixel
         	            // filled square markers.
-        	            label: usernameStrXref[3],
+        	            label: rpt5getUsernameDisplay(3),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[4],
+        	            label: rpt5getUsernameDisplay(4),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[5],
+        	            label: rpt5getUsernameDisplay(5),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[6],
+        	            label: rpt5getUsernameDisplay(6),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[7],
+        	            label: rpt5getUsernameDisplay(7),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          },
         	          { 
             	            // Use (open) circlular markers.
-          	            label: usernameStrXref[8],
-            	            lineWidth:3, 
-            	            markerOptions: { style:"circle" }
-            	          }
+          	            label: rpt5getUsernameDisplay(8),
+            	        lineWidth:3, 
+            	        markerOptions: { style:"circle" }
+            	      },
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: rpt5getUsernameDisplay(9),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }
         	          
         	      ]
         	    }
@@ -1760,10 +1831,100 @@ function showReport5() {
 	   	
 }
 
-function showReport6() {
+var rpt6usernameXref = [];
+var rpt6usernameStrXref = [];
 
-	usernameXref = [];
-	usernameStrXref = [];
+function rpt6mapUsernameIndex(index,username){
+
+	if (rpt6usernameXref.length == 0) {
+		rpt6usernameXref.push(index);
+		rpt6usernameStrXref.push(username);
+		return 0;
+	}
+	else {
+		for (var i=0; i<rpt6usernameXref.length; i++) {
+			if (rpt6usernameXref[i] == index) {
+				return i;
+			}
+			else {
+				if (i == (rpt6usernameXref.length - 1))	{			
+					rpt6usernameXref.push(index);
+					rpt6usernameStrXref.push(username);
+					return (i+1);
+				}
+			}
+		}
+	}
+}
+
+function rpt6getUsernameIndex(username) {
+
+	var teacherArr = allCohortsArr[currentCohortIndex].cohortArr;    	
+
+	for (var i=0;i<teacherArr.length;i++) {
+
+		if (teacherArr[i].userName === username) {			
+			return rpt6mapUsernameIndex(i,username);
+		}
+	}
+	return -1;
+	
+}
+
+var rpt6Populate = "ShowAll";
+
+function rpt6getUsernameDisplay(index) {
+
+	if (rpt6Populate == "showSingleWithAnonymous") {
+		for (var i=0;i<8;i++) {		
+			if (rpt6usernameStrXref[index] === currentTeacher.username) {
+				
+				rpt6Colors[index] = msTeacherColors[index];
+				return currentTeacher.username;
+			}
+		}
+		return("XXXXXXXX");
+	}
+	else {
+		return rpt6usernameStrXref[index];
+	}
+	
+}
+
+var rpt6Colors = [];
+
+function getrpt6Colors() {
+	return rpt6Colors;
+}
+
+
+
+function showReport6() {
+	
+	rpt6Colors = [];
+
+    const rb6Populate = document.querySelectorAll('input[name="optRadio6Populate"]');
+
+    for (const rb6p of rb6Populate) {
+        if (rb6p.checked) {
+        	rpt6Populate = rb6p.value;
+            break;
+        }
+    }
+	
+	switch(rpt6Populate) {
+		case "showSingleWithAnonymous":
+			rpt6Colors = Array.from(greyTeacherColors);
+			break;
+		case "showSingleOnly":
+			rpt6Colors = Array.from(msTeacherColors);		
+			break;
+		default:
+			rpt6Colors = Array.from(msTeacherColors);		
+		}
+	
+	rpt6usernameXref = [];
+	rpt6usernameStrXref = [];
 	var trendUnit = 7; 
 
 	
@@ -1811,6 +1972,12 @@ function showReport6() {
     }
     	
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
+	var teacherFilter = "";
+	if (!(currentTeacher.id === "0")) {
+		trendFilter += "~" + currentTeacher.id;
+		trendFilter += "~" + rpt6Populate;
+	}
+
 	
 	var dateArr = [];
 	dateArr.push("");
@@ -1847,7 +2014,6 @@ function showReport6() {
     }
 
 	
-	document.getElementById('trendLoader').visibility = "visible";
 	
     $.ajax({
         type : "POST",
@@ -1859,7 +2025,6 @@ function showReport6() {
             filter: trendFilter
         },
         success : function(data) {
-        	document.getElementById('trendLoader').visibility = "hidden";
         	if (data && (data.charAt(0) == '[')) {
             	//alert(data);
             	jsonRangeData = $.parseJSON(data);
@@ -1880,9 +2045,10 @@ function showReport6() {
         	  var p1_teacher7 = [];
         	  var p1_teacher8 = [];
         	  var p1_teacher9 = [];
+        	  var p1_teacher10 = [];
 
 
-        	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9];
+        	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9, p1_teacher10];
         	  var p1_teachersFound = [];
 
         	  var p2_teacher0 = [];
@@ -1895,9 +2061,10 @@ function showReport6() {
         	  var p2_teacher7 = [];
         	  var p2_teacher8 = [];
         	  var p2_teacher9 = [];
+        	  var p2_teacher10 = [];
 
 
-        	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9];
+        	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9, p2_teacher10];
         	  var p2_teachersFound = [];
         	  
         	  for (var w=0; w < jsonWeekArr.length; w++ ) {
@@ -1914,7 +2081,7 @@ function showReport6() {
     						else {
     							endDateStr  = week_date;
     						}
-     		  		  	    var index = getUsernameIndex(username);
+     		  		  	    var index = rpt6getUsernameIndex(username);
      		  		  	    if (index >= 0) {
     				  			p1_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_seen]);
     				  			p2_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_solved]);
@@ -1926,7 +2093,7 @@ function showReport6() {
     			  }        		  
         	  }
 
-        	  for (var t = 0; t<usernameXref.length; t++) {
+        	  for (var t = 0; t<rpt6usernameXref.length; t++) {
 				  p1_teachersFound.push(p1_teachers[t]);
 				  p2_teachersFound.push(p2_teachers[t]);
 			  }
@@ -1983,63 +2150,70 @@ function showReport6() {
         	    	},
         	      // Series options are specified as an array of objects, one object
         	      // for each series.
-        	      series:[ 
+				  seriesColors: getrpt6Colors(),
+				  series:[ 
         	          {
         	            // Change our line width and use a diamond shaped marker.
-        	            label: usernameStrXref[0],
+        	            label: rpt6getUsernameDisplay(0),
         	            lineWidth:3, 
         	            markerOptions: { style:'circle' }
         	          }, 
         	          {
         	            // Don't show a line, just show markers.
         	            // Make the markers 7 pixels with an 'x' style
-        	            label: usernameStrXref[1],
+        	            label: rpt6getUsernameDisplay(1),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
         	            // Use (open) circlular markers.
-        	            label: usernameStrXref[2],
+        	            label: rpt6getUsernameDisplay(2),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          }, 
         	          {
         	            // Use a thicker, 5 pixel line and 10 pixel
         	            // filled square markers.
-        	            label: usernameStrXref[3],
+        	            label: rpt6getUsernameDisplay(3),
         	            lineWidth:3, 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[4],
+        	            label: rpt6getUsernameDisplay(4),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[5],
+        	            label: rpt6getUsernameDisplay(5),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[6],
+        	            label: rpt6getUsernameDisplay(6),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
-        	            label: usernameStrXref[7],
+        	            label: rpt6getUsernameDisplay(7),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
           	          },
         	          { 
-            	            // Use (open) circlular markers.
-          	            label: usernameStrXref[8],
-            	            lineWidth:3, 
-            	            markerOptions: { style:"circle" }
-            	          }
+          	            // Use (open) circlular markers.
+        	            label: rpt6getUsernameDisplay(8),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	      	  },
+        	          { 
+          	            // Use (open) circlular markers.
+        	            label: rpt6getUsernameDisplay(9),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }
         	          
         	      ]
         	    }
@@ -2089,63 +2263,70 @@ function showReport6() {
               	    	},
               	      // Series options are specified as an array of objects, one object
               	      // for each series.
+              	      seriesColors: getrpt6Colors(),
               	      series:[ 
               	          {
               	            // Change our line width and use a diamond shaped marker.
-              	            label: usernameStrXref[0],
+              	            label: rpt6getUsernameDisplay(0),
               	            lineWidth:3, 
               	            markerOptions: { style:'circle' }
               	          }, 
               	          {
               	            // Don't show a line, just show markers.
               	            // Make the markers 7 pixels with an 'x' style
-              	            label: usernameStrXref[1],
+              	            label: rpt6getUsernameDisplay(1),
               	            lineWidth:3, 
               	            markerOptions: { style:"circle" }
               	          },
               	          { 
               	            // Use (open) circlular markers.
-              	            label: usernameStrXref[2],
+              	            label: rpt6getUsernameDisplay(2),
               	            lineWidth:3, 
               	            markerOptions: { style:"circle" }
               	          }, 
               	          {
               	            // Use a thicker, 5 pixel line and 10 pixel
               	            // filled square markers.
-              	            label: usernameStrXref[3],
+              	            label: rpt6getUsernameDisplay(3),
               	            lineWidth:3, 
               	            markerOptions: { style:"circle" }
               	          },
               	          { 
                 	            // Use (open) circlular markers.
-              	            label: usernameStrXref[4],
+              	            label: rpt6getUsernameDisplay(4),
                 	            lineWidth:3, 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
-              	            label: usernameStrXref[5],
+              	            label: rpt6getUsernameDisplay(5),
                 	            lineWidth:3, 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
-              	            label: usernameStrXref[6],
+              	            label: rpt6getUsernameDisplay(6),
                 	            lineWidth:3, 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
-              	            label: usernameStrXref[7],
-                	            lineWidth:3, 
-                	            markerOptions: { style:"circle" }
-                	          },
-              	          { 
-                  	            // Use (open) circlular markers.
-                	            label: usernameStrXref[8],
-                  	            lineWidth:3, 
-                  	            markerOptions: { style:"circle" }
-                  	          }
+              	            label: rpt6getUsernameDisplay(7),
+                	        lineWidth:3, 
+                	        markerOptions: { style:"circle" }
+                	      },
+                  	      { 
+                    	        // Use (open) circlular markers.
+                  	        label: rpt6getUsernameDisplay(8),
+                    	        lineWidth:3, 
+                    	        markerOptions: { style:"circle" }
+                    	  },
+                  	      { 
+                    	        // Use (open) circlular markers.
+                  	        label: rpt6getUsernameDisplay(9),
+                    	    lineWidth:3, 
+                    	    markerOptions: { style:"circle" }
+                    	  }
               	          
               	      ]
               	    }
@@ -2249,104 +2430,128 @@ function updateCohortSlice() {
 
 function updateAllCohortSlices() {
 
+	if (currentCohortId < 0) {	
+		alert("must select a cohort");
+		return;
+	}
+	
+	
+    $('#admin3').find('.loader').show();
+	
+	if (currentCohortId == "1") {
+		
+//		if (cohortsArr[currentCohortIndex].cohortEnddate != null) {		
+//			alert(cohortsArr[currentCohortIndex].cohortName +  " has ended.  No more updates allowed.");
+//			return;
+//		}
 
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: 1,
-            command: 'updateAllCohortSlicesTeacherActivity',
-            lang: loc,
-            filter: '08/04/2020~7~34'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
+		$('#admin3').find('.loader').show();
+	
+	    $.ajax({
+	        type : "POST",
+	        url : pgContext+"/tt/tt/cohortAdmin",
+	        data : {
+	            cohortId: 1,
+	            command: 'updateAllCohortSlicesTeacherActivity',
+	            lang: loc,
+	            filter: '08/04/2020~7~34'
+	        },
+	        success : function(data) {
+	        	if (data) {
+	            	alert(data);
+	        	}
+	        	else {
+	        		alert("response data is null");
+	        	}
+	    	    $.ajax({
+	    	        type : "POST",
+	    	        url : pgContext+"/tt/tt/cohortAdmin",
+	    	        data : {
+	    	            cohortId: 1,
+	    	            command: 'updateAllCohortClassStudentSlices',
+	    	            lang: loc,
+	    	            filter: '08/04/2020~7~34'
+	    	        },
+	    	        success : function(data) {
+	    	        	$('#admin3').find('.loader').hide();
+	    	        	if (data) {
+	    	            	alert(data);
+	    	        	}
+	    	        	else {
+	    	        		alert("response data is null");
+	    	        	}
+	    	        },
+	    	        error : function(e) {
+	    	        	$('#admin3').find('.loader').hide();
+	    	        	alert("error");
+	    	            console.log(e);
+	    	        }
+	    	    });
+	        },
+	        error : function(e) {
+	        	$('#admin3').find('.loader').hide();
+	        	alert("error");
+	            console.log(e);
+	        }
+	    });
+	    
+	}
 
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: 1,
-            command: 'updateAllCohortClassStudentSlices',
-            lang: loc,
-            filter: '08/04/2020~7~34'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
-
-	var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
-    
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: 2,
-            command: 'updateAllCohortSlicesTeacherActivity',
-            lang: loc,
-            filter: '09/05/2021~7~11'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
-
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: 2,
-            command: 'updateAllCohortClassStudentSlices',
-            lang: loc,
-            filter: '09/05/2021~7~11'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
+	if (currentCohortId == "2") {
+	
+		var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
+	    
+		$('#admin3').find('.loader').show();
+	    $.ajax({
+	        type : "POST",
+	        url : pgContext+"/tt/tt/cohortAdmin",
+	        data : {
+	            cohortId: 2,
+	            command: 'updateAllCohortSlicesTeacherActivity',
+	            lang: loc,
+	            filter: updateCohortFilter
+	        },
+	        success : function(data) {
+	        	if (data) {
+	            	alert(data);
+	        	    $.ajax({
+	        	        type : "POST",
+	        	        url : pgContext+"/tt/tt/cohortAdmin",
+	        	        data : {
+	        	            cohortId: 2,
+	        	            command: 'updateAllCohortClassStudentSlices',
+	        	            lang: loc,
+	        	            filter: updateCohortFilter
+	        	        },
+	        	        success : function(data) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	if (data) {
+	        	            	alert(data);
+	        	        	}
+	        	        	else {
+	        	        		alert("response data is null");
+	        	        	}
+	        	        },
+	        	        error : function(e) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	alert("error");
+	        	            console.log(e);
+	        	        }
+	        	    });
+	        	}
+	        	else {
+	        		alert("response data is null");
+	        	}
+	        },
+	        error : function(e) {
+	        	$('#admin3').find('.loader').hide();
+	        	alert("error");
+	            console.log(e);
+	        }
+	    });
+	    
+	
+	}    
 
 }
 /*
@@ -2457,7 +2662,7 @@ function updateAllCohortSlices() {
 						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked>Show [X] prior weeks.</label>
 				    </div>
 				    <div class="offset-md-1 col-md-2 pull-left">
-						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="settingsPriorWeeks">
+						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="settingsPriorWeeks" value="4">
 				    </div>
 				</div>
 			</div>			
@@ -2484,7 +2689,15 @@ function updateAllCohortSlices() {
 			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-4" onclick="clearSettings()";">Clear Settings</button>
 		</div>
 	</div>
+	
+	
+	
+	
     <div id="Charts" class="col-sm-12 tab-pane fade">
+        <h1 class="page-header">
+            Teacher Activity Reports
+            <br>
+        </h1>
 		<div class="row">
 			<div id="chartsCohortName">				
 			</div>
@@ -2504,10 +2717,6 @@ function updateAllCohortSlices() {
 		</div>	
 		<br>
 -->		
-        <h1 class="page-header">
-            Teacher Activity Reports
-            <br>
-        </h1>
 
         <div class="row hidden">                           
 			<div class="form-group  report_filters">
@@ -2701,16 +2910,18 @@ function updateAllCohortSlices() {
 
 
     <div id="Trends" class="col-sm-12 tab-pane fade container">
+        <h1 class="page-header">
+            Teacher Activity Trends
+            <br>
+        </h1>
 		<div class="row">
 			<div id="trendsCohortName">				
 			</div>
 			<div id="trendsCohortWeeks">				
 			</div>
+			<div id="trendsTeacherName">				
+			</div>
 		</div>
-        <h1 class="page-header">
-            Teacher Activity Trends
-            <br>
-        </h1>
 <!--         
 		<div class="row justify-content-start report_filters">
 			<br>
@@ -2744,11 +2955,7 @@ function updateAllCohortSlices() {
 
             <div id="trends-wrapper" class="row" width: 100%;">
 
-                <div id="trendLoader" class="loader" style="display: none"></div>
                 <div class="panel-group" id="trendsGroup">
-                  
-
-                    
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -2775,11 +2982,18 @@ function updateAllCohortSlices() {
 								</div>
 								<br>
                             	<div class="row">                           
-								<div class="form-group">
-									<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
-									<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
-									<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
-								</div>
+									<div class="form-group">
+										<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
+										<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
+										<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
+									</div>
+								</div>                            
+                            	<div id="rpt5PopulateSelect" class="row">      
+									<div class="form-group">
+										<label class="radio-inline"><input id="radio5ShowAll"                  value="showAll"                 type="radio" name="optRadio5Populate" checked>Show All</label>
+										<label class="radio-inline"><input id="radio5ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio5Populate">Show Single Only</label>
+										<label class="radio-inline"><input id="radio5ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio5Populate">Show Single With Anonymous</label>
+									</div>
 								</div>
                             </div>
                             <div class="panel-body report_filters">                           
@@ -2820,12 +3034,20 @@ function updateAllCohortSlices() {
 								</div>
 								<br>
                             	<div class="row">                           
-								<div class="form-group hidden">
-									<label class="radio-inline"><input id="radioProblemsSeen"  value="ProblemsSeen" type="radio" name="optRadio6Content" checked>Problems Seen</label>
-									<label class="radio-inline"><input id="radioProblemsSolved" value="ProblemsSolved" type="radio" name="optRadio6Content">Problems Solved</label>
-								</div>
+									<div class="form-group hidden">
+										<label class="radio-inline"><input id="radioProblemsSeen"  value="ProblemsSeen" type="radio" name="optRadio6Content" checked>Problems Seen</label>
+										<label class="radio-inline"><input id="radioProblemsSolved" value="ProblemsSolved" type="radio" name="optRadio6Content">Problems Solved</label>
+									</div>
+								</div>                           
+                            	<div class="row">      
+									<div class="form-group">
+										<label class="radio-inline"><input id="radio6ShowAll"                  value="showAll"                 type="radio" name="optRadio6Populate" checked>Show All</label>
+										<label class="radio-inline"><input id="radio6ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio6Populate">Show Single Only</label>
+										<label class="radio-inline"><input id="radio6ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio6Populate">Show Single With Anonymous</label>
+									</div>
 								</div>
                             </div>
+                            
                             <div class="panel-body report_filters">                           
 								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="<%= rb.getString("show_report") %>">
                             </div>
@@ -2836,13 +3058,12 @@ function updateAllCohortSlices() {
 			            		<br>
 			            		<div id="chart6_canvas2" style="width:1200px; height:400px;overflow-x: auto;"></div>
                             </div>
-
                         </div>
                     </div>
             	</div>
         	</div>
 		</div>
-    </div>
+	</div>
 
     <div id="Tables" class="col-sm-12 tab-pane fade">
       <h3>Tables</h3>
@@ -2867,7 +3088,6 @@ function updateAllCohortSlices() {
 			<div id="adminCohortName">				
 			</div>
 		</div>			
-		<br>
         <h1 class="page-header">
             Researcher Admin Tools
         </h1>
@@ -2878,7 +3098,7 @@ function updateAllCohortSlices() {
 
                 <div class="panel-group" id="adminCommands">
 
-                    <div class="panel panel-default hidden">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
@@ -2899,7 +3119,7 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
                     
-                    <div id="updateWeeklySlices" class="panel panel-default">
+                    <div id="updateWeeklySlices" class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="admin_two" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin2">
@@ -2933,9 +3153,12 @@ function updateAllCohortSlices() {
                             <div class="panel-body report_filters">                           
 								  <input id="admin3Btn" class="btn btn-lg btn-primary" onclick="updateAllCohortSlices();" type="submit" value="<%= rb.getString("submit") %>">
                             </div>
+                            <div class="loader" style="display: none"></div>
  
                             <div class="panel-body">
-                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
+                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%">
+
+                                </div>
                             </div>
 
                         </div>
@@ -2947,11 +3170,11 @@ function updateAllCohortSlices() {
 		</div>
   </div>
     <div id="Notifications" class="col-sm-12 tab-pane fade">
-      <h3>Admin Tools</h3>
+      <h3>Notifications</h3>
       <p>Tools used to support Mathspring</p>
 		<div class="dropdown">
 		  <button type="button" class="btn btn-basic dropdown-toggle" data-toggle="dropdown">
-		    Administrator Tools
+		    Notification Tools
 		  </button>
 		  <div class="dropdown-menu">
 		    <a class="dropdown-item" href="#">Modify MS Global settings</a><br>

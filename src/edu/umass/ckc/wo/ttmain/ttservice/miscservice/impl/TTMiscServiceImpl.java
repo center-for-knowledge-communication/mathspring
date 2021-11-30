@@ -294,7 +294,9 @@ public class TTMiscServiceImpl implements TTMiscService {
         boolean first = true;
     	try {
         	Connection conn = connection.getConnection();
-        	String q = "select distinct tch.ID as teacherId, tch.userName as uname, cls.ID as classId from class as cls, teacher as tch,  teacher_map_cohorts where tch.ID = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? and cls.teacherId = tch.ID order by tch.ID;";
+        	String q = "select distinct tch.ID as teacherId, tch.userName as uname, cls.ID as classId, coh.schoolYear as schoolYear from class as cls, teacher as tch,  teacher_map_cohorts as tmc, research_cohort as coh where tch.ID = tmc.teacherid and tmc.researchcohortid = ? and cls.teacherId = tch.ID and coh.researchcohortid = tmc.researchcohortid and coh.schoolYear = cls.schoolYear order by tch.ID;";
+
+        	//String q = "select distinct tch.ID as teacherId, tch.userName as uname, cls.ID as classId from class as cls, teacher as tch,  teacher_map_cohorts where tch.ID = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? and cls.teacherId = tch.ID order by tch.ID;";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
             rs = stmt.executeQuery();
@@ -305,7 +307,7 @@ public class TTMiscServiceImpl implements TTMiscService {
             	else {
             		first = false;
             	}
-            	String line = String.valueOf(rs.getInt("teacherId")) + "~" + String.valueOf(rs.getString("uname")) + "~" + String.valueOf(rs.getInt("classId"));
+            	String line = String.valueOf(rs.getInt("teacherId")) + "~" + String.valueOf(rs.getString("uname")) + "~" + String.valueOf(rs.getInt("classId")) + "~" + String.valueOf(rs.getInt("schoolYear"));
             	teacherClasses += line;
     		}
             return teacherClasses;    	
@@ -327,7 +329,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         PreparedStatement stmt=null;
     	try {
         	Connection conn = connection.getConnection();
-        	String q = "select distinct tmc.researchcohortid as cohortId, coh.name as cohortName, coh.startdate as startdate  from teacher_map_cohorts tmc INNER JOIN research_cohort as coh ON tmc.researchcohortid=coh.researchcohortid  order by tmc.researchcohortid asc;";
+        	String q = "select distinct tmc.researchcohortid as cohortId, coh.name as cohortName, coh.startdate as startdate, coh.enddate as enddate from teacher_map_cohorts tmc INNER JOIN research_cohort as coh ON tmc.researchcohortid=coh.researchcohortid  order by tmc.researchcohortid asc;";
         	stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
         	JSONArray cohortsArr = new JSONArray();
@@ -336,6 +338,7 @@ public class TTMiscServiceImpl implements TTMiscService {
                 cohortJson.put("cohortId", rs.getInt("cohortId"));
                 cohortJson.put("cohortName", rs.getString("cohortName"));
                 cohortJson.put("cohortStartdate", rs.getString("startdate"));
+                cohortJson.put("cohortEnddate", rs.getString("enddate"));
    	            cohortsArr.add(cohortJson);       	            
             }            
             stmt.close();
@@ -1055,24 +1058,25 @@ public class TTMiscServiceImpl implements TTMiscService {
     }
 
 
-    public String insertCohorClassStudentSlice(Connection conn, int cohortId, int teacherId, String uname, int classId, Timestamp week_startdate, int week_nbr, int nbr_problems_solved, int nbr_problems_seen, int nbr_active_students) throws SQLException {
+    public String insertCohorClassStudentSlice(Connection conn, int cohortId, int teacherId, String uname, int classId, int schoolYear, Timestamp week_startdate, int week_nbr, int nbr_problems_solved, int nbr_problems_seen, int nbr_active_students) throws SQLException {
     	
     	int result = 0;
     	String resultMessage = "Success";
         PreparedStatement stmt = null;
         try {
-            String q = "INSERT into teacher_class_slices (cohortId,teacherId,teacherUsername,classId, week_startdate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students) VALUES (?,?,?,?,?,?,?,?,?);";
+            String q = "INSERT into teacher_class_slices (cohortId,teacherId,teacherUsername,classId, schoolYear, week_startdate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students) VALUES (?,?,?,?,?,?,?,?,?,?);";
 
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
             stmt.setInt(2, teacherId);
             stmt.setString(3,uname);
             stmt.setInt(4, classId);
-            stmt.setTimestamp(5, week_startdate);
-            stmt.setInt(6, week_nbr);
-            stmt.setInt(7, nbr_problems_solved);
-            stmt.setInt(8, nbr_problems_seen);
-            stmt.setInt(9, nbr_active_students);
+            stmt.setInt(5, schoolYear);
+            stmt.setTimestamp(6, week_startdate);
+            stmt.setInt(7, week_nbr);
+            stmt.setInt(8, nbr_problems_solved);
+            stmt.setInt(9, nbr_problems_seen);
+            stmt.setInt(10, nbr_active_students);
             
             result = stmt.executeUpdate();
             
@@ -1113,6 +1117,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         	int teacherId = Integer.valueOf(tcSplitter[0]);
         	String teacherUsername = tcSplitter[1];
         	int classId = Integer.valueOf(tcSplitter[2]);
+        	int schoolYear = Integer.valueOf(tcSplitter[3]);
 
         	Timestamp tsFromDate = convertStartDate(startDate);
             Timestamp tsToDate = xDaysFromStartDate(tsFromDate,intDuration);
@@ -1123,7 +1128,7 @@ public class TTMiscServiceImpl implements TTMiscService {
                	int nbr_problems_solved = getClassProblemsSolved(conn, classId, tsFromDate,tsToDate);
                	int nbr_active_students = getClassActiveStudentCount(conn, classId, tsFromDate,tsToDate);
 //               	if ((nbr_problems_seen + nbr_problems_solved) > 0) {
-               		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, classId, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students);
+               		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, classId, schoolYear, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students);
 //               	}
 	            tsFromDate=xDaysFromStartDate(tsFromDate,intDuration);    	
 		        tsToDate=xDaysFromStartDate(tsFromDate,intDuration);    	
@@ -1275,12 +1280,21 @@ public class TTMiscServiceImpl implements TTMiscService {
     
     public String getCohortRangeActivitySlices(Connection conn, int cohortId, String filter) throws SQLException {
 
+    	String teacherId = "";
+    	String populate = "Show All";
+    	
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
-
+    	if (splitter.length > 3) {
+    		teacherId = (String) splitter[3];
+    	}
+    	if (splitter.length > 4) {
+    		populate = (String) splitter[4];
+    	}
+    	
     	int loopCounter = 1;
     	
     	JSONArray rangeArr = new JSONArray();
@@ -1304,22 +1318,26 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            rs = stmt.executeQuery();
 	
 	            while (rs.next()) {
-	                JSONObject resultJson = new JSONObject();
-	            	resultJson = new JSONObject();
-	            	resultJson.put("teacherId", rs.getString("teacherId"));
-	            	resultJson.put("username", rs.getString("uname"));
-
-                	Timestamp ts = rs.getTimestamp("week_date");
-                	long dt =  ts.getTime();
-                	Date da = new Date(dt);
-                	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-                	String fd = formatter.format(da);
-                	resultJson.put("week_date", (String) fd);
-	            	
-	            	resultJson.put("logins", rs.getInt("logins"));
-	    			resultJson.put("actions", rs.getInt("actions"));
-	        		resultJson.put("logouts", rs.getInt("logouts"));
-	            	weekArr.add(resultJson);;
+	            	if ((teacherId.length() == 0) 
+	            		|| (populate.equals("showAll"))
+	            		|| (populate.equals("showSingleWithAnonymous"))
+	            		|| (teacherId.equals(rs.getString("teacherId")) && (populate.equals("showSingleOnly")))
+	            		) {
+		                JSONObject resultJson = new JSONObject();
+		            	resultJson = new JSONObject();
+		            	resultJson.put("teacherId", rs.getString("teacherId"));
+		            	resultJson.put("username", rs.getString("uname"));
+	                	Timestamp ts = rs.getTimestamp("week_date");
+	                	long dt =  ts.getTime();
+	                	Date da = new Date(dt);
+	                	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+	                	String fd = formatter.format(da);
+	                	resultJson.put("week_date", (String) fd);		            	
+		            	resultJson.put("logins", rs.getInt("logins"));
+		    			resultJson.put("actions", rs.getInt("actions"));
+		        		resultJson.put("logouts", rs.getInt("logouts"));
+		            	weekArr.add(resultJson);;
+	            	}
 	        	}
 	        	stmt.close();
 	            rs.close();
@@ -1338,11 +1356,20 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     public String getCohortRangeTeacherClassSlices(Connection conn, int cohortId, String filter) throws SQLException {
 
+    	String teacherId = "";
+    	String populate = "Show All";
+    	
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
+    	if (splitter.length > 3) {
+    		teacherId = (String) splitter[3];
+    	}
+    	if (splitter.length > 4) {
+    		populate = (String) splitter[4];
+    	}
 
     	int loopCounter = 1;
     	
@@ -1367,24 +1394,31 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            rs = stmt.executeQuery();
 	
 	            while (rs.next()) {
-	                JSONObject resultJson = new JSONObject();
-	            	resultJson = new JSONObject();
-	            	resultJson.put("teacherId", rs.getString("teacherId"));
-	            	resultJson.put("username", rs.getString("uname"));
-
-                	Timestamp ts = rs.getTimestamp("week_date");
-                	long dt =  ts.getTime();
-                	Date da = new Date(dt);
-                	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-                	String fd = formatter.format(da);
-                	resultJson.put("week_date", (String) fd);
-	            	
-	            	resultJson.put("problems_seen", rs.getInt("problems_seen"));
-	    			resultJson.put("problems_solved", rs.getInt("problems_solved"));
-	            	weekArr.add(resultJson);;
-	        	}
-	        	stmt.close();
+		            if ((teacherId.length() == 0) 
+		            		|| (populate.equals("showAll"))
+		            		|| (populate.equals("showSingleWithAnonymous"))
+		            		|| (teacherId.equals(rs.getString("teacherId")) && (populate.equals("showSingleOnly")))
+		            		) {	                
+		            	JSONObject resultJson = new JSONObject();
+		            	resultJson = new JSONObject();
+		            	resultJson.put("teacherId", rs.getString("teacherId"));
+		            	resultJson.put("username", rs.getString("uname"));
+	
+	                	Timestamp ts = rs.getTimestamp("week_date");
+	                	long dt =  ts.getTime();
+	                	Date da = new Date(dt);
+	                	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+	                	String fd = formatter.format(da);
+	                	resultJson.put("week_date", (String) fd);
+		            	
+		            	resultJson.put("problems_seen", rs.getInt("problems_seen"));
+		    			resultJson.put("problems_solved", rs.getInt("problems_solved"));
+		            	weekArr.add(resultJson);;
+		            }
+		        }
+	            stmt.close();
 	            rs.close();
+
 	        } finally {
 	            if (stmt != null)
 	                stmt.close();

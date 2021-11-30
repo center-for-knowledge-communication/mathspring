@@ -3196,19 +3196,6 @@ var completeDataChart;
 
         <div id="content-conatiner" class="container-fluid">
 
-				<div id="loading_spinner" style="display: none">
-					<i class="fa fa-refresh fa-spin"
-						style="font-size: 36px; color: red"></i> <i
-						class="fa fa-refresh fa-spin" style="font-size: 36px; color: blue"></i>
-					<i class="fa fa-refresh fa-spin"
-						style="font-size: 36px; color: green"></i> <i
-						class="fa fa-refresh fa-spin"
-						style="font-size: 36px; color: orange"></i> <i
-						class="fa fa-refresh fa-spin"
-						style="font-size: 36px; color: black"></i>
-				</div>
-
-
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
                 <div class="panel-group" id="accordion">
@@ -3511,10 +3498,9 @@ var completeDataChart;
             </div>
            
         </div>
-		<div>
-			<a class="btn btn-lg btn-primary" role="button" onclick="window.close();" ><%= rb.getString("close") %></a>
-			<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Not close</a>
-		</div>
+	</div>
+	<div>
+		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Close Report card</a>
 	</div>
 
 </div>
