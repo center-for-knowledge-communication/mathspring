@@ -50,7 +50,7 @@
 <!-- Frank 08-20-21  	Move class code from page title to logout dropdown -->
 <!-- Frank 10-09-21  	Issue #526 Improve form validation -->
 <!-- Frank 10-09-21  	Issue # 523 Add user prefix lookup -->
-
+<!-- Frank 11-30-21     Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022 -->  
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -3025,9 +3025,8 @@ function registerAllEvents(){
 				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
 				                                                           name="schoolYear" value="${classInfo.schoolYear}">
 				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-				                                            <springForm:option value="2020">2020</springForm:option>
-				                                            <springForm:option value="2021">2021</springForm:option>
-				                                            <springForm:option value="2022">2022</springForm:option>
+				                                            <springForm:option value="2021">2020/2021</springForm:option>
+				                                            <springForm:option value="2022">2021/2022</springForm:option>
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
