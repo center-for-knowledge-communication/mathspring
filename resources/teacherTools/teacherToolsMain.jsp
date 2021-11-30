@@ -27,7 +27,7 @@
  *  Frank 	05-04-21  	ms-fixes-042921 - removed onclick event from create class submit button
  *  Frank 	08-03-21  	ms-fixes-150-487 classMessage and worksheet location
  *  Frank 10-09-21  	Issue #526 Improve form validation
-
+ *  Frank   11-30-21    Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022  
  */
 
  System.out.println("teacherToolsMain starting");
@@ -1188,7 +1188,7 @@ function registerAllEvents(){
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
-	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear}</div>
+	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear-1}&sol;${c.schoolYear}</div>
 	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
@@ -1244,7 +1244,7 @@ function registerAllEvents(){
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge">${c.name}</div>
-	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear}</div>
+	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear-1}&sol;${c.schoolYear}</div>
 	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
                                     </div>
                                 </div>
@@ -1505,9 +1505,8 @@ function registerAllEvents(){
                                         <springForm:select path="schoolYear" class="form-control" id="schoolYear"
                                                            name="schoolYear">
                                             <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-                                            <springForm:option value="2020">2020</springForm:option>
-                                            <springForm:option value="2021">2021</springForm:option>
-                                            <springForm:option value="2022">2022</springForm:option>
+                                            <springForm:option value="2021">2020/2021</springForm:option>
+                                            <springForm:option value="2022">2021/2022</springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
