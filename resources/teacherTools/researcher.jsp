@@ -2135,7 +2135,8 @@ function showReport6() {
         	                  fontFamily:'Helvetica'
         	                  //fontSize: '14pt'
         	              },
-        	              min: 0,  
+        	              min: 0,
+        	              max: 600,
         	              tickInterval: 20, 
         	              tickOptions: { 
         	                      formatString: '%d' 
@@ -2248,7 +2249,8 @@ function showReport6() {
               	                  fontFamily:'Helvetica'
               	                  //fontSize: '14pt'
               	              },
-              	              min: 0,  
+              	              min: 0,
+              	              max: 600,
               	              tickInterval: 20, 
               	              tickOptions: { 
               	                      formatString: '%d' 
