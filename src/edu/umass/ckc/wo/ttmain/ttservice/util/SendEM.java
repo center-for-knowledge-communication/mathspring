@@ -100,51 +100,7 @@ public class SendEM {
        //writeSuccess(toAddress, errorMsg.toString());
        return mailSent;
      }
-/**
-    private static void writeException (String to, Exception e) throws IOException {
-        if (mailLog != null) {
-        PrintWriter fw = new PrintWriter(new FileWriter(mailLog,true));
-        fw.printf("Error sending email to %s",to);
-        e.printStackTrace(fw);
-        fw.close();
-        }
-    }
 
-    private static void writeSuccess(String to, String subj) throws IOException {
-        if (mailLog != null) {
-        PrintWriter fw = new PrintWriter(new FileWriter(mailLog,true));
-        Date d = new Date(System.currentTimeMillis());
-        fw.printf("Sent Email to %s subj=%s at %s",to,subj, d.toString());
-        fw.close();
-        }
-    }
-*/
-  /**
-  * send an email to tech support with error info
-  *
-   * @param subject
-   * @param exception
-   * @return boolean
-  */
-  public boolean sendErrorEmail(Connection connection, String techEmail, String emailHost, String subject, String msg, Throwable exception)
-  {
-    Date date = new Date(System.currentTimeMillis());
-    Calendar calendar = new GregorianCalendar();
-    StringBuffer errorMsg = new StringBuffer();
-    errorMsg.append("Error occurred on: ").append(date.toString()).append(" at: ");
-    errorMsg.append(calendar.get(Calendar.HOUR_OF_DAY)).append(":");
-    errorMsg.append(calendar.get(Calendar.MINUTE)).append(":");
-    errorMsg.append(calendar.get(Calendar.SECOND)).append('\n');
-    errorMsg.append("message: ");
-    errorMsg.append(msg).append('\n');
-    if(exception!=null){
-      errorMsg.append(exception.getMessage()).append('\n');
-      errorMsg.append(getErrorMsg(exception));
-    }
-
-    boolean mailSent = send(connection, techEmail, techEmail, subject, errorMsg.toString(),emailHost);
-    return mailSent;
-  } 
   /**
   * get the error info out of the exception
   * @param exception
@@ -199,7 +155,7 @@ public class SendEM {
       public boolean send(Connection connection, String t, String f, String subj, String b,  String h)
       {
       	String to = "";
-      	String[] toArray = new String[0];
+    	String toArray[] = t.split(",");      	
       	String from = "";
           String subject = "";
           String body = "";
@@ -214,7 +170,7 @@ public class SendEM {
           host = h;
 
       	Properties props = System.getProperties();
-          
+
         
 
           // Setup mail server
@@ -222,6 +178,8 @@ public class SendEM {
           props.put("mail.smtp.auth", "true");
           props.put("mail.smtp.port", "465"); 
 
+          
+          
           	if (filenames.length > 0)
               {
                       try
