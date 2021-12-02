@@ -15,7 +15,11 @@ import edu.umass.ckc.wo.tutormeta.Intervention;
  * Date: 11/14/13
  * Time: 12:37 PM
  * To change this template use File | Settings | File Templates.
+
+Frank	12/02/2021	Issue #556 send highlight intervention for nextProb button
  */
+
+
 public class HighlightHintButtonIS extends AttemptInterventionSelector {
 
     public HighlightHintButtonIS(SessionManager smgr) {
@@ -31,13 +35,18 @@ public class HighlightHintButtonIS extends AttemptInterventionSelector {
     public Intervention selectIntervention(AttemptEvent e) throws Exception {
         StudentState st = smgr.getStudentState();
         boolean isSolved= new ProblemGrader(smgr).isAttemptCorrect(st.getCurProblem(),e.getUserInput());
-        String threshold= getConfigParameter2("threshold");
-        int numMistakesAllowedBeforeHighlight=2;
-        if (threshold!=null)
-            numMistakesAllowedBeforeHighlight= Integer.parseInt(threshold);
-        if (!isSolved && st.getNumMistakesOnCurProblem()==numMistakesAllowedBeforeHighlight && st.getNumHintsGivenOnCurProblem()==0)
-            return new HighlightHintButtonIntervention(null,null,false,"Hint","highlight");
-        else return null;
+        if (isSolved) {
+        	return new HighlightHintButtonIntervention(null,null,false,"nextProb","highlight");
+        }
+        else {
+        	String threshold= getConfigParameter2("threshold");
+        	int numMistakesAllowedBeforeHighlight=2;
+        	if (threshold!=null)
+        		numMistakesAllowedBeforeHighlight= Integer.parseInt(threshold);
+        	if (st.getNumMistakesOnCurProblem()==numMistakesAllowedBeforeHighlight && st.getNumHintsGivenOnCurProblem()==0)
+        		return new HighlightHintButtonIntervention(null,null,false,"Hint","highlight");
+        	else return null;
+        }
     }
 
     @Override
