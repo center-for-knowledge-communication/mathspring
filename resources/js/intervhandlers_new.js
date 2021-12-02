@@ -1,3 +1,5 @@
+// Frank 12-02-2021	Changed hightlightHintButton to also highlight example and video buttons one at a time and added highlightNextProbButton when problem has been solved
+
 var tmoutwait = 0;
 var timewaited = 0;
 
@@ -8,8 +10,34 @@ function highlightHintButton() {
     $hintBtn.addClass('hint-green animated tada');
     setTimeout(function() {
         $hintBtn.removeClass('hint-green animated tada');
+        var $exampleBtn = $('#example');
+        $exampleBtn.addClass('hint-green animated tada');
+        setTimeout(function() {
+            $exampleBtn.removeClass('hint-green animated tada');
+            var $videoBtn = $('#video');
+            $videoBtn.addClass('hint-green animated tada');
+            setTimeout(function() {
+                $videoBtn.removeClass('hint-green animated tada');
+            }, 1750);
+        }, 1500);
     }, 2000);
+
+
+    
 }
+
+
+function highlightNextProbButton() {
+    var $nextProbBtn = $('#nextProb');
+    $nextProbBtn.addClass('hint-green animated tada');
+    setTimeout(function() {
+        $nextProbBtn.removeClass('hint-green animated tada');
+    }, 4000);
+
+
+    
+}
+
 
 // this pops up a dialog informing or asking about topic switching
 function processTopicSwitchIntervention(html) {
@@ -183,6 +211,8 @@ function doGUIChange(component, action) {
         myprogress();
     else if (component == 'Hint' && action == 'highlight')
         highlightHintButton()
+    else if (component == 'nextProb' && action == 'highlight')
+        highlightNextProbButton()
 
 
 }
