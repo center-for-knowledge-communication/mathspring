@@ -289,23 +289,15 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
             r = disableProblemForStudent(ee,state);
             String errorMsg = "User reported error on problem:  " + state.getCurProblem() + "  problem-broken:  "
                     + ((ReportErrorEvent) e).isProbBroken() + ".  User message: " +  ((ReportErrorEvent) e).getMessage();
-             
-            new Thread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        SendEM sender = new SendEM();
-                        sender.sendEmail(smgr.getConnection(),"contact_mathspring@cs.umass.edu",
-                                "no-reply@wayangoutpost.net", Settings.mailServer,"Mathspring User Reported Error",errorMsg);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+            try {
+                SendEM sender = new SendEM();
+                sender.sendEmail(smgr.getConnection(),"Mathspring@cs.umass.edu,fsylvia13@gmail.com",
+                        "no-reply@wayangoutpost.net", Settings.mailServer,"Mathspring User Reported Error",errorMsg);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
 
-                }
-            }).start();
-
-//            Emailer.sendErrorEmail(BaseServlet.adminEmail, BaseServlet.emailServer, "wayang error for session: " + sessId, ((ReportErrorEvent) e).getMessage(), null);
             studentModel.save();
             return r;
         }
