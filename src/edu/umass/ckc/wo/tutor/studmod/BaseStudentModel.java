@@ -38,6 +38,7 @@ import java.util.List;
  * the selectors and student model to use.
  * 
  * Frank	12-26-20	Issue #329 use Multi-lingual topic names
+ * Frank	12-04-2021	Issue #555 - TopicMastery computation incorrectly updates when student abandons a problem without making any attempts by going to My Progress Page which ends the problem.  Added test in endProblem(), to only update if number of mistakes is > 0.
  */
 public class BaseStudentModel extends StudentModel {
 
@@ -359,7 +360,7 @@ public class BaseStudentModel extends StudentModel {
             int numHints = state.getNumHintsBeforeCorrect();
             mistakes = state.getNumMistakesOnCurProblem();
             isCorrect = state.isProblemSolved();
-            if (!isCorrect) {
+            if ((!isCorrect) && (mistakes > 0)) {
                 // We only update mastery if the problem has not been seen recently (either never seen before or when it was is outside
                 // the problemReuseInterval)
                 PedagogicalModelParameters pmParams = smgr.getPedagogicalModel().getParams();
