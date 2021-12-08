@@ -199,6 +199,7 @@ var plot2b = null;
 var plot2c = null;
 var plot3 = null;
 var plot_tcp = null;
+var plot_tp = null;
 var plot_tcs = null;
 var plot5 = null;
 var p1_plot6 = null;
@@ -1119,18 +1120,21 @@ function countTeachersClasses() {
 	var teacherArr = allCohortsArr[currentCohortIndex];    	
 	teacherClassCountArr = [];
 	var count = 0;
+	var teacherline = "";
 	var prevUserName = teacherArr.cohortArr[0].userName;
     for (var i=0;i<teacherArr.cohortArr.length;i++) {
 		if (teacherArr.cohortArr[i].userName != prevUserName) {
-			var line = teacherArr.cohortArr[i].lname + "~" + count;
+			teacherline = prevUserName + "~" + count;
+			teacherClassCountArr.push(teacherline);
 			prevUserName = teacherArr.cohortArr[i].userName;
-			teacherClassCountArr.push(line);
 			count = 1;
 		} 
 		else {
 			count = count + 1;
 		}
 	}
+    teacherline = prevUserName + "~" + count;
+	teacherClassCountArr.push(teacherline);
 }
 
 function showReport3() {
@@ -1311,6 +1315,110 @@ function showReport_tcp() {
     
 
 }
+
+function showReport_tp() {
+
+	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
+	if (plot_tp != null) {
+		plot_tp.destroy();
+		plot_tp = null;
+	}	
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'teacherProblems',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);
+            	console.log(data);
+            	var ticks = [];
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		
+            		var teacherName = jsonData[i].username;
+            		ticks.push(teacherName);
+            	}
+            	var theSeries = [];
+            	var row1 = [];
+            	var row2 = [];
+            	var row3 = [];
+             
+            	for (var i=0;i<jsonData.length;i = i + 1) {            	
+            		var element1 = [];
+            		var element2 = [];
+            		var element3 = [];
+            		element1.push(jsonData[i].nbr_problems_seen);
+            		element1.push(i+1);
+            		row1.push(element1);
+            		element2.push(jsonData[i].nbr_problems_solved);
+            		element2.push(i+1);
+            		row2.push(element2);
+//            		var element3 = [];
+//            		element3.push(jsonData[i].nbr_problems_skipped);
+//            		element3.push(i+1);
+//            		row3.push(element3);
+            	}
+//            	theSeries.push(row3);
+            	theSeries.push(row2);
+            	theSeries.push(row1);
+
+            	plot_tcp = $.jqplot('tp_canvas', theSeries, {
+
+                    seriesDefaults: {
+                        renderer:$.jqplot.BarRenderer,
+                        // Show point labels to the right ('e'ast) of each bar.
+                        // edgeTolerance of -15 allows labels flow outside the grid
+                        // up to 15 pixels.  If they flow out more than that, they 
+                        // will be hidden.
+                        pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
+                        // Rotate the bar shadow as if bar is lit from top right.
+                        shadowAngle: 135,
+                        // Here's where we tell the chart it is oriented horizontally.
+                        rendererOptions: {
+                            barDirection: 'horizontal'
+                        }
+                    },
+                    seriesColors:['#ff0066', '#66ccff'],
+            	    series:[
+//            	        {label:'Skipped'},
+            	        {label:'Solved'},
+            	        {label:'Seen'}
+            	    ],
+            	    legend: {
+            	        show: true,
+            	        placement: 'outsideGrid'
+            	    },                
+
+                    axes: {
+                        yaxis: {
+                            renderer: $.jqplot.CategoryAxisRenderer,
+                            ticks: ticks            
+             			}
+                    }
+            	});
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+	// For horizontal bar charts, x an y values must will be "flipped"
+    // from their vertical bar counterpart.
+    
+
+}
+
 
 
 function showReport_tcs() {
@@ -2845,7 +2953,7 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_3" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThree">
-                                    Number of Classes
+                                    Teacher Class Count 
                                 </a>
                                	<button id="Button3" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -2866,8 +2974,29 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <a id="report_tp" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTP">
+                                   Student Problem Solving Totals by Teacher
+                                </a>
+                               	<button id="ButtonTP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartTP" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="<%= rb.getString("show_report") %>">
+                            </div>
+ 
+                            <div class="panel-body">
+				            	<div id="tp_canvas" style="width:800px; height:800px;"></div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
                                 <a id="report_tcp" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTCP">
-                                    Teacher Class Problem Solving
+                                    Student Problem Solving Totals by Class
                                 </a>
                                	<button id="ButtonTCP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
