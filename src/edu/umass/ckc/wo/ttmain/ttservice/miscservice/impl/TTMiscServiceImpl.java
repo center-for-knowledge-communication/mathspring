@@ -175,7 +175,10 @@ public class TTMiscServiceImpl implements TTMiscService {
         JSONArray classNameIdArray = new JSONArray();
     	try {
         	Connection conn = connection.getConnection();
-            String q = "select tmc.researchcohortid as cohortId, coh.name as cohortName, t.ID as teacherId, t.username as username, fname as firstName ,lname as lastName, c.id as classId, c.name as className from teacher t, teacher_map_cohorts tmc, class c, research_cohort as coh where t.ID = tmc.teacherid and  tmc.researchcohortid = coh.researchcohortid and c.teacherId = t.ID order by tmc.researchcohortid,lname asc;";
+        	
+        	String q = "select tmc.researchcohortid as cohortId, coh.name as cohortName, t.ID as teacherId, t.username as username, fname as firstName, lname as lastName, c.id as classId, c.name as className from teacher t, teacher_map_cohorts tmc, class_map_cohorts as cmc, class c, research_cohort as coh where t.ID = tmc.teacherid and  tmc.researchcohortid = coh.researchcohortid and cmc.researchcohortid = coh.researchcohortid and cmc.classid = c.ID and c.teacherId = t.ID order by tmc.researchcohortid,lname asc;";
+
+//             String q = "select tmc.researchcohortid as cohortId, coh.name as cohortName, t.ID as teacherId, t.username as username, fname as firstName ,lname as lastName, c.id as classId, c.name as className from teacher t, teacher_map_cohorts tmc, class c, research_cohort as coh where t.ID = tmc.teacherid and  tmc.researchcohortid = coh.researchcohortid and c.teacherId = t.ID order by tmc.researchcohortid,lname asc;";
             stmt = conn.prepareStatement(q);
             List<Teacher> result = new ArrayList<Teacher>();
             rs = stmt.executeQuery();
@@ -522,6 +525,37 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
     }
 
+
+    public String getTeacherProblems(Connection conn, int cohortId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int currentActionTotal = 0;
+        try {
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_seen) as sumProblemSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+            rs = stmt.executeQuery();
+        	JSONArray resultArr = new JSONArray();
+
+            while (rs.next()) {
+            	JSONObject resultJson = new JSONObject();
+        		resultJson.put("teacherId", rs.getString("teacherId"));
+        		resultJson.put("username", rs.getString("uname"));
+           		resultJson.put("nbr_problems_seen", rs.getInt("sumProblemSeen"));
+       			resultJson.put("nbr_problems_solved", rs.getInt("sumProblemsSolved"));
+            	resultArr.add(resultJson);
+            }            
+            stmt.close();
+            rs.close();
+            return resultArr.toString();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
     public String getTeacherActiveStudentCount(Connection conn, int cohortId, String filter) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -620,6 +654,9 @@ public class TTMiscServiceImpl implements TTMiscService {
 				break;
     		case "teacherClassProblems":
 				result = getTeacherClassProblems(conn, Integer.valueOf(cohortId));  
+				break;
+    		case "teacherProblems":
+				result = getTeacherProblems(conn, Integer.valueOf(cohortId));  
 				break;
     		case "teacherClassActiveStudentCount":
 				result = getTeacherActiveStudentCount(conn, Integer.valueOf(cohortId), filter);  

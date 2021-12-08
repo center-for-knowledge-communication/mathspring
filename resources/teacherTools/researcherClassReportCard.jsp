@@ -2247,6 +2247,8 @@ var completeDataChart;
             }    
             );    	
         }
+        $('#classLandingReportTwo').find('.loader').show();
+
     	$.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -2258,6 +2260,7 @@ var completeDataChart;
                 filter: filterLandingTwo
             },
             success : function(data) {
+                $('#classLandingReportTwo').find('.loader').hide();
                 $('#classLandingReportTwo').collapse('show');
                 var jsonData = $.parseJSON(data);
                 landingPageReport2.clear().draw();
@@ -2266,6 +2269,7 @@ var completeDataChart;
 
             },
             error : function(e) {
+                $('#classLandingReportTwo').find('.loader').hide();
                 console.log(e);
             }
        });
@@ -3224,6 +3228,7 @@ var completeDataChart;
 								  <input id="showLandingReportTwoBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
                             </div>
                             <div class="panel-body">
+	                            <div class="loader" style="display: none" ></div>
                                 <table id="landingPageReport2" class="table table-striped table-bordered hover" width="100%"></table>
                             </div>
 						</div>
