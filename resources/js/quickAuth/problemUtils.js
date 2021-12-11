@@ -19,7 +19,8 @@
  */
 
 // Frank 10-22-19 issue #14 translation
-// Boming 08-30-21 issue #421 circle answer before submission 
+// Boming 08-30-21 issue #421 circle answer before submission
+// Frank	12-11-21	Issue #317 - fixed audio collisions on problem solving page 
 
 //Module pattern for better scoping
 var problemUtils = (function() {
@@ -129,6 +130,7 @@ m.processShortAnswer = function(doc, ans) {
 }
 
 m.prob_readProblem = function() {
+    stopHints();
     stopAudio();
     document.getElementById("QuestionSound").play();
 }
@@ -139,7 +141,6 @@ m.prob_playHint = function(hintLabel) {
     document.getElementById("HintContainer").style.display = "block";
     hintId = m.getIdCorrespondingToHint(hintLabel);
     clearHintStage();
-    stopAudio();
     var hint_thumb = document.getElementById(hintId+"Thumb");
     hint_thumb.style.visibility = "visible";
     hint_thumb.className = "hint-thumb-selected";
@@ -228,8 +229,12 @@ m.prob_playHint = function(hintLabel) {
     var hint = document.getElementById(hintId);
     hint.style.display = "initial";
     var aud = document.getElementById(hintId+"Sound");
-    if (aud)
+
+    if (aud) {
+	    stopAudio();
+	    stopHints();
         aud.play();
+	}
     var preload = document.getElementById(getNextHint(hintId) + "Sound");
     if(preload != null && document.getElementById(hintId+"Thumb").style.display != "initial"){
         preload.load();
@@ -317,14 +322,23 @@ function clearHintStage(){
 }
 
 function stopAudio(){
-    var sounds = document.getElementsByTagName("AUDIO");
-    for(i = 1; i < sounds.length; i++) {
-        if(sounds[i].readyState > 0) {
-            sounds[i].pause();
-            sounds[i].currentTime = 0;
-        }
+    var sound = document.getElementById("QuestionSound");
+    sound.pause();
+    sound.currentTime = 0;
+}
+
+function stopHints(){
+    var hint_contents = document.getElementById("HintContent").children;
+    console.log("hints " + hint_contents.length);
+    for (var h=1;h<=hint_contents.length;h++) {
+    	var hintName = "Hint" + h + "Sound"; 
+		console.log(hintName);
+        var sound = document.getElementById(hintName);
+        sound.pause();
+        sound.currentTime = 0;    	
     }
 }
+
 
 m.getIdCorrespondingToHint = function(hintLabel){
 	var languagePreference = window.navigator.language;
