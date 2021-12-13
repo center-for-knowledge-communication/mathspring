@@ -201,7 +201,6 @@ else
             activityJSON: ${activityJSON},
             showMPP: ${showMPP},
             units: null,
-            <%--The fields below turn on things for test users --%>
             showSelectProblemButton: ${showProblemSelector},
             showAnswer: ${showAnswer},
             newAnswer: null,
@@ -866,6 +865,7 @@ label {
 
 
 	<script>
+	
     function toggleNav() {
         $('.huytran-sitenav__main').toggleClass('hide');
     }
@@ -926,6 +926,7 @@ label {
         });
 
     });
+    
 </script>
 
 
