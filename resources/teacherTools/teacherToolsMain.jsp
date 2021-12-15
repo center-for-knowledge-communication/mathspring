@@ -445,6 +445,34 @@ catch (Exception e) {
 
         }
         
+        function userPrefixLookup() {
+        	
+            var values=[];
+            values[0] = document.getElementById("userPrefix").value;
+            values[1] = "0";
+
+            $('#createClassLoader').show();
+            $.ajax({
+                type: "POST",
+                url: pgContext + "/tt/tt/isStudentPrefixInUse",
+                data: {
+                    formData: values,
+                    lang: loc
+                },
+                success: function (data) {
+                    $('#createClassLoader').hide();
+                    if (data.includes("inuse")) {
+                    	alert("Prefix in use")
+                    	document.getElementById('userPrefix').value = "";
+                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( data );
+                        $('#errorMsgModelPopup').modal('show');
+                    }
+                }
+            });
+
+        }
+
+
         
         function verifyProbMinMax() {
 
@@ -541,7 +569,7 @@ catch (Exception e) {
                                 message: emsg_className
                             },
 	    			        regexp: {
-    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+    	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
         	                    message: emsg_field_invalid
             				}        
                         }
@@ -571,7 +599,7 @@ catch (Exception e) {
                                 message: emsg_town
                             },
 	    			        regexp: {
-    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+    	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
         	                    message: emsg_field_invalid
             				}
                         }
@@ -581,7 +609,7 @@ catch (Exception e) {
                                 message: emsg_schoolName
                             },
 	    			        regexp: {
-    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+    	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
         	                    message: emsg_field_invalid
             				}
                         }
@@ -604,7 +632,7 @@ catch (Exception e) {
                                 message: emsg_gradeSection
                             },
 	    			        regexp: {
-    	            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+    	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
         	                    message: emsg_field_invalid
             				}   
                         }
@@ -1578,7 +1606,7 @@ function registerAllEvents(){
                                 </div>
                             </div>
                         </div>
-                    	<div id="create_class_out_left" class="col-md-4 col-sm-4">
+                    	<div id="create_class_out_right" class="col-md-4 col-sm-4">
                             <div class="panel-heading">
                                 <%= rb.getString("advanced_settings") %>
                             </div>
@@ -1641,7 +1669,7 @@ function registerAllEvents(){
                                     <label for="userPrefix"><%= rb.getString("student_username_prefix") %></label>
                                     <div class="input-group">
                                         <springForm:input path="userPrefix" id="userPrefix" name="userPrefix"
-                                                          class="form-control" type="text"/>
+                                                          class="form-control" type="text" onblur="userPrefixLookup()"/>
                                     </div>
                                 </div>
                                 <div class="form-group hidden">
@@ -1669,6 +1697,7 @@ function registerAllEvents(){
                     <button role="button" type="submit" class="btn btn-primary btn-lg" ><%= rb.getString("create_class") %></button>
                 </div>
             </springForm:form>
+            <div id="createClassLoader" class="loader" style="display: none" ></div>               
             <div class="col-lg-12">
                 <h1 class="page-header">
                     <small><%= rb.getString("add_students_to_roster_instructions") %></small>

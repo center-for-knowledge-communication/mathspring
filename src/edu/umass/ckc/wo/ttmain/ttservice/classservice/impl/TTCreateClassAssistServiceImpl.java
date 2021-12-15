@@ -182,7 +182,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 			String password = createForm.getPasswordToken();
 			password = classId.toString();
 
-			String userPrefix = createForm.getUserPrefix() + classId.toString();
+			String userPrefix = createForm.getUserPrefix();
 			DbClass.createStudentRoster(connection.getConnection(), info, userPrefix, password,
 					createForm.getNoOfStudentAccountsForClass());
 		} catch (Exception e) {

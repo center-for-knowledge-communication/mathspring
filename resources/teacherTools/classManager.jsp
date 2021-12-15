@@ -500,11 +500,10 @@ $('#edit_class_form').submit(function() {
 
 function userPrefixLookup() {
 	
-	var dataForm = $("#create_Student_id").serializeArray();
     var values=[];
-    $.each(dataForm, function(i, field){
-        values[i] = field.value;
-    });
+    values[0] = document.getElementById("userPrefix").value;
+    values[1] = document.getElementById("classId").value;;
+
     $('#student_roster_out').find('.loader').show();
     $.ajax({
         type: "POST",
@@ -994,7 +993,7 @@ function handleclickHandlers() {
                         message: emsg_className
                     },
 			        regexp: {
-            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
                         message: emsg_field_invalid
         			}        
                 }
@@ -1025,7 +1024,7 @@ function handleclickHandlers() {
                     }
                 },
 		        regexp: {
-        			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+        			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
                     message: emsg_field_invalid
     			}        
                 
@@ -1036,7 +1035,7 @@ function handleclickHandlers() {
                     }
                 },
 		        regexp: {
-        			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+        			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
                     message: emsg_field_invalid
     			}        
                 
@@ -1059,7 +1058,7 @@ function handleclickHandlers() {
                         message: emsg_gradeSection
                     },
 			        regexp: {
-            			regexp: /^[a-zA-Z0-9_\-\.]+$/,
+            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
                         message: emsg_field_invalid
         			}                            
                 }
@@ -2103,6 +2102,7 @@ function registerAllEvents(){
         $.each(dataForm, function(i, field){
             values[i] = field.value;
         });
+
         $('#student_roster_out').find('.loader').show();
         $.ajax({
             type: "POST",
