@@ -406,22 +406,33 @@ public class DbUser {
     public static int isStudentPrefixInUse(Connection conn, String[] formValues) throws Exception {
     	
     	int result = 0;
-    	String prefix = formValues[0].trim();   	
-    	int classId = Integer.valueOf(formValues[4].trim());
-    	int teacherId = Integer.valueOf(formValues[2].trim());
-
-    	prefix = prefix + "-%";
-        SqlQuery q = new SqlQuery();
-        String s = "select count(*) from student where userName like ? and not classId = ?";
-        PreparedStatement ps = conn.prepareStatement(s);
-        ps.setString(1, prefix);
-        ps.setInt(2, classId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-        	result = rs.getInt(1);
-        }
-        rs.close();
-        ps.close();
+    	
+    	String prefix = "";
+    	int classId = 0;
+    	
+    	if (formValues.length == 2) {
+    		// create first set of ids
+    		prefix = formValues[0].trim();   	
+    		classId = Integer.valueOf(formValues[1].trim());
+    		
+        	prefix = prefix + "-%";
+            SqlQuery q = new SqlQuery();
+            
+            String s = "select count(*) from student where userName like ? and not classId = ?";
+            PreparedStatement ps = conn.prepareStatement(s);
+            ps.setString(1, prefix);
+            ps.setInt(2, classId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+            	result = rs.getInt(1);
+            }
+            rs.close();
+            ps.close();
+    		
+    	}
+    	else {
+    		result = 1;
+    	}
         return result;
     }
     
