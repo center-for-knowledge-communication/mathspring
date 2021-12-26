@@ -20,7 +20,8 @@
 
 // Frank 10-22-19 issue #14 translation
 // Boming 08-30-21 issue #421 circle answer before submission
-// Frank	12-11-21	Issue #317 - fixed audio collisions on problem solving page 
+// Frank	12-11-21	Issue #317 - fixed audio collisions on problem solving page
+// Frank	12-26-21	Issue #570 - fix for incorrect hint sound ids - causing 'hint not found' errors
 
 //Module pattern for better scoping
 var problemUtils = (function() {
@@ -330,12 +331,14 @@ function stopAudio(){
 function stopHints(){
     var hint_contents = document.getElementById("HintContent").children;
     console.log("hints " + hint_contents.length);
-    for (var h=1;h<=hint_contents.length;h++) {
-    	var hintName = "Hint" + h + "Sound"; 
-		console.log(hintName);
+    for (var h=0;h<hint_contents.length;h++) {
+       	var hintName = hint_contents[h].id + "Sound"; 
+   		console.log(hintName);
         var sound = document.getElementById(hintName);
-        sound.pause();
-        sound.currentTime = 0;    	
+        if (!(sound == null)) {
+       		sound.pause();
+       		sound.currentTime = 0;
+        }    	
     }
 }
 
@@ -344,6 +347,9 @@ m.getIdCorrespondingToHint = function(hintLabel){
 	var languagePreference = window.navigator.language;
 	
 	if(hintLabel === "Show Answer") hintLabel = "Hint 10";
+	if(hintLabel === "Correct Answer") hintLabel = "Hint 11";
+	if(hintLabel === "Problem Answer") hintLabel = "Hint 12";
+	if(hintLabel === "Answer") hintLabel = "Hint 13";
     if(hintLabel.match(/Hint \d+/)) {
         //If it's "Hint ##", remove the whitespace
         return hintLabel.replace(/\s/g, "");
@@ -374,7 +380,7 @@ function getNextHint(hintLabel){
 
     if(hintId.match(/Hint\d+/)) {
         var num = parseInt(hintId.substring(4));
-        if(num < 10) return hintText + (num + 1);
+        if(num < 14) return hintText + (num + 1);
     }
     return "";
 }
