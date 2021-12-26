@@ -7,6 +7,7 @@
 // Frank 01-26-21 Added 'correct answers' to preview page
 // Frank 02-17-21 Added div for comment button
 // Boming 08-30-21 issue #421 circle answer before submit
+// Frank  12-26-21 Issue #567 Disable multiChoice buttons and hide submit box and button
 
 var quickAuthBuildProblem = (function() {
 
@@ -161,7 +162,7 @@ m.build = function(activity, previewMode) {
 
     //For demo and example modes all answers should stay hidden
     //alert("mode is " + mode + " questType is " + questType);
-    if (mode !== "demo" && mode !== "example") {
+
     	console.log("Show answers")
         if (questType.match(/^multi(Choice|Select)$/)) {
             var multi_answers = document.getElementById("MultipleChoiceAnswers");
@@ -179,14 +180,17 @@ m.build = function(activity, previewMode) {
                         // resets it to what the CSS says, which is inline-block
                         // document.getElementById(letter.toUpperCase() + "Checkbox").style.display = "";
                     } else {
-                        problemUtils.addMultiChoiceClickListener(document, letter.toUpperCase());
+                    	if (mode !== "demo" && mode !== "example")
+                    		problemUtils.addMultiChoiceClickListener(document, letter.toUpperCase());
                     }
                 }
 
-				// add the submit answer button
-				var multiSubmitButton = buildMultiSubmit();
-				multi_answers.appendChild(multiSubmitButton);
-				problemUtils.addMultiChoiceSubmitListener(document);
+            	if (mode !== "demo" && mode !== "example") {
+					// add the submit answer button
+					var multiSubmitButton = buildMultiSubmit();
+					multi_answers.appendChild(multiSubmitButton);
+					problemUtils.addMultiChoiceSubmitListener(document);
+            	}
 				
             }
             if (mode !== "demo" && mode !== "example") {
@@ -194,14 +198,8 @@ m.build = function(activity, previewMode) {
             		document.getElementById("submit_answer").addEventListener("click", submitMultiSelectAnswer);
             	}
             }
-            ///////  -----------  shuffle ANSWER SHUFFLING -------------
-            // This moves the answers around with the flaw that it sends the orginal letters
-            // to the server when selections are made.  This preserves correct grading but logs
-            // the incorrect letter in the attempt eventlog entry.   E.g. if correct answer is C but
-            // this shuffles it to A,  if student clicks A, it sends C to server.   In dev mode
-            // it also shows the non-shuffled answer letter below the problem which sucks.
-            // if(!previewMode) problemUtils.shuffleAnswers(!multiSelect);
-        } else {
+        } 
+        else {
             if (mode !== "demo" && mode !== "example") {
             	if(questType === "shortAnswer") {
             		document.getElementById("ShortAnswerBox").style.display = "block";
@@ -214,7 +212,7 @@ m.build = function(activity, previewMode) {
         		document.getElementById("SubmitAnswerBox").style.display = "block";
         	}
         }
-    }
+
 
     if(previewMode) {
         problemContainer.style.float = "left";
