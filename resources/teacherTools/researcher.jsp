@@ -84,10 +84,12 @@ catch (Exception e) {
     <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisLabelRenderer.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisTickRenderer.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.dateAxisRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pieRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.enhancedPieLegendRenderer.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.highlighter.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pointLabels.js" />"></script>
 
-  	<link href="${pageContext.request.contextPath}/css/ttStyleMain.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
+  	<link href="${pageContext.request.contextPath}/css/researcherStyle.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
   	<link href="${pageContext.request.contextPath}/css/calendar.css?ver=<%=versions.getString("css_version")%>" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/jqplot2021/jquery.jqplot.css" />
 
@@ -102,7 +104,7 @@ div.scroll {
     overflow-y: hidden;
 }
 
-.content {
+.tab-content {
   	background-color: lightblue;
 }
 
@@ -114,7 +116,7 @@ div.scroll {
 }
 
 #selections {
-    height: 500px;
+    min-height: 400px;
   	background: lightblue;
 }
 
@@ -141,6 +143,35 @@ select {
 {
     font-size: 16px;
 
+}
+
+
+thead,
+tfoot {
+    background-color: #3f87a6;
+    color: #fff;
+}
+
+tbody {
+    background-color: #e4f0f5;
+}
+
+caption {
+    padding: 10px;
+    caption-side: bottom;
+}
+
+table {
+    padding: 40px;
+    border-collapse: collapse;
+    border: 2px solid rgb(200, 200, 200);
+    letter-spacing: 1px;
+    font-family: sans-serif;
+    font-size: 20px;
+}
+
+th, td {
+  padding: 4px;
 }
 
 </style>
@@ -198,6 +229,25 @@ var plot2 = null;
 var plot2b = null;
 var plot2c = null;
 var plot3 = null;
+var plot3a = null;
+var plot3b = null;
+
+var plot3c0 = null;
+var plot3c1 = null;
+var plot3c2 = null;
+var plot3c3 = null;
+var plot3c4 = null;
+var plot3c5 = null;
+var plot3c6 = null;
+var plot3c7 = null;
+var plot3c8 = null;
+var plot3c9 = null;
+
+var plots3c = [plot3c0,plot3c1,plot3c2,plot3c3];
+
+var plot3cf0 = null;
+var plots3cf = [plot3cf0];
+
 var plot_tcp = null;
 var plot_tp = null;
 var plot_tcs = null;
@@ -459,7 +509,8 @@ function clearTeachers() {
 
 function gotoSettingsPane() {
 
- 	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+ 	
+	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
     document.getElementById('teacherSelect').innerHTML = teachersDiv;
 
  	var classesDiv = '<label for="classList">Select class</label>';  
@@ -542,14 +593,15 @@ function handleCohortSelect(event) {
 	const msToday = Date.now();        	
    	var msStartDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
    	currentWeekRaw = ((msToday - msStartDate)  / 7);
-   	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24)) + 1;
+   	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24));
    	currentWeek = Math.ceil(currentWeekRaw);
    	
    	console.log("currentWeek = " + currentWeek);
    	
 	document.getElementById('chartsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
 	document.getElementById('trendsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
-	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + "</h3>";
+	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
+	document.getElementById('populationCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";;
       
     showTeachers();
 
@@ -818,13 +870,14 @@ function showReport2() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
 	if (plot2 != null) {
 		plot2.destroy();
 		plot2 = null;
 	}	
-	
-
-	
+		
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -910,16 +963,15 @@ function showReport2() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
-
 }
 
 function showReport2b() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
 	if (plot2b != null) {
 		plot2b.destroy();
 		plot2b = null;
@@ -940,7 +992,7 @@ function showReport2b() {
             	var jsonData = $.parseJSON(data);
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		ticks.push(jsonData[i].lname);
+            		ticks.push(jsonData[i].username);
             	}
             	var s1 = [];
 
@@ -993,15 +1045,15 @@ function showReport2b() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
 }
 
 function showReport2c() {
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
 	if (plot2c != null) {
 		plot2c.destroy();
 		plot2c = null;
@@ -1028,7 +1080,7 @@ function showReport2c() {
         		var ticks = [];
         		
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		ticks.push(jsonData[i].lname);
+            		ticks.push(jsonData[i].username);
             	}
 //            	var series = [];
 
@@ -1106,9 +1158,6 @@ function showReport2c() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
 }
 
 
@@ -1139,82 +1188,787 @@ function countTeachersClasses() {
 
 function showReport3() {
 
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
 	if (plot3 != null) {
 		plot3.destroy();
 		plot3 = null;
 	}	
 	
-		
-	countTeachersClasses();
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherClassCount',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);	
+            	
+            	var s1 = [];
+            	var ticks = [];
+
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		ticks.push(jsonData[i].userName);
+            		s1.push(jsonData[i].classCount);
+            	}
+
+				// Can specify a custom tick Array.
+				// Ticks should match up one for each y value (category) in the series.
+			
+				
+				plot3 = $.jqplot('chart3_canvas', [s1], {
+				    // The "seriesDefaults" option is an options object that will
+				    // be applied to all series in the chart.
+				    seriesDefaults:{
+				        renderer:$.jqplot.BarRenderer,
+				        rendererOptions: {
+				        	fillToZero: true,
+				        	varyBarColor: true	        	
+				        }
+			            
+				    },
+				    // Custom labels for the series are specified with the "label"
+				    // option on the series option.  Here a series option object
+				    // is specified for each series.
+				    // Show the legend and put it outside the grid, but inside the
+				    // plot container, shrinking the grid to accomodate the legend.
+				    // A value of "outside" would not shrink the grid and allow
+				    // the legend to overflow the container.
+				    axes: {
+				        // Use a category axis on the x axis and use our custom ticks.
+				        xaxis: {
+				            renderer: $.jqplot.CategoryAxisRenderer,
+				            ticks: ticks,
+				            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+			            	tickOptions: { 
+			                	angle: 15
+			            	},
+			            	label: 'Teachers'
+				        },
+				        // Pad the y axis just a little so bars can get close to, but
+				        // not touch, the grid boundaries.  1.2 is the default padding.
+				        yaxis: {
+				            pad: 1.05,
+			            	min: 0,  
+			            	tickInterval: 1, 
+			            	tickOptions: { 
+			                	formatString: '%d'
+			            	}, 
+			            	label: 'Classes'
+			
+				        }
+				    }
+				});
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
 	
-	var s1 = [];
-	var ticks = [];
-	
-	
-	var line = [];
-	for (var i=0;i<teacherClassCountArr.length;i++) {
-		var splitter = 	teacherClassCountArr[i].split('~');
-		var count = Number(splitter[1]);
-		
-		ticks.push(splitter[0]);
-		s1.push(count);
+}
+
+
+function showReport3a() {
+
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
 	}
 	
-	var s2 = [460, -210, 690, 820];
-	var s3 = [-260, -440, 320, 200];
-	// Can specify a custom tick Array.
-	// Ticks should match up one for each y value (category) in the series.
-//	var ticks = ['May', 'June', 'July', 'August'];
+	if (plot3a != null) {
+		plot3a.destroy();
+		plot3a = null;
+	}	
 	
-	plot3 = $.jqplot('chart3_canvas', [s1], {
-	    // The "seriesDefaults" option is an options object that will
-	    // be applied to all series in the chart.
-	    seriesDefaults:{
-	        renderer:$.jqplot.BarRenderer,
-	        rendererOptions: {
-	        	fillToZero: true,
-	        	varyBarColor: true	        	
-	        }
-            
-	    },
-	    // Custom labels for the series are specified with the "label"
-	    // option on the series option.  Here a series option object
-	    // is specified for each series.
-	    // Show the legend and put it outside the grid, but inside the
-	    // plot container, shrinking the grid to accomodate the legend.
-	    // A value of "outside" would not shrink the grid and allow
-	    // the legend to overflow the container.
-	    axes: {
-	        // Use a category axis on the x axis and use our custom ticks.
-	        xaxis: {
-	            renderer: $.jqplot.CategoryAxisRenderer,
-	            ticks: ticks,
-	            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-            	tickOptions: { 
-                	angle: 15
-            	},
-            	label: 'Teachers'
-	        },
-	        // Pad the y axis just a little so bars can get close to, but
-	        // not touch, the grid boundaries.  1.2 is the default padding.
-	        yaxis: {
-	            pad: 1.05,
-            	min: 0,  
-            	tickInterval: 1, 
-            	tickOptions: { 
-                	formatString: '%d'
-            	}, 
-            	label: 'Classes'
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherStudentCount',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);	
+            	
+            	var s1 = [];
+            	var ticks = [];
 
-	        }
-	    }
-	});
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		ticks.push(jsonData[i].userName);
+            		s1.push(jsonData[i].studentCount);
+            	}
+
+				// Can specify a custom tick Array.
+				// Ticks should match up one for each y value (category) in the series.
+			
+				
+				plot3a = $.jqplot('chart3a_canvas', [s1], {
+				    // The "seriesDefaults" option is an options object that will
+				    // be applied to all series in the chart.
+				    seriesDefaults:{
+				        renderer:$.jqplot.BarRenderer,
+				        rendererOptions: {
+				        	fillToZero: true,
+				        	varyBarColor: true	        	
+				        }
+			            
+				    },
+				    // Custom labels for the series are specified with the "label"
+				    // option on the series option.  Here a series option object
+				    // is specified for each series.
+				    // Show the legend and put it outside the grid, but inside the
+				    // plot container, shrinking the grid to accomodate the legend.
+				    // A value of "outside" would not shrink the grid and allow
+				    // the legend to overflow the container.
+				    axes: {
+				        // Use a category axis on the x axis and use our custom ticks.
+				        xaxis: {
+				            renderer: $.jqplot.CategoryAxisRenderer,
+				            ticks: ticks,
+				            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+			            	tickOptions: { 
+			                	angle: 90
+			            	},
+			            	label: 'Teachers'
+				        },
+				        // Pad the y axis just a little so bars can get close to, but
+				        // not touch, the grid boundaries.  1.2 is the default padding.
+				        yaxis: {
+				            pad: 1.05,
+			            	min: 0,  
+			            	tickInterval: 1, 
+			            	tickOptions: { 
+			                	formatString: '%d'
+			            	}, 
+			            	label: 'Students'
+			
+				        }
+				    }
+				});
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+function showTable3a() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherStudentCount',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+               	var resultData = $.parseJSON(data);
+
+            	var jsonData = $.parseJSON(data);	
+               	
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tbl_3a = document.getElementById("table3a");
+        	    tbl_3a.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_3a.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_3a.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+/*
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+*/
+            
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
+function showReport3b() {
+
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	if (plot3b != null) {
+		plot3b.destroy();
+		plot3b = null;
+	}	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherClassStudentCount',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);	
+            	
+            	var s1 = [];
+            	var ticks = [];
+
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		var className = jsonData[i].userName + ":" + jsonData[i].className + "[" + jsonData[i].classId + "]";;
+            		ticks.push(className);
+            		s1.push(jsonData[i].studentCount);
+            	}
+
+				// Can specify a custom tick Array.
+				// Ticks should match up one for each y value (category) in the series.
+			
+				
+				plot3b = $.jqplot('chart3b_canvas', [s1], {
+				    // The "seriesDefaults" option is an options object that will
+				    // be applied to all series in the chart.
+				    seriesDefaults:{
+				        renderer:$.jqplot.BarRenderer,
+				        rendererOptions: {
+				        	fillToZero: true,
+				        	varyBarColor: true	        	
+				        }
+			            
+				    },
+				    // Custom labels for the series are specified with the "label"
+				    // option on the series option.  Here a series option object
+				    // is specified for each series.
+				    // Show the legend and put it outside the grid, but inside the
+				    // plot container, shrinking the grid to accomodate the legend.
+				    // A value of "outside" would not shrink the grid and allow
+				    // the legend to overflow the container.
+				    axes: {
+				        // Use a category axis on the x axis and use our custom ticks.
+				        xaxis: {
+				            renderer: $.jqplot.CategoryAxisRenderer,
+				            ticks: ticks,
+				            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+			            	tickOptions: { 
+			                	angle: 90
+			            	},
+			            	label: 'Classes'
+				        },
+				        // Pad the y axis just a little so bars can get close to, but
+				        // not touch, the grid boundaries.  1.2 is the default padding.
+				        yaxis: {
+				            pad: 1.05,
+			            	min: 0,  
+			            	tickInterval: 1, 
+			            	tickOptions: { 
+			                	formatString: '%d'
+			            	}, 
+			            	label: 'Students'
+			
+				        }
+				    }
+				});
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+function showTable3b() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherClassStudentCount',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+               	var resultData = $.parseJSON(data);
+
+            	var jsonData = $.parseJSON(data);	
+               	
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tbl_3b = document.getElementById("table3b");
+        	    tbl_3b.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_3b.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_3b.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+/*
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+*/
+            
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+function hideLegend() {
+    $("#hideLegendBtn").hide();
+    $("#showLegendBtn").show();
+    $("#effortLegend").hide();
+}
+function showLegend() {
+    $("#showLegendBtn").hide();
+    $("#hideLegendBtn").show();
+    $("#effortLegend").show();
+}
+
+
+function showReport3c() {
+
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+
+	
+	
+	var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS",   "NOTR",  "SKIP", "GIVEUP",   "NODATA"];
+	var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
+	
+	if (plot3c0 != null) {
+		plot3c0.destroy();
+		plot3c0 = null;
+	}
+	if (plot3c1 != null) {
+		plot3c1.destroy();
+		plot3c1 = null;
+	}
+	if (plot3c2 != null) {
+		plot3c2.destroy();
+		plot3c2 = null;
+	}
+	if (plot3c3 != null) {
+		plot3c3.destroy();
+		plot3c3 = null;
+	}
+	if (plot3c4 != null) {
+		plot3c4.destroy();
+		plot3c4 = null;
+	}
+	if (plot3c5 != null) {
+		plot3c5.destroy();
+		plot3c5 = null;
+	}
+	if (plot3c6 != null) {
+		plot3c6.destroy();
+		plot3c6 = null;
+	}
+	if (plot3c7 != null) {
+		plot3c7.destroy();
+		plot3c7 = null;
+	}
+	if (plot3c8 != null) {
+		plot3c8.destroy();
+		plot3c8 = null;
+	}
+	if (plot3c9 != null) {
+		plot3c9.destroy();
+		plot3c9 = null;
+	}
+	if (plot3cf0 != null) {
+		plot3cf0.destroy();
+		plot3cf0 = null;
+	}
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherProblemsEffort',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+        		
+               	var resultData = $.parseJSON(data);
+
+            	var jsonData = resultData[0];
+            	var footerData = resultData[1];
+            	
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		var teacherName = jsonData[i].teacherName;
+					
+				
+		  			//var line1 = [['SOF',7], ['ATT',13],  ['GUESS', 6], ['SHINT', 20], ['GIVEUP',14], ['NOTR',7], ['SHELP',5], ['NODATA',2]];
+//		  			var line1 = [35,13,8,5,3,2,5,8,1];
+		  			var line0 = [];
+		  			var line1 = [];
+		  			var line2 = [];
+		  			var line3 = [];
+		  			var line4 = [];
+		  			var line5 = [];
+		  			var line6 = [];
+		  			var line7 = [];
+		  			var line8 = [];
+		  			var line9 = [];
+		  			var lines = [line0,line1,line0,line2,line3,line4,line5,line6,line7,line8,line9]
+		  			lines[i].push(jsonData[i].SOF);
+		  			lines[i].push(jsonData[i].ATT);
+		  			lines[i].push(jsonData[i].SHINT);
+		  			lines[i].push(jsonData[i].SHELP);
+		  			lines[i].push(jsonData[i].GUESS);
+		  			lines[i].push(jsonData[i].NOTR);
+		  			lines[i].push(jsonData[i].SKIP);
+		  			lines[i].push(jsonData[i].GIVEUP);
+		  			lines[i].push(jsonData[i].NODATA);
+					var canvasName = 'chart3c_canvas' + i;
+					var tline = lines[i];
+					plots3c[i] = $.jqplot(canvasName, [tline], {
+				    title: jsonData[i].teacherName,		    
+				    seriesDefaults: {
+		              renderer: $.jqplot.PieRenderer,
+				      rendererOptions: {
+				        showDataLabels: true,
+					    startAngle: -90,
+					    padding: 10,
+				        sliceMargin: 6
+				      },
+				    },
+	//			    legend: {
+	//			      show: true,
+	//		          location: 'w',
+	//		          labels: effort_legend_labels		         
+	//			    },
+				    seriesColors: effort_series_colors
+				 
+				  });
+	          	}
+            	for (var i=0;i<footerData.length;i = i + 1) {
+		  			var fline0 = [];
+		  			var flines = [line0]
+		  			flines[i].push(jsonData[i].SOF);
+		  			flines[i].push(jsonData[i].ATT);
+		  			flines[i].push(jsonData[i].SHINT);
+		  			flines[i].push(jsonData[i].SHELP);
+		  			flines[i].push(jsonData[i].GUESS);
+		  			flines[i].push(jsonData[i].NOTR);
+		  			flines[i].push(jsonData[i].SKIP);
+		  			flines[i].push(jsonData[i].GIVEUP);
+		  			flines[i].push(jsonData[i].NODATA);
+					var canvasName = 'chart3c_canvas_footer' + i;
+					var fline = flines[i];
+					plots3cf[i] = $.jqplot(canvasName, [fline], {
+				    title: footerData[i].cohortName,		    
+				    seriesDefaults: {
+		              renderer: $.jqplot.PieRenderer,
+				      rendererOptions: {
+				        showDataLabels: true,
+					    startAngle: -90,
+					    padding: 10,
+				        sliceMargin: 6
+				      },
+				    },
+				    legend: {
+				      show: true,
+			          location: 'e',
+			          labels: effort_legend_labels		         
+				    },
+				    seriesColors: effort_series_colors
+				 
+				  });
+            	}
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
+function showTable4a() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherClassTableSlices',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+               	var resultData = $.parseJSON(data);
+
+            	var jsonData = $.parseJSON(data);	
+               	
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tbl_4a = document.getElementById("table4a");
+        	    tbl_4a.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_4a.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_4a.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+/*
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+*/
+            
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+
 }
 
 
 
 function showReport_tcp() {
 
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 	if (plot_tcp != null) {
 		plot_tcp.destroy();
@@ -1233,33 +1987,40 @@ function showReport_tcp() {
         },
         success : function(data) {
         	if (data) {
-            	var jsonData = $.parseJSON(data);
+            	var resultData = $.parseJSON(data);
             	console.log(data);
+            	var jsonData = resultData[0];
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		
-            		var className = jsonData[i].username + ":" + jsonData[i].classId;
+            		if (jsonData[i].teacherId === "") {
+            			continue;
+            		}
+            		var className = jsonData[i].teacherName + ":" + jsonData[i].className + "[" + jsonData[i].classId + "]"+ " ( " + jsonData[i].percentSolved + "% solved )";;
             		ticks.push(className);
             	}
             	var theSeries = [];
             	var row1 = [];
             	var row2 = [];
             	var row3 = [];
-             
-            	for (var i=0;i<jsonData.length;i = i + 1) {            	
+                
+            	var index = 1;
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+            		if (jsonData[i].teacherId === "") {
+            			continue;
+            		}            	
             		var element1 = [];
             		var element2 = [];
-            		var element3 = [];
-            		element1.push(jsonData[i].nbr_problems_seen);
-            		element1.push(i+1);
+            		element1.push(jsonData[i].seen);
+            		element1.push(index);
             		row1.push(element1);
-            		element2.push(jsonData[i].nbr_problems_solved);
-            		element2.push(i+1);
+            		element2.push(jsonData[i].solved);
+            		element2.push(index);
             		row2.push(element2);
 //            		var element3 = [];
 //            		element3.push(jsonData[i].nbr_problems_skipped);
 //            		element3.push(i+1);
 //            		row3.push(element3);
+            		index = index + 1;
             	}
 //            	theSeries.push(row3);
             	theSeries.push(row2);
@@ -1310,13 +2071,115 @@ function showReport_tcp() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
-
 }
 
+function showTable_tcp() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'teacherClassProblems',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	console.log(data);
+               	var resultData = $.parseJSON(data);
+                           	    
+            	var jsonData = resultData[0];
+            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tcp_tbl = document.getElementById("tcp_table");
+        	    tcp_tbl.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tcp_tbl.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tcp_tbl.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tcp_tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
 function showReport_tp() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
 
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 	if (plot_tp != null) {
@@ -1336,12 +2199,13 @@ function showReport_tp() {
         },
         success : function(data) {
         	if (data) {
-            	var jsonData = $.parseJSON(data);
+            	var resultData = $.parseJSON(data);
             	console.log(data);
+            	var jsonData = resultData[0];
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
             		
-            		var teacherName = jsonData[i].username;
+            		var teacherName = jsonData[i].teacherName + " ( " + jsonData[i].percentSolved + "% solved )";
             		ticks.push(teacherName);
             	}
             	var theSeries = [];
@@ -1353,10 +2217,10 @@ function showReport_tp() {
             		var element1 = [];
             		var element2 = [];
             		var element3 = [];
-            		element1.push(jsonData[i].nbr_problems_seen);
+            		element1.push(jsonData[i].seen);
             		element1.push(i+1);
             		row1.push(element1);
-            		element2.push(jsonData[i].nbr_problems_solved);
+            		element2.push(jsonData[i].solved);
             		element2.push(i+1);
             		row2.push(element2);
 //            		var element3 = [];
@@ -1398,6 +2262,8 @@ function showReport_tp() {
                     axes: {
                         yaxis: {
                             renderer: $.jqplot.CategoryAxisRenderer,
+			             	fontFamily: 'Georgia',
+             			 	fontSize: '10pt',
                             ticks: ticks            
              			}
                     }
@@ -1413,10 +2279,108 @@ function showReport_tp() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
+}
 
+function showTable_tp() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'teacherProblems',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+               	var resultData = $.parseJSON(data);
+           	    
+            	var jsonData = resultData[0];
+            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tp_tbl = document.getElementById("tp_table");
+        	    tp_tbl.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tp_tbl.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tp_tbl.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tp_tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+
+            
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
 }
 
 
@@ -1424,7 +2388,47 @@ function showReport_tp() {
 function showReport_tcs() {
 
 	
-	var tcsFilter = '' + currentWeek;
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	var tcsFilter = '';
+
+	var trendUnit = 7; 
+	var rpt_tcs_Weeks = "";
+    const rb_tcsweeks = document.querySelectorAll('input[name="opt_tcs_RadioWeeks"]');
+
+    for (const rb_tcsw of rb_tcsweeks) {
+        if (rb_tcsw.checked) {
+        	rpt_tcs_Weeks = rb_tcsw.value;
+            break;
+        }
+    }
+    
+	if (rpt_tcs_Weeks == "all") {
+		trendNumberOfUnits = currentWeek - 1;
+		document.getElementById('tcs_PriorWeeks').value = "";
+	}
+	else {     
+	    if (document.getElementById('tcs_PriorWeeks').value != "") { 
+	   		trendNumberOfUnits = document.getElementById('tcs_PriorWeeks').value;
+	    }
+	    else {
+	   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
+	   		document.getElementById('tcs_PriorWeeks').value = document.getElementById('settingsPriorWeeks').value;
+	    }
+	}
+
+	var startWeek = currentWeek - 1;
+    var intNumberOfUnits = Number(trendNumberOfUnits);
+    if (intNumberOfUnits < 1) {
+    	intNumberOfUnits = 1;
+    }
+    if (intNumberOfUnits > 1) {
+    	startWeek = startWeek - intNumberOfUnits;
+    }
+    	
+	var tcsFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
+	
 	
 	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 	if (plot_tcs != null) {
@@ -1432,7 +2436,9 @@ function showReport_tcs() {
 		plot_tcs = null;
 	}	
 
-	
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1448,8 +2454,7 @@ function showReport_tcs() {
             	console.log(data);
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		
-            		var className = jsonData[i].username + ":" + jsonData[i].classId;
+            		var className = jsonData[i].username + ":" + jsonData[i].className + "(" + jsonData[i].classId + ")";
             		ticks.push(className);
             	}
             	var theSeries = [];
@@ -1492,18 +2497,24 @@ function showReport_tcs() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#66ccff'],
-            	    series:[
+//                    seriesColors:['#66ccff'],
+//            	    series:[
 //            	        {label:'Skipped'},
 //            	        {label:'Solved'},
-            	        {label:'Active Students'}
-            	    ],
-            	    legend: {
-            	        show: true,
-            	        placement: 'outsideGrid'
-            	    },                
+//            	        {label:'Active Students'}
+//            	    ],
+//            	    legend: {
+//            	        show: true,
+//            	        placement: 'outsideGrid'
+//            	    },                
 
                     axes: {
+                        xaxis: {
+                            min: 0,
+             				max: 330,
+             				interval: 25,
+                            font: '15px sans-serif'				
+               			},
                         yaxis: {
                             renderer: $.jqplot.CategoryAxisRenderer,
                             ticks: ticks            
@@ -1521,10 +2532,6 @@ function showReport_tcs() {
         }
     });
 	
-	// For horizontal bar charts, x an y values must will be "flipped"
-    // from their vertical bar counterpart.
-    
-
 }
 
 
@@ -1607,6 +2614,10 @@ function getrpt5Colors() {
 
 function showReport5() {
 
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+
 	rpt5Colors = [];
 
     const rb5Populate = document.querySelectorAll('input[name="optRadio5Populate"]');
@@ -1656,7 +2667,7 @@ function showReport5() {
 	}
 	else {     
 	    if (document.getElementById('rpt5PriorWeeks').value != "") { 
-	   		trendNumberOfUnits = document.getElementById('rpt5PriorWeeks').value;
+	   		trendNumberOfUnits = document.getElementById('rpt5PriorWeeks').value;	   		
 	    }
 	    else {
 	   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
@@ -1807,8 +2818,8 @@ function showReport5() {
 			  if (canvas_width > 1200) {
 				  canvas_width =  1200;
 			  }
-			  if (canvas_width < 320) {
-				  canvas_width = 320;
+			  if (canvas_width < 600) {
+				  canvas_width = 600;
 			  }
 			  document.getElementById("chart5_canvas").style.width = "" + canvas_width + "px";      	  			  
         	  
@@ -2008,7 +3019,11 @@ function getrpt6Colors() {
 
 
 function showReport6() {
-	
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+
 	rpt6Colors = [];
 
     const rb6Populate = document.querySelectorAll('input[name="optRadio6Populate"]');
@@ -2066,17 +3081,17 @@ function showReport6() {
 	    }
 	    else {
 	   		trendNumberOfUnits = document.getElementById('settingsPriorWeeks').value;    	
-	   		trendNumberOfUnits = document.getElementById('rpt6PriorWeeks').value = document.getElementById('settingsPriorWeeks').value;
+	   		document.getElementById('rpt6PriorWeeks').value = document.getElementById('settingsPriorWeeks').value;
 	    }
 	}
     
-	var startWeek = currentWeek - 1;
+	var startWeek = currentWeek;
     var intNumberOfUnits = Number(trendNumberOfUnits);
     if (intNumberOfUnits < 1) {
     	intNumberOfUnits = 1;
     }
     if (intNumberOfUnits > 1) {
-    	startWeek = startWeek - intNumberOfUnits;
+    	startWeek = startWeek - (intNumberOfUnits+1);
     }
     	
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
@@ -2209,8 +3224,8 @@ function showReport6() {
 			  if (canvas_width > 1200) {
 				  canvas_width =  1200;
 			  }
-			  if (canvas_width < 320) {
-				  canvas_width = 320;
+			  if (canvas_width < 600) {
+				  canvas_width = 600;
 			  }
 			  document.getElementById("chart6_canvas1").style.width = "" + canvas_width + "px";      	  			  
 			  document.getElementById("chart6_canvas2").style.width = "" + canvas_width + "px";      	  			  
@@ -2245,7 +3260,7 @@ function showReport6() {
         	              },
         	              min: 0,
         	              max: 600,
-        	              tickInterval: 20, 
+        	              tickInterval: 25, 
         	              tickOptions: { 
         	                      formatString: '%d' 
         	              }, 
@@ -2255,7 +3270,8 @@ function showReport6() {
         	      
         	      legend: {
         	    	  show: true,
-        	    	  placement: 'outsideGrid'
+          	    	  location: 'ne',
+          	    	  placement: 'outsideGrid'
         	    	},
         	      // Series options are specified as an array of objects, one object
         	      // for each series.
@@ -2359,7 +3375,7 @@ function showReport6() {
               	              },
               	              min: 0,
               	              max: 600,
-              	              tickInterval: 20, 
+              	              tickInterval: 25, 
               	              tickOptions: { 
               	                      formatString: '%d' 
               	              }, 
@@ -2369,6 +3385,7 @@ function showReport6() {
               	      
               	      legend: {
               	    	  show: true,
+              	    	  location: 'ne',
               	    	  placement: 'outsideGrid'
               	    	},
               	      // Series options are specified as an array of objects, one object
@@ -2721,15 +3738,16 @@ function updateAllCohortSlices() {
 	</script>
 
 
-<div class="container">
+<div class="container-fluid tab-content">
   <h2>Researcher Workbench</h2>
 
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#home" onclick="openSettingsPane();">Home</a></li>
+<!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
     <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();">Settings</a></li>
-    <li><a data-toggle="tab" href="#Charts">Charts</a></li>
-    <li><a data-toggle="tab" href="#Trends">Trends</a></li>
+    <li><a data-toggle="tab" href="#TeacherToolsActivityReports">Teacher Tools Activities</a></li>
+    <li><a data-toggle="tab" href="#classroomTrends">Classroom Activities</a></li>
     <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" >Class Report Cards</a></li>
+    <li><a data-toggle="tab" href="#Population">Study Population</a></li>
     <li><a data-toggle="tab" href="#Tables">Tables</a></li>
     <li><a data-toggle="tab" href="#AdminTools">Admin Tools</a></li>
     <li>
@@ -2753,7 +3771,7 @@ function updateAllCohortSlices() {
 		<div id="selections">
 			<div class="row">
 				<br>
-				<div id="cohortSelect" class="col-sm-3 border offset-md-1 border-dark">
+				<div id="cohortSelect" class="offset-md-2 col-sm-3 border offset-md-1 border-dark">
 				</div>
 				<div id="teacherSelect" class="col-sm-3">
 				</div>
@@ -2762,10 +3780,10 @@ function updateAllCohortSlices() {
 			</div>
 			<br>
 			<hr>			
-       		<p>These selections will apply to all Chart and Trend report selections. They may be over-ridden on the individual report page.</p>                            
+       		<H3>These selections will apply to all Chart and Trend report selections. They may be over-ridden on the individual report page.</H3>                            
            	<div class="row">
 				<div class="form-group">
-				    <div class="offset-md-1 col-md-3 pull-left">
+				    <div class="offset-md-3 col-md-3 pull-left">
 						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks">Show from beginning.</label>
 				    </div>
 				    <div class="offset-md-2 col-md-3 pull-left">
@@ -2776,8 +3794,6 @@ function updateAllCohortSlices() {
 				    </div>
 				</div>
 			</div>			
-			<br>
-			<br>
 			<div class="row"  style="display: none;">
 	           	<div id="chooseDateRange">
 	                 <div class="col-md-2 offset-md-1">                       
@@ -2803,10 +3819,9 @@ function updateAllCohortSlices() {
 	
 	
 	
-    <div id="Charts" class="col-sm-12 tab-pane fade">
+    <div id="TeacherToolsActivityReports" class="col-sm-12 tab-pane fade">
         <h1 class="page-header">
             Teacher Activity Reports
-            <br>
         </h1>
 		<div class="row">
 			<div id="chartsCohortName">				
@@ -2847,13 +3862,13 @@ function updateAllCohortSlices() {
 
             <div id="report-wrapper" class="row" width: 100%;">
 
-                <div class="panel-group" id="accordion">
+                <div class="panel-group" id="teacherGroup">
                   
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chart1">
+                                <a id="report_six" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chart1">
                                     <%= rb.getString("teacher_log_report") %>
                                 </a>
                                	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -2881,7 +3896,7 @@ function updateAllCohortSlices() {
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_2" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTwo">
+                                <a id="report_2" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwo">
                                     Teacher Activity Metrics
                                 </a>
                                	<button id="Button2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -2889,7 +3904,7 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartTwo" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2Btn" class="btn btn-lg btn-primary" onclick="showReport2();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReport2Btn" class="btn btn-lg btn-primary" onclick="showReport2();" type="submit" value="Show Chart">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -2904,7 +3919,7 @@ function updateAllCohortSlices() {
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_2b" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTwoB">
+                                <a id="report_2b" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwoB">
                                     Teacher Logins
                                 </a>
                                	<button id="Button2b" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -2912,7 +3927,7 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartTwoB" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2bBtn" class="btn btn-lg btn-primary" onclick="showReport2b();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReport2bBtn" class="btn btn-lg btn-primary" onclick="showReport2b();" type="submit" value="Show Chart">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -2928,7 +3943,7 @@ function updateAllCohortSlices() {
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_2c" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTwoC">
+                                <a id="report_2c" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwoC">
                                    Days Since Last Login 
                                 </a>
                                	<button id="Button2c" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -2936,7 +3951,7 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartTwoC" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2cBtn" class="btn btn-lg btn-primary" onclick="showReport2c();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReport2cBtn" class="btn btn-lg btn-primary" onclick="showReport2c();" type="submit" value="Show Chart">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -2948,99 +3963,67 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
-
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_3" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThree">
-                                    Teacher Class Count 
+                                <a id="report_5" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartFive">
+                                    Teacher Activities - Weekly Counts
                                 </a>
-                               	<button id="Button3" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                               	<button id="Button5" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="chartThree" class="panel-collapse collapse">  
+                        <div id="chartFive" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">
+                            	<div class="row">                           
+								<div class="form-group">
+								    <div class="offset-md-1 col-md-3 pull-left">
+										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks">Show from beginning.</label>
+								    </div>
+								    <div class="offset-md-2 col-md-3 pull-left">
+										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked>Show [X] prior weeks.</label>
+								    </div>
+								    <div class="offset-md-1 col-md-2 pull-left">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt5PriorWeeks">
+								    </div>
+								</div>
+								</div>
+								<br>
+                            	<div class="row">                           
+									<div class="form-group">
+										<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
+										<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
+										<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
+									</div>
+								</div>                            
+                            	<div id="rpt5PopulateSelect" class="row">      
+									<div class="form-group">
+										<label class="radio-inline"><input id="radio5ShowAll"                  value="showAll"                 type="radio" name="optRadio5Populate" checked>Show All</label>
+										<label class="radio-inline"><input id="radio5ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio5Populate">Show Single Only</label>
+										<label class="radio-inline"><input id="radio5ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio5Populate">Show Single With Anonymous</label>
+									</div>
+								</div>
+                            </div>
                             <div class="panel-body report_filters">                           
-								  <input id="showReport3Btn" class="btn btn-lg btn-primary" onclick="showReport3();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReport5Btn" class="btn btn-lg btn-primary" onclick="showReport5();" type="submit" value="Show Graph">
                             </div>
  
- 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
-                            <div class="panel-body">
-				            	<div id="chart3_canvas" style="width:800px; height:400px;"></div> 
+                            <div  class="panel-body">
+			            		<div id="chart5_canvas" style="width:1000px; height:600px;overflow-x: auto;"></div>
                             </div>
 
                         </div>
                     </div>
 
-                   <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_tp" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTP">
-                                   Student Problem Solving Totals by Teacher
-                                </a>
-                               	<button id="ButtonTP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-                        <div id="chartTP" class="panel-collapse collapse">  
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="<%= rb.getString("show_report") %>">
-                            </div>
- 
-                            <div class="panel-body">
-				            	<div id="tp_canvas" style="width:800px; height:800px;"></div> 
-                            </div>
 
-                        </div>
-                    </div>
 
-                   <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_tcp" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTCP">
-                                    Student Problem Solving Totals by Class
-                                </a>
-                               	<button id="ButtonTCP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-                        <div id="chartTCP" class="panel-collapse collapse">  
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportTCPBtn" class="btn btn-lg btn-primary" onclick="showReport_tcp();" type="submit" value="<%= rb.getString("show_report") %>">
-                            </div>
- 
-                            <div class="panel-body">
-				            	<div id="tcp_canvas" style="width:800px; height:800px;"></div> 
-                            </div>
 
-                        </div>
-                    </div>
-
-                   <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_tcs" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTCS">
-                                    Active Students This Week
-                                </a>
-                               	<button id="ButtonTCS" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-                        <div id="chartTCS" class="panel-collapse collapse">  
-                            <div class="panel-body report_filters">                           
-								  <input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="<%= rb.getString("show_report") %>">
-                            </div>
- 
-                            <div class="panel-body">
-				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
-                            </div>
-
-                        </div>
-                    </div>
-
-            	</div>
+            	</div> <!-- End panel group -->
         	</div>
 		</div>
     </div>
 
 
-    <div id="Trends" class="col-sm-12 tab-pane fade container">
+    <div id="classroomTrends" class="col-sm-12 tab-pane fade container">
         <h1 class="page-header">
             Teacher Activity Trends
             <br>
@@ -3086,63 +4069,177 @@ function updateAllCohortSlices() {
 
             <div id="trends-wrapper" class="row" width: 100%;">
 
-                <div class="panel-group" id="trendsGroup">
+                <div class="panel-group" id="classroomTrendsGroup">
+
+
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_5" class="accordion-toggle" data-toggle="collapse" data-parent="#trendsGroup" href="#chartFive">
-                                    Teacher Activities - Weekly Counts
+                                <a id="report_tp" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTP">
+                                   Student Problem Solving Totals by Teacher
                                 </a>
-                               	<button id="Button5" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                               	<button id="ButtonTP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="chartFive" class="panel-collapse collapse">  
-                            <div class="panel-body report_filters">
-                            	<div class="row">                           
-								<div class="form-group">
-								    <div class="offset-md-1 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks">Show from beginning.</label>
-								    </div>
-								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked>Show [X] prior weeks.</label>
-								    </div>
-								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt5PriorWeeks">
-								    </div>
-								</div>
-								</div>
-								<br>
-                            	<div class="row">                           
-									<div class="form-group">
-										<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
-										<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
-										<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
-									</div>
-								</div>                            
-                            	<div id="rpt5PopulateSelect" class="row">      
-									<div class="form-group">
-										<label class="radio-inline"><input id="radio5ShowAll"                  value="showAll"                 type="radio" name="optRadio5Populate" checked>Show All</label>
-										<label class="radio-inline"><input id="radio5ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio5Populate">Show Single Only</label>
-										<label class="radio-inline"><input id="radio5ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio5Populate">Show Single With Anonymous</label>
-									</div>
-								</div>
-                            </div>
+                        <div id="chartTP" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport5Btn" class="btn btn-lg btn-primary" onclick="showReport5();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="Show Chart">
+								  <input id="showTableTPBtn" class="btn btn-lg btn-primary" onclick="showTable_tp();" type="submit" value="Show Table">
                             </div>
  
-                            <div  class="panel-body">
-			            		<div id="chart5_canvas" style="width:1000px; height:600px;overflow-x: auto;"></div>
+                            <div class="panel-body col-md-12">
+				            	<div id="tp_canvas" class="col-md-6" style="width:800px; height:500px;"></div> 
+				            	<div id="tp_table_panel" class="col-md-6" style="width:800px; height:500px;">
+				            	   <table align = "center"
+            							id="tp_table" border="1">
+    							   </table>
+				            	</div> 
                             </div>
 
                         </div>
                     </div>
 
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_tcp" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTCP">
+                                    Student Problem Solving Totals by Class
+                                </a>
+                               	<button id="ButtonTCP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartTCP" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showReportTCPBtn" class="btn btn-lg btn-primary" onclick="showReport_tcp();" type="submit" value="Show Chart">
+								  <input id="showTableTCPBtn" class="btn btn-lg btn-primary" onclick="showTable_tcp();" type="submit" value="Show Table">
+                            </div>
+ 
+                            <div class="panel-body col-md-12">
+				            	<div id="tcp_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
+				            	<div id="tcp_table_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	   <table align = "center"
+            							id="tcp_table" border="1">
+    							   </table>
+				            	</div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartThreeC">
+                                    Student Problem Solving Effort by Teacher
+                                </a>
+                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartThreeC" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input class="btn btn-lg btn-primary" onclick="showReport3c();" type="submit" value="Show Chart">
+								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
+								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
+<!-- 						  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="Show Table"> -->		
+                            </div>
+ 
+ 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
+                            <div class="panel-body">
+                                <table id="effortLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("student_effort")%>:</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr><td class="span-SOF"><%= rb.getString("sof") %></td></tr>
+                                    <tr><td class="span-ATT"><%= rb.getString("att") %></td></tr>
+                                    <tr><td class="span-SHINT"><%= rb.getString("shint") %></td></tr>
+                                    <tr><td class="span-SHELP"><%= rb.getString("shelp") %></td></tr>
+                                    <tr><td class="span-GUESS"><%= rb.getString("guess") %></td></tr>
+                                    <tr><td class="span-NOTR"><%= rb.getString("notr") %></td></tr>
+                                    <tr><td class="span-SKIP"><%= rb.getString("skip") %></td></tr>
+                                    <tr><td class="span-GIVEUP"><%= rb.getString("giveup") %></td></tr>
+                                    <tr><td class="span-NODATA"><%= rb.getString("no_data") %></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                            	<div class="row">
+					            	<div id="chart3c_canvas0" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas1" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas2" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas3" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas4" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas5" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas6" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas7" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas8" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas9" class="col-md-3" style="width:300px; height:300px;"></div> 
+				            	</div>
+				            	<hr>
+                            	<div class="row">
+					            	<div class="col-md-5" style="width:450px; height:450px;"></div> 
+					            	<div id="chart3c_canvas_footer0" class="col-md-5" style="width:600px; height:450px;"></div> 
+				            	</div>
+<!--
+					            	<div id="table3c_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	   <table align = "center"
+            							id="table3c" border="1">
+    							   </table>
+				            	</div>
+-->				            	 
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    
+
+
+
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_tcs" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTCS">
+                                    Student Sessions in Recent Weeks
+                                </a>
+                               	<button id="ButtonTCS" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartTCS" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								<div class="form-group">
+								    <div class="offset-md-3 col-md-3 pull-left">
+										<label class="radio-inline"><input id="tcs_radioWeeksAll"  value="all"  type="radio" name="opt_tcs_RadioWeeks">Show from beginning.</label>
+								    </div>
+								    <div class="offset-md-2 col-md-3 pull-left">
+										<label class="radio-inline"><input id="tcs_radioWeekSelect"  value="select"  type="radio" name="opt_tcs_RadioWeeks" checked>Show [X] prior weeks.</label>
+								    </div>
+								    <div class="offset-md-1 col-md-2 pull-left">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="tcs_PriorWeeks">
+								    </div>
+								</div>
+                            </div>
+                            <div class="panel-body report_filters">                           
+								<input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="Show Chart">
+							</div> 
+                            <div class="panel-body">
+				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
                     
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_5" class="accordion-toggle" data-toggle="collapse" data-parent="#trendsGroup" href="#chartSix">
+                                <a id="report_6" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartSix">
                                     Teacher Class Problem Solving Results - Weekly Counts
                                 </a>
                                	<button id="Button6" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -3180,14 +4277,14 @@ function updateAllCohortSlices() {
                             </div>
                             
                             <div class="panel-body report_filters">                           
-								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="<%= rb.getString("show_report") %>">
+								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="Show Graph">
                             </div>
 
 
                             <div  class="panel-body">
-			            		<div id="chart6_canvas1" style="width:1200px; height:400px;overflow-x: auto;"></div>
+			            		<div id="chart6_canvas1" style="width:1600px; height:420px;overflow-x: hidden;"></div>
 			            		<br>
-			            		<div id="chart6_canvas2" style="width:1200px; height:400px;overflow-x: auto;"></div>
+			            		<div id="chart6_canvas2" style="width:1600px; height:420px;overflow-x: hidden;"></div>
                             </div>
                         </div>
                     </div>
@@ -3196,124 +4293,263 @@ function updateAllCohortSlices() {
 		</div>
 	</div>
 
-    <div id="Tables" class="col-sm-12 tab-pane fade">
-      <h3>Tables</h3>
-      <p>Tabular formats for export</p>
-			<label for="uname">paste your query here</label>
-		    <input type="text" class="form-control" id="uname" placeholder="Enter other" name="uname" required>
-			<div class="dropdown">
-			  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select output format
-			  <span class="caret"></span></button>
-			  <ul class="dropdown-menu">
-			    <li><a href="#">CSV</a></li>
-			    <li><a href="#">Excel</a></li>
-			    <li><a href="#">PDF</a></li>
-			  </ul>
-			</div>
-    </div>
-
-
-
-    <div id="AdminTools" class="col-sm-12 tab-pane fade container">
-		<div class="row">
-			<div id="adminCohortName">				
-			</div>
-		</div>			
+    <div id="Population" class="col-sm-12 tab-pane fade container">
         <h1 class="page-header">
-            Researcher Admin Tools
+            Population of Study
+            <br>
         </h1>
+		<div class="row">
+			<div id="populationCohortName">				
+			</div>
+		</div>
+		<br>
+        <div id="population-container" class="container-fluid">
 
-        <div id="admin-container" class="container-fluid">
+            <div id="population-wrapper" class="row" width: 100%;">
 
-            <div id="admin-wrapper" class="row" width: 100%;">
-
-                <div class="panel-group" id="adminCommands">
-
-                    <div class="panel panel-default">
+                   <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
-                                    Create Cohort Slice
+                                <a id="report_3" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThree">
+                                    Teacher Class Count
                                 </a>
-                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                               	<button id="Button3" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="admin1" class="panel-collapse collapse">  
+                        <div id="chartThree" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="admin1Btn" class="btn btn-lg btn-primary" onclick="createCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+								  <input id="showReport3Btn" class="btn btn-lg btn-primary" onclick="showReport3();" type="submit" value="Show Chart">
                             </div>
  
+ 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
                             <div class="panel-body">
-                                <div id="admin1Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
+				            	<div id="chart3_canvas" style="width:800px; height:400px;"></div> 
                             </div>
 
                         </div>
                     </div>
-                    
-                    <div id="updateWeeklySlices" class="panel panel-default hidden">
+
+                   <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="admin_two" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin2">
-                                    Update Cohort Weekly Slice
+                                <a id="report_3a" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeA">
+                                    Teacher Student Counts 
                                 </a>
-                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                               	<button id="Button3a" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="admin2" class="panel-collapse collapse">  
+                        <div id="chartThreeA" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="admin2Btn" class="btn btn-lg btn-primary" onclick="updateCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+								  <input id="showReport3aBtn" class="btn btn-lg btn-primary" onclick="showReport3a();" type="submit" value="Show Chart">
+								  <input id="showTable3aBtn" class="btn btn-lg btn-primary" onclick="showTable3a();" type="submit" value="Show Table">
                             </div>
  
+ 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
                             <div class="panel-body">
-                                <div id="admin2Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
+				            	<div id="chart3a_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
+				            	<div id="table3a_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	   <table align = "center"
+            							id="table3a" border="1">
+    							   </table>
+				            	</div> 
                             </div>
 
                         </div>
                     </div>
-                    
-                    <div  id="updateAllSlices" class="panel panel-default">
+
+                   <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
-                                    Update All Cohort Weekly Slices
+                                <a id="report_3b" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeB">
+                                    Class Student Counts 
                                 </a>
-                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                               	<button id="Button3b" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="admin3" class="panel-collapse collapse">  
+                        <div id="chartThreeB" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="admin3Btn" class="btn btn-lg btn-primary" onclick="updateAllCohortSlices();" type="submit" value="<%= rb.getString("submit") %>">
+								  <input id="showReport3bBtn" class="btn btn-lg btn-primary" onclick="showReport3b();" type="submit" value="Show Chart">
+								  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="Show Table">
                             </div>
-                            <div class="loader" style="display: none"></div>
  
+ 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
                             <div class="panel-body">
-                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%">
-
-                                </div>
+				            	<div id="chart3b_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
+				            	<div id="table3b_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	   <table align = "center"
+            							id="table3b" border="1">
+    							   </table>
+				            	</div> 
                             </div>
 
                         </div>
-                    </div>                   
-                    
-                                       
+                    </div>
+
             	</div>
         	</div>
 		</div>
-  </div>
-    <div id="Notifications" class="col-sm-12 tab-pane fade">
-      <h3>Notifications</h3>
-      <p>Tools used to support Mathspring</p>
-		<div class="dropdown">
-		  <button type="button" class="btn btn-basic dropdown-toggle" data-toggle="dropdown">
-		    Notification Tools
-		  </button>
-		  <div class="dropdown-menu">
-		    <a class="dropdown-item" href="#">Modify MS Global settings</a><br>
-		    <a class="dropdown-item" href="#">Create a cohort</a><br>
-		    <a class="dropdown-item" href="#">What else</a><br>
-		  </div>
-		</div>
-    </div>
+
+
+	    <div id="Tables" class="col-sm-12 tab-pane fade container">
+			<div class="row">
+				<div id="tablesCohortName">				
+				</div>
+			</div>
+			<br>
+	        <div id="tables-container" class="container-fluid">
+	
+	            <div id="tables-wrapper" class="row" width: 100%;">
+	
+	                   <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4a">
+	                                    Teacher Class Weekly Slices 
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="table_4a" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="Show Table">
+	                            </div>
+	 
+	 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
+	                            <div class="panel-body">
+					            	<div id="table_4a_panel" class="col-md-12" style="width:1600px; height:800px;overflow-x: auto;overflow-y: auto;">
+					            	   <table align = "center"
+	            							id="table4a" border="1">
+	    							   </table>
+					            	</div> 
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	
+	
+	
+	                    
+	
+	            	</div>
+	        	</div>
+	      	<h3>Tables</h3>
+	      	<p>Tabular formats for export</p>
+				<label for="uname">paste your query here</label>
+			    <input type="text" class="form-control" id="uname" placeholder="Enter other" name="uname" required>
+				<div class="dropdown">
+				  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select output format
+				  <span class="caret"></span></button>
+				  <ul class="dropdown-menu">
+				    <li><a href="#">CSV</a></li>
+				    <li><a href="#">Excel</a></li>
+				    <li><a href="#">PDF</a></li>
+				  </ul>
+				</div>
+	    </div>
+	
+	
+	
+	    <div id="AdminTools" class="col-sm-12 tab-pane fade container">
+			<div class="row">
+				<div id="adminCohortName">				
+				</div>
+			</div>			
+	        <h1 class="page-header">
+	            Researcher Admin Tools
+	        </h1>
+	
+	        <div id="admin-container" class="container-fluid">
+	
+	            <div id="admin-wrapper" class="row" width: 100%;">
+	
+	                <div class="panel-group" id="adminCommands">
+	
+	                    <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
+	                                    Create Cohort Slice
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin1" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input id="admin1Btn" class="btn btn-lg btn-primary" onclick="createCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin1Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	                    
+	                    <div id="updateWeeklySlices" class="panel panel-default hidden">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_two" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin2">
+	                                    Update Cohort Weekly Slice
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin2" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input id="admin2Btn" class="btn btn-lg btn-primary" onclick="updateCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin2Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	                    
+	                    <div  id="updateAllSlices" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
+	                                    Update All Cohort Weekly Slices
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin3" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input id="admin3Btn" class="btn btn-lg btn-primary" onclick="updateAllCohortSlices();" type="submit" value="<%= rb.getString("submit") %>">
+	                            </div>
+	                            <div class="loader" style="display: none"></div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%">
+	
+	                                </div>
+	                            </div>
+	
+	                        </div>
+	                    </div>                   
+	                    
+	                                       
+	            	</div>
+	        	</div>
+			</div>
+	  </div>
+	    <div id="Notifications" class="col-sm-12 tab-pane fade">
+	      <h3>Notifications</h3>
+	      <p>Tools used to support Mathspring</p>
+			<div class="dropdown">
+			  <button type="button" class="btn btn-basic dropdown-toggle" data-toggle="dropdown">
+			    Notification Tools
+			  </button>
+			  <div class="dropdown-menu">
+			    <a class="dropdown-item" href="#">Modify MS Global settings</a><br>
+			    <a class="dropdown-item" href="#">Create a cohort</a><br>
+			    <a class="dropdown-item" href="#">What else</a><br>
+			  </div>
+			</div>
+	    </div>
+	</div>
 
     <div id="classViews" class="col-sm-12 tab-pane fade">
       <h3>Tables</h3>
