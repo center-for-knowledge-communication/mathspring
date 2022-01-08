@@ -41,7 +41,7 @@
 <!-- Frank 05-19-21  	Issue #474 add max-width and max-height to collective effort problem image display -->
 <!-- Frank 07-11-21  	Issue #77 changes to Common Core Problem Detail Report -->
 <!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
-
+<!-- Frank 01-08-22  	Issue #578 added anonymous option to 2 reports, and Issue #417' removed 'fixed column' params for reports using paging option -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -446,6 +446,11 @@ function getFilterOne() {
 
 	document.getElementById("daysFilterOne").value = "";
 	
+	var showNamesState = "N";
+	if (document.getElementById("showNamesOne").checked == true) {
+		showNamesState = "Y";
+	}
+
 	var d1 = parseInt(document.getElementById("selectDay_r1_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay_r1_cal1").value);
 
@@ -472,7 +477,7 @@ function getFilterOne() {
 		}	
 
 		document.getElementById("daysFilterOne").value = fromDate + " thru " + toDate;
-		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
+		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
 	
 		var a_href = '${pageContext.request.contextPath}';
 		a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
@@ -486,7 +491,7 @@ function getFilterOne() {
 	else {
 		if ((d1 + d2) == 0) {
 			document.getElementById("daysFilterOne").value = "";
-			filterOne = "~" + "" + "~" + "Y";			
+			filterOne = "~" + "" + "~" + showNamesState;			
 			var a_href = '${pageContext.request.contextPath}';
 			a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
 			a_href = a_href + teacherID;
@@ -1802,6 +1807,7 @@ var completeDataChart;
                                     $(td).text();
                                     return;
                                 }
+                                
                                 var dataArray = cellData.split("---");
                                 $(td).html(""+dataArray[0] + dataArray[1]+"&nbsp;&nbsp;<div class='fa fa-line-chart getMastery-trajectory-for-problemset' title='Get Mastery Trajectory' style='cursor: pointer;' aria-hidden='true'><span style='display: none'>"+dataArray[3]+"</span></div>");
                                 if (dataArray[1] <= 0.25) {
@@ -1870,10 +1876,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     <%=jc_rb.getString("language_text")%>
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },                   
+//                    "fixedColumns": {
+//                        "leftColumns": 2,
+//                        "heightMatch": 'auto'                        
+//                    },                   
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -1886,7 +1892,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'top',
+                            placement: 'bottom',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                 '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
@@ -1898,7 +1904,7 @@ var completeDataChart;
                 
             }
         });
-
+        
 
     });
    
@@ -2073,10 +2079,10 @@ var completeDataChart;
                 	perStudentperProblemReport = $('#perStudentPerProblemReport').DataTable({
                     data: perStudentperProblemLevelOneFullTemp,
                     <%=jc_rb.getString("language_text")%>
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },
+//                    "fixedColumns": {
+//                        "leftColumns": 2,
+//                        "heightMatch": 'auto'                        
+//                    },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -3020,7 +3026,7 @@ var completeDataChart;
 	 							</div>  
 	
 							</div>
-                            <div class="panel-body report_filters hidden">
+                            <div class="panel-body report_filters">
       							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesThree" name="" value="Y"  onblur="getFilterThree();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
@@ -3058,6 +3064,9 @@ var completeDataChart;
 									    <input id="daysFilterOne" style="width:220px" type="text" name="" value="" >   
 					                </div>
 	 							</div>
+	                            <div class="panel-body report_filters">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+    	                        </div>
 	 						</div>  
                             <div class="panel-body report_filters">                           
 								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -3170,51 +3179,6 @@ var completeDataChart;
                             </div>
                         </div>
                     </div>
-
-                   <%-- <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_two" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
-                                    Class Summary Per Problem
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <label>Problem wise performance of students in this class</label>
-                                <a  href="${pageContext.request.contextPath}/tt/tt/downLoadPerProblemReport?teacherId=${teacherId}&classId=${classInfo.classid}" data-toggle="tooltip" title="Download this report" class="downloadPerStudentReport" aria-expanded="true" aria-controls="collapseOne">
-                                    <i class="fa fa-download fa-2x" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                            <div class="panel-body">
-                                <table id="perProblemReportLegendTable" class="table table-striped table-bordered hover" width="40%">
-                                    <thead>
-                                    <tr>
-                                        <th>% Range</th>
-                                        <th>Symbol</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>% greater than or equal to 80</td>
-                                        <td><i class='fa fa-thumbs-up' aria-hidden='true'></i></td>
-                                    </tr>
-                                    <tr>
-                                        <td>% less than 20</td>
-                                        <td class="span-danger-layer-one">Unsatisfactory</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div class="loader" style="display: none"></div>
-                            </div>
-                            <div class="panel-body">
-                                <table id="perProblemReport" class="table table-striped table-bordered hover" width="100%"></table>
-                            </div>
-                        </div>
-                    </div>--%>
-
-
-
 
 					<div id="report_five_panel" class="panel panel-default">
                         <div class="panel-heading">
