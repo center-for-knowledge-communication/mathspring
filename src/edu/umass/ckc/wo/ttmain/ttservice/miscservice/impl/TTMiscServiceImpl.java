@@ -538,7 +538,7 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.close();
             rs.close();           
 
-            // Create the Total object and stick it in the front of resultArray
+            //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
     		footerJson.put("teacherName", "Study Total");
     		footerJson.put("className", "");
@@ -568,7 +568,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     public String getTeacherProblems(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        int currentActionTotal = 0;
+        
         try {
             String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_seen) as sumProblemsSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
             stmt = conn.prepareStatement(q);
@@ -583,6 +583,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         	int  studyPercentSolved = 0;
 
         	while (rs.next()) {
+        		
             	
        			int sumProblemsSeen = rs.getInt("sumProblemsSeen");
        			int sumProblemsSolved = rs.getInt("sumProblemsSolved");
@@ -609,7 +610,7 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.close();
             rs.close();
 
-            // Create the Total object and stick it in the front of resultArray
+            //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
     		footerJson.put("teacherName", "Study Total");
     		footerJson.put("teacherId", "");
@@ -634,6 +635,90 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
     }
         
+    public String getTeacherProblemsStudentAverages(Connection conn, int cohortId) throws SQLException {
+
+    	
+    	String avg_problems_student = "problems per student";
+    	String avg_minutes_student = "minutes per student";
+
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int currentActionTotal = 0;
+        try {
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+            rs = stmt.executeQuery();
+        	JSONArray bodyArr = new JSONArray();
+        	JSONArray footerArr = new JSONArray();
+        	JSONArray resultArr = new JSONArray();
+
+        	int studyProblemsSolved = 0;
+        	int studentCount = 0;
+        	int studyStudentCount=0;
+        	
+        	while (rs.next()) {
+
+        		studentCount = getDistinctStudentsWhoSolvedProblems(conn, Integer.valueOf(rs.getString("teacherId")));
+
+       			int sumProblemsSolved = rs.getInt("sumProblemsSolved");
+       			studyProblemsSolved += sumProblemsSolved;
+       			studyStudentCount += studentCount;
+       			
+       			String teacherName = rs.getString("uname");
+       			if (teacherName.length() > 12) {
+       				teacherName = teacherName.substring(0,11);
+       			}
+            	            	
+            	JSONObject resultJson = new JSONObject();
+        		resultJson.put("teacherName", teacherName);
+        		resultJson.put("teacherId", rs.getString("teacherId"));
+       			resultJson.put("solved", rs.getInt("sumProblemsSolved"));
+       			resultJson.put("students", studentCount);
+       			if (studentCount == 0) {
+           			resultJson.put(avg_problems_student, 0);
+       			}
+       			else {
+       				resultJson.put(avg_problems_student, rs.getInt("sumProblemsSolved") / studentCount);
+       				resultJson.put(avg_minutes_student,  (rs.getInt("sumProblemsSolved") / studentCount) * 2);
+       			}
+       			bodyArr.add(resultJson);
+            	
+            }            
+            stmt.close();
+            rs.close();
+
+            //// Create the footer array and add it to the resultArr
+        	JSONObject footerJson  = new JSONObject();
+    		footerJson.put("teacherName", "Study Total");
+    		footerJson.put("teacherId", "");
+   			footerJson.put("solved", studyProblemsSolved);
+   			footerJson.put("students", studyStudentCount);
+   			if (studyStudentCount == 0) {
+   				footerJson.put(avg_problems_student, 0);
+   			}
+   			else {
+   				footerJson.put(avg_problems_student, studyProblemsSolved / studyStudentCount);
+   				footerJson.put(avg_minutes_student,  (studyProblemsSolved / studyStudentCount) * 2);
+   			}
+
+        	footerArr.add(footerJson);
+
+        	resultArr.add(bodyArr);
+   			resultArr.add(footerArr);
+
+            
+            return resultArr.toString();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+        
+
+    
     public String getTeacherProblemsEffort(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1064,6 +1149,10 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "teacherProblems":
 				result = getTeacherProblems(conn, Integer.valueOf(cohortId));  
 				break;
+    		case "teacherProblemsStudentAverages":
+				result = getTeacherProblemsStudentAverages(conn, Integer.valueOf(cohortId));  
+				break;
+
     		case "teacherClassActiveStudentCount":
 				result = getTeacherActiveStudentCount(conn, Integer.valueOf(cohortId), filter);  
 				break;
@@ -1478,6 +1567,35 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     }
 
+    public int getDistinctStudentsWhoSolvedProblems(Connection conn, int teacherId) throws SQLException {
+    	int result = 0;
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select count(distinct studId) AS studs from teacher as tch, class as cls, student s, studentproblemhistory sh where s.id=sh.studId and teacherId = ? and s.classId = cls.id and cls.teacherId = teacherId  and sh.isSolved = 1 and sh.mode != 'demo' ;";
+        	//String q = "Select sh.problemBeginTime, count(problemId) AS noOfProblemsSolved from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=? and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime BETWEEN ? AND ? ;";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, teacherId);
+            //stmt.setTimestamp(2, tsFromDate);
+            //stmt.setTimestamp(3, tsToDate);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getInt("studs");
+            }
+            stmt.close();
+            rs.close();
+            return result;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+    
+    
     public String getClassProblemsEffort(Connection conn, int classId, String targetEffort, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
     	String result = "";
     	
