@@ -93,6 +93,7 @@ import java.text.SimpleDateFormat;
  * Frank    05-20-21  	Issue #473 fix username update bug
  * Frank	08-03-21	Issue 150 added class message retrieval
  * Frank	08-20-21	Issue 496 added live dashboard support
+  * Frank	08-20-21	Issue 578 handled anonymous report option
  */
 
 
@@ -178,6 +179,15 @@ public class TTReportServiceImpl implements TTReportService {
                			tsToDate = defaultToDate();    		    			    		
                 	}    	
 
+                	if (filters.length >= 2) {
+                		if (filters[2].trim().equals("N")) {
+                			showNames = "N";
+                		}
+                		else {
+                			showNames = "Y";   			
+                		}
+                	}                	
+                	
             		if ("Normal".equals(teacherLoginType)) {
 	                	try {
 	               			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString(reportType), logMsg);
@@ -187,6 +197,14 @@ public class TTReportServiceImpl implements TTReportService {
 	                	}
             		}
                     List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId, filter);
+
+                    if (showNames.equals("N")) {
+                        for (ClassStudents t : classStudents) {
+                            t.setStudentName("XXXXXXXX");
+                            t.setUserName("XXXXXXXX");
+                        }
+                    }
+                    
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
                     Map<String, String> studentIdMap = classStudents.stream().collect(Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
                     Map<String, Map<String, List<String>>> effortValues = generateEfortMapValues(studentIdMap, classId, filter);
@@ -680,6 +698,7 @@ public class TTReportServiceImpl implements TTReportService {
        			tsFromDate = defaultFromDate();
        			tsToDate = defaultToDate();    		    			    		
         	}
+        	
 
 //       	SqlParameterSource namedParameters = new MapSqlParameterSource("studId", classStudent.getStudentId());
  
@@ -1065,6 +1084,8 @@ public class TTReportServiceImpl implements TTReportService {
    			tsFromDate = defaultFromDate();
    			tsToDate = defaultToDate();    		    			    		
     	}
+    	
+    	
     	if (filters.length > 3) {
     		selectedStudent = filters[3].trim();
     	}
@@ -1387,8 +1408,19 @@ public class TTReportServiceImpl implements TTReportService {
                     studentValuesList = new ArrayList<>();
                     tempTopicDescriptionList = new ArrayList<>();
 
-                    studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
-                    studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
+                    if (showNames.equals("N")) {
+                        studentValuesList.add("studentName" + "~~~" + "XXXXXXXXX");
+                        studentValuesList.add("userName" + "~~~" +"XXXXXX-XX");
+
+                    }
+                    else {
+                    	studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
+                    	studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
+                    }
+                    
+                    
+                    //studentValuesList.add("studentName" + "~~~" + mappedrow.getString("studentName"));
+                    //studentValuesList.add("userName" + "~~~" + mappedrow.getString("userName"));
                     studentValuesList.add(mappedrow.getString("description").trim().replace(" ", "") + "~~~" + "[" + noOfProblemsSolvedOnFirstAttempt.size() + "/" + noOfProblemsSolved.size() + "]" + "---" + mappedrow.getString("mastery") + "---" + noOfProblemsSolved.size() + "---" + mappedrow.getString("topicId"));
                     tempTopicDescriptionList.add(mappedrow.getString("description").trim().replace(" ", ""));
                 }

@@ -43,6 +43,7 @@
 <!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
 <!-- Frank 01-08-22  	Issue #578 added anonymous option to 2 reports, and Issue #417' removed 'fixed column' params for reports using paging option -->
 
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
