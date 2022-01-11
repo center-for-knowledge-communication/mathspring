@@ -41,6 +41,7 @@
 <!-- Frank 05-19-21  	Issue #474 add max-width and max-height to collective effort problem image display -->
 <!-- Frank 07-11-21  	Issue #77 changes to Common Core Problem Detail Report -->
 <!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
+<!-- Frank 01-08-22  	Issue #578 added anonymous option to 2 reports, and Issue #417' removed 'fixed column' params for reports using paging option -->
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -483,6 +484,11 @@ function getFilterOne() {
 
 	document.getElementById("daysFilterOne").value = "";
 	
+	var showNamesState = "N";
+	if (document.getElementById("showNamesOne").checked == true) {
+		showNamesState = "Y";
+	}
+
 	var d1 = parseInt(document.getElementById("selectDay_r1_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay_r1_cal1").value);
 
@@ -509,7 +515,7 @@ function getFilterOne() {
 		}	
 
 		document.getElementById("daysFilterOne").value = fromDate + " thru " + toDate;
-		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + "Y";
+		filterOne = "~" + document.getElementById("daysFilterOne").value + "~" + showNamesState;
 	
 		var a_href = '${pageContext.request.contextPath}';
 		a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
@@ -523,7 +529,7 @@ function getFilterOne() {
 	else {
 		if ((d1 + d2) == 0) {
 			document.getElementById("daysFilterOne").value = "";
-			filterOne = "~" + "" + "~" + "Y";			
+			filterOne = "~" + "" + "~" + showNamesState;			
 			var a_href = '${pageContext.request.contextPath}';
 			a_href = a_href + "/tt/tt/downLoadPerProblemSetReport?teacherId=";
 			a_href = a_href + teacherID;
@@ -2069,10 +2075,10 @@ var completeDataChart;
                 perProblemSetReport = $('#perStudentPerProblemSetReport').DataTable({
                     data: perProblemSetLevelOneFullTemp,
                     <%=jc_rb.getString("language_text")%>
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },                   
+//                    "fixedColumns": {
+//                        "leftColumns": 2,
+//                        "heightMatch": 'auto'                        
+//                    },                   
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -2085,7 +2091,7 @@ var completeDataChart;
                         $('a[rel=completeMasteryChartPopover]').popover({
                             html: true,
                             trigger: 'focus',
-                            placement: 'top',
+                            placement: 'bottom',
                             content: function () {
                                 return '<ul><li><a style="cursor: pointer;" class="getCompleteMasteryByAverage"> <%= rb.getString("get_mastery_by_average")%> </a></li>' +
                                 '<li><a style="cursor: pointer;" class="getCompleteMasteryByMax"> <%= rb.getString("get_mastery_by_highest")%></a></li>' +
@@ -2446,10 +2452,10 @@ var completeDataChart;
                 	perStudentperProblemReport = $('#perStudentPerProblemReport').DataTable({
                     data: perStudentperProblemLevelOneFullTemp,
                     <%=jc_rb.getString("language_text")%>
-                    "fixedColumns": {
-                        "leftColumns": 2,
-                        "heightMatch": 'auto'                        
-                    },
+//                    "fixedColumns": {
+//                        "leftColumns": 2,
+//                        "heightMatch": 'auto'                        
+//                    },
                     "columns": columDvalues,
                     "columnDefs": columNvalues,
                     "bPaginate": true,
@@ -3347,7 +3353,7 @@ var completeDataChart;
 	 							</div>  
 	
 							</div>
-                            <div class="panel-body report_filters hidden">
+                            <div class="panel-body report_filters">
       							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesThree" name="" value="Y"  onblur="getFilterThree();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
@@ -3385,6 +3391,9 @@ var completeDataChart;
 									    <input id="daysFilterOne" style="width:220px" type="text" name="" value="" >   
 					                </div>
 	 							</div>
+	                            <div class="panel-body report_filters">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+    	                        </div>
 	 						</div>  
                             <div class="panel-body report_filters">                           
 								  <input id="showReportOneBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">

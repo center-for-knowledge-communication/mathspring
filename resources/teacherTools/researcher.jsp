@@ -2384,6 +2384,109 @@ function showTable_tp() {
 }
 
 
+function showTable_tpsa() {
+
+	if (currentCohortId == "") {
+		alert("Must select a cohort");
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'teacherProblemsStudentAverages',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+               	var resultData = $.parseJSON(data);
+           	    
+            	var jsonData = resultData[0];
+            	var footerData = resultData[1];
+            	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tpsa_tbl = document.getElementById("tpsa_table");
+        	    tpsa_tbl.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tpsa_tbl.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tpsa_tbl.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+
+                var fcols = [];
+
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                    for (var k in footerData[i]) {
+                        if (fcols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            fcols.push(k);
+                        }
+                    }
+                }
+
+                // Adding the data to the table
+                for (var i = footerData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tpsa_tbl.insertRow(-1);
+                    for (var j = 0; j < fcols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = '<b>' + footerData[i][fcols[j]] + '</b>';
+                    }
+                }              
+
+            
+        	}
+        	else {
+        		alert("response data is null");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
 
 function showReport_tcs() {
 
@@ -4075,12 +4178,41 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
+                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTPSA">
+                                   Student Problem Solving Averages by Teacher
+                                </a>
+                               	<button id="ButtonTPSA" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="chartTPSA" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="Show Table">
+                            </div>
+ 
+                            <div class="panel-body col-md-12">
+				            	<div id="tpsa_table_panel" class="col-md-6" style="width:800px; height:1200px;">
+				            	   <table align = "center"
+            							id="tpsa_table" border="1">
+    							   </table>
+				            	</div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
                                 <a id="report_tp" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTP">
                                    Student Problem Solving Totals by Teacher
                                 </a>
                                	<button id="ButtonTP" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
+
                         <div id="chartTP" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
 								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="Show Chart">
