@@ -2443,7 +2443,19 @@ function showTable_tpsa() {
                         var cell = trow.insertCell(-1);
                          
                         // Inserting the cell at particular place
-                       	cell.innerHTML = jsonData[i][cols[j]];
+                        var cellValue = "" + jsonData[i][cols[j]];
+                        let result = cellValue.indexOf("~");
+                        if (result < 0) {
+                        	cell.style.backgroundColor = "white";
+                           	cell.innerHTML = cellValue;
+                        }
+                        else {
+	                        var splitValue = cellValue.split("~");
+	                        cellValue = splitValue[0];
+                        	cell.style.backgroundColor = splitValue[1];
+                           	cell.innerHTML = splitValue[0];
+                        }
+                       	
                     }
                 }              
 
@@ -3847,10 +3859,10 @@ function updateAllCohortSlices() {
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
     <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();">Settings</a></li>
+    <li><a data-toggle="tab" href="#Population">Study Population and Status</a></li>
     <li><a data-toggle="tab" href="#TeacherToolsActivityReports">Teacher Tools Activities</a></li>
     <li><a data-toggle="tab" href="#classroomTrends">Classroom Activities</a></li>
     <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" >Class Report Cards</a></li>
-    <li><a data-toggle="tab" href="#Population">Study Population</a></li>
     <li><a data-toggle="tab" href="#Tables">Tables</a></li>
     <li><a data-toggle="tab" href="#AdminTools">Admin Tools</a></li>
     <li>
@@ -4175,33 +4187,6 @@ function updateAllCohortSlices() {
                 <div class="panel-group" id="classroomTrendsGroup">
 
 
-                   <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTPSA">
-                                   Student Problem Solving Averages by Teacher
-                                </a>
-                               	<button id="ButtonTPSA" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-
-                        <div id="chartTPSA" class="panel-collapse collapse">  
-                            <div class="panel-body report_filters">                           
-								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="Show Table">
-                            </div>
- 
-                            <div class="panel-body col-md-12">
-				            	<div id="tpsa_table_panel" class="col-md-6" style="width:800px; height:1200px;">
-				            	   <table align = "center"
-            							id="tpsa_table" border="1">
-    							   </table>
-				            	</div> 
-                            </div>
-
-                        </div>
-                    </div>
-
-
 
                    <div class="panel panel-default">
                         <div class="panel-heading">
@@ -4438,6 +4423,39 @@ function updateAllCohortSlices() {
         <div id="population-container" class="container-fluid">
 
             <div id="population-wrapper" class="row" width: 100%;">
+
+
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTPSA">
+                                   Study Status Snapshot
+                                </a>
+                               	<button id="ButtonTPSA" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+
+                        <div id="chartTPSA" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="Show Table">
+                            </div>
+ 
+                            <div class="panel-body col-md-12">
+				            	<div id="tpsa_table_panel" class="col-md-6" style="width:1700px; height:800px;">
+				            	   <table align = "center"
+            							id="tpsa_table" border="1">
+    							   </table>
+				            	</div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
 
                    <div class="panel panel-default">
                         <div class="panel-heading">
