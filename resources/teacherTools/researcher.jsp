@@ -3374,7 +3374,7 @@ function showReport6() {
         	                  //fontSize: '14pt'
         	              },
         	              min: 0,
-        	              max: 600,
+        	              max: 1000,
         	              tickInterval: 25, 
         	              tickOptions: { 
         	                      formatString: '%d' 
@@ -3489,7 +3489,7 @@ function showReport6() {
               	                  //fontSize: '14pt'
               	              },
               	              min: 0,
-              	              max: 600,
+              	              max: 1000,
               	              tickInterval: 25, 
               	              tickOptions: { 
               	                      formatString: '%d' 
