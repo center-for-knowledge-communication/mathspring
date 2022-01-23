@@ -355,6 +355,7 @@ function getFilterLandingTwo() {
 			fromDate = toDate;
 			toDate = temp;
 		}
+		document.getElementById("daysFilterLanding2").value = fromDate + " thru " + toDate;
 		filterLandingTwo = "~" + fromDate + "thru" + toDate;
     	$.ajax({
             type : "POST",
@@ -3230,6 +3231,10 @@ function registerAllEvents(){
                         		<div class="col-md-2 offset-md-1">                       
 				                	<button type="button" class="btn btn-primary" onclick="initCalendar();initCalendar_cal2();$('#calendarModalPopup').modal('show');" ><%= rb.getString("choose_date_range") %></button>
 				                </div>
+                        		<div class="col-md-3">                       
+								    <input id="daysFilterLanding2" style="width:220px" type="text" name="" value="" >   
+				                </div>
+				                
  							</div>  
 
 						</div>

@@ -198,11 +198,11 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            	String colValue = "";
 	            	if (colType.equals("INT")) {
 	            		colValue = String.valueOf(rs.getInt(column));
-	            		System.out.println(colName + " " + colType + " " +  String.valueOf(rs.getInt(column)));
+//	            		System.out.println(colName + " " + colType + " " +  String.valueOf(rs.getInt(column)));
 	            	}
 	            	else {
 	            		colValue = rs.getString(column);
-	        			System.out.println(colName + " " + colType + " " +  rs.getString(column));	 
+//	        			System.out.println(colName + " " + colType + " " +  rs.getString(column));	 
 	            	}
 	            	if (colName.equals("researchcohortid")) {
             			currCohort = colValue;	            			
@@ -297,7 +297,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         boolean first = true;
     	try {
         	Connection conn = connection.getConnection();
-        	String q = "select distinct tch.ID as teacherId, tch.userName as uname, cmc.classid, cls.name as className from class as cls, teacher as tch,  teacher_map_cohorts as tmc, class_map_cohorts as cmc where tch.ID = tmc.teacherid and tmc.researchcohortid = ? and cmc.researchcohortid = ? and cls.teacherId = tch.ID and cmc.classid = cls.ID order by tch.ID;";
+        	String q = "select distinct tch.ID as teacherId, tch.userName as uname, tch.fname as fname, tch.lname as lname, cmc.classid, cls.name as className from class as cls, teacher as tch,  teacher_map_cohorts as tmc, class_map_cohorts as cmc where tch.ID = tmc.teacherid and tmc.researchcohortid = ? and cmc.researchcohortid = ? and cls.teacherId = tch.ID and cmc.classid = cls.ID order by tch.ID;";
 
         	//String q = "select distinct tch.ID as teacherId, tch.userName as uname, cls.ID as classId from class as cls, teacher as tch,  teacher_map_cohorts where tch.ID = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? and cls.teacherId = tch.ID order by tch.ID;";
             stmt = conn.prepareStatement(q);
@@ -311,7 +311,8 @@ public class TTMiscServiceImpl implements TTMiscService {
             	else {
             		first = false;
             	}
-            	String line = String.valueOf(rs.getInt("teacherId")) + "~" + String.valueOf(rs.getString("uname")) + "~" + String.valueOf(rs.getInt("classId")) + "~" + rs.getString("className");
+            	String fullName = rs.getString("fname") + " " + rs.getString("lname");
+            	String line = String.valueOf(rs.getInt("teacherId")) + "~" + rs.getString("uname") + "~" + fullName  + "~" + String.valueOf(rs.getInt("classId")) + "~" + rs.getString("className");
             	teacherClasses += line;
     		}
             return teacherClasses;    	
@@ -603,7 +604,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         		resultJson.put("teacherName", teacherName);
         		resultJson.put("teacherId", rs.getString("teacherId"));
            		resultJson.put("seen", rs.getInt("sumProblemsSeen"));
-       			resultJson.put("solved", rs.getInt("sumProblemsSolved"));
+       			resultJson.put("solved", sumProblemsSolved);
        			resultJson.put("percentSolved", pctProblemsSolved);
             	bodyArr.add(resultJson);
             }            
@@ -638,14 +639,27 @@ public class TTMiscServiceImpl implements TTMiscService {
     public String getTeacherProblemsStudentAverages(Connection conn, int cohortId) throws SQLException {
 
     	
-    	String avg_problems_student = "problems per student";
-    	String avg_minutes_student = "minutes per student";
+    	String avg_problems_student =    "Problems per Active Student";
+    	String avg_minutes_student =     "Actual Minutes per Student";
+    	String avg_minutes_per_problem = "Actual Minutes per Problem";
+    	String minutes_to_solve =        "Total Minutes to Solve";
+    	String students_not_active =     "# Students NOT using MS";
+    	String students_not_active_pct = "% Students NOT using MS";
 
+    	String need_to_spend_more_time = "Need to spend more time on MS";
+    	
+    	int fppsLowLimit = 20;
+    	float fminsLowLimit = (float) 1.0;
+    	float fminsHighLimit = (float) 1.75;
+    	int fmpsLowLimit = 30;
+    	int studentCountDiffLowLimit = 15;
+    	int studentCountDiffHighLimit = 30;
+    	
     	ResultSet rs = null;
         PreparedStatement stmt = null;
         int currentActionTotal = 0;
         try {
-            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.teacherFullname as fullname, sum(tcs.nbr_problems_solved) as sumProblemsSolved, sum(tcs.time_problems_solved) as time_problems_solved, tmc.expectedStudentCount FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tmc.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
             rs = stmt.executeQuery();
@@ -656,6 +670,8 @@ public class TTMiscServiceImpl implements TTMiscService {
         	int studyProblemsSolved = 0;
         	int studentCount = 0;
         	int studyStudentCount=0;
+        	int studyMinutesToSolve=0;
+        	int studyExpectedStudentCount=0;
         	
         	while (rs.next()) {
 
@@ -665,22 +681,94 @@ public class TTMiscServiceImpl implements TTMiscService {
        			studyProblemsSolved += sumProblemsSolved;
        			studyStudentCount += studentCount;
        			
+       			String comments = "";
+       			
        			String teacherName = rs.getString("uname");
        			if (teacherName.length() > 12) {
        				teacherName = teacherName.substring(0,11);
        			}
-            	            	
+
+       			String fullName = rs.getString("fullname");
+       			
+       			int minutesToSolve =  rs.getInt("time_problems_solved");
+   				minutesToSolve = minutesToSolve / 60000;
+       			studyMinutesToSolve += minutesToSolve;
+
             	JSONObject resultJson = new JSONObject();
-        		resultJson.put("teacherName", teacherName);
-        		resultJson.put("teacherId", rs.getString("teacherId"));
-       			resultJson.put("solved", rs.getInt("sumProblemsSolved"));
-       			resultJson.put("students", studentCount);
-       			if (studentCount == 0) {
-           			resultJson.put(avg_problems_student, 0);
+       			resultJson.put("Id", rs.getString("teacherId"));
+        		resultJson.put("Teacher", fullName);
+        		int expectedStudentCount = rs.getInt("expectedStudentCount");
+        		if (expectedStudentCount == 0) {
+        			expectedStudentCount = studentCount;
+        		}
+        		studyExpectedStudentCount += expectedStudentCount;
+       			resultJson.put("Actual # Students", expectedStudentCount);
+       			resultJson.put("Active Students", studentCount);
+       			int studentCountDiff = expectedStudentCount - studentCount;
+       			int StudentCountDiffPct = (studentCountDiff * 100) / expectedStudentCount;
+       			String StudentCountDiffColor = "white";
+       			if (studentCountDiff >= 0) {;
+	       			if (StudentCountDiffPct > studentCountDiffHighLimit) {
+	       				StudentCountDiffColor = "red";      			
+	       			}
+	       			else {
+	       				if (StudentCountDiffPct > studentCountDiffLowLimit) {
+	       					StudentCountDiffColor = "yellow";	
+	       				}       				
+	       			}
+       	       		resultJson.put(students_not_active, studentCountDiff);
+       	       		resultJson.put(students_not_active_pct, StudentCountDiffPct + "%" +"~" + StudentCountDiffColor);
        			}
        			else {
-       				resultJson.put(avg_problems_student, rs.getInt("sumProblemsSolved") / studentCount);
-       				resultJson.put(avg_minutes_student,  (rs.getInt("sumProblemsSolved") / studentCount) * 2);
+       	       		resultJson.put(students_not_active, (studentCountDiff * -1) + " extra");       				
+       	       		resultJson.put(students_not_active_pct, 0);
+       			}
+       			resultJson.put("Total # Problems", sumProblemsSolved);
+       			resultJson.put(minutes_to_solve, minutesToSolve);
+       			if (studentCount == 0) {
+           			resultJson.put(avg_problems_student, 0);
+           			resultJson.put(avg_minutes_per_problem, 0);
+       				resultJson.put(avg_minutes_student,  0);
+       			}
+       			else {
+       				float fpps =  sumProblemsSolved / (float)studentCount;      	       				
+       				String strpps = String.format("%.02f", fpps);
+       				if (fpps < fppsLowLimit) {
+       					strpps = strpps + "~" + "yellow";
+       				} 
+       				else {
+   						strpps = strpps + "~" + "white";  
+       				}      				
+       				resultJson.put(avg_problems_student, strpps);
+       				        				
+       				float fmins = (float)minutesToSolve / (float)sumProblemsSolved;
+       				String strMins = String.format("%.02f", fmins);
+       				if (fmins < fminsLowLimit) {
+       					strMins = strMins + "~" + "orange";
+       				} 
+       				else {
+       					if (fmins > fminsHighLimit) {
+       						strMins = strMins + "~" + "lightgreen";       					
+       					}
+       					else {
+       						strMins = strMins + "~" + "white";  
+       					}
+       				}
+       				resultJson.put(avg_minutes_per_problem, strMins);
+           			
+           			
+       				float fmps =  minutesToSolve / (float)studentCount;      	       				
+       				String strmps = String.format("%.02f", fmps);
+       				if (fmps < fmpsLowLimit) {
+       					strmps = strmps + "~" + "yellow";
+       					comments += need_to_spend_more_time;
+       				} 
+       				else {
+   						strmps = strmps + "~" + "white";  
+       				}      				
+           			resultJson.put(avg_minutes_student,  strmps);
+           			resultJson.put("Comments",  comments);
+           			
        			}
        			bodyArr.add(resultJson);
             	
@@ -690,18 +778,55 @@ public class TTMiscServiceImpl implements TTMiscService {
 
             //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
-    		footerJson.put("teacherName", "Study Total");
-    		footerJson.put("teacherId", "");
-   			footerJson.put("solved", studyProblemsSolved);
-   			footerJson.put("students", studyStudentCount);
+    		footerJson.put("Id", "");
+    		footerJson.put("Teacher", "Study Total");
+    		footerJson.put("Actual # Students", studyExpectedStudentCount);
+    		footerJson.put("Active Students", studyStudentCount);
+    		
+   			int studyStudentCountDiff = studyExpectedStudentCount - studyStudentCount;
+   			int studyStudentCountDiffPct = (studyStudentCountDiff * 100) / studyExpectedStudentCount;
+/*
+   			String studyStudentCountDiffColor = "white";
+   			if (studyStudentCountDiff >= 0) {;
+       			if (studyStudentCountDiffPct > studentCountDiffHighLimit) {
+       				studyStudentCountDiffColor = "red";      			
+       			}
+       			else {
+       				if (studyStudentCountDiffPct > studentCountDiffLowLimit) {
+       					studyStudentCountDiffColor = "yellow";	
+       				}       				
+       			}
+   	       		footerJson.put(students_not_active, studyStudentCountDiff);
+   	       		footerJson.put(students_not_active_pct, studyStudentCountDiffPct + "%" +"~" + studyStudentCountDiffColor);
+   			}
+   			else {
+   				footerJson.put(students_not_active, (studyStudentCountDiff * -1) + " extra");       				
+   				footerJson.put(students_not_active_pct, 0);
+   			}    		
+*/    		
+			footerJson.put(students_not_active, " ");       				
+			footerJson.put(students_not_active_pct, " ");
+   			
+   			
+    		footerJson.put("Total # Problems", studyProblemsSolved);
+   			footerJson.put(minutes_to_solve, studyMinutesToSolve);
    			if (studyStudentCount == 0) {
    				footerJson.put(avg_problems_student, 0);
+       			footerJson.put(avg_minutes_per_problem, 0);
+   				footerJson.put(avg_minutes_student,  0);
    			}
    			else {
    				footerJson.put(avg_problems_student, studyProblemsSolved / studyStudentCount);
-   				footerJson.put(avg_minutes_student,  (studyProblemsSolved / studyStudentCount) * 2);
-   			}
 
+   				float fmins = (float)studyMinutesToSolve / (float)studyProblemsSolved;
+   				String strMins = String.format("%.02f", fmins);   				
+   				footerJson.put(avg_minutes_per_problem, strMins);
+   				
+   				fmins = (float)studyMinutesToSolve / (float)studyStudentCount;
+   				strMins = String.format("%.02f", fmins);   				
+   				footerJson.put(avg_minutes_student,  strMins);
+   			}
+   			
         	footerArr.add(footerJson);
 
         	resultArr.add(bodyArr);
@@ -949,7 +1074,8 @@ public class TTMiscServiceImpl implements TTMiscService {
             while (rs.next()) {
             	JSONObject resultJson = new JSONObject();
         		resultJson.put("Teacher Id", rs.getString("teacherId"));
-        		resultJson.put("Teacher Name", rs.getString("teacherUserName"));
+        		resultJson.put("Teacher Username", rs.getString("teacherUserName"));
+        		resultJson.put("Teacher FullName", rs.getString("teacherFullName"));
         		resultJson.put("Class Id", rs.getString("classId"));
         		resultJson.put("Class Name", rs.getString("className"));
         		
@@ -1567,6 +1693,36 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     }
 
+    public int getClassProblemsTimeToSolve(Connection conn, int classId, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
+
+    	int result = 0;
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "Select sh.problemBeginTime, sum(sh.timeToSolve) AS timeToSolve from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=? and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime BETWEEN ? AND ? ;";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            stmt.setTimestamp(2, tsFromDate);
+            stmt.setTimestamp(3, tsToDate);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getInt("timeToSolve");            	
+            }
+            stmt.close();
+            rs.close();
+            return result;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+
+    
     public int getDistinctStudentsWhoSolvedProblems(Connection conn, int teacherId) throws SQLException {
     	int result = 0;
     	
@@ -1635,7 +1791,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     		}
     		effortValues += getClassProblemsEffort(conn, classId, effortLabels[i], tsFromDate, tsToDate);
 		}
-    	System.out.println(effortValues);
+    	//System.out.println(effortValues);
     	return effortValues;
     }
 
@@ -1669,7 +1825,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     }
 
 
-    public String insertCohorClassStudentSlice(Connection conn, int cohortId, int teacherId, String uname, int classId, String className, Timestamp week_startdate, int week_nbr, int nbr_problems_solved, int nbr_problems_seen, int nbr_active_students, String effort) throws SQLException {
+    public String insertCohorClassStudentSlice(Connection conn, int cohortId, int teacherId, String uname, String teacherFullname, int classId, String className, Timestamp week_startdate, int week_nbr, int nbr_problems_solved, int nbr_problems_seen, int time_problems_solved, int nbr_active_students, String effort) throws SQLException {
     	
     	
     	String[] efforts = effort.split(",");
@@ -1677,27 +1833,29 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String resultMessage = "Success";
         PreparedStatement stmt = null;
         try {
-            String q = "INSERT into teacher_class_slices (cohortId,teacherId,teacherUsername,classId, className, week_startdate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students, SOF, ATT, SHINT, SHELP, GUESS, NOTR, SKIP, GIVEUP, NODATA) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+            String q = "INSERT into teacher_class_slices (cohortId,teacherId,teacherUsername,teacherFullname,classId, className, week_startdate, week_nbr, nbr_problems_solved,nbr_problems_seen,time_problems_solved,nbr_active_students, SOF, ATT, SHINT, SHELP, GUESS, NOTR, SKIP, GIVEUP, NODATA) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
             stmt.setInt(2, teacherId);
             stmt.setString(3,uname);
-            stmt.setInt(4, classId);
-            stmt.setString(5, className);
-            stmt.setTimestamp(6, week_startdate);
-            stmt.setInt(7, week_nbr);
-            stmt.setInt(8, nbr_problems_solved);
-            stmt.setInt(9, nbr_problems_seen);
-            stmt.setInt(10, nbr_active_students);
-            stmt.setInt(11, Integer.valueOf(efforts[0]));
-            stmt.setInt(12, Integer.valueOf(efforts[1]));
-            stmt.setInt(13, Integer.valueOf(efforts[2]));
-            stmt.setInt(14, Integer.valueOf(efforts[3]));
-            stmt.setInt(15, Integer.valueOf(efforts[4]));
-            stmt.setInt(16, Integer.valueOf(efforts[5]));
-            stmt.setInt(17, Integer.valueOf(efforts[6]));
-            stmt.setInt(18, Integer.valueOf(efforts[7]));
-            stmt.setInt(19, Integer.valueOf(efforts[8]));
+            stmt.setString(4,teacherFullname);
+            stmt.setInt(5, classId);
+            stmt.setString(6, className);
+            stmt.setTimestamp(7, week_startdate);
+            stmt.setInt(8, week_nbr);
+            stmt.setInt(9, nbr_problems_solved);
+            stmt.setInt(10, nbr_problems_seen);
+            stmt.setInt(11, time_problems_solved);
+            stmt.setInt(12, nbr_active_students);
+            stmt.setInt(13, Integer.valueOf(efforts[0]));
+            stmt.setInt(14, Integer.valueOf(efforts[1]));
+            stmt.setInt(15, Integer.valueOf(efforts[2]));
+            stmt.setInt(16, Integer.valueOf(efforts[3]));
+            stmt.setInt(17, Integer.valueOf(efforts[4]));
+            stmt.setInt(18, Integer.valueOf(efforts[5]));
+            stmt.setInt(19, Integer.valueOf(efforts[6]));
+            stmt.setInt(20, Integer.valueOf(efforts[7]));
+            stmt.setInt(21, Integer.valueOf(efforts[8]));
            
             result = stmt.executeUpdate();
             
@@ -1733,12 +1891,13 @@ public class TTMiscServiceImpl implements TTMiscService {
         
         for (int tc=0;tc<teacherClassSplitter.length;tc++) {
         	
-        	String teacherClassSpilitter = teacherClassSplitter[tc];
-        	String[] tcSplitter = teacherClassSpilitter.split("~");
+        	String teacherClassStr = teacherClassSplitter[tc];
+        	String[] tcSplitter = teacherClassStr.split("~");
         	int teacherId = Integer.valueOf(tcSplitter[0]);
         	String teacherUsername = tcSplitter[1];
-        	int classId = Integer.valueOf(tcSplitter[2]);
-        	String className = tcSplitter[3];
+        	String teacherFullname = tcSplitter[2];
+        	int classId = Integer.valueOf(tcSplitter[3]);
+        	String className = tcSplitter[4];
 
         	Timestamp tsFromDate = convertStartDate(startDate);
             Timestamp tsToDate = xDaysFromStartDate(tsFromDate,intDuration);
@@ -1747,10 +1906,11 @@ public class TTMiscServiceImpl implements TTMiscService {
 	    	for (int week_nbr = 1;week_nbr<=weeksToReport;week_nbr++) {
                	int nbr_problems_seen = getClassProblemsSeen(conn, classId, tsFromDate,tsToDate);
                	int nbr_problems_solved = getClassProblemsSolved(conn, classId, tsFromDate,tsToDate);
+               	int time_problems_solved = getClassProblemsTimeToSolve(conn, classId, tsFromDate,tsToDate);
                	int nbr_active_students = getClassActiveStudentCount(conn, classId, tsFromDate,tsToDate);
                	String effort = getClassProblemsEffortSet(conn, classId, tsFromDate,tsToDate);
 //               	if ((nbr_problems_seen + nbr_problems_solved) > 0) {
-               		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, classId, className, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,nbr_active_students, effort);
+               		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, teacherFullname, classId, className, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,time_problems_solved,nbr_active_students, effort);
 //               	}
 	            tsFromDate=xDaysFromStartDate(tsFromDate,intDuration);    	
 		        tsToDate=xDaysFromStartDate(tsFromDate,intDuration);    	
