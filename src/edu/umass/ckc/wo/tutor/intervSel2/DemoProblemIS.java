@@ -29,6 +29,9 @@ import org.jdom.Element;
  * Date: 3/20/15
  * Time: 11:53 AM
  * To change this template use File | Settings | File Templates.
+ 
+ Frank	01-25-21	Hard-code demoFrequency to oncePerSession for now until oncePreTopic setting is working
+ 
  */
 public class DemoProblemIS extends NextProblemInterventionSelector {
     TopicModel topicModel;
@@ -55,7 +58,7 @@ public class DemoProblemIS extends NextProblemInterventionSelector {
 
         String freqstr = getConfigParameter2("demoFrequency");
         if (freqstr == null)
-            this.freq = TopicModelParameters.frequency.always;
+            this.freq = TopicModelParameters.frequency.oncePerSession;
         else
             this.freq = TopicModelParameters.convertExampleFrequency(freqstr);
 
@@ -96,7 +99,7 @@ public class DemoProblemIS extends NextProblemInterventionSelector {
 //       if (this.pedagogicalModel instanceof ConfigurablePedagogy) {
         // these params are the ones that were passed in by Assistments and saved for the user
 
-
+        this.freq = TopicModelParameters.frequency.oncePerSession;
         if (!smgr.getStudentState().isExampleShown()) {
             if (freq == TopicModelParameters.frequency.always) {
                 if (!smgr.getStudentState().isExampleSeen(curTopic))
