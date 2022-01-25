@@ -25,7 +25,7 @@ public class TopicModelParameters extends LessonModelParameters {
     public static final String MAX_TIME_IN_TOPIC_SECS = "maxTimeInTopicSecs";
     public static final String MIN_TIME_IN_TOPIC_SECS = "minTimeInTopicSecs";
     public static final frequency DEFAULT_TOPIC_INTRO_FREQ = frequency.always;
-    public static final frequency DEFAULT_EXAMPLE_FREQ = frequency.always;
+    public static final frequency DEFAULT_EXAMPLE_FREQ = frequency.oncePerSession;
     public static final String DIFFICULTY_RATE = "difficultyRate";
     public static final String CONTENT_FAILURE_THRESHOLD = "contentFailureThreshold";
 
