@@ -37,7 +37,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	01-17-21	issue #358R3 disallow multiple concurrent logins
  * Frank	02-27-21	issue #383 logFeeaback
- * Frank  	1o-09-2021	issue #528 Research Tool 
+ * Frank  	10-09-2021	issue #528 Research Tool
+ * Frank	01-29-22	issue #358R4 reduce instances of login retry if user has skipped logout 
  */
 @Controller
 public class TeacherToolsMainLoginController {
@@ -89,12 +90,29 @@ public class TeacherToolsMainLoginController {
 
         		Object activeTeacherIdObject = session.getAttribute("teacherId");
         		if (activeTeacherIdObject != null) {
-                    request.setAttribute(LoginParams.MESSAGE,rb.getString("multiple_teacher_logins_detected"));
-        			session.invalidate();
-                    return "login/loginK12_teacher";        				
+        			if (teacherLoginType.equals("Master")) {
+        				request.setAttribute(LoginParams.MESSAGE,rb.getString("teacher_already_logged_in")); 
+        				return "login/loginK12_teacher";
+        			}
+        			if (teacherLoginType.equals("Normal")) {
+        				if (loginId != (int) session.getAttribute("teacherId")) {
+        					request.setAttribute(LoginParams.MESSAGE,rb.getString("multiple_teacher_logins_detected"));
+        					session.invalidate();
+            				return "login/loginK12_teacher";
+        				}
+        				else {
+        					session.invalidate();
+        					HttpSession  oldSession = request.getSession(false);
+        					session = request.getSession();
+        				}
+        			}
+        			if (teacherLoginType.equals("Researcher")) {
+        				session.invalidate();
+    					HttpSession  oldSession = request.getSession(false);
+    					session = request.getSession();
+        			}
         		}
-        		
-        		session.setAttribute("teacherId", loginId);
+    			session.setAttribute("teacherId", loginId);
         		session.setAttribute("teacherUsername", username);         	
         		session.setAttribute("teacherLoginType", teacherLoginType);
         		if (teacherLoginType.equals("Normal"))
