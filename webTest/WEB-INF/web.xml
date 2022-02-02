@@ -23,7 +23,7 @@
   </context-param>
   <context-param>
     <param-name>wodb.datasource</param-name>
-    <param-value>jdbc/woodrose</param-value>
+    <param-value>jdbc/wodbrose</param-value>
   </context-param>
   <context-param>
     <param-name>pedagogiesFile</param-name>
