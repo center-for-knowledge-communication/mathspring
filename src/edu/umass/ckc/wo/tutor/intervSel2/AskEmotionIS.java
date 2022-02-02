@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.tutor.intervSel2;
 import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbEmotionResponses;
+import edu.umass.ckc.wo.db.DbStudentProblemHistory;
 import edu.umass.ckc.wo.event.tutorhut.*;
 import edu.umass.ckc.wo.interventions.AskEmotionFreeAnswerIntervention;
 import edu.umass.ckc.wo.interventions.AskEmotionRadioIntervention;
@@ -31,6 +32,8 @@ import java.util.Random;
  * Date: 12/2/13
  * Time: 1:06 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank	02-01-22	Issue #424 - add a new column and update it when an emotion value has been entered by an intervention
  */
 public class AskEmotionIS extends NextProblemInterventionSelector  {
 
@@ -209,9 +212,12 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
         StudentModel sm = smgr.getStudentModel();
         // The AffectStudentModel is the place where this emotion data is being kept.   It only keeps the last reported emotion.
         // The emotionInterventionResponse table keeps
-        if (sm instanceof AffectStudentModel  && levelInt > 0)
+               
+        if (sm instanceof AffectStudentModel  && levelInt > 0) {
             ((AffectStudentModel) sm).setLastReportedEmotion(emotion,levelInt,e.getElapsedTime());
-
+            int id = DbStudentProblemHistory.getMostRecentStudentProblemHistoryRecord(conn,smgr.getStudentId());
+            DbStudentProblemHistory.updateEmotionAsked(conn, id);                    
+        }
         String reason = params.getString(AskEmotionSliderIntervention.REASON);
         String skipFreq = params.getString(AskEmotionFreeAnswerIntervention.SKIP_FREQ,"");
         String skipReason = params.getString(AskEmotionFreeAnswerIntervention.SKIP_REASON,"");

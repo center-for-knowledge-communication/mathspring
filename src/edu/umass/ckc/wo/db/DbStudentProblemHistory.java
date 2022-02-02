@@ -15,6 +15,8 @@ import java.util.List;
  * Time: 2:37 PM
  * To change this template use File | Settings | File Templates.
  *
+ * Frank	02-01-22	Issue #424 - add new method to update the 'emotionAsked' column in the latest problem history record.
+ *
  * Methods for accessing the studentProblemHistory table
  *
  *  The assumption for now is that each time a problem is presented, a new row gets inserted in this table.
@@ -294,6 +296,20 @@ public class DbStudentProblemHistory {
                 stmt.close();
         }
     }
+    
+    public static int updateEmotionAsked(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt=null;
+        try {
+            String q = "update " +SPHTBL+ " set emotionAsked=1 where id=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,id);
+            return stmt.executeUpdate();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+    }
+    
 
     public static List<String> getSeenBindings(int probId, int studId, Connection conn) throws SQLException {
         String s = "select id, problemId, studId, probHistId, bindings" +
