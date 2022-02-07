@@ -41,6 +41,7 @@ import java.util.Map;
  * Frank	10-30-20	Issue #293 added call to setAdvancedCofig()
  * Kartik	11-02-20	issue #292 test users to be created on class creation
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
+ * Frank	02--7-22	issue #600 removed code to adjustment maxTime after changing Topic selections
  */
 
 @Service
@@ -277,10 +278,8 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
     @Override
     public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder, String activateFlag) throws TTCustomException {
-    	int updated_topic_count = 0;
-    	long maxTimeInTopic = 10 * 60 * 1000;
     	Map<String, Integer> insertParams = null;
-    	try {
+    	try {    		
             if ("deactivate".equals(activateFlag)) {
                 //Deactivate ProblemSets
                 List<Topic> topics = DbTopics.getClassActiveTopics(connection.getConnection(), classId);
@@ -297,7 +296,6 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                         namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
                     }
                 }
-                updated_topic_count = problemSetsToReorder.size();
 
             } else {
                 //Activate ProblemSets
@@ -315,18 +313,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
                     insertParams.put("isDefault", 0);
                     namedParameterJdbcTemplate.update(TTUtil.INSERT_ON_CLASS_PLAN, insertParams);
                 }
-                updated_topic_count = SequenceEntryIndex - 1;
             }
-            
-            if (updated_topic_count < 5) {
-            	maxTimeInTopic = Math.round(45.0 / updated_topic_count) * 60 * 1000;
-            }
-            insertParams = new HashMap<String, Integer>();
-            insertParams.put("maxTimeInTopic", (int)maxTimeInTopic);
-            insertParams.put("classId", classId);
-            namedParameterJdbcTemplate.update(TTUtil.UPDATE_MAX_TIMEIN_TOPIC_FOR_CLASS, insertParams);
-            
-            
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
