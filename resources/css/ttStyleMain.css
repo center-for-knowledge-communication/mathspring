@@ -515,14 +515,14 @@ background-color: #FF4766;
 
 .tt-live-dashboard-box {
   background-color: #faff91;
-  margin: 40px 80px 40px 80px;
+  margin: 20px 60px 40px 60px;
   border: 8px solid #000000;
 }
 
 .tt-Live_dashboard_canvas {
   width:300px; 
-  height:250px; 
-  margin-left:100px;	
+  height:300px; 
+  margin-left:40px;	
 }
 
 .tt-LiveDashboardProblemPane {
@@ -536,7 +536,7 @@ background-color: #FF4766;
 background-color:powderblue;
 border: 2px solid #000000;
 border-radius: 25px;
-height:500px;">	
+height:800px;">	
 } 
 
 

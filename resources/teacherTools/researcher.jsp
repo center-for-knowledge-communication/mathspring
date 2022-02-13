@@ -536,6 +536,16 @@ function gotoSettingsPane() {
 }
 
 
+function validatePriorWeeks(tid) {
+	var temp = document.getElementById(tid).value;
+	if (temp.length > 0) {
+		if (isNaN(temp)) {
+			document.getElementById(tid).value = "";
+			alert("must enter a number");
+		}
+	}
+}
+
 function showCohorts() {
 	
     $.ajax({
@@ -2260,10 +2270,10 @@ function showReport_tcp() {
             	var jsonData = resultData[0];
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		if (jsonData[i].teacherId === "") {
+            		if (jsonData[i].TID === "") {
             			continue;
             		}
-            		var className = jsonData[i].teacherName + ":" + jsonData[i].className + "[" + jsonData[i].classId + "]"+ " ( " + jsonData[i].percentSolved + "% solved )";;
+            		var className = jsonData[i].Teacher + ":" + jsonData[i].Class + "[" + jsonData[i].CID + "]"+ " ( " + jsonData[i].pctSolved + "% solved )";;
             		ticks.push(className);
             	}
             	var theSeries = [];
@@ -2273,15 +2283,15 @@ function showReport_tcp() {
                 
             	var index = 1;
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		if (jsonData[i].teacherId === "") {
+            		if (jsonData[i].TID === "") {
             			continue;
             		}            	
             		var element1 = [];
             		var element2 = [];
-            		element1.push(jsonData[i].seen);
+            		element1.push(jsonData[i].Seen);
             		element1.push(index);
             		row1.push(element1);
-            		element2.push(jsonData[i].solved);
+            		element2.push(jsonData[i].Solved);
             		element2.push(index);
             		row2.push(element2);
 //            		var element3 = [];
@@ -2317,8 +2327,7 @@ function showReport_tcp() {
             	        {label:'<%= rwrb.getString("seen") %>'}
             	    ],
             	    legend: {
-            	        show: true,
-            	        placement: 'outsideGrid'
+            	        show: true
             	    },                
 
                     axes: {
@@ -2388,6 +2397,7 @@ function showTable_tcp() {
                      
                     // Create the table header th element
                     var theader = document.createElement("th");
+                    
                     theader.innerHTML = cols[i];
                      
                     // Append columnName to the table row
@@ -2474,7 +2484,7 @@ function showReport_tp() {
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
             		
-            		var teacherName = jsonData[i].teacherName + " ( " + jsonData[i].percentSolved + "% solved )";
+            		var teacherName = jsonData[i].Teacher + " ( " + jsonData[i].pctSolved + "% solved )";
             		ticks.push(teacherName);
             	}
             	var theSeries = [];
@@ -2486,10 +2496,10 @@ function showReport_tp() {
             		var element1 = [];
             		var element2 = [];
             		var element3 = [];
-            		element1.push(jsonData[i].seen);
+            		element1.push(jsonData[i].Seen);
             		element1.push(i+1);
             		row1.push(element1);
-            		element2.push(jsonData[i].solved);
+            		element2.push(jsonData[i].Solved);
             		element2.push(i+1);
             		row2.push(element2);
 //            		var element3 = [];
@@ -2524,8 +2534,7 @@ function showReport_tp() {
             	        {label:'<%= rwrb.getString("seen") %>'}
             	    ],
             	    legend: {
-            	        show: true,
-            	        placement: 'outsideGrid'
+            	        show: true
             	    },                
 
                     axes: {
@@ -4144,13 +4153,13 @@ function updateAllCohortSlices() {
            	<div class="row">
 				<div class="form-group">
 				    <div class="offset-md-3 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks">Show from beginning.</label>
+						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks"><%= rwrb.getString("show_from_beginning") %></label>
 				    </div>
 				    <div class="offset-md-2 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked>Show [X] prior weeks.</label>
+						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 				    </div>
 				    <div class="offset-md-1 col-md-2 pull-left">
-						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="settingsPriorWeeks" value="4">
+						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('settingsPriorWeeks')"; id="settingsPriorWeeks" value="4">
 				    </div>
 				</div>
 			</div>			
@@ -4212,7 +4221,7 @@ function updateAllCohortSlices() {
 					<label class="radio-inline"><input id="radioChartsWeekSelect"  value="select"  type="radio" name="optRadioChartsWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 			    </div>
 			    <div class="offset-md-1 col-md-2 pull-left">
-					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="chartsPriorWeeks">
+					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('chartsPriorWeeks')"; id="chartsPriorWeeks">
 			    </div>
 			</div>
 		</div>
@@ -4337,13 +4346,13 @@ function updateAllCohortSlices() {
                             	<div class="row">                           
 								<div class="form-group">
 								    <div class="offset-md-1 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks">Show from beginning.</label>
+										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks"><%= rwrb.getString("show_from_beginning") %></label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt5PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('rpt5PriorWeeks')"; id="rpt5PriorWeeks">
 								    </div>
 								</div>
 								</div>
@@ -4451,7 +4460,7 @@ function updateAllCohortSlices() {
  
                             <div class="panel-body col-md-12">
 				            	<div id="tp_canvas" class="col-md-6" style="width:800px; height:500px;"></div> 
-				            	<div id="tp_table_panel" class="col-md-6" style="width:800px; height:500px;">
+				            	<div id="tp_table_panel" class="col-md-6" style="width:600px; height:500px;">
 				            	   <table align = "center"
             							id="tp_table" border="1">
     							   </table>
@@ -4477,8 +4486,8 @@ function updateAllCohortSlices() {
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tcp_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
-				            	<div id="tcp_table_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:800px;"></div> 
+				            	<div id="tcp_table_panel" class="col-md-6" style="width:600px; height:800px;">
 				            	   <table align = "center"
             							id="tcp_table" border="1">
     							   </table>
@@ -4569,13 +4578,13 @@ function updateAllCohortSlices() {
                             <div class="panel-body report_filters">                           
 								<div class="form-group">
 								    <div class="offset-md-3 col-md-3 pull-left">
-										<label class="radio-inline"><input id="tcs_radioWeeksAll"  value="all"  type="radio" name="opt_tcs_RadioWeeks">Show from beginning.</label>
+										<label class="radio-inline"><input id="tcs_radioWeeksAll"  value="all"  type="radio" name="opt_tcs_RadioWeeks"><%= rwrb.getString("show_from_beginning") %></label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="tcs_radioWeekSelect"  value="select"  type="radio" name="opt_tcs_RadioWeeks" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="tcs_radioWeekSelect"  value="select"  type="radio" name="opt_tcs_RadioWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="tcs_PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('tcs_PriorWeeks')"; id="tcs_PriorWeeks">
 								    </div>
 								</div>
                             </div>
@@ -4612,7 +4621,7 @@ function updateAllCohortSlices() {
 										<label class="radio-inline"><input id="radio6WeekSelect"  value="select"  type="radio" name="optRadio6Weeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt6PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('rpt6PriorWeeks')"; id="rpt6PriorWeeks">
 								    </div>
 								</div>
 								</div>
@@ -4713,7 +4722,22 @@ function updateAllCohortSlices() {
 					            	</div> 
 				                    <div id="liveDashboardEffortPane" class="col-md-8" style="background-color:powderblue; border: 2px solid #000000; border-radius: 25px; height:500px;">
 				                        <div style="text-align:center;"> <h2>Problem Solving Effort</h2></div>
-						            	<div id="chart3d_canvas" class="col-md-6" style="width:400px; height:400px;"></div> 
+						            	<div id="chart3d_canvas" class="col-md-5" style="width:400px; height:400px;"></div> 
+						            	<div id="chart3d_legend" class="col-md-7"> 		            	
+						            	     <table class="table table-striped table-bordered hover">
+			                                    <tbody>
+			                                    <tr><td class="span-SOF"    style="height:8px;padding:0;"><h5><%= rb.getString("sof") %></h5></td></tr>
+			                                    <tr><td class="span-ATT"    style="height:8px;padding:0;"><h5><%= rb.getString("att") %></h5></td></tr>
+			                                    <tr><td class="span-SHINT"  style="height:8px;padding:0;"><h5><%= rb.getString("shint") %></h5></td></tr>
+			                                    <tr><td class="span-SHELP"  style="height:8px;padding:0;"><h5><%= rb.getString("shelp") %></h5></td></tr>
+			                                    <tr><td class="span-GUESS"  style="height:8px;padding:0;"><h5><%= rb.getString("guess") %></h5></td></tr>
+			                                    <tr><td class="span-NOTR"   style="height:8px;padding:0;"><h5><%= rb.getString("notr") %></h5></td></tr>
+			                                    <tr><td class="span-SKIP"   style="height:8px;padding:0;"><h5><%= rb.getString("skip") %></h5></td></tr>
+			                                    <tr><td class="span-GIVEUP" style="height:8px;padding:0;"><h5><%= rb.getString("giveup") %></h5></td></tr>
+			                                    <tr><td class="span-NODATA" style="height:8px;padding:0;"><h5><%= rb.getString("no_data") %></h5></td></tr>
+			                                    </tbody>
+			                                </table>
+						            	</div>
 					            	</div> 
 				            	</div>
                             </div>
