@@ -705,10 +705,29 @@ function liveDashboardPopulate() {
                	
                	var intLiveDashboardTotal = parseInt(data);
                	
-               	var theMax = 400;
-               	theInterval = intLiveDashboardTotal = 25;
-              		ticks.push(" ");
-              		s1.push(liveDashboardTotal);
+               	var liveMaxStr = document.getElementById("tt-live-goal").value;
+               	if ((liveMaxStr == "") || liveMaxStr.isNaN()) {
+               		liveMax = 500;
+               	}
+               	liveMax = parseInt(liveMaxStr);
+               	if (liveMax <= 100) {
+                   	theInterval = 5;               		
+               	}
+               	else {
+               		if (liveMax <= 500) {
+	                   	theInterval = 25;               		
+	               	}
+	               	else {
+	               		if (liveMax <= 1000) {
+	               			theInterval = 50;
+	               		}
+	               		else {
+	               			theInterval = 100;               			
+	               		}
+	               	}
+               	}
+               	ticks.push(" ");
+              	s1.push(liveDashboardTotal);
    				
    				plot_effort_chart = $.jqplot('live_dashboard_canvas', [s1], {
    				    seriesDefaults:{
@@ -727,11 +746,11 @@ function liveDashboardPopulate() {
    			            	tickOptions: { 
    			                	angle: 15
    			            	},
-   			            	label: 'Total Problems Solved'
+   			            	label: '<%= rb.getString("total_problems_solved")%>'
    				        },
    				        yaxis: {
    				            pad: 1.05,
-   				            max: theMax,
+   				            max: liveMax,
    			            	min: 0,  
    			            	tickInterval: theInterval, 
    			            	tickOptions: { 
@@ -3348,8 +3367,17 @@ function registerAllEvents(){
 	             	<div class="col-md-12">                                
 	                    <div id="liveDashboardProblemPane" class="col-md-4 tt-LiveDashboardProblemPane">
 	
-	                        <h2><%= rb.getString("number_problems_class_solved") %></h2>	                       
-	                        <h3><%= rb.getString("with_or_without_hints") %></h3>
+	                        <div class="row">
+		                        <h2><%= rb.getString("number_problems_class_solved") %></h2>	                       
+		            		</div>
+	                        <div class="row">
+		                        <h3><%= rb.getString("with_or_without_hints") %></h3>
+		            		</div>
+	                        <div class="row" style="margin-left:100px">
+								<label><h3><%= rb.getString("live_goal") %></h3></label>&nbsp
+								<input id="tt-live-goal" style="width:50px" type="text" name="" value="500">   
+								
+		            		</div>
 	                        <div class="row">
 		                        <div id="classTotalProblems" class="tt-live-dashboard-box" style="width:300px; height:200px;"">
 		                        	<div id="live-dashboard-content" >
@@ -3362,24 +3390,25 @@ function registerAllEvents(){
 		            		</div>
 	                    </div>
 	                    <div id="liveDashboardEffortPane" class="col-md-8 tt-LiveDashboardEffortPane">
-	                        <div style="text-align:center;"> <h2>Problem Solving Effort</h2></div>
-			            	<div id="chart3d_canvas" class="col-md-6" style="width:400px; height:400px;"></div> 
-			            	<div id="chart3d_legend" class="col-md-6"> 		            	
-			            	     <table class="table table-striped table-bordered hover">
-                                    <tbody>
-                                    <tr><td class="span-SOF" style="height:10px;padding:0;"><%= rb.getString("sof") %></td></tr>
-                                    <tr><td class="span-ATT" style="height:10px;padding:0;"><%= rb.getString("att") %></td></tr>
-                                    <tr><td class="span-SHINT" style="height:10px;padding:0;"><%= rb.getString("shint") %></td></tr>
-                                    <tr><td class="span-SHELP" style="height:10px;padding:0;"><%= rb.getString("shelp") %></td></tr>
-                                    <tr><td class="span-GUESS" style="height:10px;padding:0;"><%= rb.getString("guess") %></td></tr>
-                                    <tr><td class="span-NOTR" style="height:10px;padding:0;"><%= rb.getString("notr") %></td></tr>
-                                    <tr><td class="span-SKIP" style="height:10px;padding:0;"><%= rb.getString("skip") %></td></tr>
-                                    <tr><td class="span-GIVEUP" style="height:10px;padding:0;"><%= rb.getString("giveup") %></td></tr>
-                                    <tr><td class="span-NODATA" style="height:10px;padding:0;"><%= rb.getString("no_data") %></td></tr>
-                                    </tbody>
-                                </table>
-			            	</div>
-			            	</div>
+	                        <div style="text-align:center;"> <h2><%= rb.getString("problem_solving_effort") %></h2></div>
+	                        <div class="row">
+				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:80px; width:400px; height:400px;"></div> 
+				            	<div id="chart3d_legend" class="col-md-5 float-left" style="margin-top:20px";> 		            	
+				            	     <table class="table table-striped table-bordered hover">
+	                                    <tbody>
+		                                    <tr><td class="span-SOF"    style="height:8px;padding:0;"><h5><%= rb.getString("sof") %></h5></td></tr>
+		                                    <tr><td class="span-ATT"    style="height:8px;padding:0;"><h5><%= rb.getString("att") %></h5></td></tr>
+		                                    <tr><td class="span-SHINT"  style="height:8px;padding:0;"><h5><%= rb.getString("shint") %></h5></td></tr>
+		                                    <tr><td class="span-SHELP"  style="height:8px;padding:0;"><h5><%= rb.getString("shelp") %></h5></td></tr>
+		                                    <tr><td class="span-GUESS"  style="height:8px;padding:0;"><h5><%= rb.getString("guess") %></h5></td></tr>
+		                                    <tr><td class="span-NOTR"   style="height:8px;padding:0;"><h5><%= rb.getString("notr") %></h5></td></tr>
+		                                    <tr><td class="span-SKIP"   style="height:8px;padding:0;"><h5><%= rb.getString("skip") %></h5></td></tr>
+		                                    <tr><td class="span-GIVEUP" style="height:8px;padding:0;"><h5><%= rb.getString("giveup") %></h5></td></tr>
+		                                    <tr><td class="span-NODATA" style="height:8px;padding:0;"><h5><%= rb.getString("no_data") %></h5></td></tr>
+	                                    </tbody>
+	                                </table>
+				            	</div>
+				            </div>
 	                    </div>
 	                </div>
             	</div>
