@@ -706,8 +706,9 @@ function liveDashboardPopulate() {
                	var intLiveDashboardTotal = parseInt(data);
                	
                	var liveMaxStr = document.getElementById("tt-live-goal").value;
-               	if ((liveMaxStr == "") || liveMaxStr.isNaN()) {
-               		liveMax = 500;
+               	if ((liveMaxStr == "") || isNaN(liveMaxStr)) {
+               		document.getElementById("tt-live-goal").value = '500';
+               		liveMaxStr = '500';
                	}
                	liveMax = parseInt(liveMaxStr);
                	if (liveMax <= 100) {
