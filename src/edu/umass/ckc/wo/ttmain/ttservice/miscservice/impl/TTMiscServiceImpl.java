@@ -79,6 +79,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     private static Logger logger = Logger.getLogger(TTMiscServiceImpl.class);
 
 	private ResourceBundle rb = null;
+	private ResourceBundle rwrb = null;
 	private Locale ploc;
 	
     @Autowired
@@ -104,8 +105,15 @@ public class TTMiscServiceImpl implements TTMiscService {
         		loc = new Locale("es","AR");	
         	}        	
     		ploc = loc;
-    		rb = ResourceBundle.getBundle("MathSpring",loc);
 
+    		try {
+        		rb = ResourceBundle.getBundle("MathSpring",loc);
+    			rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
+    		}
+    		catch (Exception e) {
+    			logger.error(e.getMessage());	
+    		}
+    		
     		String result = "";
     		switch (reportType) {
 			case "getCohortTeachersClasses":
@@ -529,13 +537,13 @@ public class TTMiscServiceImpl implements TTMiscService {
        				teacherName = teacherName.substring(0,11);
        			}
             	JSONObject resultJson = new JSONObject();
-        		resultJson.put("teacherName", teacherName);
-        		resultJson.put("className", rs.getString("className"));
-        		resultJson.put("teacherId", rs.getString("teacherId"));
-        		resultJson.put("classId", rs.getString("classId"));
-           		resultJson.put("seen", rs.getInt("sumProblemsSeen"));
-       			resultJson.put("solved", rs.getInt("sumProblemsSolved"));
-       			resultJson.put("percentSolved", pctProblemsSolved);
+        		resultJson.put("Teacher", teacherName);
+        		resultJson.put("Class", rs.getString("className"));
+        		resultJson.put("TID", rs.getString("teacherId"));
+        		resultJson.put("CID", rs.getString("classId"));
+           		resultJson.put("Seen", rs.getInt("sumProblemsSeen"));
+       			resultJson.put("Solved", rs.getInt("sumProblemsSolved"));
+       			resultJson.put("pctSolved", pctProblemsSolved);
             	bodyArr.add(resultJson);
             }            
             stmt.close();
@@ -543,16 +551,16 @@ public class TTMiscServiceImpl implements TTMiscService {
 
             //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
-    		footerJson.put("teacherName", "Study Total");
-    		footerJson.put("className", "");
-    		footerJson.put("teacherId", "");
-    		footerJson.put("classId", "");
-       		footerJson.put("seen", studyProblemsSeen);
-   			footerJson.put("solved", studyProblemsSolved);
+    		footerJson.put("Teacher", "Study Total");
+    		footerJson.put("Class", "");
+    		footerJson.put("TID", "");
+    		footerJson.put("CID", "");
+       		footerJson.put("Seen", studyProblemsSeen);
+   			footerJson.put("Solved", studyProblemsSolved);
    			if (studyProblemsSeen > 0) {
    				studyPercentSolved = (studyProblemsSolved * 100) / studyProblemsSeen;
    			}
-   			footerJson.put("percentSolved", studyPercentSolved);
+   			footerJson.put("pctSolved", studyPercentSolved);
         	footerArr.add(footerJson);
 
         	resultArr.add(bodyArr);
@@ -604,11 +612,11 @@ public class TTMiscServiceImpl implements TTMiscService {
        			}
             	            	
             	JSONObject resultJson = new JSONObject();
-        		resultJson.put("teacherName", teacherName);
-        		resultJson.put("teacherId", rs.getString("teacherId"));
-           		resultJson.put("seen", rs.getInt("sumProblemsSeen"));
-       			resultJson.put("solved", sumProblemsSolved);
-       			resultJson.put("percentSolved", pctProblemsSolved);
+        		resultJson.put("Teacher", teacherName);
+        		resultJson.put("Id", rs.getString("teacherId"));
+           		resultJson.put("Seen", rs.getInt("sumProblemsSeen"));
+       			resultJson.put("Solved", sumProblemsSolved);
+       			resultJson.put("pctSolved", pctProblemsSolved);
             	bodyArr.add(resultJson);
             }            
             stmt.close();
@@ -616,14 +624,14 @@ public class TTMiscServiceImpl implements TTMiscService {
 
             //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
-    		footerJson.put("teacherName", "Study Total");
-    		footerJson.put("teacherId", "");
-       		footerJson.put("seen", studyProblemsSeen);
-   			footerJson.put("solved", studyProblemsSolved);
+    		footerJson.put("Teacher", "Study Total");
+    		footerJson.put("Id", "");
+       		footerJson.put("Seen", studyProblemsSeen);
+   			footerJson.put("Solved", studyProblemsSolved);
    			if (studyProblemsSeen > 0) {
    				studyPercentSolved = (studyProblemsSolved * 100) / studyProblemsSeen;
    			}
-   			footerJson.put("percentSolved", studyPercentSolved);
+   			footerJson.put("pctSolved", studyPercentSolved);
         	footerArr.add(footerJson);
 
         	resultArr.add(bodyArr);
