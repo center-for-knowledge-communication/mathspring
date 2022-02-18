@@ -51,6 +51,7 @@
 <!-- Frank 10-09-21  	Issue #526 Improve form validation -->
 <!-- Frank 10-09-21  	Issue # 523 Add user prefix lookup -->
 <!-- Frank 11-30-21     Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022 -->  
+<!-- Frank 02-11-22     Issue #599 - live dashboard added 2 charts -->  
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -170,6 +171,17 @@ System.out.println("msHost = " + msHost + msContext);
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
 
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/jquery.jqplot.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.barRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.categoryAxisRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasTextRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisLabelRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisTickRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.dateAxisRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pieRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.enhancedPieLegendRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.highlighter.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pointLabels.js" />"></script>
 
 <style>
 .nobull {
@@ -259,6 +271,13 @@ var surveyQuestionTable;
 var apply_content_table;
 var filterLandingOne = "~7";
 var filterLandingTwo = "~0";
+
+
+var plot_live_dashboard = null;
+var plot_effort_chart = null;
+var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS",   "NOTR",  "SKIP", "GIVEUP",   "NODATA"];
+var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
+var live_series_colors = ['#0000c6'];
 
 var emsg_classLanguage   = 'Class language is mandatory field';
 var emsg_className       = 'Class name is mandatory field';
@@ -575,6 +594,86 @@ function verifyTimeMinMax() {
 	
 }
 
+
+function showReport3d() {
+	
+	if (plot_live_dashboard != null) {
+		plot_live_dashboard.destroy();
+		plot_live_dashboard = null;
+	}
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: 0,
+            reportType: 'getClassProblemsEffortRpt',
+            lang: loc,
+            filter: classID
+        },
+        success : function(data) {
+        	if (data) {
+        		
+               	var resultData = $.parseJSON(data);
+            	var jsonData = resultData[0];
+            	
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+		  			var effortValue = new Array(9);
+		  			effortValue[0] = parseInt(jsonData[i].SOF);
+		  			effortValue[1] = parseInt(jsonData[i].ATT);
+		  			effortValue[2] = parseInt(jsonData[i].SHINT);
+		  			effortValue[3] = parseInt(jsonData[i].SHELP);
+		  			effortValue[4] = parseInt(jsonData[i].GUESS);
+		  			effortValue[5] = parseInt(jsonData[i].NOTR);
+		  			effortValue[6] = parseInt(jsonData[i].SKIP);
+		  			effortValue[7] = parseInt(jsonData[i].GIVEUP);
+		  			effortValue[8] = parseInt(jsonData[i].NODATA);
+		  			
+            		var line0 = [];
+		  			var lines = [line0];
+		  			for (j=0;j<9;j = j + 1) {
+		  				var eff = [];
+			  			eff.push(effort_legend_labels[j],effortValue[j]);
+			  			lines[i].push(eff);
+		  				
+		  			}
+					var canvasName = 'chart3d_canvas';
+					var tline = lines[i];
+					plot_live_dashboard = $.jqplot(canvasName, [tline], {
+				    seriesDefaults: {
+		              renderer: $.jqplot.PieRenderer,
+				      rendererOptions: {
+				        showDataLabels: true,
+					    startAngle: -90,
+					    padding: 10,
+				        sliceMargin: 6
+				      },
+				    },
+//				    legend: {
+//				      show: true,
+//			          location: 'w',
+//			          labels: effort_legend_labels		
+//				    },
+				    seriesColors: effort_series_colors
+				 
+				  });
+            	}
+        	}
+        	else {
+        		alert('No data available');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
+
+
 var liveDashboardTotal = 0;
 
 function liveDashboardPopulate() {
@@ -591,15 +690,82 @@ function liveDashboardPopulate() {
 
         },
         success : function(data) {
-        	    if (data) {
-        	    	liveDashboardTotal = "" + data;
-        	    	document.getElementById('live-dashboard-content').innerHTML = '<h1 class="tt-live-dashboard-content">' + liveDashboardTotal + '</h1>';
-        	    	document.getElementById("live-dashboard").style.visibility = 'visible';
-        	    	liveDashboardLoop();
-        	    }
-              	else {
-              		console.log("response data is null");
-              	}
+       	    if (data) {
+       	    	liveDashboardTotal = "" + data;
+       	    	document.getElementById('live-dashboard-content').innerHTML = '<h1 class="tt-live-dashboard-content">' + liveDashboardTotal + '</h1>';
+       	    	document.getElementById("live-dashboard").style.visibility = 'visible';
+       	    	liveDashboardLoop();
+
+       	    	if (plot_effort_chart != null) {
+       	    		plot_effort_chart.destroy();
+       	    		plot_effort_chart = null;
+       	    	}       	                	
+               	var s1 = [];
+               	var ticks = [];
+               	
+               	var intLiveDashboardTotal = parseInt(data);
+               	
+               	var liveMaxStr = document.getElementById("tt-live-goal").value;
+               	if ((liveMaxStr == "") || isNaN(liveMaxStr)) {
+               		document.getElementById("tt-live-goal").value = '500';
+               		liveMaxStr = '500';
+               	}
+               	liveMax = parseInt(liveMaxStr);
+               	if (liveMax <= 100) {
+                   	theInterval = 5;               		
+               	}
+               	else {
+               		if (liveMax <= 500) {
+	                   	theInterval = 25;               		
+	               	}
+	               	else {
+	               		if (liveMax <= 1000) {
+	               			theInterval = 50;
+	               		}
+	               		else {
+	               			theInterval = 100;               			
+	               		}
+	               	}
+               	}
+               	ticks.push(" ");
+              	s1.push(liveDashboardTotal);
+   				
+   				plot_effort_chart = $.jqplot('live_dashboard_canvas', [s1], {
+   				    seriesDefaults:{
+   				        renderer:$.jqplot.BarRenderer,
+   				        rendererOptions: {
+   				        	fillToZero: true,
+   				        	varyBarColor: true	        	
+   				        }
+   			            
+   				    },
+   				    axes: {
+   				        xaxis: {
+   				            renderer: $.jqplot.CategoryAxisRenderer,
+   				            ticks: ticks,
+   				            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+   			            	tickOptions: { 
+   			                	angle: 15
+   			            	},
+   			            	label: '<%= rb.getString("total_problems_solved")%>'
+   				        },
+   				        yaxis: {
+   				            pad: 1.05,
+   				            max: liveMax,
+   			            	min: 0,  
+   			            	tickInterval: theInterval, 
+   			            	tickOptions: { 
+   			                	formatString: '%d'
+   			            	} 
+   			
+   				        },
+   					    seriesColors: live_series_colors
+   				    }
+   				});
+       	    }
+           	else {
+           		console.log("response data is null");
+           	}
         },
         error : function(e) {
             console.log(e);
@@ -613,7 +779,7 @@ function liveDashboardLoop() {
 
 	setTimeout(function() {
 		liveDashboardPopulate();
-	}, 5000);	
+	}, 60000);	
 	 
 }
 
@@ -621,6 +787,8 @@ function liveDashboardStart() {
 
 	liveDashboardPopulate();
 	$("#live-dashboard").show();
+
+
 }
 
 var resetStudentDataTitle = "";
@@ -1274,6 +1442,7 @@ function handleclickHandlers() {
 
         $("#content-conatiner").children().hide();
         liveDashboardStart();
+    	showReport3d();
     });
 
     $('a[rel=initialPopover]').popover({
@@ -2211,9 +2380,10 @@ function registerAllEvents(){
     });
 	
 
+
+
+	
 }
-
-
     /** Report Handler Starts **/
     
 
@@ -3193,21 +3363,56 @@ function registerAllEvents(){
                 </div>
              </div>
 
-             <div id="live-dashboard" style="display:none;width: 100%;">
-             <div>
-                    <h3 class="tt-page-header">
-                        <h2><%= rb.getString("number_problems_class_solved") %></h2>
-                        <br>
-                        <h3><%= rb.getString("with_or_without_hints") %></h3>
-                    </h3>
-                    <div>
-                        <div id="classTotalProblems" class="tt-live-dashboard-box">
-                        	<div id="live-dashboard-content" >
-								<h1 class="tt-live-dashboard-content"></h1>
-							</div>
-                        </div>
-                    </div>
-                </div>
+             <div id="live-dashboard" class="container-fluid" style="display:none;width: 100%;">
+               	<div class="row">
+	             	<div class="col-md-12">                                
+	                    <div id="liveDashboardProblemPane" class="col-md-4 tt-LiveDashboardProblemPane">
+	
+	                        <div class="row">
+		                        <h2><%= rb.getString("number_problems_class_solved") %></h2>	                       
+		            		</div>
+	                        <div class="row">
+		                        <h3><%= rb.getString("with_or_without_hints") %></h3>
+		            		</div>
+	                        <div class="row" style="margin-left:100px">
+								<label><h3><%= rb.getString("live_goal") %></h3></label>&nbsp
+								<input id="tt-live-goal" style="width:50px" type="text" name="" value="500">   
+								
+		            		</div>
+	                        <div class="row">
+		                        <div id="classTotalProblems" class="tt-live-dashboard-box" style="width:300px; height:200px;"">
+		                        	<div id="live-dashboard-content" >
+										<h1 class="tt-live-dashboard-content"></h1>
+									</div>
+		                        </div>
+		            		</div>
+	                        <div class="row">
+			            		<div id="live_dashboard_canvas" class="col-md-4 tt-Live_dashboard_canvas"></div>
+		            		</div>
+	                    </div>
+	                    <div id="liveDashboardEffortPane" class="col-md-8 tt-LiveDashboardEffortPane">
+	                        <div style="text-align:center;"> <h2><%= rb.getString("problem_solving_effort") %></h2></div>
+	                        <div class="row">
+				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:80px; width:400px; height:400px;"></div> 
+				            	<div id="chart3d_legend" class="col-md-5 float-left" style="margin-top:20px";> 		            	
+				            	     <table class="table table-striped table-bordered hover">
+	                                    <tbody>
+		                                    <tr><td class="span-SOF"    style="height:8px;padding:0;"><h5><%= rb.getString("sof") %></h5></td></tr>
+		                                    <tr><td class="span-ATT"    style="height:8px;padding:0;"><h5><%= rb.getString("att") %></h5></td></tr>
+		                                    <tr><td class="span-SHINT"  style="height:8px;padding:0;"><h5><%= rb.getString("shint") %></h5></td></tr>
+		                                    <tr><td class="span-SHELP"  style="height:8px;padding:0;"><h5><%= rb.getString("shelp") %></h5></td></tr>
+		                                    <tr><td class="span-GUESS"  style="height:8px;padding:0;"><h5><%= rb.getString("guess") %></h5></td></tr>
+		                                    <tr><td class="span-NOTR"   style="height:8px;padding:0;"><h5><%= rb.getString("notr") %></h5></td></tr>
+		                                    <tr><td class="span-SKIP"   style="height:8px;padding:0;"><h5><%= rb.getString("skip") %></h5></td></tr>
+		                                    <tr><td class="span-GIVEUP" style="height:8px;padding:0;"><h5><%= rb.getString("giveup") %></h5></td></tr>
+		                                    <tr><td class="span-NODATA" style="height:8px;padding:0;"><h5><%= rb.getString("no_data") %></h5></td></tr>
+	                                    </tbody>
+	                                </table>
+				            	</div>
+				            </div>
+	                    </div>
+	                </div>
+            	</div>
              </div>
 
              <div id="splash_page" style="display:none;width: 100%;">

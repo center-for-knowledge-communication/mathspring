@@ -1,5 +1,7 @@
 @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css";
 @import "https://daneden.github.io/animate.css/animate.min.css";
+
+/* Frank	0211-2022	Issue #599 - live dashboard */
 /*-------------------------------*/
 /*           VARIABLES           */
 /*-------------------------------*/
@@ -513,9 +515,32 @@ background-color: #FF4766;
 
 .tt-live-dashboard-box {
   background-color: #faff91;
-  margin: 40px 400px 40px 400px;
+  margin: 20px 60px 40px 60px;
   border: 8px solid #000000;
 }
+
+.tt-Live_dashboard_canvas {
+  width:300px; 
+  height:300px; 
+  margin-left:40px;	
+}
+
+.tt-LiveDashboardProblemPane {
+ background-color:lightgreen;
+ border: 2px solid #000000; 
+ border-radius: 25px;
+ height:800px;"
+}
+
+.tt-LiveDashboardEffortPane {
+background-color:powderblue;
+border: 2px solid #000000;
+border-radius: 25px;
+height:800px;">	
+} 
+
+
+
 /* Tab Navigation */
 .nav-tabs {
   margin: 0;

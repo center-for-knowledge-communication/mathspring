@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -254,6 +255,22 @@
 								<include>MathSpring_es.properties</include>
 							</includes>
 						</resource>
+
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>MSResearcherWorkbench.properties</include>
+							</includes>
+						</resource>
+						<resource>
+							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+							<includes>
+								<include>MSResearcherWorkbench_es.properties</include>
+							</includes>
+						</resource>
+
 						<resource>
 							<directory>${pom.basedir}/${webpath}/WEB-INF/classes</directory>
 							<targetPath>WEB-INF/classes</targetPath>

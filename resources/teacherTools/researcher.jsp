@@ -47,13 +47,22 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());	
 }
+
+ResourceBundle rwrb = null;
+try {
+	rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());	
+}
+
 %>
 
 <!DOCTYPE HTML>
 <html>
 
 <head>
-  <title>Researcher Workbench</title>
+  <title><%= rwrb.getString("researcher_workbench") %></title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -221,6 +230,7 @@ var currentTeacher = new Object();
 var currentClass = "";
 
 var currentWeek = 1;
+var finalWeek = 1;
 
 var filterOne = "";
 var headers = "";
@@ -248,6 +258,9 @@ var plots3c = [plot3c0,plot3c1,plot3c2,plot3c3];
 var plot3cf0 = null;
 var plots3cf = [plot3cf0];
 
+var plot3d = null;
+var plot3e = null;
+
 var plot_tcp = null;
 var plot_tp = null;
 var plot_tcs = null;
@@ -267,11 +280,11 @@ function launchReportCard() {
 	var isValid = true;
 	
 	if (currentTeacher.id == null) {
-		alert("Must select a teacher on the settings page");
+		alert('<%= rwrb.getString("must_select_teacher") %>');
 		isValid = false;
 	}
 	if ((currentClass == null) || (currentClass == "")) {
-		alert("Must select a class on the settings page");
+		alert('<%= rwrb.getString("must_select_class") %>');
 		isValid = false;
 	}
 	if (isValid) {
@@ -480,26 +493,26 @@ function clearSettings() {
 	document.getElementById('cohortSelect').innerHTML = cohortsDiv;
 	currentCohortId = -1;
 	
- 	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+ 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label>';  
     document.getElementById('teacherSelect').innerHTML = teachersDiv;
 
- 	var classesDiv = '<label for="classList">Select class</label>';  
+ 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label>';  
     document.getElementById('classSelect').innerHTML = classesDiv;
 
-    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
 
     showCohorts();
 }
 
 function clearTeachers() {
 
-	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label>';  
     document.getElementById('teacherSelect').innerHTML = teachersDiv;
 
- 	var classesDiv = '<label for="classList">Select class</label>';  
+ 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label>';  
     document.getElementById('classSelect').innerHTML = classesDiv;
 
-    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
     document.getElementById('trendsTeacherName').innerHTML = "";
     
     document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
@@ -510,18 +523,28 @@ function clearTeachers() {
 function gotoSettingsPane() {
 
  	
-	var teachersDiv = '<label for="teacherList">Select teacher</label>';  
+	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label>';  
     document.getElementById('teacherSelect').innerHTML = teachersDiv;
 
- 	var classesDiv = '<label for="classList">Select class</label>';  
+ 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label>';  
     document.getElementById('classSelect').innerHTML = classesDiv;
 
-    document.getElementById('chartUsername').innerHTML = "Please select a teacher from the Settings page";
+    document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
     document.getElementById('trendsTeacherName').innerHTML = "";
 
     showCohorts();
 }
 
+
+function validatePriorWeeks(tid) {
+	var temp = document.getElementById(tid).value;
+	if (temp.length > 0) {
+		if (isNaN(temp)) {
+			document.getElementById(tid).value = "";
+			alert("must enter a number");
+		}
+	}
+}
 
 function showCohorts() {
 	
@@ -595,13 +618,38 @@ function handleCohortSelect(event) {
    	currentWeekRaw = ((msToday - msStartDate)  / 7);
    	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24));
    	currentWeek = Math.ceil(currentWeekRaw);
-   	
+
+   	if (cohortsArr[currentCohortIndex].cohortEnddate == null) {
+   		finalWeek = -1;
+   	}
+   	else {
+	   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
+	   	finalWeekRaw = ((msToday - msEndDate)  / 7);
+	   	finalWeekRaw = (finalWeekRaw / (1000 * 3600 * 24));
+	   	finalWeek = Math.ceil(finalWeekRaw);
+   	}
    	console.log("currentWeek = " + currentWeek);
+   	console.log("finalWeek = " + finalWeek);
    	
-	document.getElementById('chartsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
-	document.getElementById('trendsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
-	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";
-	document.getElementById('populationCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + " (Week # " + currentWeek + ")</h3>";;
+	var currentWeekHdr = "";
+	
+   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
+	var msEndDateStr = msEndDate.toLocaleDateString();
+   	
+   	if (msEndDate > 0) {
+   		currentWeekHdr = " - ended " + msEndDateStr;   		
+   	}
+   	else {
+   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
+   		
+   	}
+   	
+   	
+	document.getElementById('chartsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
+	document.getElementById('trendsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
+	document.getElementById('adminCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
+	document.getElementById('populationCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
+	document.getElementById('dashboardCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
       
     showTeachers();
 
@@ -618,7 +666,7 @@ function showTeachers() {
     currentTeacher.id = "0";
     currentTeacher.username = "";
 	var teacherArr = allCohortsArr[currentCohortIndex];    	
- 	var teachersDiv = '<label for="teacherList">Select teacher</label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+ 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
 
  	var prevname = "";
     for (var i=0;i<teacherArr.cohortArr.length;i++) {
@@ -653,7 +701,7 @@ function handleTeacherSelect(event) {
 function showClasses() {
 	
 	var teacherArr = allCohortsArr[currentCohortIndex];    	
- 	var classesDiv = '<label for="classList">Select class</label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+ 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
 
  	var prevClassName = "";
     for (var i=0;i<teacherArr.cohortArr.length;i++) {
@@ -681,6 +729,54 @@ function handleClassSelect(event) {
 
     var selectElement = event.target;
     currentClass = Number(selectElement.value);
+}
+
+
+function editCohort(cmd) {
+	alert(cmd + '(tbd)');
+}
+
+function editCohortTeachers(cmd) {
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+	}
+	if (cmd === "remove") {
+		var lastname = prompt("Enter teacher last name;");
+		var id = prompt("Enter teacher id");
+		var conf = confirm("are you sure you want to remove " + lastname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
+		if (conf) {
+			//alert("Ok, let's do it!");			
+		}
+		else {
+			alert("Whoa,that was close!");
+		}
+		
+	}
+	if (cmd === "add") {
+		var lastname = prompt("Enter teacher last name;");
+		var id = prompt("Enter teacher id");
+		var conf = confirm("are you sure you want to add " + lastname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
+		if (conf) {
+			//alert("Ok, let's do it!");			
+		}
+		else {
+			alert("Whoa,that was close!");
+		}
+	}
+}
+
+function editCohortClasses(cmd) {
+	if (cmd === "remove") {
+		var answer = prompt("Enter class id");
+		var conf = confirm("are you sure you want to remove the class id " + answer);
+		if (conf) {
+			//alert("Ok, let's do it!");			
+		}
+		else {
+			alert("Whoa,that was close!");
+		}
+		
+	}
 }
 
 function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
@@ -775,7 +871,7 @@ function showReport1() {
         	    perTeacherReport.columns.adjust().draw();            	    
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -789,7 +885,10 @@ function showReport1() {
 /*
 function rptTeacherClassesCount() {
 
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
+	}
 
 	
     $.ajax({
@@ -841,7 +940,7 @@ function rptTeacherClassesCount() {
                         }
                     },
             	    series:[
-            	        {label:'Logins'}
+            	        {label:'<%= rwrb.getString("logins") %>'}
             	    ],
                     axes: {
                         yaxis: {
@@ -855,7 +954,7 @@ function rptTeacherClassesCount() {
 
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -868,10 +967,9 @@ function rptTeacherClassesCount() {
 */
 function showReport2() {
 
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
-
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	if (plot2 != null) {
 		plot2.destroy();
@@ -936,9 +1034,9 @@ function showReport2() {
                         }
                     },
             	    series:[
-            	        {label:'Logouts'},
-            	        {label:'Actions'},
-            	        {label:'Logins'}
+            	        {label:'<%= rwrb.getString("logouts") %>'},
+            	        {label:'<%= rwrb.getString("actions") %>'},
+            	        {label:'<%= rwrb.getString("logins") %>'}
             	    ],
             	    legend: {
             	        show: true,
@@ -954,7 +1052,7 @@ function showReport2() {
             	});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -967,10 +1065,9 @@ function showReport2() {
 
 function showReport2b() {
 
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
-
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	if (plot2b != null) {
 		plot2b.destroy();
@@ -1018,7 +1115,7 @@ function showReport2b() {
                         	tickOptions: { 
                             	angle: 15
                         	},
-                        	label: 'Teachers'
+                        	label: '<%= rwrb.getString("teachers") %>'
              			},
 	                    yaxis: {
 			 	            pad: 1.05,
@@ -1027,7 +1124,7 @@ function showReport2b() {
             				tickOptions: { 
                 				formatString: '%d'
             				}, 
-            				label: 'Number of Logins'
+            				label: '<%= rwrb.getString("number_of_logins") %>'
                			}
                     },
 
@@ -1036,7 +1133,7 @@ function showReport2b() {
 
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1049,10 +1146,10 @@ function showReport2b() {
 
 function showReport2c() {
 
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	if (plot2c != null) {
 		plot2c.destroy();
@@ -1119,7 +1216,7 @@ function showReport2c() {
                         	tickOptions: { 
                             	angle: 15
                         	},
-                        	label: 'Teachers'
+                        	label: '<%= rwrb.getString("teachers") %>'
 
                         	
 //                        	renderer: $.jqplot.CategoryAxisRenderer,
@@ -1139,7 +1236,7 @@ function showReport2c() {
             				tickOptions: { 
                 				formatString: '%d'
             				}, 
-            				label: 'Days Since Last Login'
+            				label: '<%= rwrb.getString("days_since_login") %>'
                			}
                     },
 
@@ -1149,7 +1246,7 @@ function showReport2c() {
         		}
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1190,7 +1287,8 @@ function showReport3() {
 
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	if (plot3 != null) {
@@ -1250,7 +1348,7 @@ function showReport3() {
 			            	tickOptions: { 
 			                	angle: 15
 			            	},
-			            	label: 'Teachers'
+			            	label: '<%= rwrb.getString("teachers") %>'
 				        },
 				        // Pad the y axis just a little so bars can get close to, but
 				        // not touch, the grid boundaries.  1.2 is the default padding.
@@ -1261,14 +1359,14 @@ function showReport3() {
 			            	tickOptions: { 
 			                	formatString: '%d'
 			            	}, 
-			            	label: 'Classes'
+			            	label: '<%= rwrb.getString("classes") %>'
 			
 				        }
 				    }
 				});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1284,7 +1382,8 @@ function showReport3a() {
 
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	if (plot3a != null) {
@@ -1344,7 +1443,7 @@ function showReport3a() {
 			            	tickOptions: { 
 			                	angle: 90
 			            	},
-			            	label: 'Teachers'
+			            	label: '<%= rwrb.getString("teachers") %>'
 				        },
 				        // Pad the y axis just a little so bars can get close to, but
 				        // not touch, the grid boundaries.  1.2 is the default padding.
@@ -1355,14 +1454,14 @@ function showReport3a() {
 			            	tickOptions: { 
 			                	formatString: '%d'
 			            	}, 
-			            	label: 'Students'
+			            	label: '<%= rwrb.getString("students") %>'
 			
 				        }
 				    }
 				});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1376,7 +1475,8 @@ function showReport3a() {
 function showTable3a() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	
@@ -1466,7 +1566,7 @@ function showTable3a() {
             
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1482,7 +1582,8 @@ function showReport3b() {
 
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	if (plot3b != null) {
@@ -1543,7 +1644,7 @@ function showReport3b() {
 			            	tickOptions: { 
 			                	angle: 90
 			            	},
-			            	label: 'Classes'
+			            	label: '<%= rwrb.getString("classes") %>'
 				        },
 				        // Pad the y axis just a little so bars can get close to, but
 				        // not touch, the grid boundaries.  1.2 is the default padding.
@@ -1554,14 +1655,14 @@ function showReport3b() {
 			            	tickOptions: { 
 			                	formatString: '%d'
 			            	}, 
-			            	label: 'Students'
+			            	label: '<%= rwrb.getString("students") %>'
 			
 				        }
 				    }
 				});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1575,7 +1676,8 @@ function showReport3b() {
 function showTable3b() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	
@@ -1665,7 +1767,7 @@ function showTable3b() {
             
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1687,18 +1789,30 @@ function showLegend() {
     $("#effortLegend").show();
 }
 
+function hideDashboardLegend() {
+    $("#hideDashboardLegendBtn").hide();
+    $("#showDashboardLegendBtn").show();
+    $("#dashboardEffortLegend").hide();
+}
+function showDashboardLegend() {
+    $("#showDashboardLegendBtn").hide();
+    $("#hideDashboardLegendBtn").show();
+    $("#dashboardEffortLegend").show();
+}
+
+
+
+var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS",   "NOTR",  "SKIP", "GIVEUP",   "NODATA"];
+var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
+
 
 function showReport3c() {
 
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
-
-	
-	
-	var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS",   "NOTR",  "SKIP", "GIVEUP",   "NODATA"];
-	var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
 	
 	if (plot3c0 != null) {
 		plot3c0.destroy();
@@ -1778,7 +1892,7 @@ function showReport3c() {
 		  			var line7 = [];
 		  			var line8 = [];
 		  			var line9 = [];
-		  			var lines = [line0,line1,line0,line2,line3,line4,line5,line6,line7,line8,line9]
+		  			var lines = [line0,line1,line2,line3,line4,line5,line6,line7,line8,line9]
 		  			lines[i].push(jsonData[i].SOF);
 		  			lines[i].push(jsonData[i].ATT);
 		  			lines[i].push(jsonData[i].SHINT);
@@ -1810,18 +1924,19 @@ function showReport3c() {
 				 
 				  });
 	          	}
-            	for (var i=0;i<footerData.length;i = i + 1) {
+//            	for (var i=0;i<footerData.length;i = i + 1) {
+               	for (var i=0;i<1;i = i + 1) {
 		  			var fline0 = [];
 		  			var flines = [line0]
-		  			flines[i].push(jsonData[i].SOF);
-		  			flines[i].push(jsonData[i].ATT);
-		  			flines[i].push(jsonData[i].SHINT);
-		  			flines[i].push(jsonData[i].SHELP);
-		  			flines[i].push(jsonData[i].GUESS);
-		  			flines[i].push(jsonData[i].NOTR);
-		  			flines[i].push(jsonData[i].SKIP);
-		  			flines[i].push(jsonData[i].GIVEUP);
-		  			flines[i].push(jsonData[i].NODATA);
+		  			flines[i].push(footerData[i].SOF);
+		  			flines[i].push(footerData[i].ATT);
+		  			flines[i].push(footerData[i].SHINT);
+		  			flines[i].push(footerData[i].SHELP);
+		  			flines[i].push(footerData[i].GUESS);
+		  			flines[i].push(footerData[i].NOTR);
+		  			flines[i].push(footerData[i].SKIP);
+		  			flines[i].push(footerData[i].GIVEUP);
+		  			flines[i].push(footerData[i].NODATA);
 					var canvasName = 'chart3c_canvas_footer' + i;
 					var fline = flines[i];
 					plots3cf[i] = $.jqplot(canvasName, [fline], {
@@ -1846,7 +1961,170 @@ function showReport3c() {
             	}
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
+
+
+function showReport3d() {
+
+
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
+	}
+	if ((currentClass == null) || (currentClass == "")) {
+		alert('<%= rwrb.getString("must_select_class") %>');
+		return;
+	}
+		
+	if (plot3d != null) {
+		plot3d.destroy();
+		plot3d = null;
+	}
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getClassProblemsEffortDashboard',
+            lang: loc,
+            filter: currentClass
+        },
+        success : function(data) {
+        	if (data) {
+        		
+                $("#liveDashboardEffortPane").show();
+                
+               	var resultData = $.parseJSON(data);
+                var jsonData = resultData[0];
+            	
+            	for (var i=0;i<jsonData.length;i = i + 1) {
+		  			var line0 = [];
+//		  			var lines = [line0,line1,line2,line3,line4,line5,line6,line7,line8,line9]
+		  			var lines = [line0]
+		  			lines[i].push(jsonData[i].SOF);
+		  			lines[i].push(jsonData[i].ATT);
+		  			lines[i].push(jsonData[i].SHINT);
+		  			lines[i].push(jsonData[i].SHELP);
+		  			lines[i].push(jsonData[i].GUESS);
+		  			lines[i].push(jsonData[i].NOTR);
+		  			lines[i].push(jsonData[i].SKIP);
+		  			lines[i].push(jsonData[i].GIVEUP);
+		  			lines[i].push(jsonData[i].NODATA);
+					var canvasName = 'chart3d_canvas';
+					var tline = lines[i];
+					plot3d = $.jqplot(canvasName, [tline], {
+				    seriesDefaults: {
+		              renderer: $.jqplot.PieRenderer,
+				      rendererOptions: {
+				        showDataLabels: true,
+					    startAngle: -90,
+					    padding: 10,
+				        sliceMargin: 6
+				      },
+				    },
+//				    legend: {
+//				      show: true,
+//			          location: 'w',
+//			          labels: effort_legend_labels		         
+//				    },
+				    seriesColors: effort_series_colors
+				 
+				  });
+            	}
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+}
+
+function showReport3e() {
+
+
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
+	}
+	
+	if (plot3e != null) {
+		plot3e.destroy();
+		plot3e = null;
+	}
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getClassProblemsSolvedDashboard',
+            lang: loc,
+            filter: currentClass
+       },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);	
+            	
+                $("#liveDashboardProblemPane").show();
+            	var s1 = [];
+            	var ticks = [];
+            	
+            	var liveDashboardTotal = parseInt(data);
+            	
+            	var theMax = liveDashboardTotal * 2;
+            	theInterval = liveDashboardTotal / 25;
+           		ticks.push("Today");
+           		s1.push(liveDashboardTotal);
+				
+				plot3e = $.jqplot('chart3e_canvas', [s1], {
+				    seriesDefaults:{
+				        renderer:$.jqplot.BarRenderer,
+				        rendererOptions: {
+				        	fillToZero: true,
+				        	varyBarColor: true	        	
+				        }
+			            
+				    },
+				    axes: {
+				        xaxis: {
+				            renderer: $.jqplot.CategoryAxisRenderer,
+				            ticks: ticks,
+				            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+			            	tickOptions: { 
+			                	angle: 15
+			            	},
+			            	label: 'Total for today'
+				        },
+				        yaxis: {
+				            pad: 1.05,
+				            max: theMax,
+			            	min: 0,  
+			            	tickInterval: theInterval, 
+			            	tickOptions: { 
+			                	formatString: '%d'
+			            	}, 
+			            	label: 'Problems Solved'
+			
+				        }
+				    }
+				});
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1861,7 +2139,7 @@ function showReport3c() {
 function showTable4a() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 
     $.ajax({
@@ -1950,7 +2228,7 @@ function showTable4a() {
             
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -1967,9 +2245,9 @@ function showTable4a() {
 function showReport_tcp() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 	if (plot_tcp != null) {
 		plot_tcp.destroy();
 		plot_tcp = null;
@@ -1992,10 +2270,10 @@ function showReport_tcp() {
             	var jsonData = resultData[0];
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		if (jsonData[i].teacherId === "") {
+            		if (jsonData[i].TID === "") {
             			continue;
             		}
-            		var className = jsonData[i].teacherName + ":" + jsonData[i].className + "[" + jsonData[i].classId + "]"+ " ( " + jsonData[i].percentSolved + "% solved )";;
+            		var className = jsonData[i].Teacher + ":" + jsonData[i].Class + "[" + jsonData[i].CID + "]"+ " ( " + jsonData[i].pctSolved + "% solved )";;
             		ticks.push(className);
             	}
             	var theSeries = [];
@@ -2005,15 +2283,15 @@ function showReport_tcp() {
                 
             	var index = 1;
             	for (var i=0;i<jsonData.length;i = i + 1) {
-            		if (jsonData[i].teacherId === "") {
+            		if (jsonData[i].TID === "") {
             			continue;
             		}            	
             		var element1 = [];
             		var element2 = [];
-            		element1.push(jsonData[i].seen);
+            		element1.push(jsonData[i].Seen);
             		element1.push(index);
             		row1.push(element1);
-            		element2.push(jsonData[i].solved);
+            		element2.push(jsonData[i].Solved);
             		element2.push(index);
             		row2.push(element2);
 //            		var element3 = [];
@@ -2044,13 +2322,12 @@ function showReport_tcp() {
                     },
                     seriesColors:['#ff0066', '#66ccff'],
             	    series:[
-//            	        {label:'Skipped'},
-            	        {label:'Solved'},
-            	        {label:'Seen'}
+//            	        {label:'<%= rwrb.getString("skipped") %>'},
+            	        {label:'<%= rwrb.getString("solved") %>'},
+            	        {label:'<%= rwrb.getString("seen") %>'}
             	    ],
             	    legend: {
-            	        show: true,
-            	        placement: 'outsideGrid'
+            	        show: true
             	    },                
 
                     axes: {
@@ -2062,7 +2339,7 @@ function showReport_tcp() {
             	});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -2076,7 +2353,8 @@ function showReport_tcp() {
 function showTable_tcp() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 	
 	
@@ -2119,6 +2397,7 @@ function showTable_tcp() {
                      
                     // Create the table header th element
                     var theader = document.createElement("th");
+                    
                     theader.innerHTML = cols[i];
                      
                     // Append columnName to the table row
@@ -2163,7 +2442,7 @@ function showTable_tcp() {
                 }              
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -2178,10 +2457,10 @@ function showTable_tcp() {
 function showReport_tp() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 
-	//SELECT teacherlog.teacherId, userName as uname, COUNT(*) AS total FROM teacher, teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and teacher.id = teacherlog.teacherId and action = "login" GROUP BY teacherId;
 	if (plot_tp != null) {
 		plot_tp.destroy();
 		plot_tp = null;
@@ -2205,7 +2484,7 @@ function showReport_tp() {
             	var ticks = [];
             	for (var i=0;i<jsonData.length;i = i + 1) {
             		
-            		var teacherName = jsonData[i].teacherName + " ( " + jsonData[i].percentSolved + "% solved )";
+            		var teacherName = jsonData[i].Teacher + " ( " + jsonData[i].pctSolved + "% solved )";
             		ticks.push(teacherName);
             	}
             	var theSeries = [];
@@ -2217,10 +2496,10 @@ function showReport_tp() {
             		var element1 = [];
             		var element2 = [];
             		var element3 = [];
-            		element1.push(jsonData[i].seen);
+            		element1.push(jsonData[i].Seen);
             		element1.push(i+1);
             		row1.push(element1);
-            		element2.push(jsonData[i].solved);
+            		element2.push(jsonData[i].Solved);
             		element2.push(i+1);
             		row2.push(element2);
 //            		var element3 = [];
@@ -2232,7 +2511,7 @@ function showReport_tp() {
             	theSeries.push(row2);
             	theSeries.push(row1);
 
-            	plot_tcp = $.jqplot('tp_canvas', theSeries, {
+            	plot_tp = $.jqplot('tp_canvas', theSeries, {
 
                     seriesDefaults: {
                         renderer:$.jqplot.BarRenderer,
@@ -2250,13 +2529,12 @@ function showReport_tp() {
                     },
                     seriesColors:['#ff0066', '#66ccff'],
             	    series:[
-//            	        {label:'Skipped'},
-            	        {label:'Solved'},
-            	        {label:'Seen'}
+//            	        {label:'<%= rwrb.getString("skipped") %>'},
+            	        {label:'<%= rwrb.getString("solved") %>'},
+            	        {label:'<%= rwrb.getString("seen") %>'}
             	    ],
             	    legend: {
-            	        show: true,
-            	        placement: 'outsideGrid'
+            	        show: true
             	    },                
 
                     axes: {
@@ -2270,7 +2548,7 @@ function showReport_tp() {
             	});
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -2284,7 +2562,7 @@ function showReport_tp() {
 function showTable_tp() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	
 	
@@ -2372,7 +2650,7 @@ function showTable_tp() {
             
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -2387,7 +2665,7 @@ function showTable_tp() {
 function showTable_tpsa() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	
 	
@@ -2487,7 +2765,7 @@ function showTable_tpsa() {
             
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -2504,7 +2782,7 @@ function showReport_tcs() {
 
 	
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	var tcsFilter = '';
 
@@ -2552,7 +2830,7 @@ function showReport_tcs() {
 	}	
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
     $.ajax({
         type : "POST",
@@ -2638,7 +2916,7 @@ function showReport_tcs() {
             	});
         	}
         	else {
-        		alert("response data is null");
+        		gotoSettingsPane
         	}
         },
         error : function(e) {
@@ -2730,7 +3008,7 @@ function getrpt5Colors() {
 function showReport5() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 
 	rpt5Colors = [];
@@ -2840,17 +3118,17 @@ function showReport5() {
         }
     }
 	var rpt5Title = "";
-	var rpt5XAxisLabel = 'Weeks from current date';
+	var rpt5XAxisLabel = '<%= rwrb.getString("weeks_from_current_date") %>';
 	var rpt5YAxisLabel = "";
 		switch(rpt5Content) {
   		case "Logouts":
-			rpt5Title = 'Weekly Teachers Logouts'							
+			rpt5Title = '<%= rwrb.getString("weekly_teacher_logouts") %>'							
   			break;
   		case "Actions":
-			rpt5Title = 'Weekly Teachers Activities'							
+			rpt5Title = '<%= rwrb.getString("weekly_teacher_activities") %>'							
 			break;
 		default:
-			rpt5Title = 'Weekly Teachers Logins'							
+			rpt5Title = '<%= rwrb.getString("weekly_teacher_logins") %>'							
   		}
 	
 
@@ -3052,7 +3330,7 @@ function showReport5() {
         	  );
         	}
         	else {
-        		alert("Data unavailable.");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3136,7 +3414,7 @@ function getrpt6Colors() {
 function showReport6() {
 
 	if (currentCohortId == "") {
-		alert("Must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 
 	rpt6Colors = [];
@@ -3347,7 +3625,7 @@ function showReport6() {
         	  
         	  p1_plot6 = $.jqplot('chart6_canvas1', p1_teachersFound, 
         	    { 
-        	      title: 'Weekly - Math Problems Seen', 
+        	      title: '<%= rwrb.getString("weekly_problems_seen") %>', 
         	      // Set default options on all series, turn on smoothing.
         	      seriesDefaults: {
         	          rendererOptions: {
@@ -3462,7 +3740,7 @@ function showReport6() {
         	  
         	  p2_plot6 = $.jqplot('chart6_canvas2', p2_teachersFound, 
               	    { 
-              	      title: 'Weekly - Math Problems Solved', 
+              	      title: '<%= rwrb.getString("weekly_problems_solved") %>', 
               	      // Set default options on all series, turn on smoothing.
               	      seriesDefaults: {
               	          rendererOptions: {
@@ -3578,7 +3856,7 @@ function showReport6() {
         	  
         	}
         	else {
-        		alert("Data unavailable.");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3608,7 +3886,7 @@ function createCohortSlice() {
             	alert(data);
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3620,6 +3898,10 @@ function createCohortSlice() {
 }
 
 function updateCohortSlice() {
+	
+	
+	alert('deprecated');
+	return;
 
 	var updateCohortFilter = currentCohortDateArr[currentWeek] + "~7~1"
 	
@@ -3637,7 +3919,7 @@ function updateCohortSlice() {
             	alert(data);
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3660,7 +3942,7 @@ function updateCohortSlice() {
             	alert(data);
         	}
         	else {
-        		alert("response data is null");
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3673,7 +3955,7 @@ function updateCohortSlice() {
 function updateAllCohortSlices() {
 
 	if (currentCohortId < 0) {	
-		alert("must select a cohort");
+		alert('<%= rwrb.getString("must_select_cohort") %>');
 		return;
 	}
 	
@@ -3703,7 +3985,7 @@ function updateAllCohortSlices() {
 	            	alert(data);
 	        	}
 	        	else {
-	        		alert("response data is null");
+	        		alert('<%= rwrb.getString("response_data_null") %>');
 	        	}
 	    	    $.ajax({
 	    	        type : "POST",
@@ -3720,7 +4002,7 @@ function updateAllCohortSlices() {
 	    	            	alert(data);
 	    	        	}
 	    	        	else {
-	    	        		alert("response data is null");
+	    	        		alert('<%= rwrb.getString("response_data_null") %>');
 	    	        	}
 	    	        },
 	    	        error : function(e) {
@@ -3771,7 +4053,7 @@ function updateAllCohortSlices() {
 	        	            	alert(data);
 	        	        	}
 	        	        	else {
-	        	        		alert("response data is null");
+	        	        		alert('<%= rwrb.getString("response_data_null") %>');
 	        	        	}
 	        	        },
 	        	        error : function(e) {
@@ -3782,7 +4064,7 @@ function updateAllCohortSlices() {
 	        	    });
 	        	}
 	        	else {
-	        		alert("response data is null");
+	        		alert('<%= rwrb.getString("response_data_null") %>');
 	        	}
 	        },
 	        error : function(e) {
@@ -3796,36 +4078,7 @@ function updateAllCohortSlices() {
 	}    
 
 }
-/*
-function updateAllCohortSlices() {
 
-
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/cohortAdmin",
-        data : {
-            cohortId: currentCohortId,
-            command: 'updateAllCohortSlicesTeacherActivity',
-            lang: loc,
-            filter: '08/02/2020~7~44'
-        },
-        success : function(data) {
-        	if (data) {
-            	alert(data);
-        	}
-        	else {
-        		alert("response data is null");
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-    
-}
-
-*/
 </script>
 
 <script type="text/javascript">
@@ -3858,13 +4111,14 @@ function updateAllCohortSlices() {
 
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
-    <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();">Settings</a></li>
-    <li><a data-toggle="tab" href="#Population">Study Population and Status</a></li>
-    <li><a data-toggle="tab" href="#TeacherToolsActivityReports">Teacher Tools Activities</a></li>
-    <li><a data-toggle="tab" href="#classroomTrends">Classroom Activities</a></li>
-    <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" >Class Report Cards</a></li>
-    <li><a data-toggle="tab" href="#Tables">Tables</a></li>
-    <li><a data-toggle="tab" href="#AdminTools">Admin Tools</a></li>
+    <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
+    <li><a data-toggle="tab" href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
+    <li><a data-toggle="tab" href="#TeacherToolsActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
+    <li><a data-toggle="tab" href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
+    <li><a data-toggle="tab" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
+    <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" ><%= rwrb.getString("class_report_card") %></a></li>
+    <li><a data-toggle="tab" href="#Tables"><%= rwrb.getString("tables") %></a></li>
+    <li><a data-toggle="tab" href="#AdminTools"><%= rwrb.getString("admin_tools") %></a></li>
     <li>
         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
@@ -3877,8 +4131,8 @@ function updateAllCohortSlices() {
       <p></p>
     </div>
     <div id="Settings" class="container col-sm-12 tab-pane fade">
-      	<h3>Settings</h3>
-        <p>Selection criteria for this session</p>
+      	<h3><%= rwrb.getString("settings") %></h3>
+        <p><%= rwrb.getString("settings_selection_msg1") %></p>
 		<br>
 		<label for="setname">other</label>
 	    <input type="text" class="form-control" id="setname" placeholder="Set Name" name="uname" required>
@@ -3895,17 +4149,17 @@ function updateAllCohortSlices() {
 			</div>
 			<br>
 			<hr>			
-       		<H3>These selections will apply to all Chart and Trend report selections. They may be over-ridden on the individual report page.</H3>                            
+       		<H3><%= rwrb.getString("settings_selection_msg2") %></H3>                            
            	<div class="row">
 				<div class="form-group">
 				    <div class="offset-md-3 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks">Show from beginning.</label>
+						<label class="radio-inline"><input id="radioWeeksAll"  value="all"  type="radio" name="optRadioWeeks"><%= rwrb.getString("show_from_beginning") %></label>
 				    </div>
 				    <div class="offset-md-2 col-md-3 pull-left">
-						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked>Show [X] prior weeks.</label>
+						<label class="radio-inline"><input id="radioWeekSelect"  value="select"  type="radio" name="optRadioWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 				    </div>
 				    <div class="offset-md-1 col-md-2 pull-left">
-						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="settingsPriorWeeks" value="4">
+						<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('settingsPriorWeeks')"; id="settingsPriorWeeks" value="4">
 				    </div>
 				</div>
 			</div>			
@@ -3936,7 +4190,7 @@ function updateAllCohortSlices() {
 	
     <div id="TeacherToolsActivityReports" class="col-sm-12 tab-pane fade">
         <h1 class="page-header">
-            Teacher Activity Reports
+            <%= rwrb.getString("teacher_tools_activities") %>
         </h1>
 		<div class="row">
 			<div id="chartsCohortName">				
@@ -3961,13 +4215,13 @@ function updateAllCohortSlices() {
         <div class="row hidden">                           
 			<div class="form-group  report_filters">
 			    <div class="offset-md-1 col-md-3 pull-left">
-					<label class="radio-inline"><input id="radioChartsWeeksAll"  value="all"  type="radio" name="optRadioChartsWeeks">Show from beginning.</label>
+					<label class="radio-inline"><input id="radioChartsWeeksAll"  value="all"  type="radio" name="optRadioChartsWeeks"><%= rwrb.getString("show_from_beginning") %></label>
 			    </div>
 			    <div class="offset-md-2 col-md-3 pull-left">
-					<label class="radio-inline"><input id="radioChartsWeekSelect"  value="select"  type="radio" name="optRadioChartsWeeks" checked>Show [X] prior weeks.</label>
+					<label class="radio-inline"><input id="radioChartsWeekSelect"  value="select"  type="radio" name="optRadioChartsWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 			    </div>
 			    <div class="offset-md-1 col-md-2 pull-left">
-					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="chartsPriorWeeks">
+					<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('chartsPriorWeeks')"; id="chartsPriorWeeks">
 			    </div>
 			</div>
 		</div>
@@ -4012,14 +4266,14 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_2" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwo">
-                                    Teacher Activity Metrics
+                                    <%= rwrb.getString("teacher_activity_metrics") %>
                                 </a>
                                	<button id="Button2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
                         <div id="chartTwo" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2Btn" class="btn btn-lg btn-primary" onclick="showReport2();" type="submit" value="Show Chart">
+								  <input id="showReport2Btn" class="btn btn-lg btn-primary" onclick="showReport2();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -4035,14 +4289,14 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_2b" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwoB">
-                                    Teacher Logins
+                                    <%= rwrb.getString("teacher_logins") %>
                                 </a>
                                	<button id="Button2b" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
                         <div id="chartTwoB" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2bBtn" class="btn btn-lg btn-primary" onclick="showReport2b();" type="submit" value="Show Chart">
+								  <input id="showReport2bBtn" class="btn btn-lg btn-primary" onclick="showReport2b();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -4059,14 +4313,14 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_2c" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwoC">
-                                   Days Since Last Login 
+                                   <%= rwrb.getString("days_since_last_logins") %> 
                                 </a>
                                	<button id="Button2c" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
                         </div>
                         <div id="chartTwoC" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport2cBtn" class="btn btn-lg btn-primary" onclick="showReport2c();" type="submit" value="Show Chart">
+								  <input id="showReport2cBtn" class="btn btn-lg btn-primary" onclick="showReport2c();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
  							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
@@ -4082,7 +4336,7 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_5" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartFive">
-                                    Teacher Activities - Weekly Counts
+                                    <%= rwrb.getString("teacher_activities_weekly") %>
                                 </a>
                                	<button id="Button5" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -4092,34 +4346,34 @@ function updateAllCohortSlices() {
                             	<div class="row">                           
 								<div class="form-group">
 								    <div class="offset-md-1 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks">Show from beginning.</label>
+										<label class="radio-inline"><input id="radio5WeeksAll"  value="all"  type="radio" name="optRadio5Weeks"><%= rwrb.getString("show_from_beginning") %></label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="radio5WeekSelect"  value="select"  type="radio" name="optRadio5Weeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt5PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('rpt5PriorWeeks')"; id="rpt5PriorWeeks">
 								    </div>
 								</div>
 								</div>
 								<br>
                             	<div class="row">                           
 									<div class="form-group">
-										<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked>Logins</label>
-										<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content">Actions</label>
-										<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content">Logouts</label>
+										<label class="radio-inline"><input id="radioLogins"  value="Logins" type="radio" name="optRadio5Content" checked><%= rwrb.getString("logins") %></label>
+										<label class="radio-inline"><input id="radioActions" value="Actions" type="radio" name="optRadio5Content"><%= rwrb.getString("actions") %></label>
+										<label class="radio-inline"><input id="radioLogouts" value="Logouts" type="radio" name="optRadio5Content"><%= rwrb.getString("logouts") %></label>
 									</div>
 								</div>                            
                             	<div id="rpt5PopulateSelect" class="row">      
 									<div class="form-group">
-										<label class="radio-inline"><input id="radio5ShowAll"                  value="showAll"                 type="radio" name="optRadio5Populate" checked>Show All</label>
-										<label class="radio-inline"><input id="radio5ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio5Populate">Show Single Only</label>
-										<label class="radio-inline"><input id="radio5ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio5Populate">Show Single With Anonymous</label>
+										<label class="radio-inline"><input id="radio5ShowAll"                  value="showAll"                 type="radio" name="optRadio5Populate" checked><%= rwrb.getString("show_all") %></label>
+										<label class="radio-inline"><input id="radio5ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio5Populate"><%= rwrb.getString("show_single_only") %></label>
+										<label class="radio-inline"><input id="radio5ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio5Populate"><%= rwrb.getString("show_single_with_anon") %></label>
 									</div>
 								</div>
                             </div>
                             <div class="panel-body report_filters">                           
-								  <input id="showReport5Btn" class="btn btn-lg btn-primary" onclick="showReport5();" type="submit" value="Show Graph">
+								  <input id="showReport5Btn" class="btn btn-lg btn-primary" onclick="showReport5();" type="submit" value="<%= rwrb.getString("show_graph") %>">
                             </div>
  
                             <div  class="panel-body">
@@ -4140,7 +4394,7 @@ function updateAllCohortSlices() {
 
     <div id="classroomTrends" class="col-sm-12 tab-pane fade container">
         <h1 class="page-header">
-            Teacher Activity Trends
+            <%= rwrb.getString("classroom_activities") %>
             <br>
         </h1>
 		<div class="row">
@@ -4200,13 +4454,13 @@ function updateAllCohortSlices() {
 
                         <div id="chartTP" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="Show Chart">
-								  <input id="showTableTPBtn" class="btn btn-lg btn-primary" onclick="showTable_tp();" type="submit" value="Show Table">
+								  <input id="showReportTPBtn" class="btn btn-lg btn-primary" onclick="showReport_tp();" type="submit" value="<%= rwrb.getString("show_chart") %>">
+								  <input id="showTableTPBtn" class="btn btn-lg btn-primary" onclick="showTable_tp();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
  
                             <div class="panel-body col-md-12">
 				            	<div id="tp_canvas" class="col-md-6" style="width:800px; height:500px;"></div> 
-				            	<div id="tp_table_panel" class="col-md-6" style="width:800px; height:500px;">
+				            	<div id="tp_table_panel" class="col-md-6" style="width:600px; height:500px;">
 				            	   <table align = "center"
             							id="tp_table" border="1">
     							   </table>
@@ -4227,13 +4481,13 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartTCP" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReportTCPBtn" class="btn btn-lg btn-primary" onclick="showReport_tcp();" type="submit" value="Show Chart">
-								  <input id="showTableTCPBtn" class="btn btn-lg btn-primary" onclick="showTable_tcp();" type="submit" value="Show Table">
+								  <input id="showReportTCPBtn" class="btn btn-lg btn-primary" onclick="showReport_tcp();" type="submit" value="<%= rwrb.getString("show_chart") %>">
+								  <input id="showTableTCPBtn" class="btn btn-lg btn-primary" onclick="showTable_tcp();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tcp_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
-				            	<div id="tcp_table_panel" class="col-md-6" style="width:800px; height:800px;">
+				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:800px;"></div> 
+				            	<div id="tcp_table_panel" class="col-md-6" style="width:600px; height:800px;">
 				            	   <table align = "center"
             							id="tcp_table" border="1">
     							   </table>
@@ -4254,10 +4508,10 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartThreeC" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input class="btn btn-lg btn-primary" onclick="showReport3c();" type="submit" value="Show Chart">
+								  <input class="btn btn-lg btn-primary" onclick="showReport3c();" type="submit" value="<%= rwrb.getString("show_chart") %>">
 								  <a id="showLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showLegend();"><%= rb.getString("show_legend") %></a>
 								  <a id="hideLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideLegend();"><%= rb.getString("hide_legend") %></a>
-<!-- 						  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="Show Table"> -->		
+<!-- 						  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="<%= rwrb.getString("show_table") %>"> -->		
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
@@ -4311,12 +4565,6 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
-
-                    
-
-
-
-
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -4330,18 +4578,18 @@ function updateAllCohortSlices() {
                             <div class="panel-body report_filters">                           
 								<div class="form-group">
 								    <div class="offset-md-3 col-md-3 pull-left">
-										<label class="radio-inline"><input id="tcs_radioWeeksAll"  value="all"  type="radio" name="opt_tcs_RadioWeeks">Show from beginning.</label>
+										<label class="radio-inline"><input id="tcs_radioWeeksAll"  value="all"  type="radio" name="opt_tcs_RadioWeeks"><%= rwrb.getString("show_from_beginning") %></label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="tcs_radioWeekSelect"  value="select"  type="radio" name="opt_tcs_RadioWeeks" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="tcs_radioWeekSelect"  value="select"  type="radio" name="opt_tcs_RadioWeeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="tcs_PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('tcs_PriorWeeks')"; id="tcs_PriorWeeks">
 								    </div>
 								</div>
                             </div>
                             <div class="panel-body report_filters">                           
-								<input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="Show Chart">
+								<input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="<%= rwrb.getString("show_chart") %>">
 							</div> 
                             <div class="panel-body">
 				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
@@ -4367,34 +4615,34 @@ function updateAllCohortSlices() {
                             	<div class="row">                           
 								<div class="form-group">
 								    <div class="offset-md-1 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio6WeeksAll"  value="all"  type="radio" name="optRadio6Weeks">Show from beginning.</label>
+										<label class="radio-inline"><input id="radio6WeeksAll"  value="all"  type="radio" name="optRadio6Weeks"><%= rwrb.getString("show_from_beginning") %></label>
 								    </div>
 								    <div class="offset-md-2 col-md-3 pull-left">
-										<label class="radio-inline"><input id="radio6WeekSelect"  value="select"  type="radio" name="optRadio6Weeks" checked>Show [X] prior weeks.</label>
+										<label class="radio-inline"><input id="radio6WeekSelect"  value="select"  type="radio" name="optRadio6Weeks" checked><%= rwrb.getString("show_prior_weeks") %></label>
 								    </div>
 								    <div class="offset-md-1 col-md-2 pull-left">
-										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" id="rpt6PriorWeeks">
+										<input type="text" maxlength="2" size="2" class="form-control" style="width: 50px;" onblur="validatePriorWeeks('rpt6PriorWeeks')"; id="rpt6PriorWeeks">
 								    </div>
 								</div>
 								</div>
 								<br>
                             	<div class="row">                           
 									<div class="form-group hidden">
-										<label class="radio-inline"><input id="radioProblemsSeen"  value="ProblemsSeen" type="radio" name="optRadio6Content" checked>Problems Seen</label>
-										<label class="radio-inline"><input id="radioProblemsSolved" value="ProblemsSolved" type="radio" name="optRadio6Content">Problems Solved</label>
+										<label class="radio-inline"><input id="radioProblemsSeen"  value="ProblemsSeen" type="radio" name="optRadio6Content" checked><%= rwrb.getString("problems_seen") %></label>
+										<label class="radio-inline"><input id="radioProblemsSolved" value="ProblemsSolved" type="radio" name="optRadio6Content"><%= rwrb.getString("problems_solved") %></label>
 									</div>
 								</div>                           
                             	<div class="row">      
 									<div class="form-group">
-										<label class="radio-inline"><input id="radio6ShowAll"                  value="showAll"                 type="radio" name="optRadio6Populate" checked>Show All</label>
-										<label class="radio-inline"><input id="radio6ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio6Populate">Show Single Only</label>
-										<label class="radio-inline"><input id="radio6ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio6Populate">Show Single With Anonymous</label>
+										<label class="radio-inline"><input id="radio6ShowAll"                  value="showAll"                 type="radio" name="optRadio6Populate" checked><%= rwrb.getString("show_all") %></label>
+										<label class="radio-inline"><input id="radio6ShowSingleOnly"           value="showSingleOnly"          type="radio" name="optRadio6Populate"><%= rwrb.getString("show_single_only") %></label>
+										<label class="radio-inline"><input id="radio6ShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadio6Populate"><%= rwrb.getString("show_single_with_anon") %></label>
 									</div>
 								</div>
                             </div>
                             
                             <div class="panel-body report_filters">                           
-								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="Show Graph">
+								  <input id="showReport6Btn" class="btn btn-lg btn-primary" onclick="showReport6();" type="submit" value="<%= rwrb.getString("show_graph") %>">
                             </div>
 
 
@@ -4410,9 +4658,100 @@ function updateAllCohortSlices() {
 		</div>
 	</div>
 
+    <div id="classroomDashboard" class="col-sm-12 tab-pane fade container">
+        <h1 class="page-header">
+            <%= rwrb.getString("classroom_dashboard") %>
+            <br>
+        </h1>
+		<div class="row">
+			<div id="dashboardCohortName">				
+			</div>
+			<div id="dashboardCohortWeeks">				
+			</div>
+			<div id="dashboardTeacherName">				
+			</div>
+		</div>
+		<br>
+        <div id="dashboard-container" class="container-fluid">
+
+            <div id="dashboard-wrapper" class="row" width: 100%;">
+
+                <div class="panel-group" id="dashboardGroup">
+
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#dashboardGroup" href="#chartThreeD">
+                                    Live Dashboard
+                                </a>
+                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartThreeD" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input class="btn btn-lg btn-primary" onclick="showReport3d();showReport3e();" type="submit" value="<%= rwrb.getString("show_chart") %>">
+								  <a id="showDashboardLegendBtn" class="btn btn-lg btn-primary" role="button" value="show" onclick="showDashboardLegend();"><%= rb.getString("show_legend") %></a>
+								  <a id="hideDashboardLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideDashboardLegend();"><%= rb.getString("hide_legend") %></a>
+                            </div>
+ 
+ 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
+                            <div class="panel-body">
+                                <table id="dashboardEffortLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
+                                    <thead>
+                                    <tr>
+                                        <th><%= rb.getString("student_effort")%>:</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr><td class="span-SOF" style="height:10px;padding:0;"><%= rb.getString("sof") %></td></tr>
+                                    <tr><td class="span-ATT" style="height:10px;padding:0;"><%= rb.getString("att") %></td></tr>
+                                    <tr><td class="span-SHINT" style="height:10px;padding:0;"><%= rb.getString("shint") %></td></tr>
+                                    <tr><td class="span-SHELP" style="height:10px;padding:0;"><%= rb.getString("shelp") %></td></tr>
+                                    <tr><td class="span-GUESS" style="height:10px;padding:0;"><%= rb.getString("guess") %></td></tr>
+                                    <tr><td class="span-NOTR" style="height:10px;padding:0;"><%= rb.getString("notr") %></td></tr>
+                                    <tr><td class="span-SKIP" style="height:10px;padding:0;"><%= rb.getString("skip") %></td></tr>
+                                    <tr><td class="span-GIVEUP" style="height:10px;padding:0;"><%= rb.getString("giveup") %></td></tr>
+                                    <tr><td class="span-NODATA" style="height:10px;padding:0;"><%= rb.getString("no_data") %></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                            	<div class="row">
+				                    <div id="liveDashboardProblemPane" class="col-md-4 " style="background-color:lightgreen; padding: 50px; border: 2px solid #000000; border-radius: 25px;height:500px;">
+					            		<div id="chart3e_canvas" class="col-md-4" style="width:300px; height:400px;"></div>
+					            	</div> 
+				                    <div id="liveDashboardEffortPane" class="col-md-8" style="background-color:powderblue; border: 2px solid #000000; border-radius: 25px; height:500px;">
+				                        <div style="text-align:center;"> <h2>Problem Solving Effort</h2></div>
+						            	<div id="chart3d_canvas" class="col-md-5" style="width:400px; height:400px;"></div> 
+						            	<div id="chart3d_legend" class="col-md-7"> 		            	
+						            	     <table class="table table-striped table-bordered hover">
+			                                    <tbody>
+			                                    <tr><td class="span-SOF"    style="height:8px;padding:0;"><h5><%= rb.getString("sof") %></h5></td></tr>
+			                                    <tr><td class="span-ATT"    style="height:8px;padding:0;"><h5><%= rb.getString("att") %></h5></td></tr>
+			                                    <tr><td class="span-SHINT"  style="height:8px;padding:0;"><h5><%= rb.getString("shint") %></h5></td></tr>
+			                                    <tr><td class="span-SHELP"  style="height:8px;padding:0;"><h5><%= rb.getString("shelp") %></h5></td></tr>
+			                                    <tr><td class="span-GUESS"  style="height:8px;padding:0;"><h5><%= rb.getString("guess") %></h5></td></tr>
+			                                    <tr><td class="span-NOTR"   style="height:8px;padding:0;"><h5><%= rb.getString("notr") %></h5></td></tr>
+			                                    <tr><td class="span-SKIP"   style="height:8px;padding:0;"><h5><%= rb.getString("skip") %></h5></td></tr>
+			                                    <tr><td class="span-GIVEUP" style="height:8px;padding:0;"><h5><%= rb.getString("giveup") %></h5></td></tr>
+			                                    <tr><td class="span-NODATA" style="height:8px;padding:0;"><h5><%= rb.getString("no_data") %></h5></td></tr>
+			                                    </tbody>
+			                                </table>
+						            	</div>
+					            	</div> 
+				            	</div>
+                            </div>
+                        </div>
+                    </div>
+            	</div>
+        	</div>
+		</div>
+	</div>
+
+
     <div id="Population" class="col-sm-12 tab-pane fade container">
         <h1 class="page-header">
-            Population of Study
+            <%= rwrb.getString("status_and_population") %>
             <br>
         </h1>
 		<div class="row">
@@ -4429,7 +4768,7 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#classroomTrendsGroup" href="#chartTPSA">
+                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTPSA">
                                    Study Status Snapshot
                                 </a>
                                	<button id="ButtonTPSA" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -4438,11 +4777,11 @@ function updateAllCohortSlices() {
 
                         <div id="chartTPSA" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="Show Table">
+								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tpsa_table_panel" class="col-md-6" style="width:1700px; height:800px;">
+				            	<div id="tpsa_table_panel" class="col-md-12" overflow-x: auto;overflow-y: auto;">
 				            	   <table align = "center"
             							id="tpsa_table" border="1">
     							   </table>
@@ -4468,7 +4807,7 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartThree" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport3Btn" class="btn btn-lg btn-primary" onclick="showReport3();" type="submit" value="Show Chart">
+								  <input id="showReport3Btn" class="btn btn-lg btn-primary" onclick="showReport3();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
@@ -4490,8 +4829,8 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartThreeA" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport3aBtn" class="btn btn-lg btn-primary" onclick="showReport3a();" type="submit" value="Show Chart">
-								  <input id="showTable3aBtn" class="btn btn-lg btn-primary" onclick="showTable3a();" type="submit" value="Show Table">
+								  <input id="showReport3aBtn" class="btn btn-lg btn-primary" onclick="showReport3a();" type="submit" value="<%= rwrb.getString("show_chart") %>">
+								  <input id="showTable3aBtn" class="btn btn-lg btn-primary" onclick="showTable3a();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
@@ -4518,8 +4857,8 @@ function updateAllCohortSlices() {
                         </div>
                         <div id="chartThreeB" class="panel-collapse collapse">  
                             <div class="panel-body report_filters">                           
-								  <input id="showReport3bBtn" class="btn btn-lg btn-primary" onclick="showReport3b();" type="submit" value="Show Chart">
-								  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="Show Table">
+								  <input id="showReport3bBtn" class="btn btn-lg btn-primary" onclick="showReport3b();" type="submit" value="<%= rwrb.getString("show_chart") %>">
+								  <input id="showTable3bBtn" class="btn btn-lg btn-primary" onclick="showTable3b();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
@@ -4541,6 +4880,7 @@ function updateAllCohortSlices() {
 
 
 	    <div id="Tables" class="col-sm-12 tab-pane fade container">
+	    	<h3><%= rwrb.getString("tables") %></h3>
 			<div class="row">
 				<div id="tablesCohortName">				
 				</div>
@@ -4561,7 +4901,7 @@ function updateAllCohortSlices() {
 	                        </div>
 	                        <div id="table_4a" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
-									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="Show Table">
+									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="<%= rwrb.getString("show_table") %>">
 	                            </div>
 	 
 	 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
@@ -4582,7 +4922,6 @@ function updateAllCohortSlices() {
 	
 	            	</div>
 	        	</div>
-	      	<h3>Tables</h3>
 	      	<p>Tabular formats for export</p>
 				<label for="uname">paste your query here</label>
 			    <input type="text" class="form-control" id="uname" placeholder="Enter other" name="uname" required>
@@ -4605,7 +4944,7 @@ function updateAllCohortSlices() {
 				</div>
 			</div>			
 	        <h1 class="page-header">
-	            Researcher Admin Tools
+	            <%= rwrb.getString("admin_tools") %>
 	        </h1>
 	
 	        <div id="admin-container" class="container-fluid">
@@ -4634,7 +4973,7 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>
-	                    
+<!-- 	                    
 	                    <div id="updateWeeklySlices" class="panel panel-default hidden">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
@@ -4655,12 +4994,12 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>
-	                    
+	                    -->
 	                    <div  id="updateAllSlices" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
 	                                <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
-	                                    Update All Cohort Weekly Slices
+	                                    <%= rwrb.getString("update_all_cohort_slices") %>
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
 	                            </h4>
@@ -4680,7 +5019,77 @@ function updateAllCohortSlices() {
 	                        </div>
 	                    </div>                   
 	                    
+	                    <div  id="editCohort" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin4">
+	                                    <%= rwrb.getString("add_change_cohort") %>
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin4" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="editCohort('add');" type="submit" value="<%= rwrb.getString("add") %>">
+									  <input class="btn btn-lg btn-primary" onclick="editCohort('change');" type="submit" value="<%= rwrb.getString("change") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                                <div class="table table-striped table-bordered hover display nowrap" width="100%">
+	
+	                                </div>
+	                            </div>
+	
+	                        </div>
+	                    </div>                   
+	                    
+	                    <div  id="addCohortTeacher" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin5">
+	                                    <%= rwrb.getString("add_remove_cohort_teacher") %>
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin5" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="editCohortTeachers('add');" type="submit" value="<%= rwrb.getString("add") %>">
+									  <input class="btn btn-lg btn-primary" onclick="editCohortTeachers('remove');" type="submit" value="<%= rwrb.getString("remove") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin5Form" class="table table-striped table-bordered hover display nowrap" width="100%">
+	
+	                                </div>
+	                            </div>
+	
+	                        </div>
+	                    </div>                   
 	                                       
+	                    <div  id="addCohortTeacher" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin6">
+	                                    <%= rwrb.getString("add_remove_cohort_classes") %>
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin6" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="editCohortClasses('add');" type="submit" value="<%= rwrb.getString("add") %>">
+									  <input class="btn btn-lg btn-primary" onclick="editCohortClasses('remove');" type="submit" value="<%= rwrb.getString("remove") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin6Form" class="table table-striped table-bordered hover display nowrap" width="100%">
+	
+	                                </div>
+	                            </div>
+	
+	                        </div>
+	                    </div>                   
 	            	</div>
 	        	</div>
 			</div>

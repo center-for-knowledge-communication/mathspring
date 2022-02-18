@@ -57,6 +57,7 @@ import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
@@ -78,6 +79,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     private static Logger logger = Logger.getLogger(TTMiscServiceImpl.class);
 
 	private ResourceBundle rb = null;
+	private ResourceBundle rwrb = null;
 	private Locale ploc;
 	
     @Autowired
@@ -103,8 +105,15 @@ public class TTMiscServiceImpl implements TTMiscService {
         		loc = new Locale("es","AR");	
         	}        	
     		ploc = loc;
-    		rb = ResourceBundle.getBundle("MathSpring",loc);
 
+    		try {
+        		rb = ResourceBundle.getBundle("MathSpring",loc);
+    			rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
+    		}
+    		catch (Exception e) {
+    			logger.error(e.getMessage());	
+    		}
+    		
     		String result = "";
     		switch (reportType) {
 			case "getCohortTeachersClasses":
@@ -500,9 +509,10 @@ public class TTMiscServiceImpl implements TTMiscService {
         PreparedStatement stmt = null;
         int currentActionTotal = 0;
         try {
-            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.classId, tcs.className, sum(tcs.nbr_problems_seen) as sumProblemsSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId,classId";
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.classId, tcs.className, sum(tcs.nbr_problems_seen) as sumProblemsSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? GROUP BY teacherId,classId";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
+            stmt.setInt(2, cohortId);
             rs = stmt.executeQuery();
         	JSONArray bodyArr = new JSONArray();
         	JSONArray footerArr = new JSONArray();
@@ -527,13 +537,13 @@ public class TTMiscServiceImpl implements TTMiscService {
        				teacherName = teacherName.substring(0,11);
        			}
             	JSONObject resultJson = new JSONObject();
-        		resultJson.put("teacherName", teacherName);
-        		resultJson.put("className", rs.getString("className"));
-        		resultJson.put("teacherId", rs.getString("teacherId"));
-        		resultJson.put("classId", rs.getString("classId"));
-           		resultJson.put("seen", rs.getInt("sumProblemsSeen"));
-       			resultJson.put("solved", rs.getInt("sumProblemsSolved"));
-       			resultJson.put("percentSolved", pctProblemsSolved);
+        		resultJson.put("Teacher", teacherName);
+        		resultJson.put("Class", rs.getString("className"));
+        		resultJson.put("TID", rs.getString("teacherId"));
+        		resultJson.put("CID", rs.getString("classId"));
+           		resultJson.put("Seen", rs.getInt("sumProblemsSeen"));
+       			resultJson.put("Solved", rs.getInt("sumProblemsSolved"));
+       			resultJson.put("pctSolved", pctProblemsSolved);
             	bodyArr.add(resultJson);
             }            
             stmt.close();
@@ -541,16 +551,16 @@ public class TTMiscServiceImpl implements TTMiscService {
 
             //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
-    		footerJson.put("teacherName", "Study Total");
-    		footerJson.put("className", "");
-    		footerJson.put("teacherId", "");
-    		footerJson.put("classId", "");
-       		footerJson.put("seen", studyProblemsSeen);
-   			footerJson.put("solved", studyProblemsSolved);
+    		footerJson.put("Teacher", "Study Total");
+    		footerJson.put("Class", "");
+    		footerJson.put("TID", "");
+    		footerJson.put("CID", "");
+       		footerJson.put("Seen", studyProblemsSeen);
+   			footerJson.put("Solved", studyProblemsSolved);
    			if (studyProblemsSeen > 0) {
    				studyPercentSolved = (studyProblemsSolved * 100) / studyProblemsSeen;
    			}
-   			footerJson.put("percentSolved", studyPercentSolved);
+   			footerJson.put("pctSolved", studyPercentSolved);
         	footerArr.add(footerJson);
 
         	resultArr.add(bodyArr);
@@ -571,9 +581,10 @@ public class TTMiscServiceImpl implements TTMiscService {
         PreparedStatement stmt = null;
         
         try {
-            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_seen) as sumProblemsSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.nbr_problems_seen) as sumProblemsSeen, sum(tcs.nbr_problems_solved) as sumProblemsSolved FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
+            stmt.setInt(2, cohortId);
             rs = stmt.executeQuery();
         	JSONArray bodyArr = new JSONArray();
         	JSONArray footerArr = new JSONArray();
@@ -601,11 +612,11 @@ public class TTMiscServiceImpl implements TTMiscService {
        			}
             	            	
             	JSONObject resultJson = new JSONObject();
-        		resultJson.put("teacherName", teacherName);
-        		resultJson.put("teacherId", rs.getString("teacherId"));
-           		resultJson.put("seen", rs.getInt("sumProblemsSeen"));
-       			resultJson.put("solved", sumProblemsSolved);
-       			resultJson.put("percentSolved", pctProblemsSolved);
+        		resultJson.put("Teacher", teacherName);
+        		resultJson.put("Id", rs.getString("teacherId"));
+           		resultJson.put("Seen", rs.getInt("sumProblemsSeen"));
+       			resultJson.put("Solved", sumProblemsSolved);
+       			resultJson.put("pctSolved", pctProblemsSolved);
             	bodyArr.add(resultJson);
             }            
             stmt.close();
@@ -613,14 +624,14 @@ public class TTMiscServiceImpl implements TTMiscService {
 
             //// Create the footer array and add it to the resultArr
         	JSONObject footerJson  = new JSONObject();
-    		footerJson.put("teacherName", "Study Total");
-    		footerJson.put("teacherId", "");
-       		footerJson.put("seen", studyProblemsSeen);
-   			footerJson.put("solved", studyProblemsSolved);
+    		footerJson.put("Teacher", "Study Total");
+    		footerJson.put("Id", "");
+       		footerJson.put("Seen", studyProblemsSeen);
+   			footerJson.put("Solved", studyProblemsSolved);
    			if (studyProblemsSeen > 0) {
    				studyPercentSolved = (studyProblemsSolved * 100) / studyProblemsSeen;
    			}
-   			footerJson.put("percentSolved", studyPercentSolved);
+   			footerJson.put("pctSolved", studyPercentSolved);
         	footerArr.add(footerJson);
 
         	resultArr.add(bodyArr);
@@ -659,9 +670,10 @@ public class TTMiscServiceImpl implements TTMiscService {
         PreparedStatement stmt = null;
         int currentActionTotal = 0;
         try {
-            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.teacherFullname as fullname, sum(tcs.nbr_problems_solved) as sumProblemsSolved, sum(tcs.time_problems_solved) as time_problems_solved, tmc.expectedStudentCount FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tmc.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.teacherFullname as fullname, sum(tcs.nbr_problems_solved) as sumProblemsSolved, sum(tcs.time_problems_solved) as time_problems_solved, tmc.expectedStudentCount FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? GROUP BY teacherId order by sumProblemsSolved DESC";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
+            stmt.setInt(2, cohortId);
             rs = stmt.executeQuery();
         	JSONArray bodyArr = new JSONArray();
         	JSONArray footerArr = new JSONArray();
@@ -705,7 +717,10 @@ public class TTMiscServiceImpl implements TTMiscService {
        			resultJson.put("Actual # Students", expectedStudentCount);
        			resultJson.put("Active Students", studentCount);
        			int studentCountDiff = expectedStudentCount - studentCount;
-       			int StudentCountDiffPct = (studentCountDiff * 100) / expectedStudentCount;
+       			int StudentCountDiffPct = 0;
+       			if (expectedStudentCount > 0) {
+           			StudentCountDiffPct = (studentCountDiff * 100) / expectedStudentCount;       				
+       			}
        			String StudentCountDiffColor = "white";
        			if (studentCountDiff >= 0) {;
 	       			if (StudentCountDiffPct > studentCountDiffHighLimit) {
@@ -731,7 +746,10 @@ public class TTMiscServiceImpl implements TTMiscService {
        				resultJson.put(avg_minutes_student,  0);
        			}
        			else {
-       				float fpps =  sumProblemsSolved / (float)studentCount;      	       				
+       				float fpps = 0;
+       				if (studentCount > 0) {
+       					fpps = sumProblemsSolved / (float)studentCount;
+       				}
        				String strpps = String.format("%.02f", fpps);
        				if (fpps < fppsLowLimit) {
        					strpps = strpps + "~" + "yellow";
@@ -740,8 +758,11 @@ public class TTMiscServiceImpl implements TTMiscService {
    						strpps = strpps + "~" + "white";  
        				}      				
        				resultJson.put(avg_problems_student, strpps);
-       				        				
-       				float fmins = (float)minutesToSolve / (float)sumProblemsSolved;
+       				  
+       				float fmins = 0;
+       				if (sumProblemsSolved > 0) {
+       					fmins = (float)minutesToSolve / (float)sumProblemsSolved;
+       				}
        				String strMins = String.format("%.02f", fmins);
        				if (fmins < fminsLowLimit) {
        					strMins = strMins + "~" + "orange";
@@ -756,8 +777,10 @@ public class TTMiscServiceImpl implements TTMiscService {
        				}
        				resultJson.put(avg_minutes_per_problem, strMins);
            			
-           			
-       				float fmps =  minutesToSolve / (float)studentCount;      	       				
+       				float fmps = 0;
+       				if (studentCount > 0) {
+       					fmps =  minutesToSolve / (float)studentCount;
+       				}
        				String strmps = String.format("%.02f", fmps);
        				if (fmps < fmpsLowLimit) {
        					strmps = strmps + "~" + "yellow";
@@ -817,8 +840,10 @@ public class TTMiscServiceImpl implements TTMiscService {
    			}
    			else {
    				footerJson.put(avg_problems_student, studyProblemsSolved / studyStudentCount);
-
-   				float fmins = (float)studyMinutesToSolve / (float)studyProblemsSolved;
+   				float fmins = 0;
+   				if (studyProblemsSolved > 0) {
+   					fmins = (float)studyMinutesToSolve / (float)studyProblemsSolved;
+   				}
    				String strMins = String.format("%.02f", fmins);   				
    				footerJson.put(avg_minutes_per_problem, strMins);
    				
@@ -849,9 +874,10 @@ public class TTMiscServiceImpl implements TTMiscService {
         PreparedStatement stmt = null;
         int currentActionTotal = 0;
         try {
-            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? GROUP BY teacherId";
+            String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? GROUP BY teacherId";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
+            stmt.setInt(2, cohortId);
             rs = stmt.executeQuery();
         	JSONArray bodyArr = new JSONArray();
         	JSONArray footerArr = new JSONArray();
@@ -881,10 +907,11 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.close();
             rs.close();
 
-            q= "SELECT tcs.cohortid as cohortid, coh.name as cohortName, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc, research_cohort as coh where tcs.teacherId = tmc.teacherid and tmc.researchcohortid = ? and coh.researchcohortid = ? GROUP BY cohortid;";
+            q= "SELECT tcs.cohortid as cohortid, coh.name as cohortName, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc, research_cohort as coh where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? and coh.researchcohortid = ?;";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
             stmt.setInt(2, cohortId);
+            stmt.setInt(3, cohortId);
             rs = stmt.executeQuery();
 
         	while (rs.next()) {
@@ -918,8 +945,113 @@ public class TTMiscServiceImpl implements TTMiscService {
                 rs.close();
         }
     }
+
+
+    public String getClassProblemsSolvedDashboard(Connection conn, int cohortId, String filter) throws SQLException {
+    	String result = "";
+    	
+    	int classId = Integer.valueOf(filter);
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "Select sh.problemBeginTime, count(problemId) AS noOfProblemsSolved from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=? and sh.isSolved = 1 and sh.mode != 'demo';";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	int t = rs.getInt("noOfProblemsSolved");
+            	result = String.valueOf(t);
+            }
+            stmt.close();
+            rs.close();
+            return result;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
     
     
+    public String getClassProblemsEffortDashboard(Connection conn, int cohortId, String filter) throws SQLException {
+        
+    	int classId = Integer.valueOf(filter);
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int currentActionTotal = 0;
+        try {
+            String q = "SELECT tcs.classId AS classId, tcs.className as className, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, class_map_cohorts as cmc where tcs.classId = cmc.classid and tcs.cohortId = ? and cmc.researchcohortid = ? and tcs.classId = ? GROUP BY classId";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+            stmt.setInt(2, cohortId);
+            stmt.setInt(3, classId);
+            
+            rs = stmt.executeQuery();
+        	JSONArray bodyArr = new JSONArray();
+        	JSONArray resultArr = new JSONArray();
+
+        	while (rs.next()) {
+            	          	            	
+            	JSONObject resultJson = new JSONObject();
+        		resultJson.put("className", rs.getString("className"));
+        		resultJson.put("classId", rs.getInt("classId"));
+           		resultJson.put("SOF", rs.getInt("SOF"));
+           		resultJson.put("ATT", rs.getInt("ATT"));
+           		resultJson.put("SHINT", rs.getInt("SHINT"));
+           		resultJson.put("SHELP", rs.getInt("SHELP"));
+           		resultJson.put("GUESS", rs.getInt("GUESS"));
+           		resultJson.put("NOTR", rs.getInt("NOTR"));
+           		resultJson.put("SKIP", rs.getInt("SKIP"));
+           		resultJson.put("GIVEUP", rs.getInt("GIVEUP"));
+           		resultJson.put("NODATA", rs.getInt("NODATA"));
+            	bodyArr.add(resultJson);
+            }            
+            stmt.close();
+            rs.close();
+            
+        	resultArr.add(bodyArr);
+            
+            return resultArr.toString();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+
+    public String getClassProblemsEffortRpt(Connection conn, int cohortId, String filter) throws SQLException {
+        
+    	int classId = Integer.valueOf(filter);
+    	
+    	String effortStr = getClassProblemsEffortSet(conn,classId);
+    	String effortSplitter[] = effortStr.split(",");
+
+    	JSONArray bodyArr = new JSONArray();
+        JSONArray resultArr = new JSONArray();
+
+            	          	            	
+        JSONObject resultJson = new JSONObject();
+    	resultJson.put("SOF", effortSplitter[0]);
+     	resultJson.put("ATT", effortSplitter[1]);
+       	resultJson.put("SHINT", effortSplitter[2]);
+       	resultJson.put("SHELP", effortSplitter[3]);
+       	resultJson.put("GUESS", effortSplitter[4]);
+       	resultJson.put("NOTR", effortSplitter[5]);
+       	resultJson.put("SKIP", effortSplitter[6]);
+       	resultJson.put("GIVEUP", effortSplitter[7]);
+       	resultJson.put("NODATA", effortSplitter[8]);
+        bodyArr.add(resultJson);
+            
+        resultArr.add(bodyArr);
+            
+        return resultArr.toString();    	
+    }
+
     
     public String teacherClassCount(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
@@ -1129,11 +1261,12 @@ public class TTMiscServiceImpl implements TTMiscService {
     		
         try {
         	
-        	String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.classId, tcs.className as className, sum(tcs.nbr_active_students) as sumActiveStudents FROM teacher_class_slices as tcs, teacher_map_cohorts where tcs.teacherId = teacher_map_cohorts.teacherid and teacher_map_cohorts.researchcohortid = ? and tcs.week_nbr BETWEEN ? and ? GROUP BY teacherId,classId";
+        	String q = "SELECT tcs.teacherId AS teacherId, tcs.teacherUsername as uname, tcs.classId, tcs.className as className, sum(tcs.nbr_active_students) as sumActiveStudents FROM teacher_class_slices as tcs, teacher_map_cohorts as tmc where tcs.teacherId = tmc.teacherid and tcs.cohortId = ? and tmc.researchcohortid = ? and tcs.week_nbr BETWEEN ? and ? GROUP BY teacherId,classId";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, cohortId);
-            stmt.setInt(2, startWeek);
-            stmt.setInt(3, startWeek+weeksToReport);
+            stmt.setInt(2, cohortId);
+            stmt.setInt(3, startWeek);
+            stmt.setInt(4, startWeek+weeksToReport);
             
             rs = stmt.executeQuery();
         	JSONArray resultArr = new JSONArray();
@@ -1270,6 +1403,15 @@ public class TTMiscServiceImpl implements TTMiscService {
 				break;    			
     		case "getTeacherProblemsEffort":
 				result = getTeacherProblemsEffort(conn, Integer.valueOf(cohortId));  
+				break;
+    		case "getClassProblemsEffortDashboard":
+				result = getClassProblemsEffortDashboard(conn, Integer.valueOf(cohortId), filter);  
+				break;
+    		case "getClassProblemsSolvedDashboard":
+    			result = getClassProblemsSolvedDashboard(conn, Integer.valueOf(cohortId), filter);
+    			break;
+    		case "getClassProblemsEffortRpt":
+				result = getClassProblemsEffortRpt(conn, Integer.valueOf(cohortId), filter);  
 				break;
     			
     		case "teacherProblems":
@@ -1751,8 +1893,50 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     }
     
+    String effortLabels[] = {"SOF","ATT","SHINT","SHELP", "GUESS","NOTR","SKIP","GIVEUP","NODATA"};
     
-    public String getClassProblemsEffort(Connection conn, int classId, String targetEffort, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
+    public String getClassProblemsEffort(Connection conn, int classId, String targetEffort) throws SQLException {
+    	String result = "";
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {           
+        	String q = "Select count(sh.effort) as effort from student s,studentproblemhistory sh where s.id=sh.studId and s.classId = ? and sh.mode != 'demo' and sh.effort = ?;";
+        	stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            stmt.setString(2, targetEffort);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getString("effort");
+            }
+            stmt.close();
+            rs.close();
+            return result;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+  
+    public String getClassProblemsEffortSet(Connection conn, int classId) throws SQLException {
+
+    	String effortValues = "";
+    	for(int i=0;i<effortLabels.length;i++) {
+    		if (effortValues.length() > 0) {
+    			effortValues += ",";
+    		}
+    		effortValues += getClassProblemsEffort(conn, classId, effortLabels[i]);
+		}
+    	//System.out.println(effortValues);
+    	return effortValues;
+    }
+
+    
+    
+    public String getClassProblemsEffortSlice(Connection conn, int classId, String targetEffort, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
     	String result = "";
     	
     	ResultSet rs = null;
@@ -1780,21 +1964,20 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     }
     
-    String effortLabels[] = {"SOF","ATT","SHINT","SHELP", "GUESS","NOTR","SKIP","GIVEUP","NODATA"};
-
-    public String getClassProblemsEffortSet(Connection conn, int classId, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
+    public String getClassProblemsEffortSetSlice(Connection conn, int classId, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
 
     	String effortValues = "";
     	for(int i=0;i<effortLabels.length;i++) {
     		if (effortValues.length() > 0) {
     			effortValues += ",";
     		}
-    		effortValues += getClassProblemsEffort(conn, classId, effortLabels[i], tsFromDate, tsToDate);
+    		effortValues += getClassProblemsEffortSlice(conn, classId, effortLabels[i], tsFromDate, tsToDate);
 		}
     	//System.out.println(effortValues);
     	return effortValues;
     }
 
+    
     
 
     public int getClassActiveStudentCount(Connection conn, int classId, Timestamp tsFromDate, Timestamp tsToDate) throws SQLException {
@@ -1908,7 +2091,7 @@ public class TTMiscServiceImpl implements TTMiscService {
                	int nbr_problems_solved = getClassProblemsSolved(conn, classId, tsFromDate,tsToDate);
                	int time_problems_solved = getClassProblemsTimeToSolve(conn, classId, tsFromDate,tsToDate);
                	int nbr_active_students = getClassActiveStudentCount(conn, classId, tsFromDate,tsToDate);
-               	String effort = getClassProblemsEffortSet(conn, classId, tsFromDate,tsToDate);
+               	String effort = getClassProblemsEffortSetSlice(conn, classId, tsFromDate,tsToDate);
 //               	if ((nbr_problems_seen + nbr_problems_solved) > 0) {
                		insertCohorClassStudentSlice(conn, cohortId, teacherId, teacherUsername, teacherFullname, classId, className, tsFromDate, week_nbr, nbr_problems_solved,nbr_problems_seen,time_problems_solved,nbr_active_students, effort);
 //               	}
