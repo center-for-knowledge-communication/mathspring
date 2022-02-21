@@ -22,13 +22,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Locale;
 /**
  * Created by IntelliJ IDEA.
  * User: marshall
  * Date: 9/6/11
  * Time: 12:43 PM
  * To change this template use File | Settings | File Templates.
+ * Frank	01-21-22	Issue #610 - Save session  locale in DB for use by interventions 
  */
 public class DbSession {
     private static final Logger logger = Logger.getLogger(DbSession.class);
@@ -81,6 +82,25 @@ public class DbSession {
         }
     }
 
+    public static String getLocaleStr(Connection conn, int sessId) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select lang from session where id=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, sessId);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                String locStr = rs.getString(1);
+                return locStr;
+            } else return null;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
 
     public static List<Session> getStudentSessions(Connection conn, int studId, int withLastNDays) throws SQLException {
         ResultSet rs = null;
@@ -137,18 +157,19 @@ public class DbSession {
      * @return an int array with studId in the first position and classId in the second
      * @throws SQLException
      */
-    public static int[] setSessionInfo(Connection conn, int sessionId) throws Exception {
+    public static String[] setSessionInfo(Connection conn, int sessionId) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String q = "select sess.studId, stud.classId from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
+            String q = "select sess.studId, stud.classId, lang from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
             ps = conn.prepareStatement(q);
             ps.setInt(1, sessionId);
             rs = ps.executeQuery();
             if (rs.next()) {
-                int[] res = new int[2];
-                res[0] = rs.getInt(1);    // studId
-                res[1] = rs.getInt(2);    // classId
+                String[] res = new String[3];
+                res[0] = String.valueOf(rs.getInt(1));    // studId
+                res[1] = String.valueOf(rs.getInt(2));    // classId
+                res[2] = rs.getString(3);                 // lang abbr from locale
                 return res;
 //                this.curGUIState= rs.getString(2);
             } else throw new NoSessionException(sessionId);
@@ -170,12 +191,11 @@ public class DbSession {
             return -1;
     }
 
-
     /* Return the session id. */
-    public static int newSession(Connection conn, int studId, long sessBeginTime, boolean isAssistmentsUser) throws Exception {
+    public static int newSession(Connection conn, int studId, long sessBeginTime, boolean isAssistmentsUser, Locale loc) throws Exception {
 
-        String i = "insert into Session (studId, beginTime,isActive, lastAccessTime, endTime, ipAddr, isAssistmentsUser) " +
-                "values (?,?,?,?,?,'',?)";
+        String i = "insert into Session (studId, beginTime,isActive, lastAccessTime, endTime, ipAddr, isAssistmentsUser, lang) " +
+                "values (?,?,?,?,?,'',?,?)";
         PreparedStatement ps = conn.prepareStatement(i, Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, studId);
         Timestamp now = new Timestamp(sessBeginTime);
@@ -184,12 +204,18 @@ public class DbSession {
         ps.setTimestamp(4, now);
         ps.setNull(5, Types.TIMESTAMP);
         ps.setBoolean(6,isAssistmentsUser);
+      	String lang = loc.getLanguage();
+      	String country = loc.getCountry();
+      	String localeStr = lang + "-" + country;
+        ps.setString(7,localeStr);
         ps.executeUpdate();
         ResultSet rs = ps.getGeneratedKeys();
         if (rs.next())
             return rs.getInt(1);
         else return -1;
     }
+
+
 
     public static int findActiveSession(Connection conn, int studId) throws SQLException {
         String q = "select id from Session where isActive=1 and studId=?";

@@ -24,8 +24,10 @@ document.getElementById("year").innerHTML = createYear;
 var calendar = document.getElementById("calendar");
 var lang = calendar.getAttribute('data-lang');
 
-var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var months = [];
+initMonthNames();
+var days = []; 
+initDayNames();
 
 var dayHeader = "<tr>";
 for (day in days) {
@@ -35,6 +37,31 @@ dayHeader += "</tr>";
 
 document.getElementById("thead-month").innerHTML = dayHeader;
 monthAndYear = document.getElementById("monthAndYear");
+
+function initMonthNames() {
+	months.push(jan_name);
+	months.push(feb_name);
+	months.push(mar_name);
+	months.push(apr_name);
+	months.push(may_name);
+	months.push(jun_name);
+	months.push(jul_name);
+	months.push(aug_name);
+	months.push(sep_name);
+	months.push(oct_name);
+	months.push(nov_name);
+	months.push(dec_name);
+}
+
+function initDayNames() {
+	days.push(sun_name);
+	days.push(mon_name);
+	days.push(tue_name);
+	days.push(wed_name);
+	days.push(thu_name);
+	days.push(fri_name);
+	days.push(sat_name);
+}
 
 function initCalendar() {
 	today = new Date();

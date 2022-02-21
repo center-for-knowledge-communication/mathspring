@@ -45,15 +45,13 @@
  
  Locale loc = request.getLocale(); 
  String lang = loc.getLanguage();
+ String country = loc.getCountry();
 
- if (lang.equals("es")) {
- 	loc = new Locale("es","AR");	
- }
- else {
+ System.out.println("locale set to:" + lang + "-" + country );	
+
+ if (!lang.equals("es")) {
  	loc = new Locale("en","US");	
- }	
- System.out.println(loc.toString());
-
+ }			
  
 ResourceBundle rb = null;
 try {
@@ -237,8 +235,10 @@ catch (Exception e) {
 <script type="text/javascript">
 
     var languagePreference = window.navigator.language;
-    var languageSet = "en";
-    var loc = "en-US";
+    var localeSplitter = languagePreference.split("-");
+    var languageSet = localeSplitter[0];
+    var countrySet = localeSplitter[1];
+    var loc = languagePreference;    
 
 	var emsg_classLanguage   = 'Class language is mandatory field';
 	var emsg_className       = 'Class name is mandatory field';
@@ -261,12 +261,7 @@ catch (Exception e) {
 	var emsg_minTime         = 'Min Time is a mandatory field';
 	
 
-    if (languagePreference.includes("en")) {
-    	languageSet = "en"
-    	loc = "en-US";
-    } else if (languagePreference.includes("es")) {
-    	languageSet = "es"
-    	loc = "es-Ar";
+	if (languageSet == "es") {
     	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
     	emsg_className       = 'El nombre de la clase es obligatorio';
     	emsg_field_invalid   = 'El nombre de solo debe incluir letras, números o . _ - ';
@@ -367,7 +362,7 @@ catch (Exception e) {
 
        		messageStartDate = m2 + "/" + document.getElementById("selectDay_m1_cal1").value + "/" + document.getElementById("year_m1_cal1").value;
 
-       		if (languageSet == "es") {
+       		if (!(countrySet == "US")) {
        			messageStartDate = document.getElementById("selectDay_m1_cal1").value + "/" + m2 + "/" + document.getElementById("year_m1_cal1").value;
        		}   		
        		
@@ -394,7 +389,7 @@ catch (Exception e) {
 
     		messageStartDate = m2 + "/" + document.getElementById("selectDay_m1_cal1").value + "/" + document.getElementById("year_m1_cal1").value;
 
-    		if (languageSet == "es") {
+       		if (!(countrySet == "US")) {
     			messageStartDate = document.getElementById("selectDay_m1_cal1").value + "/" + m2 + "/" + document.getElementById("year_m1_cal1").value;
     		}
 
@@ -1422,46 +1417,54 @@ function registerAllEvents(){
 		        <div class="col-sm-8 col-sm-offset-2 registration-box">
 	                <div id="dangerMessageBar" class="alert alert-danger msg-bar" style="visibility: hidden" role="alert"></div>
 	                <div id="successMessageBar" class="alert alert-success msg-bar" style="visibility: hidden" role="alert"></div>
-		            <h3 class="text-center form-label form-title">Provide timely information to your classes.</h3>
+		            <h3 class="text-center form-label form-title"><%= rb.getString("provide_timely_information_for_class")%>.</h3>
 		            <hr>
-		            <form
-		                    class="form-horizontal"
-		                    method="post"
-		            >		
+		            <form class="form-horizontal" method="post">		
 		                
-	                        <div class="panel-body">
-	                        	<div id="chooseDateRange" class="row">
-	                        		<div class="col-md-2 offset-md-2">                       
-					                	<button type="button" class="btn btn-primary" onclick="initCalendar_m1_cal1();$('#calendarModalPopupMsg').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-					                </div>					             
-	                        		<div class="col-md-3">
-	                        			&nbsp;&nbsp;&nbsp;                       
-									    <input id="daysSelectedMsg" style="width:240px" type="text" name="" value="" >   
-					                </div>
-	 							</div>  
-	
+                        <div class="panel-body">
+                        	<div id="chooseDateRange" class="row">
+                        		<div class="col-md-2 offset-md-2">                       
+				                	<button type="button" class="btn btn-primary" onclick="initCalendar_m1_cal1();$('#calendarModalPopupMsg').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+				                </div>	 						
 							</div>
-		                
-		                <div class="form-group">
-		                    <label id="msgLabel" class="control-label col-sm-8" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
-		                    <div class="col-sm-8">
-		                    	<textarea id="msg" name="msg" class="form-control" rows="6" cols="60" required ></textarea>
-		                    </div>
-		                </div><!-- form-group -->
-		
-		                <div class="form-group">
-		                    <div id="messageClassList" class="col-sm-6">
-		                    </div>
+		                	<br>
+                       		<div class="row">
+	                   			<div class="col-md-3">                       
+							    	<input id="daysSelectedMsg" style="width:300px" type="text" name="" value="" >   
+			                	</div>
+ 							</div>  	                
 		                </div>
-		                <div class="form-group row">
-		                    <div class="col-sm-offset-4 col-sm-2">
-		                        <button type="button" value="submit" class="btn btn-success pull-right btn-block" onclick="submitClassMessage()";><%= rb.getString("submit")%></button>
-		                    </div>
-		                    <div class="col-sm-2">
-            				<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><button type="button" value="reset" class="btn btn-danger pull-right btn-block" ><%= rb.getString("close")%></button></a>
 
-		                    </div>
-		                </div><!-- form-group -->
+                        <div class="panel-body">
+			                <div class="form-group">
+			                	<div class="row">
+				                    <div class="col-sm-8">
+				                    	<label id="msgLabel" class="control-label" for="msg"><%= rb.getString("type_your_message_here")%>:</label>
+				                    </div>
+			                    </div>
+			                    <br>
+			                	<div class="row">
+				                    <div class="col-sm-8">
+				                    	<textarea id="msg" name="msg" class="form-control" rows="6" cols="60" required ></textarea>
+				                    </div>
+			                    </div>
+			                </div><!-- form-group -->
+	
+			
+			                <div class="form-group">
+			                    <div id="messageClassList" class="col-sm-6">
+			                    </div>
+			                </div>
+			                <div class="form-group row">
+			                    <div class="col-sm-offset-4 col-sm-2">
+			                        <button type="button" value="submit" class="btn btn-success pull-right btn-block" onclick="submitClassMessage()";><%= rb.getString("submit")%></button>
+			                    </div>
+			                    <div class="col-sm-2">
+	            				<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><button type="button" value="reset" class="btn btn-danger pull-right btn-block" ><%= rb.getString("close")%></button></a>
+	
+			                    </div>
+			                </div><!-- form-group -->
+		                </div>
 		            </form>
 		            <hr>
 		        </div>
@@ -1762,7 +1765,7 @@ function registerAllEvents(){
 		                    </div>
 		                </div><!-- form-group -->
 		                <div class="form-group">
-		                    <label class="control-label col-sm-4" for="password">Teacher Id:</label>
+		                    <label class="control-label col-sm-4" for="password"><%= rb.getString("teacher_id")%>:</label>
 		                    <div class="col-sm-6">
 		                        <input type="text" name="teacherId" class="form-control" id="teacherId" value="${teacherId}" readonly>
 		                    </div>

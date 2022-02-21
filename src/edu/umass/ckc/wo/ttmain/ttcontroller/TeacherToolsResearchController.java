@@ -81,15 +81,15 @@ public class TeacherToolsResearchController {
     @RequestMapping(value = "/tt/researcherViewClassReportCard", method = RequestMethod.GET)
     public String researcherViewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("teacherId") String teacherId,  @RequestParam("classId") String classId  ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {

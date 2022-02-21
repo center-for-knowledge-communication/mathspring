@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.tutor.intervSel2;
 import edu.umass.ckc.servlet.servbase.ServletParams;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbEmotionResponses;
+import edu.umass.ckc.wo.db.DbSession;
 import edu.umass.ckc.wo.db.DbStudentProblemHistory;
 import edu.umass.ckc.wo.event.tutorhut.*;
 import edu.umass.ckc.wo.interventions.AskEmotionFreeAnswerIntervention;
@@ -20,9 +21,12 @@ import edu.umass.ckc.wo.util.WoProps;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
+import java.util.ResourceBundle;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -56,7 +60,7 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
     private String inputType ;
     private String question ;
     private String questionHeader ;
-
+    
 
     public AskEmotionIS(SessionManager smgr) throws SQLException {
         super(smgr);
@@ -66,11 +70,11 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
     public void init(SessionManager smgr, PedagogicalModel pedagogicalModel) {
         this.pedagogicalModel=pedagogicalModel;
 //        super.setServletInfo(smgr,pedagogicalModel);
-        configure();
+        configure(smgr);
     }
 
-    private void configure() {
-        emotions = new ArrayList<Emotion>();
+    private void configure(SessionManager smgr) {
+    	emotions = new ArrayList<Emotion>();
         Element config = this.getConfigXML();
         timeInterval = getConfigParameter2("interruptIntervalMin");
         probInterval = getConfigParameter2("interruptIntervalProblems");
@@ -79,15 +83,25 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
         if (config != null) {
             List<Element> emotElts = config.getChildren("emotion");
             if (emotElts != null) {
-                for (Element em: emotElts) {
-                    String n = em.getAttributeValue("name");
-                    Emotion e = new Emotion(n);
-
-                    List<Element> labels = em.getChildren("label");
-                    for (Element lab: labels)
-                        e.addLabel(lab.getTextTrim(),Integer.parseInt(lab.getAttributeValue("val")));
-                    emotions.add(e);
-                }
+            	try {
+            		ResourceBundle rb = ResourceBundle.getBundle("MathSpring",smgr.getLocale());
+	                for (Element em: emotElts) {
+	                    String n = em.getAttributeValue("name");
+	                    Emotion e = new Emotion(n);
+	
+	                    List<Element> labels = em.getChildren("label");
+	                    for (Element lab: labels) {
+	                    	String tLabel = lab.getTextTrim();
+	                    	tLabel = tLabel.replaceAll(" ","_");
+	                    	String mlLabel = rb.getString(tLabel);
+	                        e.addLabel(mlLabel,Integer.parseInt(lab.getAttributeValue("val")));
+	                    }
+	                    emotions.add(e);
+	                }
+            	}
+            	catch (Exception e) {
+	            	logger.error(e.getMessage());	
+            	}
             }
             String askWhyTxt = getConfigParameter2("askWhy");
             if (askWhyTxt != null) {
@@ -102,7 +116,7 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
         }
         question = getConfigParameter2("question");
         questionHeader = getConfigParameter2("questionHeader");
-
+        
     }
 
 
@@ -145,8 +159,9 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
                 emotionToQuery= getEmotionToQueryRandom();
                 intervention = new AskEmotionSliderIntervention(emotionToQuery,this.numVals,this.askWhy, askAboutSkipping, this.questionHeader, this.question, skippedProblem, smgr.getLocale());
             }
-            else if (inputType.equals("freeAnswer"))
+            else if (inputType.equals("freeAnswer")) {
                 intervention = new AskEmotionFreeAnswerIntervention(askAboutSkipping, skippedProblem, smgr.getLocale());
+            }
             else   {
                 emotionToQuery= getEmotionToQueryRandom();
                 intervention = new AskEmotionRadioIntervention(emotionToQuery, this.askWhy, askAboutSkipping, skippedProblem, smgr.getLocale());

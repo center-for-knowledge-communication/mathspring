@@ -25,11 +25,11 @@ catch (Exception e) {
 
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
+String country = loc.getCountry();
 
-if (lang.equals("es")) {
-	loc = new Locale("es","AR");	
-}
-else {
+System.out.println("locale set to:" + lang + "-" + country );	
+
+if (!lang.equals("es")) {
 	loc = new Locale("en","US");	
 }			
 		
