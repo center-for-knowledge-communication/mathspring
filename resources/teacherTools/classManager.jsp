@@ -79,14 +79,14 @@ catch (Exception e) {
 
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
+String country = loc.getCountry();
 
-if (lang.equals("es")) {
-	loc = new Locale("es","AR");	
-}
-else {
+System.out.println("locale set to:" + lang + "-" + country );	
+
+if (!lang.equals("es")) {
 	loc = new Locale("en","US");	
-}	
-System.out.println(loc.toString());
+}			
+
 
 ResourceBundle rb = null;
 try {
@@ -95,6 +95,15 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());
 }
+
+ResourceBundle jc_rb = null;
+try {
+	jc_rb = ResourceBundle.getBundle("jchartML",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
 
 String msContext = request.getContextPath();
 String msURL = request.getRequestURL().toString();
@@ -220,6 +229,31 @@ System.out.println("msHost = " + msHost + msContext);
 }
 
 </style>
+
+<script type="text/javascript">
+	var jan_name = "<%=rb.getString("January")%>";
+	var feb_name = "<%=rb.getString("February")%>";
+	var mar_name = "<%=rb.getString("March")%>";
+	var apr_name = "<%=rb.getString("April")%>";
+	var may_name = "<%=rb.getString("May")%>";
+	var jun_name = "<%=rb.getString("June")%>";
+	var jul_name = "<%=rb.getString("July")%>";
+	var aug_name = "<%=rb.getString("August")%>";
+	var sep_name = "<%=rb.getString("September")%>";
+	var oct_name = "<%=rb.getString("October")%>";
+	var nov_name = "<%=rb.getString("November")%>";
+	var dec_name = "<%=rb.getString("December")%>";
+
+	var sun_name = "<%=rb.getString("Sun")%>";
+	var mon_name = "<%=rb.getString("Mon")%>";
+	var tue_name = "<%=rb.getString("Tue")%>";
+	var wed_name = "<%=rb.getString("Wed")%>";
+	var thu_name = "<%=rb.getString("Thu")%>";
+	var fri_name = "<%=rb.getString("Fri")%>";
+	var sat_name = "<%=rb.getString("Sat")%>";
+	
+</script>
+
  
 <script type="text/javascript">
 /**
@@ -299,16 +333,14 @@ var emsg_maxTime         = 'Max Time is a mandatory field';
 var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
 var emsg_minTime         = 'Min Time is a mandatory field';
 
-var languagePreference = window.navigator.language;
-var languageSet = "en";
-var loc = "en-US";
 
-if (languagePreference.includes("en")) {
-	languageSet = "en"
-	loc = "en-US";
-} else if (languagePreference.includes("es")) {
-	languageSet = "es"
-	loc = "es-Ar";
+var languagePreference = window.navigator.language;
+var localeSplitter = languagePreference.split("-");
+var languageSet = localeSplitter[0];
+var countrySet = localeSplitter[1];
+var loc = languagePreference;    
+
+if (languageSet == "es") {
 	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
 	emsg_className       = 'El nombre de la clase es obligatorio';
 	emsg_field_invalid   = 'El nombre solo debe incluir letras, números o . _ - ';
@@ -362,7 +394,7 @@ function getFilterLandingTwo() {
 		var fromDate = m1 + "/" + document.getElementById("selectDay_cal2").value + "/" +  document.getElementById("year_cal2").value;
 		var toDate = m2 + "/" + document.getElementById("selectDay").value + "/" + document.getElementById("year").value;
 
-		if (languageSet == "es") {
+		if (!(countrySet == "US")) {
 			fromDate = document.getElementById("selectDay_cal2").value + "/" +  m1 + "/" + document.getElementById("year_cal2").value;
 			toDate = document.getElementById("selectDay").value + "/" + m2 + "/" + document.getElementById("year").value;
 		}
@@ -1486,13 +1518,7 @@ function handleclickHandlers() {
 }
 
 function changeLandingPageHeaderAccordingToLanguage(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-		languageSet = "en"
-	} else if (languagePreference.includes("es")) {
-		languageSet = "es"
-	}
+
 	if (languageSet == 'es') {
 		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Problemas resueltos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
 		return header;
@@ -1503,13 +1529,7 @@ function changeLandingPageHeaderAccordingToLanguage(){
 }
 
 function changeLandingPageHeader2AccordingToLanguage(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-		languageSet = "en"
-	} else if (languagePreference.includes("es")) {
-		languageSet = "es"
-	}
+
 	if (languageSet == 'es') {
 		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Problemas resueltos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
 		return header;
@@ -1558,89 +1578,7 @@ function registerAllEvents(){
     var headers = changeLandingPageHeaderAccordingToLanguage();
     var headers2 = changeLandingPageHeader2AccordingToLanguage();
   
-    if (languageSet == 'es') {
-    
-    landingPageReport1  =  $('#landingPageReport1').DataTable({
-        data: [],
-        destroy: true,
-        columns: [
-            { title: headers['sid'] },
-            { title: headers['sname']  },
-            { title: headers['uname']  },
-            { title: headers['problems']  },
-            { title: headers['timeInMS']  },
-            { title: headers['latestLogin']  },
-        ],
-        "bPaginate": false,
-        "bFilter": false,
-        "bLengthChange": false,
-        rowReorder: false,                
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
 
-        "scrollX": true,
-        "bSort" : false,
-        "columnDefs": [
-            {
-                "width": "10%",
-                "targets": [ 0 ],
-                "visible": false
-
-            },{
-                "width": "10%",
-                "targets": [ 1 ],
-                "visible": true
-
-            },{
-                "width": "10%",
-                "targets": [ 2 ],
-                "visible": false
-
-            },
-            {
-                "width": "10%",
-                "targets": [ 3 ],
-                "visible": true
-
-            },
-            {
-                "targets": [ 4 ],
-                "width": "10%",
-                "visible": true
-            }, 
-            {
-                "targets": [ 5 ],
-                "width": "10%",
-                "visible": true
-            }
-                
-    	]
-    }    
-    );
-    }
-    else {
         landingPageReport1  =  $('#landingPageReport1').DataTable({
             data: [],
             destroy: true,
@@ -1653,6 +1591,7 @@ function registerAllEvents(){
                 { title: headers['latestLogin']  },
             ],
             "bPaginate": false,
+            <%=jc_rb.getString("language_text")%>
             "bFilter": false,
             "bLengthChange": false,
             rowReorder: false,                
@@ -1695,7 +1634,7 @@ function registerAllEvents(){
         	]
         }    
         );    	
-    }
+    
     
     $('#classLandingReportOne').on('show.bs.collapse', function ()  {
 
@@ -1725,89 +1664,6 @@ function registerAllEvents(){
     });
 
 
-    if (languageSet == 'es') {
-    
-    landingPageReport2  =  $('#landingPageReport2').DataTable({
-        data: [],
-        destroy: true,
-        columns: [
-            { title: headers2['sid'] },
-            { title: headers2['sname']  },
-            { title: headers2['uname']  },
-            { title: headers2['problems']  },
-            { title: headers2['timeInMS']  },
-            { title: headers2['latestLogin']  },
-        ],
-        "bPaginate": false,
-        "bFilter": false,
-        "bLengthChange": false,
-        rowReorder: false,                
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
-
-        "scrollX": true,
-        "bSort" : false,
-        "columnDefs": [
-            {
-                "width": "10%",
-                "targets": [ 0 ],
-                "visible": false
-
-            },{
-                "width": "10%",
-                "targets": [ 1 ],
-                "visible": true
-
-            },{
-                "width": "10%",
-                "targets": [ 2 ],
-                "visible": false
-
-            },
-            {
-                "width": "10%",
-                "targets": [ 3 ],
-                "visible": true
-
-            },
-            {
-                "targets": [ 4 ],
-                "width": "10%",
-                "visible": true
-            }, 
-            {
-                "targets": [ 5 ],
-                "width": "10%",
-                "visible": true
-            }
-                
-    	]
-    }    
-    );
-    }
-    else {
         landingPageReport2  =  $('#landingPageReport2').DataTable({
             data: [],
             destroy: true,
@@ -1820,6 +1676,7 @@ function registerAllEvents(){
                 { title: headers2['latestLogin']  },
             ],
             "bPaginate": false,
+	        <%=jc_rb.getString("language_text")%>
             "bFilter": false,
             "bLengthChange": false,
             rowReorder: false,                
@@ -1860,9 +1717,10 @@ function registerAllEvents(){
                 }
                     
         	]
-        }    
+            
+        }
         );    	
-    }
+    
     
 
     var classListSize = $('#classListSize').val();
@@ -1870,7 +1728,8 @@ function registerAllEvents(){
 
     	apply_content_table = $('#apply_content_table').DataTable({
 	        "bPaginate": false,
-	        "bFilter": false,
+	        <%=jc_rb.getString("language_text")%>
+    		"bFilter": false,
 	        "bLengthChange": false,
 	        rowReorder: true,
 	        "columnDefs": [
@@ -1902,34 +1761,10 @@ function registerAllEvents(){
 	var activeProblemSetsize = $('#activeproblemSetSize').val();
     if(activeProblemSetsize != 0){
     	
-        if (languageSet == 'es') {
     	activetable = $('#activateProbSetTable').DataTable({
         "bPaginate": false,
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        },
-        "bFilter": false,
+        <%=jc_rb.getString("language_text")%>
+    	"bFilter": false,
         "bLengthChange": false,
         rowReorder: true,
         "columnDefs": [
@@ -1968,50 +1803,6 @@ function registerAllEvents(){
         ]
 
     });
-    }
-    else {
-    	activetable = $('#activateProbSetTable').DataTable({
-            "bPaginate": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            rowReorder: true,
-            "columnDefs": [
-                {
-                    "targets": [ 0 ],
-                    "width": "10%",
-                    'className': 'reorder',
-                    orderable: false
-                },
-                {
-                    "targets": [ 1 ],
-                    "width": "30%",
-                    "orderable": false,
-                },
-                {
-                    "targets": [ 2 ],
-                    orderable: false,
-                    "width": "10%",
-                },
-                {
-                    "width": "30%",
-                    "targets": [ 3 ],
-                    "visible": false,
-                    "orderable": false,
-
-                },
-                {
-                    "targets": [ -1 ],
-                    "orderable": false,
-                    "width": "20%",
-                    'className': 'dt-body-center',
-                    'render': function (data, type, full, meta){
-                        return '<input type="checkbox">';
-                    }
-                },
-            ]
-
-        });        	
-    }
 	
 	 $(".active").click(function () {
         $(this).children(':first').toggleClass('rotate-icon');
@@ -2082,9 +1873,11 @@ function registerAllEvents(){
 
     var inactiveProblemSetsize = $('#inactiveproblemSetSize').val();
     if(inactiveProblemSetsize != 0){
-    inactivetable = $('#inActiveProbSetTable').DataTable({
+
+    	inactivetable = $('#inActiveProbSetTable').DataTable({
         "bPaginate": false,
-        "bFilter": false,
+        <%=jc_rb.getString("language_text")%>
+    	"bFilter": false,
         "bSort" : false,
         "bLengthChange": false,
         rowReorder: false,
@@ -2134,7 +1927,6 @@ function registerAllEvents(){
 
     });
 	
-	
     $(".passive").click(function () {
         $(this).children(':first').toggleClass('rotate-icon');
         var tr = $(this).closest('tr');
@@ -2181,48 +1973,14 @@ function registerAllEvents(){
 
     var studentRosterSize = $('#studentRosterSize').val();
     if(studentRosterSize != 0) {
-        if (languageSet == 'es') {
-            studentRosterTable = $('#student_roster').DataTable({
-                "bPaginate": false,
-                "bFilter": false,
-                "bLengthChange": false,
-                "bSort": false,            
-                "language": {
-                    "sProcessing":     "Procesando...",
-                    "sLengthMenu":     "Mostrar _MENU_ registros",
-                    "sZeroRecords":    "No se encontraron resultados",
-                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                    "sInfoPostFix":    "",
-                    "sSearch":         "Buscar:",
-                    "sUrl":            "",
-                    "sInfoThousands":  ",",
-                    "sLoadingRecords": "Cargando...",
-                    "oPaginate": {
-                        "sFirst":    "Primero",
-                        "sLast":     "Último",
-                        "sNext":     "Siguiente",
-                        "sPrevious": "Anterior"
-                    },
-                    "oAria": {
-                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                    }
-                }
-
-            });
-        } 
-        else {
         studentRosterTable = $('#student_roster').DataTable({
             "bPaginate": false,
+            <%=jc_rb.getString("language_text")%>
             "bFilter": false,
             "bLengthChange": false,
             "bSort": false            
 
         });
-        }
     }
 
     $("#deactivateProblemSets").click(function () {
@@ -2586,11 +2344,11 @@ function registerAllEvents(){
             '<div class="input-group"><button role="button" onclick="updateStudentInfo('+id+')" class="btn btn-primary"><%= rb.getString("update_information") %></button></div></form></div>';
 
         var formHtmlPassWord = '<div class="panel-body"><form id="resetPasswordfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newPassword"><%= rb.getString("new_password") %></label></div><div class="input-group">'+
-            '<input type="password"  placeholder="New password to be set" id="newPassword" class="form-control" name="newPassword"/></div></div>' +
+            '<input type="password"  placeholder="<%= rb.getString("new_password_to_be_set") %>" id="newPassword" class="form-control" name="newPassword"/></div></div>' +
             '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary"> <%= rb.getString("reset_password") %></button></div></form></div>';
 
 
-        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass">New Class</label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
+        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass"><%= rb.getString("new_class") %></label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
             
         var tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
             '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +

@@ -85,15 +85,13 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {
@@ -164,15 +162,13 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/viewClassReportCard", method = RequestMethod.GET)
     public String viewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection  ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {
@@ -308,15 +304,15 @@ public class TeacherToolsViewClassDetailsController {
     @RequestMapping(value = "/tt/getProblemForProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String viewProblemsForProblemSet(ModelMap map,  HttpServletRequest request, @RequestParam(value = "problemID") String problemId, @RequestParam(value = "classid") String classid) throws TTCustomException {
 
-    	Locale loc = request.getLocale();
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
         try {
             ProblemsView pView = pvService.viewProblemSetsInGivenProblem(Integer.valueOf(problemId), Integer.valueOf(classid), lang);
             ObjectMapper objectMapp = new ObjectMapper();

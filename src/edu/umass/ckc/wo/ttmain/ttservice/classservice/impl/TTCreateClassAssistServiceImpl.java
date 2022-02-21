@@ -42,6 +42,7 @@ import java.util.Map;
  * Kartik	11-02-20	issue #292 test users to be created on class creation
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  * Frank	02--7-22	issue #600 removed code to adjustment maxTime after changing Topic selections
+ * Frank	01-21-22	Issue #610 - compute numProblems for inactive topics
  */
 
 @Service
@@ -217,14 +218,15 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             DbTopics.clearClassLessonPlan(connection.getConnection(), classId);
 
             TTUtil.getInstance().resetSequenceNosForTheClass(activeproblemSetModified, classId, namedParameterJdbcTemplate);
-            TTUtil.getInstance().setNumProblemsForProblemSet(probMgr, classId, connection.getConnection(), activeproblemSetModified);
+            TTUtil.getInstance().setNumProblemsForActiveProblemSet(probMgr, classId, connection.getConnection(), activeproblemSetModified);
 
             //DbTopics.getClassInactiveTopics(connection.getConnection(), activeproblemSet);
             List<Topic> inactiveproblemSets = TTUtil.getInstance().updateTopicNameAndDescription(activeproblemSetModified,classId,connection.getConnection(),namedParameterJdbcTemplate, false);
 		            
-            TTUtil.getInstance().setNumProblemsForProblemSet(probMgr, classId, connection.getConnection(), inactiveproblemSets);
+            //Modified list has topics with no problems removed.
+            List<Topic> inactiveproblemSetsModified = TTUtil.getInstance().setNumProblemsForInactiveProblemSet(probMgr, classId, connection.getConnection(), inactiveproblemSets);
 
-
+            
             Map<String, Integer> gradewiseProblemMapActive = new HashMap<String, Integer>();
             Map<String, Integer> gradewiseProblemMapInActive = new HashMap<String, Integer>();
 
@@ -237,7 +239,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
             map.addAttribute("inActiveproblemSetHeaders", gradewiseProblemMapInActive);
             map.addAttribute("activeproblemSet", activeproblemSetModified);
-            map.addAttribute("inactiveproblemSets", inactiveproblemSets);
+            map.addAttribute("inactiveproblemSets", inactiveproblemSetsModified);
             map.addAttribute("activeproblemSetHeaders", gradewiseProblemMapActive);
 
         } catch (SQLException e) {

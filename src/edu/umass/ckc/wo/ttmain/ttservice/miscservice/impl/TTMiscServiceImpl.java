@@ -102,7 +102,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 
         	Locale loc = new Locale("en","US");	
         	if (lang.substring(0,2).equals("es")) {
-        		loc = new Locale("es","AR");	
+        		loc = new Locale("es","US");	
         	}        	
     		ploc = loc;
 

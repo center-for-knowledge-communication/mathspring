@@ -54,15 +54,17 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttMain", method = RequestMethod.POST)
     public String printWelcome(@RequestParam("userName") String username, @RequestParam("password") String password, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
 
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
+    	
     	
     	ResourceBundle rb = null;
     	try {
@@ -149,15 +151,15 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestParam("userName") String username, @RequestParam("email") String email, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {
@@ -199,15 +201,15 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttLoginHelp", method = RequestMethod.POST)
     public String loginHelp(@RequestParam("email") String email, @RequestParam("helpmsg") String helpmsg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {
@@ -243,15 +245,15 @@ public class TeacherToolsMainLoginController {
     @RequestMapping(value = "/tt/ttLogFeedback", method = RequestMethod.POST)
     public String logFeedback(@RequestParam("messageType") String messageType,@RequestParam("teacherId") int teacherId,@RequestParam("objectId") String objectId,@RequestParam("priority") String priority, @RequestParam("msg") String msg, ModelMap model, HttpServletRequest request, HttpServletResponse response ) throws TTCustomException {
 
-    	Locale loc = request.getLocale(); 
-    	String lang = loc.getLanguage();
-
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
     	
     	ResourceBundle rb = null;
     	try {

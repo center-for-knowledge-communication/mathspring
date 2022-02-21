@@ -29,15 +29,16 @@ public class TeacherEditHandler {
 
     public void handleEvent(Connection conn, AdminTeacherEditEvent event, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
-    	Locale loc = req.getLocale();
-    	String lang = loc.getLanguage();
+    	 Locale loc = req.getLocale(); 
+    	 String lang = loc.getLanguage();
+    	 String country = loc.getCountry();
 
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+    	 System.out.println("locale set to:" + lang + "-" + country );	
+
+    	 if (!lang.equals("es")) {
+    	 	loc = new Locale("en","US");	
+    	 }			
+    	
     	
     	ResourceBundle rb = null;
     	try {
