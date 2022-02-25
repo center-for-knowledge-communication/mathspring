@@ -723,10 +723,10 @@ function liveDashboardPopulate() {
         },
         success : function(data) {
        	    if (data) {
+       			$("#ModalPopupFireworks").modal('hide');
        	    	liveDashboardTotal = "" + data;
        	    	document.getElementById('live-dashboard-content').innerHTML = '<h1 class="tt-live-dashboard-content">' + liveDashboardTotal + '</h1>';
        	    	document.getElementById("live-dashboard").style.visibility = 'visible';
-       	    	liveDashboardLoop();
 
        	    	if (plot_effort_chart != null) {
        	    		plot_effort_chart.destroy();
@@ -736,11 +736,14 @@ function liveDashboardPopulate() {
                	var ticks = [];
                	
                	var intLiveDashboardTotal = parseInt(data);
-               	
+
                	var liveMaxStr = document.getElementById("tt-live-goal").value;
                	if ((liveMaxStr == "") || isNaN(liveMaxStr)) {
-               		document.getElementById("tt-live-goal").value = '500';
-               		liveMaxStr = '500';
+               		document.getElementById("tt-live-goal").value = ' ';
+               		liveMaxStr = '0';
+               	}
+               	else {
+               		$("#tt-live-goal-msg").hide();
                	}
                	liveMax = parseInt(liveMaxStr);
                	if (liveMax <= 100) {
@@ -794,6 +797,17 @@ function liveDashboardPopulate() {
    					    seriesColors: live_series_colors
    				    }
    				});
+   				if (liveMax > 0) {
+	                if (intLiveDashboardTotal >= liveMax) {
+	            		$("#ModalPopupFireworks").modal('show');
+	            		document.getElementById("tt-live-goal").value = " ";
+	            		liveMax = 0;
+	            	}
+	                else {
+	            		$("#ModalPopupFireworks").modal('hide');
+	                }
+   				}
+       	    	liveDashboardLoop();
        	    }
            	else {
            		console.log("response data is null");
@@ -804,20 +818,21 @@ function liveDashboardPopulate() {
         }
     });
 
-
 }
 
 function liveDashboardLoop() {
 
 	setTimeout(function() {
 		liveDashboardPopulate();
-	}, 60000);	
+	}, 30000);	
 	 
 }
 
 function liveDashboardStart() {
 
 	liveDashboardPopulate();
+
+	$("#tt-live-goal-msg").hide();
 	$("#live-dashboard").show();
 
 
@@ -3127,14 +3142,20 @@ function registerAllEvents(){
 	                    <div id="liveDashboardProblemPane" class="col-md-4 tt-LiveDashboardProblemPane">
 	
 	                        <div class="row">
-		                        <h2><%= rb.getString("number_problems_class_solved") %></h2>	                       
+		                        <div style="text-align:center;">
+		                        	<h3><%= rb.getString("number_problems_class_solved") %></h3>
+		                        </div>	                       
 		            		</div>
 	                        <div class="row">
-		                        <h3><%= rb.getString("with_or_without_hints") %></h3>
+		                        <div style="text-align:center;">
+			                        <h4><%= rb.getString("with_or_without_hints") %></h4>
+		                        </div>	                       
 		            		</div>
-	                        <div class="row" style="margin-left:100px">
+	                        <div class="row" style="margin-left:50px">
 								<label><h3><%= rb.getString("live_goal") %></h3></label>&nbsp
-								<input id="tt-live-goal" style="width:50px" type="text" name="" value="500">   
+								<input id="tt-live-goal" style="width:50px" type="text" name="" value="0">&nbsp   
+								<button type="button" class="btn btn-primary btn-small" onclick='$("#tt-live-goal-msg").show();'><%= rb.getString("set_a_new_goal")%></button>
+								<label id="tt-live-goal-msg"><%= rb.getString("your_goal_will_be_ready")%></label>
 								
 		            		</div>
 	                        <div class="row">
@@ -3497,6 +3518,23 @@ function registerAllEvents(){
 </div>
 <!-- Modal -->
 
+<!-- Modal Popup fireworks -->
+<div id="ModalPopupFireworks" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <!-- Modal content-->
+        <div class="fireworks-modal-content ">
+            	<div id="fireworksContent" >
+					<div id="fireworksImage"><img src="../../images/Fireworks_1000.gif" /></div>
+	            </div>
+            </div>
+        </div>
+        <div class="fireworks-modal-header">
+        	<span id="fireworksImageHdr" class="modal-title mx-auto style="width:300px"><h3><%= rb.getString("hooray") %>&nbsp<%= rb.getString("we_reached_our_goal") %></h3></span></div>
+        <div>
+
+    </div>
+</div>
+<!-- Modal -->
 
 
 <!-- Modal -->

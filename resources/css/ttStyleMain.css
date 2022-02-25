@@ -526,20 +526,36 @@ background-color: #FF4766;
 }
 
 .tt-LiveDashboardProblemPane {
- background-color:lightgreen;
- border: 2px solid #000000; 
- border-radius: 25px;
- height:800px;"
+   background-color:lightgreen;
+   border: 2px solid #000000; 
+   border-radius: 25px;
+   height:800px;"
 }
 
 .tt-LiveDashboardEffortPane {
-background-color:powderblue;
-border: 2px solid #000000;
-border-radius: 25px;
-height:800px;">	
+  background-color:powderblue;
+  border: 2px solid #000000;
+  border-radius: 25px;
+  height:800px;">	
 } 
 
+.fireworks-modal-content {
+  padding: 5px 50px  100px  0px;
+  height: 600px;
+  width: 600px
+}        
 
+.fireworks-modal-header {
+  text-align: center;  	
+  color:#0000c6;
+  background-color: #faff91;
+  width: 600px
+  padding:5px 50px  100px  0px;
+ }
+ 
+.fireworks-modal-image {
+	opacity: 0.1
+}
 
 /* Tab Navigation */
 .nav-tabs {
