@@ -185,7 +185,6 @@ public class TTUtil {
             if (problems != null && !problems.isEmpty()) {
                 for (Problem p : problems) {
                     if (!ids.contains("" + p.getId())) {
-                        availabProblem++;
                         if(p.getStandards().isEmpty())
                         {
                             CCStandard standard = new CCStandard("0.0.0.0","No Standard Associated With Problem","No Category","0","0.0.0.0");
@@ -194,6 +193,7 @@ public class TTUtil {
                         if(gradewiseProblemMap.containsKey(p.getStandards().get(0).getGrade())){
                             int numProb = gradewiseProblemMap.get(p.getStandards().get(0).getGrade());
                             numProb++;
+                            availabProblem++;
                             gradewiseProblemMap.put(p.getStandards().get(0).getGrade(),numProb);
                         }else{
                             gradewiseProblemMap.put(p.getStandards().get(0).getGrade(),1);
