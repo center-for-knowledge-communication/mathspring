@@ -141,7 +141,7 @@ public class TTUtil {
 
     private ClassInfo cc = null;
 
-    public void setNumProblemsForProblemSet(DbProblem probMgr,Integer classId ,Connection conn,List<Topic> problemSets) throws SQLException {
+    public void setNumProblemsForActiveProblemSet(DbProblem probMgr,Integer classId ,Connection conn,List<Topic> problemSets) throws SQLException {
         for (Topic t : problemSets) {
             List<Problem> problems = ProblemMgr.getWorkingProblems(t.getId());
             probMgr.filterproblemsBasedOnLanguagePreference(conn, problems, classId);
@@ -173,6 +173,44 @@ public class TTUtil {
         }
     }
     
+    public List<Topic> setNumProblemsForInactiveProblemSet(DbProblem probMgr,Integer classId ,Connection conn,List<Topic> problemSets) throws SQLException {
+    	
+    	List<Topic> inactiveproblemSetsModified = new ArrayList<>();
+    	for (Topic t : problemSets) {
+            List<Problem> problems = ProblemMgr.getWorkingProblems(t.getId());
+            probMgr.filterproblemsBasedOnLanguagePreference(conn, problems, classId);
+            List<String> ids = probMgr.getClassOmittedTopicProblemIds(conn, classId, t.getId());
+            Map<String,Integer> gradewiseProblemMap = new HashMap<String,Integer>();
+            int availabProblem = 0;
+            if (problems != null && !problems.isEmpty()) {
+                for (Problem p : problems) {
+                    if (!ids.contains("" + p.getId())) {
+                        if(p.getStandards().isEmpty())
+                        {
+                            CCStandard standard = new CCStandard("0.0.0.0","No Standard Associated With Problem","No Category","0","0.0.0.0");
+                            p.getStandards().add(standard);
+                        }
+                        if(gradewiseProblemMap.containsKey(p.getStandards().get(0).getGrade())){
+                            int numProb = gradewiseProblemMap.get(p.getStandards().get(0).getGrade());
+                            numProb++;
+                            availabProblem++;
+                            gradewiseProblemMap.put(p.getStandards().get(0).getGrade(),numProb);
+                        }else{
+                            gradewiseProblemMap.put(p.getStandards().get(0).getGrade(),1);
+                        }
+                    }
+                }
+
+            }
+            t.setNumProbs(availabProblem);
+            t.setGradewiseProblemDistribution(gradewiseProblemMap);
+            if (availabProblem > 0) {
+            	inactiveproblemSetsModified.add(t);
+            }
+            
+        }
+    	return inactiveproblemSetsModified;
+    }
  
     public void resetSequenceNosForTheClass( List<Topic> classActiveTopics,int classId, NamedParameterJdbcTemplate namedParameterJdbcTemplate){
         int resetSeq = 1;
@@ -250,12 +288,12 @@ public class TTUtil {
 			                		System.out.println("Added " + tp.getName());
 			                	}
 			                	else {
-			                		System.out.println("Not added " + tp.getName());
+			                		System.out.println("Topic not within standards. Not added " + tp.getName());
 			                	}
 			                }
 			                catch (Exception tpe) {
 			                	System.out.println(tpe.getMessage());
-			                }
+			                }							
 						}
 						return inactiveTopicList;
 					});

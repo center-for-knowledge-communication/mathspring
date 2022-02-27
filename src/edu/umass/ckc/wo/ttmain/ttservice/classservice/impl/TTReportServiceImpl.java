@@ -123,7 +123,7 @@ public class TTReportServiceImpl implements TTReportService {
 
         	Locale loc = new Locale("en","US");	
         	if (lang.substring(0,2).equals("es")) {
-        		loc = new Locale("es","AR");	
+        		loc = new Locale("es","US");	
         	}        	
     		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -373,6 +373,14 @@ public class TTReportServiceImpl implements TTReportService {
                     landingReportTwo_dataMap.put("levelOneData", landingReportTwo_levelOneData);
                     return landingReportTwo_objMapper.writeValueAsString(landingReportTwo_dataMap);
 
+                case "classStudentClusterReport":
+                	
+                	// Run the K-Mean algorithm here
+
+                	// We'll need to discuss the report format
+                	String dummyReport = "<thead><tr><th>Cluster 1</th><th> 2</th></tr></thead><tbody><tr><td>Some Content</td></tr><tr><td>More Conent</td></tr></tbody>";
+
+                	return dummyReport;
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                 	if ("Normal".equals(teacherLoginType)) {
@@ -445,7 +453,7 @@ public class TTReportServiceImpl implements TTReportService {
                 	Timestamp endTimestamp = null;
                 	
                 	if (lang.equals("es")) {
-                		loc = new Locale("es","AR");	
+                		loc = new Locale("es","US");	
                 	}
                 	else {
                 		loc = new Locale("en","US");	

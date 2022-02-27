@@ -48,7 +48,7 @@ catch (Exception e) {
           			<c:if test="${lcompanion.value[1] != 'NoLC'}">
           				<img src="${url}/${lcompanion.value[1]}/character.png" width="150px" height="188px">
           			</c:if>
-          			<span style="display:block; text-align: center;">${lcompanion.value[0]}</span>
+          			<span style="display:block; text-align: center;">${lcompanion.value[1]}</span>
          		</label>
        		</div>
 		    <c:if test="${loop.index == terminator}">

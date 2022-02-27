@@ -76,15 +76,17 @@ public class UserRegistrationHandler {
      * FINAL: Generate a message saying the user has been created successfully.
      */
     public View handleEvent(ServletContext sc, HttpServletRequest servletRequest, Connection conn, ServletEvent e, HttpServletResponse servletResponse) throws Exception {
-    	Locale loc = servletRequest.getLocale();
-    	String lang = loc.getLanguage();
 
-    	if (lang.equals("es")) {
-    		loc = new Locale("es","AR");	
-    	}
-    	else {
-    		loc = new Locale("en","US");	
-    	}	
+    	 Locale loc = servletRequest.getLocale();
+       	 String lang = loc.getLanguage();
+       	 String country = loc.getCountry();
+
+       	 System.out.println("locale set to:" + lang + "-" + country );	
+
+       	 if (!lang.equals("es")) {
+       	 	loc = new Locale("en","US");	
+       	 }			
+       	       	
     	
     	try {
     		rb = ResourceBundle.getBundle("MathSpring",loc);

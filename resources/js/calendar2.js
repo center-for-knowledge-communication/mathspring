@@ -24,8 +24,10 @@ document.getElementById("year_cal2").innerHTML = createYear;
 var calendar_cal2 = document.getElementById("calendar_cal2");
 var lang_cal2 = calendar_cal2.getAttribute('data-lang');
 
-var months_cal2 = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-var days_cal2 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var months_cal2 = [];
+initMonthNames_cal2();
+var days_cal2= []; 
+initDayNames_cal2();	today = new Date();
 
 var dayHeader_cal2 = "<tr>";
 for (day in days) {
@@ -35,6 +37,31 @@ dayHeader_cal2 += "</tr>";
 
 document.getElementById("thead-month_cal2").innerHTML = dayHeader;
 monthAndYear_cal2 = document.getElementById("monthAndYear_cal2");
+
+function initMonthNames_cal2() {
+	months_cal2.push(jan_name);
+	months_cal2.push(feb_name);
+	months_cal2.push(mar_name);
+	months_cal2.push(apr_name);
+	months_cal2.push(may_name);
+	months_cal2.push(jun_name);
+	months_cal2.push(jul_name);
+	months_cal2.push(aug_name);
+	months_cal2.push(sep_name);
+	months_cal2.push(oct_name);
+	months_cal2.push(nov_name);
+	months_cal2.push(dec_name);
+}
+
+function initDayNames_cal2() {
+	days_cal2.push(sun_name);
+	days_cal2.push(mon_name);
+	days_cal2.push(tue_name);
+	days_cal2.push(wed_name);
+	days_cal2.push(thu_name);
+	days_cal2.push(fri_name);
+	days_cal2.push(sat_name);
+}
 
 
 function initCalendar_cal2() {

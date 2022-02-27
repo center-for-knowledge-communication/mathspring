@@ -15,11 +15,11 @@ catch (Exception e) {
 
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
+String country = loc.getCountry();
 
-if (lang.equals("es")) {
-	loc = new Locale("es","AR");	
-}
-else {
+System.out.println("locale set to:" + lang + "-" + country );	
+
+if (!lang.equals("es")) {
 	loc = new Locale("en","US");	
 }			
 		
@@ -48,7 +48,7 @@ catch (Exception e) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Grow Your Math Â· MathSpring</title>
+    <title>Grow Your Math with MathSpring</title>
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="img/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="img/favicon-16x16.png" sizes="16x16">

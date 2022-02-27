@@ -117,7 +117,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 		// Multi=lingual enhancement
     	Locale loc = new Locale("en","US");	
     	if (lang.substring(0,2).equals("es")) {
-    		loc = new Locale("es","AR");	
+    		loc = new Locale("es","US");	
     	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
@@ -170,7 +170,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 		// Multi=lingual enhancement
     	Locale loc = new Locale("en","US");	
     	if (lang.substring(0,2).equals("es")) {
-    		loc = new Locale("es","AR");	
+    		loc = new Locale("es","US");	
     	}		
     	rb = ResourceBundle.getBundle("MathSpring",loc);        
 		String message = "";
@@ -230,7 +230,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	// Multi=lingual enhancement
     	Locale loc = new Locale("en","US");	
     	if (lang.substring(0,2).equals("es")) {
-    		loc = new Locale("es","AR");	
+    		loc = new Locale("es","US");	
     	}		
     	rb = ResourceBundle.getBundle("MathSpring",loc);
 		String msg =  "";
@@ -279,7 +279,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	// Multi=lingual enhancement
     	Locale loc = new Locale("en","US");	
     	if (lang.substring(0,2).equals("es")) {
-    		loc = new Locale("es","AR");	
+    		loc = new Locale("es","US");	
     	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
         String msg = "";
@@ -306,7 +306,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 		// Multi=lingual enhancement
     	Locale loc = new Locale("en","US");	
     	if (lang.substring(0,2).equals("es")) {
-    		loc = new Locale("es","AR");	
+    		loc = new Locale("es","US");	
     	}
 		rb = ResourceBundle.getBundle("MathSpring",loc);        
         String msg = "";

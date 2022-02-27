@@ -68,14 +68,14 @@ catch (Exception e) {
 
 Locale loc = request.getLocale(); 
 String lang = loc.getLanguage();
+String country = loc.getCountry();
 
-if (lang.equals("es")) {
-	loc = new Locale("es","AR");	
-}
-else {
+System.out.println("locale set to:" + lang + "-" + country );	
+
+if (!lang.equals("es")) {
 	loc = new Locale("en","US");	
-}	
-System.out.println(loc.toString());
+}			
+
 ResourceBundle rb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
@@ -243,6 +243,7 @@ var filterFour = "~~";
 //Report3 variables
 var filterThree = "~~";
 
+var filterSeven = "~~";
 
 
 //Report5 Varribales
@@ -507,6 +508,7 @@ function getFilterOne() {
 	}
 }
 
+
 function getFilterFour() {
 
 	document.getElementById("daysFilterFour").value = "";
@@ -587,6 +589,18 @@ function getFilterFour() {
 			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
 		}
 	}
+}
+
+
+
+function getFilterSeven() {
+
+	var showNamesState = "N";
+	if (document.getElementById("showNamesSix").checked == true) {
+		showNamesState = "Y";
+	}
+	filterSeven = "~" + document.getElementById("numberOfStudentClusters").value + "~" + showNamesState;		
+			
 }
 
 
@@ -2478,7 +2492,40 @@ var completeDataChart;
         });
 
     });
-        
+
+    
+    $('#showReportSevenBtn').on('click', function ()  {    	
+
+    	   
+        getFilterSeven();
+        $("#studentClusterReport").hide();
+        $('#collapseSevenLoader').show();
+
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'classStudentClusterReport',
+                lang: loc,
+                filter: filterSeven
+            },
+            success : function(data) {
+                $('#collapseSevenLoader').hide();
+                $("#studentClusterReport").show();
+                
+                
+                
+                document.getElementById("studentClusterReport").innerHTML = "<table  class='table table-striped table-bordered hover' width='100%'></table><tr class='row'><td><h3>Under Constuction</h3></td></tr></table>";
+                
+            }
+        });
+
+    });
+
+    
+    
     $('body').on('click', 'a.getStudentDetail', function () {
         $(this).children(':first').toggleClass('rotate-icon');
         var tr = $(this).closest('tr');
@@ -3179,6 +3226,35 @@ var completeDataChart;
                             </div>
                         </div>
                     </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_seven" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven">
+                                    Student Clusters
+                                </a>
+                                <button id="sevenButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseSeven" class="panel-collapse collapse">
+	                            <div class="panel-body report_filters">                           
+									  <label class="report_filters">How many clusters</label>
+									  <input id="numberOfStudentClusters" style="width:48px" type="text" name="" value="" onblur="getFilterSeven();">
+								</div>
+	                            <div class="panel-body report_filters">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSeven" name="" value="Y"  onblur="getFilterSeven();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	                            </div>
+	                            <div class="panel-body report_filters">                           
+									  <input id="showReportSevenBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+	                            </div>                            
+	                            <div class="panel-body">
+                            </div>
+                            <div id="collapseSevenLoader" class="loader" style="display: none" ></div>
+                            
+                            <div id="studentClusterReport" class="panel-body">
+                            </div>
+                        </div>
+					</div>
 
 					<div id="report_five_panel" class="panel panel-default">
                         <div class="panel-heading">

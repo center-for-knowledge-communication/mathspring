@@ -30,14 +30,13 @@ Where the "[ ]" is a check box you select, and the "_______" is a multi-choice (
  
  Locale loc = request.getLocale(); 
  String lang = loc.getLanguage();
+ String country = loc.getCountry();
 
- if (lang.equals("es")) {
- 	loc = new Locale("es","AR");	
- }
- else {
+ System.out.println("locale set to:" + lang + "-" + country );	
+
+ if (!lang.equals("es")) {
  	loc = new Locale("en","US");	
- }	
- System.out.println(loc.toString());
+ }			
 
  
 ResourceBundle rb = null;

@@ -44,6 +44,7 @@ import java.util.ResourceBundle;
  * Frank	09-29-20	issue #237R3 added event logging
  * Frank	10-07-20  	Issue #261 change problem header
  * Frank	06-26-21	Added gaze detection support
+ * Frank	01-21-22	Issue #610 - Save session  locale in DB for use by interventions 
  */
 
 public class SessionManager {
@@ -131,8 +132,7 @@ public class SessionManager {
         this.contextPath = contextPath;
     }
 
-    public SessionManager(Connection connection,
-            int sessionId, String hostPath, String contextPath, Locale loc) throws Exception {
+    public SessionManager(Connection connection, int sessionId, String hostPath, String contextPath, Locale loc) throws Exception {
     	this(connection, sessionId);
     	this.hostPath = hostPath;
     	this.contextPath = contextPath;
@@ -235,7 +235,7 @@ public class SessionManager {
      * Constructor only used when the user is logging in from Assistments
     */
     public SessionManager assistmentsLoginSession(int studId) throws Exception {
-        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), true);
+        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), true, new Locale("en","US"));
         timeInSession = 0;
         loginResult = new LoginResult(newSessId, null);
         sessionId = loginResult.getSessId();
@@ -249,7 +249,7 @@ public class SessionManager {
      * Constructor only used when the user is logging in as guest.
      */
     public SessionManager guestLoginSession(int studId) throws Exception {
-        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), false);
+        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), false, new Locale("en","US"));
         timeInSession = 0;
         loginResult = new LoginResult(newSessId, null);
         sessionId = loginResult.getSessId();
@@ -273,7 +273,17 @@ public class SessionManager {
     }
 
     public Locale getLocale() {
-        return this.locale;
+
+    	Locale loc = new Locale("en","US");
+    	try {
+	    	String locStr = DbSession.getLocaleStr(connection, sessionId);
+	    	String splitter[] = locStr.split("-");
+	    	loc = new Locale(splitter[0],splitter[1]);	    	
+    	}
+    	catch (Exception e) {
+            e.printStackTrace();    		
+    	}
+        return loc;
     }
 
     public void createSessionForStudent(int studId) {
@@ -340,22 +350,23 @@ public class SessionManager {
 
     private void buildSession(Connection connection, int sessionId) throws Exception {
         DbSession.updateSessionLastAccessTime(connection, sessionId);
-        int[] ids = DbSession.setSessionInfo(connection, sessionId);
-        this.studId = ids[0];
-        this.classId = ids[1];
+        String[] fields = DbSession.setSessionInfo(connection, sessionId);
+        this.studId = Integer.valueOf(fields[0]);
+        this.classId = Integer.valueOf(fields[1]);
+        String language = fields[2];
    
         ClassInfo cl = DbClass.getClass(connection, this.classId);
         
         this.gazeDetectionOn = cl.getGazeDetectionOn();
         this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId);
 
-        String language = "en";
+
         language = cl.getClassLanguageCode();
         if (language.startsWith("es")) {
         	language = "es";
-            this.locale = new Locale(language,"Ar");
+            this.locale = new Locale(language,"US");
         }
-        System.out.println("Locale from Class " + this.locale.toString());
+        
         this.user = DbUser.getStudent(connection, this.studId);
         
         // Issue #267 add teacher name and class name to problem display header
@@ -582,7 +593,8 @@ public class SessionManager {
                     }
                     else {
                         inactivateAllUserSessions();
-                        this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false);
+                        String lang = loc.getLanguage();
+                        this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false, loc);
                         if (DbUser.isLoginPaused(connection, studId)) {
                             new TutorLogger(this).logStudentAccess(studId, ACCESS_PAUSED);
     	                    return new LoginResult(-1, rb.getString("login_is_paused"), LoginResult.ERROR);                	
@@ -612,7 +624,7 @@ public class SessionManager {
                         this.timeInSession = System.currentTimeMillis() - lastLoginTime.getTime();
 
                     setStudentState(woProps);   // pull out student state props from all properties
-                    this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false);
+                    this.sessionId = DbSession.newSession(getConnection(), studId, sessBeginTime, false, loc);
                     studState.getSessionState().initializeState();
                     instantiatePedagogicalModel(ped);
                     if (DbUser.isLoginPaused(connection, studId)) {
@@ -657,7 +669,7 @@ public class SessionManager {
                 // Give them a sessionId so that if they choose to logout the other sessions, this session will be left
                 // active.
             else if (sessId != -1) {
-                int newSessId = DbSession.newSession(getConnection(), studId, clientBeginTime, false);
+                int newSessId = DbSession.newSession(getConnection(), studId, clientBeginTime, false, new Locale("en","US"));
                 return getLoginView(OTHER_ACTIVE_SESSIONS, NavigationHandler.TRUE, null, newSessId, studId, null);
             } else
                 loginCheck = LOGIN_USER_PASS;
@@ -672,7 +684,7 @@ public class SessionManager {
             throw new UserException("must provide uname and password or uname and momName");
         }
 
-        this.sessionId = DbSession.newSession(getConnection(), studId, clientBeginTime, false);
+        this.sessionId = DbSession.newSession(getConnection(), studId, clientBeginTime, false, new Locale("en","US"));
         // At login time we need a PedagogicalModel for the user (so that a learning companion can be returned to the client)
         // Only way to get it is to construct another (full) smgr using our new sessionID.   We can then
         // get its PedagogicalModel's learning companion
