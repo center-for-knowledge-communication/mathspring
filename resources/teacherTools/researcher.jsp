@@ -297,6 +297,30 @@ function launchReportCard() {
 	}
 }
 
+
+function refreshLocalData() {
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/researchServices",
+        data : {
+            cohortId: 0,
+            teacherId: 0,
+            classId: 0,
+            reportType: 'getCohortTeachersClasses',
+            lang: 'en_US',
+            filter: '~'
+        },
+        success : function(data) {
+        	allCohortsArr = $.parseJSON(data);
+        	
+        }
+    });
+    
+	
+}
+
+
 $(document).ready(function () {
 	
 	headers = changeTeacherActivitiesReportHeaderAccordingToLanguage();
@@ -733,48 +757,56 @@ function handleClassSelect(event) {
 
 function editCohort(cmd) {
 	alert(cmd + '(tbd)');
+	adminCohortInfo();
 }
 
 function editCohortTeachers(cmd) {
+
+	var filter = "";
+
 	if (currentCohortId == "") {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	if (cmd === "remove") {
-		var lastname = prompt("Enter teacher last name;");
 		var id = prompt("Enter teacher id");
-		var conf = confirm("are you sure you want to remove " + lastname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
+		var tname = prompt("Enter teacher last name;");
+		var conf = confirm("Are you sure you want to remove teacher " + tname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
+			filter = filter + "remove" + "~" +  id + "~" + tname;
+			adminCohortTeachers(filter);		
 		}
-		else {
-			alert("Whoa,that was close!");
-		}
-		
 	}
 	if (cmd === "add") {
-		var lastname = prompt("Enter teacher last name;");
+		var tname = prompt("Enter teacher last name;");
 		var id = prompt("Enter teacher id");
-		var conf = confirm("are you sure you want to add " + lastname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
+		var conf = confirm("Are you sure you want to add teacher " + tname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
-		}
-		else {
-			alert("Whoa,that was close!");
+			filter = filter + "add" + "~" +  id + "~" + tname;
+			adminCohortTeachers(filter);		
 		}
 	}
 }
 
 function editCohortClasses(cmd) {
+
+	var filter = "";
 	if (cmd === "remove") {
-		var answer = prompt("Enter class id");
-		var conf = confirm("are you sure you want to remove the class id " + answer);
+		var id = prompt("Enter class id");
+		var tname = prompt("Enter teacher last name");
+		var conf = confirm("Are you sure you want to remove class id: " + id + " of teacher " + tname + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
+			filter = filter + "remove" + "~" +  id + "~" + tname;
+			adminCohortClasses(filter);				
 		}
-		else {
-			alert("Whoa,that was close!");
+	}
+	if (cmd === "add") {
+		var id = prompt("Enter class id");
+		var tname = prompt("Enter teacher last name");
+		var conf = confirm("Are you sure you want to add class id " + id + " of teacher " + tname + " to " + cohortsArr[currentCohortIndex].cohortName);
+		if (conf) {
+			filter = filter + "add" + "~" +  id + "~" + tname;
+			adminCohortClasses(filter);				
 		}
-		
 	}
 }
 
@@ -3896,6 +3928,96 @@ function createCohortSlice() {
     
 }
 
+
+function adminCohortInfo() {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortInfo',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+function adminCohortTeachers(filter) {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortTeachers',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+            	refreshLocalData();
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+function adminCohortClasses(filter) {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortClasses',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+            	refreshLocalData();
+            }
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+
 function updateCohortSlice() {
 	
 	
@@ -4042,6 +4164,63 @@ function updateAllCohortSlices() {
 	        	        url : pgContext+"/tt/tt/cohortAdmin",
 	        	        data : {
 	        	            cohortId: 2,
+	        	            command: 'updateAllCohortClassStudentSlices',
+	        	            lang: loc,
+	        	            filter: updateCohortFilter
+	        	        },
+	        	        success : function(data) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	if (data) {
+	        	            	alert(data);
+	        	        	}
+	        	        	else {
+	        	        		alert('<%= rwrb.getString("response_data_null") %>');
+	        	        	}
+	        	        },
+	        	        error : function(e) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	alert("error");
+	        	            console.log(e);
+	        	        }
+	        	    });
+	        	}
+	        	else {
+	        		alert('<%= rwrb.getString("response_data_null") %>');
+	        	}
+	        },
+	        error : function(e) {
+	        	$('#admin3').find('.loader').hide();
+	        	alert("error");
+	            console.log(e);
+	        }
+	    });
+	    
+	
+	}    
+
+
+	if (currentCohortId == "3") {
+		
+		var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
+	    
+		$('#admin3').find('.loader').show();
+	    $.ajax({
+	        type : "POST",
+	        url : pgContext+"/tt/tt/cohortAdmin",
+	        data : {
+	            cohortId: currentCohortId,
+	            command: 'updateAllCohortSlicesTeacherActivity',
+	            lang: loc,
+	            filter: updateCohortFilter
+	        },
+	        success : function(data) {
+	        	if (data) {
+	            	alert(data);
+	        	    $.ajax({
+	        	        type : "POST",
+	        	        url : pgContext+"/tt/tt/cohortAdmin",
+	        	        data : {
+	        	            cohortId: currentCohortId,
 	        	            command: 'updateAllCohortClassStudentSlices',
 	        	            lang: loc,
 	        	            filter: updateCohortFilter
@@ -5037,8 +5216,7 @@ function updateAllCohortSlices() {
 	                                <div class="table table-striped table-bordered hover display nowrap" width="100%">
 	
 	                                </div>
-	                            </div>
-	
+	                            </div>	
 	                        </div>
 	                    </div>                   
 	                    
@@ -5066,7 +5244,7 @@ function updateAllCohortSlices() {
 	                        </div>
 	                    </div>                   
 	                                       
-	                    <div  id="addCohortTeacher" class="panel panel-default">
+	                    <div  id="addCohortClass" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
 	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin6">

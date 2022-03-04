@@ -806,8 +806,12 @@ public class TTMiscServiceImpl implements TTMiscService {
     		footerJson.put("Actual # Students", studyExpectedStudentCount);
     		footerJson.put("Active Students", studyStudentCount);
     		
+    		int studyStudentCountDiffPct = 0;
    			int studyStudentCountDiff = studyExpectedStudentCount - studyStudentCount;
-   			int studyStudentCountDiffPct = (studyStudentCountDiff * 100) / studyExpectedStudentCount;
+   			
+   			if (studyExpectedStudentCount > 0) {
+   				studyStudentCountDiffPct = (studyStudentCountDiff * 100) / studyExpectedStudentCount;
+   			}
 /*
    			String studyStudentCountDiffColor = "white";
    			if (studyStudentCountDiff >= 0) {;
@@ -839,7 +843,10 @@ public class TTMiscServiceImpl implements TTMiscService {
    				footerJson.put(avg_minutes_student,  0);
    			}
    			else {
-   				footerJson.put(avg_problems_student, studyProblemsSolved / studyStudentCount);
+   				if (studyStudentCount > 0)
+   					footerJson.put(avg_problems_student, studyProblemsSolved / studyStudentCount);
+   				else
+   					footerJson.put(avg_problems_student, 0);
    				float fmins = 0;
    				if (studyProblemsSolved > 0) {
    					fmins = (float)studyMinutesToSolve / (float)studyProblemsSolved;
@@ -847,7 +854,9 @@ public class TTMiscServiceImpl implements TTMiscService {
    				String strMins = String.format("%.02f", fmins);   				
    				footerJson.put(avg_minutes_per_problem, strMins);
    				
-   				fmins = (float)studyMinutesToSolve / (float)studyStudentCount;
+   				fmins = 0;
+   				if (studyStudentCount > 0)
+   					fmins = (float)studyMinutesToSolve / (float)studyStudentCount;
    				strMins = String.format("%.02f", fmins);   				
    				footerJson.put(avg_minutes_student,  strMins);
    			}
@@ -1461,6 +1470,16 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "getCohortWeeks":
     			result = getCohortWeeks(conn, Integer.valueOf(cohortId),filter);
     			break;
+    		case "adminCohortInfo":
+    			result = adminCohortInfo(conn, Integer.valueOf(cohortId),filter);
+    			break;
+    		case "adminCohortTeachers":
+    			result = adminCohortTeachers(conn, Integer.valueOf(cohortId),filter);
+    			break;
+    		case "adminCohortClasses":
+    			result = adminCohortClasses(conn, Integer.valueOf(cohortId),filter);
+    			break;
+
     		case "createCohortSlice":
     			result = createCohortSlice(conn, Integer.valueOf(cohortId),filter);
     			break;
@@ -1690,6 +1709,25 @@ public class TTMiscServiceImpl implements TTMiscService {
     
     public String updateAllCohortSlicesTeacherActivity(Connection conn, int cohortId, String filter) throws SQLException {
     	
+    	int result = 0;
+        PreparedStatement stmt_del = null;
+        try {
+            String q_del = "delete from teacher_log_slices where cohortid = ?;";
+            stmt_del = conn.prepareStatement(q_del);
+            stmt_del.setInt(1, cohortId);          
+            result = stmt_del.executeUpdate();
+        	stmt_del.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        } finally {
+            if (stmt_del != null)
+                stmt_del.close();
+        }    
+
+        if (result == 0) {
+        	return "SQL Insert error"; 
+        }
 
     	String[] splitter = filter.split("~");
     	
@@ -2062,6 +2100,26 @@ public class TTMiscServiceImpl implements TTMiscService {
     public String updateAllCohortClassStudentSlices(Connection conn, int cohortId, String filter) throws SQLException {
     	
 
+    	int result = 0;
+        PreparedStatement stmt_del = null;
+        try {
+            String q_del = "delete from teacher_class_slices where cohortid = ?;";
+            stmt_del = conn.prepareStatement(q_del);
+            stmt_del.setInt(1, cohortId);          
+            result = stmt_del.executeUpdate();
+        	stmt_del.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        } finally {
+            if (stmt_del != null)
+                stmt_del.close();
+        }    
+
+        if (result == 0) {
+        	return "SQL Insert error"; 
+        }
+    	
     	String[] splitter = filter.split("~");
     	
     	String startDate = splitter[0];
@@ -2104,6 +2162,246 @@ public class TTMiscServiceImpl implements TTMiscService {
         return "Class Slices Updated Successfully"; 
     }
     
+
+    public String adminCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
+    	
+
+    	String[] splitter = filter.split("~");
+    	
+    	String startDate = splitter[0];
+    	
+    	return "adminCohortInfo Status";
+    	
+    }
+
+    public String adminCohortTeachers(Connection conn, int cohortId, String filter) throws SQLException {
+    	
+    	System.out.println("filter = " + filter);
+    	String[] splitter = filter.split("~");
+    	
+    	String cmd = splitter[0];
+    	int tid = Integer.valueOf(splitter[1]);
+    	String lname = splitter[2];
+
+    	String result = "";
+    	
+    	ResultSet rs1 = null;
+        PreparedStatement stmt1 = null;
+    	ResultSet rs2 = null;
+        PreparedStatement stmt2 = null;
+    	if (cmd.equals("add")) {
+    		try {
+    	
+	            String q1 = "select tch.ID, tch.lname from teacher as tch, teacher_map_cohorts as tmc where tmc.researchcohortid = ? and not tch.ID = tmc.teacherId and tch.ID = ? and tch.lname = ? ;";
+	            stmt1 = conn.prepareStatement(q1);
+	            stmt1.setInt(1, cohortId);
+	            stmt1.setInt(2, tid);
+	            stmt1.setString(3, lname);
+	            rs1 = stmt1.executeQuery();
+	            if (rs1.next()) {
+	            	if (!rs1.getString("tch.lname").equals(lname)) {
+	            		result  = "Teacher id found, but last name does not match";
+	            	}
+	            	else {
+	            		result  = "Cannot add teacher";
+	            	}
+	            }
+	        	stmt1.close();
+	            rs1.close();
+	        } finally {
+	            if (stmt1 != null)
+	                stmt1.close();
+	            if (rs1 != null)
+	                rs1.close();
+	        }
+    		if (result.length() == 0) {
+		        try {
+		            String q2 = "insert into teacher_map_cohorts (researchcohortid, teacherid, expectedStudentCount) values (?,?,?);";
+		            stmt2 = conn.prepareStatement(q2);
+		            stmt2.setInt(1, cohortId);
+		            stmt2.setInt(2, tid);
+		            stmt2.setInt(3, 0);
+		            int sqlresult = stmt2.executeUpdate();
+		            
+		            if (sqlresult == 0) {
+		            	result = "SQL error - Teacher not added"; 
+		            }
+		            else {
+		            	result = "Teacher added to cohort";
+		            }
+	        	
+		        	stmt2.close();
+		            return result;    	
+		        } finally {
+		            if (stmt2 != null)
+		                stmt2.close();
+		        }
+        	}
+    	}
+        if (cmd.equals("remove")) {
+    		try {
+    	    	
+	            String q1 = "select tch.ID, tch.lname from teacher as tch, teacher_map_cohorts as tmc where tmc.researchcohortid = ? and tch.ID = tmc.teacherId and tch.ID = ? and tch.lname = ? ;";
+	            stmt1 = conn.prepareStatement(q1);
+	            stmt1.setInt(1, cohortId);
+	            stmt1.setInt(2, tid);
+	            stmt1.setString(3, lname);
+	            rs1 = stmt1.executeQuery();
+	            if (rs1.next()) {
+	            	if (!rs1.getString("tch.lname").equals(lname)) {
+	            		result  = "Teacher id found, but last name does not match";
+	            	}
+
+	            }
+	        	stmt1.close();
+	            rs1.close();
+	        } finally {
+	            if (stmt1 != null)
+	                stmt1.close();
+	            if (rs1 != null)
+	                rs1.close();
+	        }
+    		if (result.length() == 0) {
+		        try {
+		            String q2 = "delete from teacher_map_cohorts where researchcohortid = ? and teacherid = ?;";
+		            stmt2 = conn.prepareStatement(q2);
+		            stmt2.setInt(1, cohortId);
+		            stmt2.setInt(2, tid);
+		            int sqlresult = stmt2.executeUpdate();
+		            
+		            if (sqlresult == 0) {
+		            	result = "SQL error - Teacher not removed"; 
+		            }
+		            else {
+		            	result = "Teacher removed from cohort";
+		            }
+	        	
+		        	stmt2.close();
+		            return result;    	
+		        } finally {
+		            if (stmt2 != null)
+		                stmt2.close();
+		        }
+        	}
+    	}
+    	
+    	return result;
+    	
+    }
+    public String adminCohortClasses(Connection conn, int cohortId, String filter) throws SQLException {
+    	
+
+    	System.out.println("filter = " + filter);
+    	String[] splitter = filter.split("~");
+    	
+    	String cmd = splitter[0];
+    	int cid = Integer.valueOf(splitter[1]);
+    	String lname = splitter[2];
+
+    	String result = "";
+    	
+    	ResultSet rs1 = null;
+        PreparedStatement stmt1 = null;
+    	ResultSet rs2 = null;
+        PreparedStatement stmt2 = null;
+        
+    	if (cmd.equals("add")) {
+    		try {
+	            String q1 = "select cls.id, tch.lname from class as cls, teacher as tch, class_map_cohorts as cmc where cmc.researchcohortid = ? and cls.id = cmc.classid and cls.id = ? and tch.ID = cls.teacherId";
+	            stmt1 = conn.prepareStatement(q1);
+	            stmt1.setInt(1, cohortId);
+	            stmt1.setInt(2, cid);
+	            rs1 = stmt1.executeQuery();
+	            if (rs1.next()) {
+	            	if (!rs1.getString("tch.lname").equals(lname)) {
+	            		result  = "Class id found, but last name does not match";
+	            	}
+	            	else {
+	            		result  = "Cannot add class";
+	            	}
+	            }
+	        	stmt1.close();
+	            rs1.close();
+	        } finally {
+	            if (stmt1 != null)
+	                stmt1.close();
+	            if (rs1 != null)
+	                rs1.close();
+	        }
+    		if (result.length() == 0) {
+		        try {
+		            String q2 = "insert into class_map_cohorts (researchcohortid, classid) values (?,?);";
+		            stmt2 = conn.prepareStatement(q2);
+		            stmt2.setInt(1, cohortId);
+		            stmt2.setInt(2, cid);
+		            int sqlresult = stmt2.executeUpdate();
+		            
+		            if (sqlresult == 0) {
+		            	result = "SQL error - class not added"; 
+		            }
+		            else {
+		            	result = "Class added to cohort";
+		            }
+	        	
+		        	stmt2.close();
+		            return result;    	
+		        } finally {
+		            if (stmt2 != null)
+		                stmt2.close();
+		        }
+        	}
+    	}
+        if (cmd.equals("remove")) {
+    		try {
+    	    	
+	            String q1 = "select cls.id, tch.lname from class as cls, teacher as tch, class_map_cohorts as cmc where cmc.researchcohortid = ? and cls.id = cmc.classid and cls.id = ? and tch.ID = cls.teacherId";
+	            stmt1 = conn.prepareStatement(q1);
+	            stmt1.setInt(1, cohortId);
+	            stmt1.setInt(2, cid);
+	            rs1 = stmt1.executeQuery();
+	            if (!rs1.next()) {
+            		result  = "Class id not found";
+	            }
+    			else {
+    				if (!rs1.getString("tch.lname").equals(lname)) {
+    					result  = "Class id not found, but teacher name does not match" ;
+    				}
+    			}
+	        	stmt1.close();
+	            rs1.close();
+	        } finally {
+	            if (stmt1 != null)
+	                stmt1.close();
+	            if (rs1 != null)
+	                rs1.close();
+	        }
+    		if (result.length() == 0) {
+		        try {
+		            String q2 = "delete from class_map_cohorts where researchcohortid = ? and classid = ?;";
+		            stmt2 = conn.prepareStatement(q2);
+		            stmt2.setInt(1, cohortId);
+		            stmt2.setInt(2, cid);
+		            int sqlresult = stmt2.executeUpdate();
+		            
+		            if (sqlresult == 0) {
+		            	result = "SQL error - class not removed"; 
+		            }
+		            else {
+		            	result = "Class removed from cohort";
+		            }
+	        	
+		        	stmt2.close();
+		            return result;    	
+		        } finally {
+		            if (stmt2 != null)
+		                stmt2.close();
+		        }
+        	}
+    	}
+
+    	return result;
+    	
+    }
     
     
     public String updateCohortSliceTeacherActivity(Connection conn, int cohortId, String filter) throws SQLException {
