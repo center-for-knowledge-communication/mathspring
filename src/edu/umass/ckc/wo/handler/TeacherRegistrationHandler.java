@@ -99,7 +99,7 @@ public class TeacherRegistrationHandler {
         }
         else if (isNotValidField(event.getFname(),"^[A-Za-z]\\w{3,30}$"))
         {
-            req.setAttribute("message","Names must use letters or _");
+            req.setAttribute("message",rb.getString("names_must_use_letters_or_"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher("b".equals(req.getParameter("var"))
@@ -108,7 +108,7 @@ public class TeacherRegistrationHandler {
         }
         else if (isNotValidField(event.getLname(),"^[A-Za-z]\\w{3,30}$"))
         {
-            req.setAttribute("message","Names must use letters or _");
+            req.setAttribute("message",rb.getString("names_must_use_letters_or_"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher("b".equals(req.getParameter("var"))
@@ -117,7 +117,7 @@ public class TeacherRegistrationHandler {
         }
         else if (isNotValidField(event.getEmail(),regexEmail))
         {
-            req.setAttribute("message","Email address not formatted correctly");
+            req.setAttribute("message",rb.getString("email_address_not_formatted_correctly"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
             req.getRequestDispatcher("b".equals(req.getParameter("var"))
@@ -126,7 +126,7 @@ public class TeacherRegistrationHandler {
         }
         else if (isNotValidField(event.getPw1(),regexPwd))
         {
-            req.setAttribute("message","Password must contain only letters and numbers");
+            req.setAttribute("message",rb.getString("password_must_contain_only_letters_and_numbers"));
 //            req.setAttribute("message","Password is not strong enough. It must contain: at least one of UPPER case letter, at least one lower case letter, at least one number and at least one special character from this set. @#$%^&+= And it must be at least 8 characters long");
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
             req.setAttribute("isAdmin",adminId != null ? true : false);
@@ -156,10 +156,9 @@ public class TeacherRegistrationHandler {
                     }
                 }).start();
 
-            String msg =  "Created the user name: " + userName + ".  Please remember it (and your password). \n You will need it for" +
-                    " creating classes and getting reports about how your students are doing." ;
+            String msg =  rb.getString("created_the_user_name") + "[ " + userName + " ]. " + rb.getString("new_teacher_reminder");
             req.setAttribute("isAdmin",adminId != null ? true : false);
-            req.setAttribute("message",msg);
+            req.setAttribute("success",msg);
             req.getRequestDispatcher(Settings.useNewGUI()
                             ? "/login/loginK12_new.jsp"
                             : "/teacherTools/teacherLogin.jsp").forward(req ,resp);
