@@ -876,6 +876,74 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
     }
         
+    public String getStudentCensus(Connection conn, int cohortId) throws SQLException {
+
+        ResultSet ev_rs = null;
+        PreparedStatement ev_stmt = null;
+    	JSONObject evJson = new JSONObject();
+    	
+        try {
+
+        	String ev_q = "select ev.studid, COUNT(ev.id) as eventCount  from eventlog ev where studid > 45000 group by studId;";
+        	ev_stmt = conn.prepareStatement(ev_q);
+            ev_rs = ev_stmt.executeQuery();
+
+            while (ev_rs.next()) {
+            	evJson.put(ev_rs.getString("studId"), ev_rs.getInt("eventCount"));
+            }
+            ev_stmt.close();
+            ev_rs.close();
+            
+        } finally {
+            if (ev_stmt != null)
+            	ev_stmt.close();
+            if (ev_rs != null)
+            	ev_rs.close();
+        }
+
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+        	
+        	String q = "select st.id, st.userName, st.fname, st.lname, st.trialUser, st.keepData, st.keepUser, st.pedagogyId, cls.id as classId, cls.name as 'w_class_main::name', cls.teacherid as 'w_teacher_main::ID', tch.lname as 'w_teacher_main::lname', COUNT(DISTINCT(sh.problemId)) as c_numProblemsinHist from student st, studentproblemhistory sh, class cls, teacher tch, teacher_map_cohorts tmc, class_map_cohorts cmc, research_cohort coh where st.id = sh.studId and st.classId = cls.id and st.id and tch.id = cls.teacherid and cls.id = cmc.classId and tch.id = tmc.teacherid and cls.id = cmc.classid and tmc.researchcohortid = coh.researchcohortid and cmc.researchcohortid = coh.researchcohortid  and coh.researchcohortid = ? group by st.id;";
+
+        	stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+            
+            rs = stmt.executeQuery();
+        	JSONArray resultArr = new JSONArray();
+
+            while (rs.next()) {
+            	JSONObject resultJson = new JSONObject();
+            	resultJson.put("id", rs.getString("id"));
+            	resultJson.put("userName", rs.getString("userName"));
+            	resultJson.put("fname", rs.getString("fname"));
+            	resultJson.put("lname", rs.getString("lname"));
+            	resultJson.put("w_class_main::name", rs.getString("w_class_main::name"));
+            	resultJson.put("w_teacher_main::ID", rs.getString("w_teacher_main::ID"));
+            	resultJson.put("w_teacher_main::lname", rs.getString("w_teacher_main::lname"));
+            	resultJson.put("c_RealStudent", " ");
+            	resultJson.put("c_numProblemsinHist", rs.getString("c_numProblemsinHist"));
+            	resultJson.put("c_numEvents", evJson.get(rs.getString("id")));
+            	resultJson.put("c_gender", " ");
+            	resultJson.put("class", " ");
+            	resultJson.put("trialUser", rs.getString("trialUser"));
+            	resultJson.put("keepData", rs.getString("keepData"));
+            	resultJson.put("keepUser", rs.getString("keepUser"));
+            	resultJson.put("pedagogyId", rs.getString("pedagogyId"));
+            	resultArr.add(resultJson);
+            }            
+            stmt.close();
+            rs.close();
+            return resultArr.toString();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+   	}
 
     
     public String getTeacherProblemsEffort(Connection conn, int cohortId) throws SQLException {
@@ -1428,6 +1496,10 @@ public class TTMiscServiceImpl implements TTMiscService {
 				break;
     		case "teacherProblemsStudentAverages":
 				result = getTeacherProblemsStudentAverages(conn, Integer.valueOf(cohortId));  
+				break;
+
+    		case "getStudentCensus":
+				result = getStudentCensus(conn, Integer.valueOf(cohortId));  
 				break;
 
     		case "teacherClassActiveStudentCount":
