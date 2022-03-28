@@ -2889,6 +2889,9 @@ function showTable_tpsa() {
 	                        cellValue = splitValue[0];
                         	cell.style.backgroundColor = splitValue[1];
                            	cell.innerHTML = splitValue[0];
+                           	if (splitValue.length > 2) {
+                           		cell.title = splitValue[2];
+                           	}
                         }
                        	
                     }
@@ -4896,7 +4899,7 @@ function updateAllCohortSlices() {
 								<input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="<%= rwrb.getString("show_chart") %>">
 							</div> 
                             <div class="panel-body">
-				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
+				            	<div id="tcs_canvas" style="width:1200px; height:500px;"></div> 
                             </div>
 
                         </div>

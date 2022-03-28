@@ -724,11 +724,11 @@ public class TTMiscServiceImpl implements TTMiscService {
        			String StudentCountDiffColor = "white";
        			if (studentCountDiff >= 0) {;
 	       			if (StudentCountDiffPct > studentCountDiffHighLimit) {
-	       				StudentCountDiffColor = "red";      			
+	       				StudentCountDiffColor = "red" + "~" + "Below acceptable student usage";      			
 	       			}
 	       			else {
 	       				if (StudentCountDiffPct > studentCountDiffLowLimit) {
-	       					StudentCountDiffColor = "yellow";	
+	       					StudentCountDiffColor = "yellow" + "~" + "Below average student usage";;	
 	       				}       				
 	       			}
        	       		resultJson.put(students_not_active, studentCountDiff);
@@ -752,7 +752,7 @@ public class TTMiscServiceImpl implements TTMiscService {
        				}
        				String strpps = String.format("%.02f", fpps);
        				if (fpps < fppsLowLimit) {
-       					strpps = strpps + "~" + "yellow";
+       					strpps = strpps + "~" + "orange" + "~" + "Below average";
        				} 
        				else {
    						strpps = strpps + "~" + "white";  
@@ -765,11 +765,11 @@ public class TTMiscServiceImpl implements TTMiscService {
        				}
        				String strMins = String.format("%.02f", fmins);
        				if (fmins < fminsLowLimit) {
-       					strMins = strMins + "~" + "orange";
+       					strMins = strMins + "~" + "orange" + "~" + "Below average";
        				} 
        				else {
        					if (fmins > fminsHighLimit) {
-       						strMins = strMins + "~" + "lightgreen";       					
+       						strMins = strMins + "~" + "lightgreen" + "~" + "Above average";       					
        					}
        					else {
        						strMins = strMins + "~" + "white";  
@@ -783,7 +783,7 @@ public class TTMiscServiceImpl implements TTMiscService {
        				}
        				String strmps = String.format("%.02f", fmps);
        				if (fmps < fmpsLowLimit) {
-       					strmps = strmps + "~" + "yellow";
+       					strmps = strmps + "~" + "yellow" + "~" + need_to_spend_more_time;
        					comments += need_to_spend_more_time;
        				} 
        				else {
@@ -912,8 +912,27 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.setInt(1, cohortId);
             
             rs = stmt.executeQuery();
+        	JSONObject headerJson = new JSONObject();
+        	headerJson.put("id", "id");
+        	headerJson.put("userName", "userName");
+        	headerJson.put("fname", "fname");
+        	headerJson.put("lname", "lname");
+        	headerJson.put("w_class_main::name", "w_class_main::name");
+        	headerJson.put("w_teacher_main::ID", "w_teacher_main::ID");
+        	headerJson.put("w_teacher_main::lname", "w_teacher_main::lname");
+        	headerJson.put("c_RealStudent", "c_RealStudent");
+        	headerJson.put("c_numProblemsinHist", "c_numProblemsinHist");
+        	headerJson.put("c_numEvents", "c_numEvents");
+        	headerJson.put("c_gender", "c_gender");
+        	headerJson.put("class", "class");
+        	headerJson.put("trialUser", "trialUser");
+        	headerJson.put("keepData", "keepData");
+        	headerJson.put("keepUser", "keepUser");
+        	headerJson.put("pedagogyId", "pedagogyId");
+        	
         	JSONArray resultArr = new JSONArray();
-
+        	resultArr.add(headerJson);
+        	
             while (rs.next()) {
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", rs.getString("id"));
