@@ -84,6 +84,9 @@ catch (Exception e) {
 			        <c:if test="${message != null && not empty message}">
 	    		        <div class="alert alert-danger msg-bar" role="alert">${message}</div>
 	        		</c:if>
+			        <c:if test="${success != null && not empty success}">
+	    		        <div class="alert alert-success msg-bar" role="alert">${success}</div>
+	        		</c:if>
 	                <div class="row sign-in-up-box">
 	                    <div class="col-sm-6">
                             <p class="text-center"><%= rb.getString("have_username_already") %></p>

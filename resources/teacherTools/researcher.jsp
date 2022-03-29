@@ -186,7 +186,53 @@ th, td {
 
 
 
+
+
 <script>
+
+
+function JSON2CSV(objArray) {
+    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+    var line = '';
+
+    if ($("#labels").is(':checked')) {
+        var head = array[0];
+        if ($("#quote").is(':checked')) {
+            for (var index in array[0]) {
+                var value = index + "";
+                line += '"' + value.replace(/"/g, '""') + '",';
+            }
+        } else {
+            for (var index in array[0]) {
+                line += index + ',';
+            }
+        }
+
+        line = line.slice(0, -1);
+        str += line + '\r\n';
+    }
+
+    for (var i = 0; i < array.length; i++) {
+        var line = '';
+
+        if ($("#quote").is(':checked')) {
+            for (var index in array[i]) {
+                var value = array[i][index] + "";
+                line += '"' + value.replace(/"/g, '""') + '",';
+            }
+        } else {
+            for (var index in array[i]) {
+                line += array[i][index] + ',';
+            }
+        }
+
+        line = line.slice(0, -1);
+        str += line + '\r\n';
+    }
+    return str;
+}
+
 /*
 var cohortListQuery = select distinct researchcohortid from teacher_map_cohort;
 var cohortTeacherListQuery = select * from teacher t, teacher_map_cohort tmc where t.ID = tmc.teacherid;
@@ -296,6 +342,30 @@ function launchReportCard() {
 		document.getElementById("reportCardLink").click();
 	}
 }
+
+
+function refreshLocalData() {
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/researchServices",
+        data : {
+            cohortId: 0,
+            teacherId: 0,
+            classId: 0,
+            reportType: 'getCohortTeachersClasses',
+            lang: 'en_US',
+            filter: '~'
+        },
+        success : function(data) {
+        	allCohortsArr = $.parseJSON(data);
+        	
+        }
+    });
+    
+	
+}
+
 
 $(document).ready(function () {
 	
@@ -733,48 +803,56 @@ function handleClassSelect(event) {
 
 function editCohort(cmd) {
 	alert(cmd + '(tbd)');
+	adminCohortInfo();
 }
 
 function editCohortTeachers(cmd) {
+
+	var filter = "";
+
 	if (currentCohortId == "") {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	if (cmd === "remove") {
-		var lastname = prompt("Enter teacher last name;");
 		var id = prompt("Enter teacher id");
-		var conf = confirm("are you sure you want to remove " + lastname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
+		var tname = prompt("Enter teacher last name;");
+		var conf = confirm("Are you sure you want to remove teacher " + tname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
+			filter = filter + "remove" + "~" +  id + "~" + tname;
+			adminCohortTeachers(filter);		
 		}
-		else {
-			alert("Whoa,that was close!");
-		}
-		
 	}
 	if (cmd === "add") {
-		var lastname = prompt("Enter teacher last name;");
+		var tname = prompt("Enter teacher last name;");
 		var id = prompt("Enter teacher id");
-		var conf = confirm("are you sure you want to add " + lastname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
+		var conf = confirm("Are you sure you want to add teacher " + tname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
-		}
-		else {
-			alert("Whoa,that was close!");
+			filter = filter + "add" + "~" +  id + "~" + tname;
+			adminCohortTeachers(filter);		
 		}
 	}
 }
 
 function editCohortClasses(cmd) {
+
+	var filter = "";
 	if (cmd === "remove") {
-		var answer = prompt("Enter class id");
-		var conf = confirm("are you sure you want to remove the class id " + answer);
+		var id = prompt("Enter class id");
+		var tname = prompt("Enter teacher last name");
+		var conf = confirm("Are you sure you want to remove class id: " + id + " of teacher " + tname + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			//alert("Ok, let's do it!");			
+			filter = filter + "remove" + "~" +  id + "~" + tname;
+			adminCohortClasses(filter);				
 		}
-		else {
-			alert("Whoa,that was close!");
+	}
+	if (cmd === "add") {
+		var id = prompt("Enter class id");
+		var tname = prompt("Enter teacher last name");
+		var conf = confirm("Are you sure you want to add class id " + id + " of teacher " + tname + " to " + cohortsArr[currentCohortIndex].cohortName);
+		if (conf) {
+			filter = filter + "add" + "~" +  id + "~" + tname;
+			adminCohortClasses(filter);				
 		}
-		
 	}
 }
 
@@ -2134,6 +2212,86 @@ function showReport3e() {
 	
 }
 
+function showTable3f() {
+
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
+	}
+	
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getStudentCensus',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	var jsonData = $.parseJSON(data);	
+               	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var tbl_3f = document.getElementById("table3f");
+        	    tbl_3f.innerHTML = "";
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_3f.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_3f.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                         
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }
+                
+                var csv = JSON2CSV(jsonData);
+                var downloadLink = document.createElement("a");
+                var blob = new Blob(["\ufeff", csv]);
+                var url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = cohortsArr[currentCohortIndex].cohortName + "_StudentCensus.csv";                
+                downloadLink.click();
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+	
+}
 
 function showTable4a() {
 
@@ -2731,6 +2889,9 @@ function showTable_tpsa() {
 	                        cellValue = splitValue[0];
                         	cell.style.backgroundColor = splitValue[1];
                            	cell.innerHTML = splitValue[0];
+                           	if (splitValue.length > 2) {
+                           		cell.title = splitValue[2];
+                           	}
                         }
                        	
                     }
@@ -2903,7 +3064,7 @@ function showReport_tcs() {
                     axes: {
                         xaxis: {
                             min: 0,
-             				max: 330,
+             				max: 600,
              				interval: 25,
                             font: '15px sans-serif'				
                			},
@@ -3896,6 +4057,96 @@ function createCohortSlice() {
     
 }
 
+
+function adminCohortInfo() {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortInfo',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+function adminCohortTeachers(filter) {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortTeachers',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+            	refreshLocalData();
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+function adminCohortClasses(filter) {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'adminCohortClasses',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
+            	refreshLocalData();
+            }
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+
 function updateCohortSlice() {
 	
 	
@@ -4042,6 +4293,63 @@ function updateAllCohortSlices() {
 	        	        url : pgContext+"/tt/tt/cohortAdmin",
 	        	        data : {
 	        	            cohortId: 2,
+	        	            command: 'updateAllCohortClassStudentSlices',
+	        	            lang: loc,
+	        	            filter: updateCohortFilter
+	        	        },
+	        	        success : function(data) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	if (data) {
+	        	            	alert(data);
+	        	        	}
+	        	        	else {
+	        	        		alert('<%= rwrb.getString("response_data_null") %>');
+	        	        	}
+	        	        },
+	        	        error : function(e) {
+	        	        	$('#admin3').find('.loader').hide();
+	        	        	alert("error");
+	        	            console.log(e);
+	        	        }
+	        	    });
+	        	}
+	        	else {
+	        		alert('<%= rwrb.getString("response_data_null") %>');
+	        	}
+	        },
+	        error : function(e) {
+	        	$('#admin3').find('.loader').hide();
+	        	alert("error");
+	            console.log(e);
+	        }
+	    });
+	    
+	
+	}    
+
+
+	if (currentCohortId == "3") {
+		
+		var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
+	    
+		$('#admin3').find('.loader').show();
+	    $.ajax({
+	        type : "POST",
+	        url : pgContext+"/tt/tt/cohortAdmin",
+	        data : {
+	            cohortId: currentCohortId,
+	            command: 'updateAllCohortSlicesTeacherActivity',
+	            lang: loc,
+	            filter: updateCohortFilter
+	        },
+	        success : function(data) {
+	        	if (data) {
+	            	alert(data);
+	        	    $.ajax({
+	        	        type : "POST",
+	        	        url : pgContext+"/tt/tt/cohortAdmin",
+	        	        data : {
+	        	            cohortId: currentCohortId,
 	        	            command: 'updateAllCohortClassStudentSlices',
 	        	            lang: loc,
 	        	            filter: updateCohortFilter
@@ -4591,7 +4899,7 @@ function updateAllCohortSlices() {
 								<input id="showReportTCSBtn" class="btn btn-lg btn-primary" onclick="showReport_tcs();" type="submit" value="<%= rwrb.getString("show_chart") %>">
 							</div> 
                             <div class="panel-body">
-				            	<div id="tcs_canvas" style="width:800px; height:500px;"></div> 
+				            	<div id="tcs_canvas" style="width:1200px; height:500px;"></div> 
                             </div>
 
                         </div>
@@ -4873,6 +5181,32 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
+                   <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_3f" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeF">
+                                    Student Census 
+                                </a>
+                               	<button id="Button3f" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="chartThreeF" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input id="showTable3fBtn" class="btn btn-lg btn-primary" onclick="showTable3f();" type="submit" value="<%= rwrb.getString("show_table") %>">
+                            </div>
+ 
+                            <div class="panel-body">
+				            	<div id="table3f_panel" class="col-md-12" style="width:1200px; height:700px;overflow-x: auto;overflow-y: auto;">
+				            	   <table align = "center"
+            							id="table3f" border="1">
+    							   </table>
+				            	</div> 
+                            </div>
+
+                        </div>
+                    </div>
+
+
             	</div>
         	</div>
 		</div>
@@ -5037,8 +5371,7 @@ function updateAllCohortSlices() {
 	                                <div class="table table-striped table-bordered hover display nowrap" width="100%">
 	
 	                                </div>
-	                            </div>
-	
+	                            </div>	
 	                        </div>
 	                    </div>                   
 	                    
@@ -5066,7 +5399,7 @@ function updateAllCohortSlices() {
 	                        </div>
 	                    </div>                   
 	                                       
-	                    <div  id="addCohortTeacher" class="panel panel-default">
+	                    <div  id="addCohortClass" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
 	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin6">
