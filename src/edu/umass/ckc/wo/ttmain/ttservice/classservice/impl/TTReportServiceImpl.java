@@ -1188,14 +1188,24 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
         String prevStudent = "";
+        int attemptTime = 0;
+        int endTimeElapsed = 0;
         int probElapsedTime = 0;
         String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
-        		case "EndProblem":
-        			countable = true;
-        			break;
+				case "Attempt":
+					attemptTime = Integer.valueOf(event.getProbElapsed());
+					countable = false;
+					break;
+	    		case "EndProblem":
+	    			endTimeElapsed = Integer.valueOf(event.getProbElapsed());
+	    			if (endTimeElapsed < attemptTime) {
+	    				endTimeElapsed = attemptTime;
+	    			}
+	    			countable = true;
+	    			break;
         		case "Student Access":
             		latestLoginMap.put(event.getStudentId(), event.getTimestampString("en"));
         			break;
@@ -1204,13 +1214,15 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         	if (event.getStudentId().equals(prevStudent)) {
             	if (countable) {
-            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            		probElapsedTime += attemptTime;
             	}
         	}
         	else {
             	if (prevStudent.length() > 0) {
 //                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
             		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+            		attemptTime = 0;
+                    endTimeElapsed = 0;
             		probElapsedTime = 0;
             	}
             	if (countable) {
@@ -1294,12 +1306,22 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
         String prevStudent = "";
+        int attemptTime = 0;
+        int endTimeElapsed = 0;
         int probElapsedTime = 0;
         String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
+    			case "Attempt":
+    				attemptTime = Integer.valueOf(event.getProbElapsed());
+    				countable = false;
+    				break;
         		case "EndProblem":
+        			endTimeElapsed = Integer.valueOf(event.getProbElapsed());
+        			if (endTimeElapsed < attemptTime) {
+        				endTimeElapsed = attemptTime;
+        			}
         			countable = true;
         			break;
         		case "Student Access":
@@ -1310,13 +1332,15 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         	if (event.getStudentId().equals(prevStudent)) {
             	if (countable) {
-            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            		probElapsedTime += attemptTime;
             	}
         	}
         	else {
             	if (prevStudent.length() > 0) {
 //                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
             		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+                    attemptTime = 0;
+                    endTimeElapsed = 0;
             		probElapsedTime = 0;
             	}
             	if (countable) {

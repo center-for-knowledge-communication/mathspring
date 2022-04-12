@@ -408,7 +408,8 @@ function getFilterLandingTwo() {
 		}
 		document.getElementById("daysFilterLanding2").value = fromDate + " thru " + toDate;
 		filterLandingTwo = "~" + fromDate + "thru" + toDate;
-    	$.ajax({
+	    $('#landing-report-loader').show();
+	    $.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
             data : {
@@ -419,6 +420,8 @@ function getFilterLandingTwo() {
                 filter: filterLandingTwo
             },
             success : function(data) {
+        	    $('#landing-report-loader').hide();
+                $('#classLandingReportOne').collapse('hide');
                 $('#classLandingReportTwo').collapse('show');
                 var jsonData = $.parseJSON(data);
                 landingPageReport2.clear().draw();
@@ -1815,6 +1818,8 @@ function registerAllEvents(){
 
     	
     	getFilterLandingOne(); 
+	    $('#landing-report-loader').show();
+
        	$.ajax({
             type : "POST",
             url : pgContext+"/tt/tt/getTeacherReports",
@@ -1826,6 +1831,7 @@ function registerAllEvents(){
                 filter: filterLandingOne
             },
             success : function(data) {
+        	    $('#landing-report-loader').hide();
                 var jsonData = $.parseJSON(data);
                 landingPageReport1.clear().draw();
                 landingPageReport1.rows.add(jsonData.levelOneData).draw();
@@ -2353,7 +2359,8 @@ function registerAllEvents(){
             $("#content-conatiner").children().hide();
 
             if (currentSelection == "classHomePage") {
-            	$("#splash_page").show();            	
+            	$("#splash_page").show();            
+        	    $('#landing-report-loader').show();
             	$("#classLandingReportOne").collapse('show');
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
@@ -3388,6 +3395,7 @@ function registerAllEvents(){
                     </h3>
                 </div>
                 <div class="panel-group" id="accordion">
+ 		             <div id="landing-report-loader" class="loader" style="display: none" ></div>               
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">
