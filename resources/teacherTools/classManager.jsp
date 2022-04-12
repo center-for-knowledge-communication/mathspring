@@ -838,6 +838,157 @@ function liveDashboardStart() {
 
 }
 
+
+
+function liveGardenPopulate() {
+	
+	
+	var showNames = "Y";
+	var filter = showNames;
+    $('#live-garden-loader').show();
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+        	classId: classID,
+            teacherId: teacherID,
+            reportType: 'classLiveGarden',
+            lang: loc,
+            filter: filter
+
+        },
+        success : function(data) {
+       	    if (data) {
+				//alert(data);
+               	var jsonData = $.parseJSON(data);
+
+               	
+                var cols = [];
+                 
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {
+                             
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+        	    var lgt_head = document.getElementById("live-garden-thead");
+        	    lgt_head.innerHTML = "";
+        	    var headerWidth = cols.length * 75;
+        	    lgt_head.style.width = "" + headerWidth + "px";
+                // Create table row tr element of a table
+                var tr = lgt_head.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+
+                	if (i > 0) {
+	                    // Create the table header th element
+	                    var theader = document.createElement("th");
+	                    
+	                    theader.className += 'tt-plant-header';
+	                    // Keep cell width to a minimum by forcing wrap
+	                    var tcol = cols[i];
+	                    theader.title = tcol;
+	                    tcol = tcol.replace("/"," /");
+	                    tcol = tcol.replace("&"," &");
+	                    tcolSplitter = tcol.split(" ");
+	                    theader.innerHTML = "";
+	                    for (var tc = 0; tc < tcolSplitter.length; tc++ ) {
+	                    	if (tcolSplitter[tc].length > 9)
+	                    		tcolSplitter[tc] = tcolSplitter[tc].substr(0,9);
+	               			theader.innerHTML += tcolSplitter[tc] + " ";               			
+	               			if (tc > 3)
+	               				break;
+                		}
+
+	                    // Append columnName to the table row
+    	                tr.appendChild(theader);
+                	}
+                	else {
+	                    // Create the table header th element
+	                    var theader = document.createElement("th");
+	                    
+                       	if (showNames === "Y") {
+    	                    theader.className += 'tt-plant-header';
+    	                    // Keep cell width to a minimum by forcing wrap
+		                    var tcol = cols[i];
+	    	           		theader.innerHTML = tcol;
+		                    // Append columnName to the table row
+	    	                tr.appendChild(theader);
+                       	}
+                	}
+                }
+                // End of header
+                
+        	    var lgt_body = document.getElementById("live-garden-tbody");
+        	    lgt_body.innerHTML = "";
+        	    var bodyWidth = cols.length * 75;
+        	    lgt_body.style.width = "" + bodyWidth + "px";
+
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = lgt_body.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        if (j > 0)  {
+                            var cell = trow.insertCell(-1);
+                       		cell.className += 'tt-plant';
+                        	var plant = jsonData[i][cols[j]];
+                        	if (plant.length > 0) {
+                        		if (plant === "noPepper") {
+		                           	cell.innerHTML = "";                        			
+                        		}
+                        		else {
+	                       			var im = "<img src='../../img/pp/" + plant + ".png' height='75' width='75'>";
+		                           	cell.innerHTML = im;
+                        		}
+                        	}
+                        	else {
+	                       		cell.innerHTML = "";
+                        	}
+                        }
+                        else {
+                        	if (showNames === "Y") {
+	                        	// Inserting the cell at particular place
+	                        	var cell = trow.insertCell(-1);
+	                       		cell.className += 'tt-plant';
+	                       		cell.innerHTML = jsonData[i][cols[j]];
+                        	}
+                        }
+                    }
+                }              
+                $('#live-garden-loader').hide();
+            	$("#live-garden").show();
+
+       	    }
+           	else {
+           		console.log("response data is null");
+           	}
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+
+}
+
+
+
+function liveGardenStart() {
+
+	liveGardenPopulate();
+
+
+
+
+}
+
+
+
 var resetStudentDataTitle = "";
 var resetStudentDataId = "";
 var resetStudentDataLogmsg = "";
@@ -1490,6 +1641,15 @@ function handleclickHandlers() {
         $("#content-conatiner").children().hide();
         liveDashboardStart();
     	showReport3d();
+    });
+
+    $("#live-garden_handler").click(function () {
+        $('#content_apply_handler').css('background-color', '');
+        $('#content_apply_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        liveGardenPopulate();
+    	
     });
 
     $('a[rel=initialPopover]').popover({
@@ -2457,6 +2617,7 @@ function registerAllEvents(){
 
              <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
+             <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> Class Garden</a></li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -3193,6 +3354,32 @@ function registerAllEvents(){
 	                </div>
             	</div>
              </div>
+
+             <div id="live-garden-loader" class="loader" style="display: none" ></div>               
+             <div id="live-garden" class="container-fluid" style="display:none;width: 100%; overflow-x: scroll;">
+               	<div class="row">
+	             	<div class="col-md-12">
+		            	<div id="liveGarden_table_panel" class= "tt-garden-header">
+		            	    <table align = "left"	id="liveGarden_header_table" border="1">
+	            	    		<thead id="live-garden-thead">
+  								</thead>
+  							</table>
+		            	</div> 
+	                </div>
+            	</div>
+               	<div class="row">
+	             	<div class="col-md-12">
+		            	<div id="liveGarden_table_panel" class= "tt-garden-body">
+		            	    <table align = "left"	id="liveGarden_body_table" border="1">
+	            	    		<tbody id="live-garden-tbody">
+	            	    		</tbody>
+  							</table>
+		            	</div> 
+	                </div>
+            	</div>
+             </div>
+
+
 
              <div id="splash_page" style="display:none;width: 100%;">
              	<div>

@@ -393,4 +393,75 @@ public class DbStudentProblemHistory {
 
     }
 
+    public static void loadTopicHistory(Connection conn, int studId, int topicId, List<StudentProblemData> history) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement ps=null;
+        try {
+
+        	String q = "select ID,sessionId,problemId,topicId,problemBeginTime,problemEndTime,timeInSession," +
+                    "timeInTutor,timeToFirstAttempt,timeToFirstHint,timeToSolve,numMistakes,numHints,videoSeen," +
+                    "numAttemptsToSolve,solutionHintGiven,mode,mastery,emotionAfter,emotionLevel,effort,exampleSeen," +
+                    "textReaderUsed,numHintsBeforeSolve,isSolved,timeToSecondAttempt,timeToThirdAttempt,timeToSecondHint," +
+                    "timeToThirdHint,probDiff from " +SPHTBL+ " where studId=? and topicId = ? and mode='practice' order by ID";
+           
+            ps = conn.prepareStatement(q);
+            ps.setInt(1,studId );
+            ps.setInt(2,topicId );
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                StudentProblemData d = new StudentProblemData();
+                d.setId(rs.getInt("ID"));
+                d.setSessId(rs.getInt("sessionId"));
+                d.setProbId(rs.getInt("problemId"));
+                d.setTopicId(rs.getInt("topicId"));
+                d.setProblemBeginTime(rs.getTimestamp("problemBeginTime").getTime());
+                Timestamp endTime = rs.getTimestamp("problemEndTime");
+                if (!rs.wasNull())
+                    d.setProblemEndTime(endTime.getTime());
+                else d.setProblemEndTime(0);
+                d.setTimeInSession(rs.getInt("timeInSession"));
+                d.setTimeInTutor(rs.getInt("timeInTutor"));
+                d.setTimeToFirstAttempt(rs.getInt("timeToFirstAttempt"));
+                d.setTimeToSecondAttempt(rs.getInt("timeToSecondAttempt"));
+                d.setTimeToThirdAttempt(rs.getInt("timeToThirdAttempt"));
+                d.setTimeToFirstHint(rs.getInt("timeToFirstHint"));
+                d.setTimeToSecondHint(rs.getInt("timeToSecondHint"));
+                d.setTimeToThirdHint(rs.getInt("timeToThirdHint"));
+                d.setTimeToSolve(rs.getInt("timeToSolve"));
+                d.setNumMistakes(rs.getInt("numMistakes"));
+                d.setNumHints(rs.getInt("numHints"));
+                d.setSeenVideo(rs.getBoolean("videoSeen"));
+                d.setNumAttemptsToSolve(rs.getInt("numAttemptsToSolve"));
+                d.setGivenAnswerHint(rs.getBoolean("solutionHintGiven"));
+                d.setMode(rs.getString("mode"));
+                d.setMastery(rs.getDouble("mastery"));
+                d.setEmotion(rs.getString("emotionAfter"));
+                d.setEmotionLevel(rs.getInt("emotionLevel"));
+                d.setEffort(rs.getString("effort"));
+                d.setSeenExample(rs.getBoolean("exampleSeen"));
+                d.setUsedTextReader(rs.getBoolean("textReaderUsed"));
+                d.setNumHintsBeforeCorrect(rs.getInt("numHintsBeforeSolve"));
+                d.setSolved(rs.getBoolean("isSolved"));
+                d.setProbDifficulty(rs.getDouble("probDiff"));
+                history.add(d);
+            }
+        }
+        catch (SQLException se) {
+            System.out.println(se.getErrorCode());
+        }
+       catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+    
+    
 }
