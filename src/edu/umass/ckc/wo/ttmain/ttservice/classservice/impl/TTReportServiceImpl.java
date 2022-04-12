@@ -2,12 +2,15 @@ package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
 import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
+import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbTeacher;
+import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
+import edu.umass.ckc.wo.myprogress.TopicSummaryGarden;
 import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
@@ -35,6 +38,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.studmod.StudentProblemHistory;
 import edu.umass.ckc.wo.util.StringUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -434,13 +439,58 @@ public class TTReportServiceImpl implements TTReportService {
             		ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
                     return classLiveDashboard.getProblemsSolved();       
 
+                case "classLiveGarden":
+
+                	// Note: classId parameter is used to communicate target teacherId for this report only
+            		//ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
+                	List<Topic> activeTopics = null;;
+                	try {
+                		activeTopics = DbTopics.getClassActiveTopics(connection.getConnection(), Integer.valueOf(classId));
+                	}
+                	catch (Exception e) {
+                		System.out.println("classLiveGarden error " + e.getMessage());
+                	}
+                	JSONArray resultArr = new JSONArray();
+                	
+                    List<ClassStudents> gardenStudents = generateClassReportPerStudent(teacherId, classId, filter);
+
+                    for (ClassStudents t : gardenStudents) {
+                       	JSONObject resultJson = new JSONObject();
+                       	resultJson.put(rb.getString("student_name"), t.getStudentName());
+                       	String plantName = "";
+                       	int topicProblemsSeen = 0;
+                    	for (Topic topic: activeTopics) {
+                    		int tid = Integer.valueOf(topic.getId());
+                            int cid = Integer.valueOf(classId);
+                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
+                            int sid = Integer.valueOf(t.getStudentId());
+                        	try {
+                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
+                        		plantName = ts.getPlantName();
+                        	}
+                        	catch (Exception e) {
+                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
+                        	}
+                        	if (topicProblemsSeen > 0 ) {
+                        		resultJson.put(topic.getSummary(), plantName);
+                        	}
+                        	else {
+                        		resultJson.put(topic.getSummary(), "noPepper");                        		
+                        	}
+                    	}
+                       	resultArr.add(resultJson);
+                    }
+                    
+                	
+                    return resultArr.toString();        
+
                 case "classMessage":
                 	
                 	String errorMsg = "";
                 	String fields[] = filter.split("~~~");
                 	
                 	if (fields.length < 4) {
-                		errorMsg += "You must complete all fields.  Please try again.  ";
+                		errorMsg += rb.getString("you_must_complete_all_fields");
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
 
                 	}
@@ -470,7 +520,7 @@ public class TTReportServiceImpl implements TTReportService {
                 	
                     try {
 	                	if (startDate.length() == 0) {
-	                		errorMsg += "You must select a date.  Choose date range again.  ";    		
+	                		errorMsg += rb.getString("you_must_select_date");    		
 	                	}
 
 	                	int intDuration = 0;
@@ -481,18 +531,18 @@ public class TTReportServiceImpl implements TTReportService {
 	                	try {
 	                		intDuration = Integer.parseInt(duration);
 		                	if (intDuration < 1) {
-		                		errorMsg += "duration must be a positive number of days.  Choose date range again.  ";    		
+		                		errorMsg += rb.getString("duration_must_be_number");    		
 		                	}
 	                	}
 	                	catch (Exception e) {
-	                		errorMsg += "duration must be a number of days.  Choose date range again. ";
+	                		errorMsg += rb.getString("duration_must_be_number");
 	                	}
 	                	if (msg.length() == 0) {
-	                		errorMsg += "You must enter a message for the students. ";
+	                		errorMsg += rb.getString("please_enter_your_message");
 	                	}
 	                	else {
 	                		if (hasBadCharacters(msg)) {
-		                		errorMsg += "Please use only letters, numbers and the following punctuation marks ( .,;?! ). ";	                			
+		                		errorMsg += rb.getString("use_only_valid_characters_in_message");	                			
 	                		}
 	                		else {
 	                			System.out.println(msg + " - Message validated!");
@@ -500,7 +550,7 @@ public class TTReportServiceImpl implements TTReportService {
 	                		
 	                	}
 	                	if (classesBundle.length() == 0) {
-	                		errorMsg += "You must select class(es) ";
+	                		errorMsg += rb.getString("you_must_select_classes");
 	                	}
 	                	if (errorMsg.length() == 0) {
 	                		String[] splitter = classesBundle.split(",");
@@ -529,7 +579,7 @@ public class TTReportServiceImpl implements TTReportService {
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
                     }
                     else {
-                    	String successMsg = "Message will be displayed at student login";
+                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login=");
                     	return "{\"status\": \"success\", \"message\" : \"" + successMsg + "\"}";                    	
                     }
         	}
