@@ -94,6 +94,7 @@ public class TeacherToolsMainLoginController {
         		if (activeTeacherIdObject != null) {
         			if (teacherLoginType.equals("Master")) {
         				request.setAttribute(LoginParams.MESSAGE,rb.getString("teacher_already_logged_in")); 
+    					session.invalidate();
         				return "login/loginK12_teacher";
         			}
         			if (teacherLoginType.equals("Normal")) {
