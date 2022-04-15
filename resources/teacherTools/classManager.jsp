@@ -842,12 +842,23 @@ function liveDashboardStart() {
 }
 
 
+var gardenShownames = "";
 
-function liveGardenPopulate() {
+function liveGardenPopulate(showNames) {
+		
+	if (gardenShownames === "") {
+		gardenShownames = "N";		
+	}
+	else {
+		if (gardenShownames === "N") {
+			gardenShownames = "Y";	
+		}
+		else {
+			gardenShownames = "N";
+		}
+	}
 	
-	
-	var showNames = "Y";
-	var filter = showNames;
+	var filter = gardenShownames;
     $('#live-garden-loader').show();
     $.ajax({
         type : "POST",
@@ -914,14 +925,24 @@ function liveGardenPopulate() {
 	                    // Create the table header th element
 	                    var theader = document.createElement("th");
 	                    
-                       	if (showNames === "Y") {
-    	                    theader.className += 'tt-plant-header';
+//                       	if (showNames === "Y") {
+    	                    theader.className += 'tt-plant-header0';
     	                    // Keep cell width to a minimum by forcing wrap
 		                    var tcol = cols[i];
-	    	           		theader.innerHTML = tcol;
+		            		if (gardenShownames === "N") {
+	    	           			theader.innerHTML = '<%= rb.getString("show_student_names")%>';
+		            		}
+		            		else {
+	    	           			theader.innerHTML = '<%= rb.getString("hide_student_names")%>';		            			
+		            		}
+	    	           		theader.style.cursor = 'pointer';
 		                    // Append columnName to the table row
+                            theader.onclick = function(){
+                            	liveGardenPopulate("");
+		                    }
+
 	    	                tr.appendChild(theader);
-                       	}
+//                       	}
                 	}
                 }
                 // End of header
@@ -955,13 +976,13 @@ function liveGardenPopulate() {
                         	}
                         }
                         else {
-                        	if (showNames === "Y") {
+//                        	if (showNames === "Y") {
 	                        	// Inserting the cell at particular place
 	                        	var cell = trow.insertCell(-1);
 	                       		cell.className += 'tt-plant';
 	                       		cell.innerHTML = jsonData[i][cols[j]];
                         	}
-                        }
+//                        }
                     }
                 }              
                 $('#live-garden-loader').hide();
@@ -1651,7 +1672,7 @@ function handleclickHandlers() {
         $('#content_apply_handler').css('color', '#dddddd');
 
         $("#content-conatiner").children().hide();
-        liveGardenPopulate();
+        liveGardenPopulate("N");
     	
     });
 
@@ -2624,7 +2645,7 @@ function registerAllEvents(){
 
              <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
-             <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> Class Garden</a></li>
+             <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("class_garden") %></a></li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -3366,7 +3387,7 @@ function registerAllEvents(){
              <div id="live-garden" class="container-fluid" style="display:none;width: 100%; overflow-x: scroll;">
                	<div class="row">
 	             	<div class="col-md-12">
-		            	<div id="liveGarden_table_panel" class= "tt-garden-header">
+		            	<div class= "tt-garden-header">
 		            	    <table align = "left"	id="liveGarden_header_table" border="1">
 	            	    		<thead id="live-garden-thead">
   								</thead>

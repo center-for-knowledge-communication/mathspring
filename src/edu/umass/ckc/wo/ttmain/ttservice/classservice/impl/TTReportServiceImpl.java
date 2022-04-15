@@ -456,7 +456,12 @@ public class TTReportServiceImpl implements TTReportService {
 
                     for (ClassStudents t : gardenStudents) {
                        	JSONObject resultJson = new JSONObject();
-                       	resultJson.put(rb.getString("student_name"), t.getStudentName());
+                       	if (filter.equals("Y")) {
+                       		resultJson.put(rb.getString("student_name"), t.getStudentName());
+                       	}
+                       	else {
+                       		resultJson.put(rb.getString("student_name"), "XXXX");                       		
+                       	}
                        	String plantName = "";
                        	int topicProblemsSeen = 0;
                     	for (Topic topic: activeTopics) {
