@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 /**
  * Copyright (c) University of Massachusetts
+ * 
+ * Frank	04-16-22	Issue# 634R2 handle empty topics
  */
 public class TopicSummaryGarden {
 
@@ -106,18 +108,23 @@ public class TopicSummaryGarden {
     	List<Problem> topicProblems = ProblemMgr.getTopicProblems(topicId);
         new DbProblem().filterproblemsBasedOnLanguagePreference(conn, topicProblems, classId);
         List<Integer> topicProbs = topicProblems.stream().map(p -> p.getId()).collect(Collectors.toList());
+        if (topicProbs.size() == 0)
+            return -1;
         if (!DbUser.isShowTestControls(conn, studId))  {
             removeTestProblems(topicProbs);
             if (topicProbs.size() == 0)
-                throw new UserException("Cannot find a problem in topic " + topicId + ".  For a non-test user, the topic must contain READY problems.  Try running the system with isTest=true");
+                return -1;
+//              throw new UserException("Cannot find a problem in topic " + topicId + ".  For a non-test user, the topic must contain READY problems.  Try running the system with isTest=true");
 
         }
         List<Integer> omittedProbIds = DbClass.getClassOmittedProblems(conn, classId, topicId); // problems omitted for this class
         topicProbs.removeAll(omittedProbIds);
     	
-        if (topicProbs != null)
+        if (topicProbs != null) {
+            if (topicProbs.size() == 0)
+                return -1;        	        
             totalProblems = topicProbs.size();
-
+        }
         List<StudentProblemData> history = new ArrayList<StudentProblemData>();
         DbStudentProblemHistory.loadTopicHistory(conn, studId, topicId, history); 
         
