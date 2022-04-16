@@ -99,6 +99,7 @@ import java.text.SimpleDateFormat;
  * Frank	08-03-21	Issue 150 added class message retrieval
  * Frank	08-20-21	Issue 496 added live dashboard support
   * Frank	08-20-21	Issue 578 handled anonymous report option
+  * Frank	04-16-22	Issue# 634R2 use full topic list not activeTopics
  */
 
 
@@ -441,11 +442,11 @@ public class TTReportServiceImpl implements TTReportService {
 
                 case "classLiveGarden":
 
-                	// Note: classId parameter is used to communicate target teacherId for this report only
-            		//ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
-                	List<Topic> activeTopics = null;;
+                	List<Topic> gardenTopics = null;;
                 	try {
-                		activeTopics = DbTopics.getClassActiveTopics(connection.getConnection(), Integer.valueOf(classId));
+                		// Can't use activeTopics since the teacher can change the topic selections
+                		// Instead grab full list and weed out topic that do not appear in the sudentproblehistory table                		
+                		gardenTopics = DbTopics.getClassGardenTopics(connection.getConnection(), Integer.valueOf(classId));
                 	}
                 	catch (Exception e) {
                 		System.out.println("classLiveGarden error " + e.getMessage());
@@ -454,6 +455,31 @@ public class TTReportServiceImpl implements TTReportService {
                 	
                     List<ClassStudents> gardenStudents = generateClassReportPerStudent(teacherId, classId, filter);
 
+                    
+                    int[] topicWasUsed = new int[400];
+                    
+                    
+                    for (ClassStudents t : gardenStudents) {
+                       	int topicProblemsSeen = 0;
+                    	for (Topic topic: gardenTopics) {
+                    		topicProblemsSeen = 0;
+                    		int tid = Integer.valueOf(topic.getId());
+                            int cid = Integer.valueOf(classId);
+                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
+                            int sid = Integer.valueOf(t.getStudentId());
+                        	try {
+                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
+                        		if (topicProblemsSeen >= 0) {
+                        			topicWasUsed[tid] = topicWasUsed[tid] + 1;
+                        		}
+                        	}
+                        	catch (Exception e) {
+                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
+                        	}
+                    	}
+                    }
+                    
+                    
                     for (ClassStudents t : gardenStudents) {
                        	JSONObject resultJson = new JSONObject();
                        	if (filter.equals("Y")) {
@@ -464,26 +490,37 @@ public class TTReportServiceImpl implements TTReportService {
                        	}
                        	String plantName = "";
                        	int topicProblemsSeen = 0;
-                    	for (Topic topic: activeTopics) {
+                    	for (Topic topic: gardenTopics) {
                     		int tid = Integer.valueOf(topic.getId());
+                    		if (topicWasUsed[tid] <= 0) {
+                    			continue;
+                    		}
                             int cid = Integer.valueOf(classId);
                             TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
                             int sid = Integer.valueOf(t.getStudentId());
                         	try {
                         		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
-                        		plantName = ts.getPlantName();
+                        		if (topicProblemsSeen == -1) {
+                        			System.out.println("classLiveGarden error - No problems found for topic # " + String.valueOf(tid));
+                        			plantName = "UNUSED";
+                        		}
+                        		else {
+                        			plantName = ts.getPlantName();
+                        		}
                         	}
                         	catch (Exception e) {
                         		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
                         	}
-                        	if (topicProblemsSeen > 0 ) {
-                        		resultJson.put(topic.getSummary(), plantName);
+                        	if (topicProblemsSeen == 0 ) {
+                        		resultJson.put(topic.getSummary(), "noPepper");
                         	}
                         	else {
-                        		resultJson.put(topic.getSummary(), "noPepper");                        		
+                        		resultJson.put(topic.getSummary(), plantName);
                         	}
+
+                        	System.out.println(resultJson.toString());
                     	}
-                       	resultArr.add(resultJson);
+                    	resultArr.add(resultJson);
                     }
                     
                 	

@@ -26,6 +26,7 @@ import java.util.TreeSet;
  *  Frank   06-30-2020  issue #132 use idABC field when user-facing 
  *  Frank	12-26-20	issue #329 added multi-lingual versions of getAllTopics() and getTopicName()
  *  Frank	01-03-21	issue #329R2 fixed bug missing parameter getDefaultTopicsSequence()
+ *  Frank	04-16-22	Issue# 634R2 getGardenTopics
  */
 public class DbTopics {
 
@@ -284,6 +285,52 @@ public class DbTopics {
         }
 
     }
+
+
+    /**
+    *
+    * @param conn
+    * @param classId  Will be used to get active topics for a class when isDefault is false
+    * @param isDefault controls whether topics are found for the class or by using the default set of topics
+    * @return
+    * @throws SQLException
+    */
+    public static List<Topic> getClassGardenTopics (Connection conn, int classId) throws SQLException {
+       ResultSet rs=null;
+       PreparedStatement stmt=null;
+       try {
+           String q = "select probGroupId, \r\n" + 
+           		"json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description, seqPos,\r\n" + 
+           		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as summary \r\n" + 
+           		"from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where isDefault=1 \r\n" +           		
+           		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
+           		"and topic.id=probGroupId and seqPos > 0 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
+           		"order by probGroupId;";
+           stmt = conn.prepareStatement(q);
+           stmt.setInt(1,classId);
+           stmt.setInt(2,classId);
+
+           rs = stmt.executeQuery();
+           List<Topic> topics = new ArrayList<Topic>();
+           while (rs.next()) {
+               Topic t = new Topic(rs.getInt(1),rs.getString(2));
+               String topicSummary = rs.getString("summary");
+                   if("".equals(topicSummary) || topicSummary == null)
+                       topicSummary = "The problemset does not have a description";
+               t.setSummary(topicSummary);
+               // We get the set of CCStandards for this topic from the ProblemMgr
+               topics.add(t);
+           }
+           return topics;
+       }
+       finally {
+           if (stmt != null)
+               stmt.close();
+           if (rs != null)
+               rs.close();
+       }
+
+   }
 
     /**
      * Given the id of a class, clone its lesson plan for another class.
