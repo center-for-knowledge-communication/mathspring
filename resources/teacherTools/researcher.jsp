@@ -2821,6 +2821,8 @@ function showTable_tp() {
 
 function showTable_tpsa() {
 
+	
+	var teacherComments = '';
 	if (currentCohortId == "") {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
@@ -2839,6 +2841,8 @@ function showTable_tpsa() {
         	if (data) {
                	var resultData = $.parseJSON(data);
            	    
+                $("#tpsa-panel").show();	
+               	
             	var jsonData = resultData[0];
             	var footerData = resultData[1];
             	
@@ -2854,31 +2858,60 @@ function showTable_tpsa() {
                     }
                 }
                  
-        	    var tpsa_tbl = document.getElementById("tpsa_table");
-        	    tpsa_tbl.innerHTML = "";
+        	    var tpsa_head = document.getElementById("tpsa_header_table");
+        	    tpsa_head.innerHTML = "";
+        	    var headerWidth = cols.length * 100;
                                  
                 // Create table row tr element of a table
-                var tr = tpsa_tbl.insertRow(-1);
+                var tr = tpsa_head.insertRow(-1);
                  
                 for (var i = 0; i < cols.length; i++) {
                      
                     // Create the table header th element
                     var theader = document.createElement("th");
+                    if (i == 0) {
+                    	theader.className += 'tt-tpsa-cell-small';
+                    }
+                    else {
+                    	if (i == cols.length-1) {
+                    		theader.className += 'tt-tpsa-cell-large';
+                    	}
+                    	else {
+                    		theader.className += 'tt-tpsa-cell';
+                    	}
+                    }
                     theader.innerHTML = cols[i];
                      
                     // Append columnName to the table row
                     tr.appendChild(theader);
                 }
-                // Adding the data to the table
-                for (var i = jsonData.length-1; i >= 0 ; i--) {
+
+                
+        	    var tpsa_body = document.getElementById("tpsa_body_table");
+				// Adding the data to the table
+				tpsa_body.innerHTML = "";
+				teacherComments = '';
+        	    for (var i = jsonData.length-1; i >= 0 ; i--) {
                      
                     // Create a new row
-                    trow = tpsa_tbl.insertRow(-1);
+                    trow = tpsa_body.insertRow(-1);
                     for (var j = 0; j < cols.length; j++) {
                         var cell = trow.insertCell(-1);
                          
-                        // Inserting the cell at particular place
+                        if (j == 0) {
+                        	cell.className += 'tt-tpsa-cell-small';
+                        }
+                        else {
+                       		if (j == cols.length-1) {
+                       			cell.className += 'tt-tpsa-cell-large';
+                       		}
+                       		else {
+                            	cell.className += 'tt-tpsa-cell';                    	                       			
+                       		}
+                        }
                         var cellValue = "" + jsonData[i][cols[j]];
+
+                        // Inserting the cell at particular place
                         let result = cellValue.indexOf("~");
                         if (result < 0) {
                         	cell.style.backgroundColor = "white";
@@ -2891,6 +2924,10 @@ function showTable_tpsa() {
                            	cell.innerHTML = splitValue[0];
                            	if (splitValue.length > 2) {
                            		cell.title = splitValue[2];
+                               	cell.style.cursor = "pointer";
+//                                cell.onclick = function(){
+//                                    alert(teacherComments);
+//                                }                               	
                            	}
                         }
                        	
@@ -2913,7 +2950,7 @@ function showTable_tpsa() {
                 for (var i = footerData.length-1; i >= 0 ; i--) {
                      
                     // Create a new row
-                    trow = tpsa_tbl.insertRow(-1);
+                    trow = tpsa_body.insertRow(-1);
                     for (var j = 0; j < fcols.length; j++) {
                         var cell = trow.insertCell(-1);
                          
@@ -5088,17 +5125,36 @@ function updateAllCohortSlices() {
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tpsa_table_panel" class="col-md-12" overflow-x: auto;overflow-y: auto;">
-				            	   <table align = "center"
-            							id="tpsa_table" border="1">
-    							   </table>
-				            	</div> 
+                            
+	             			<div id="tpsa-panel" class="container-fluid" style="display:none;width: 100%; overflow-x: scroll;">
+				               	<div class="row">
+					             	<div class="col-md-12">
+						            	<div class= "tt-tpsa-header">
+						            	    <table align = "left"	id="tpsa_header_table" border="1">
+					            	    		<thead id="tpsa-thead">
+				  								</thead>
+				  							</table>
+						            	</div> 
+					                </div>
+				            	</div>
+				               	<div class="row">
+					             	<div class="col-md-12">
+						            	<div class= "tt-tpsa-body">
+						            	    <table align = "left"	id="tpsa_body_table" border="1">
+					            	    		<tbody id="tpsa-tbody">
+					            	    		</tbody>
+				  							</table>
+						            	</div> 
+					                </div>
+				            	</div>
+                            
                             </div>
 
                         </div>
                     </div>
 
 
+             </div>
 
 
 
