@@ -501,6 +501,34 @@ background-color: #FF4766;
   border-bottom: 1px solid #eee;
 }
 
+.tt-tpsa-cell {
+  width: 120px;	
+  min-width: 120px;	
+  max-width: 120px;		
+}
+
+.tt-tpsa-cell-small {
+  width: 60px;	
+  min-width: 60px;	
+  max-width: 60px;		
+}
+
+.tt-tpsa-cell-large {
+  width: 240px;	
+  max-width: 240px;		
+}
+
+.tt-tpsa-header {
+  overflow-x: visible;
+ }
+
+.tt-tpsa-body {
+  width: 1950px;
+  height: 600px;
+  overflow-x: visible; 
+  overflow-y: scroll;
+}
+
 .tt-live-dashboard-content {
   text-align: center;
   font-size: xxx-large;
