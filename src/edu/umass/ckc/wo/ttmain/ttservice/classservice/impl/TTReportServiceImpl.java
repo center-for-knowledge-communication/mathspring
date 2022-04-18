@@ -2,12 +2,15 @@ package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
 import edu.umass.ckc.wo.beans.StudentDetails;
 import edu.umass.ckc.wo.beans.SurveyQuestionDetails;
+import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbTeacher;
+import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbClass;
 import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
+import edu.umass.ckc.wo.myprogress.TopicSummaryGarden;
 import edu.umass.ckc.wo.smgr.User;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.TTConfiguration;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.ErrorCodeMessageConstants;
@@ -35,6 +38,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.studmod.StudentProblemHistory;
 import edu.umass.ckc.wo.util.StringUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -94,6 +99,7 @@ import java.text.SimpleDateFormat;
  * Frank	08-03-21	Issue 150 added class message retrieval
  * Frank	08-20-21	Issue 496 added live dashboard support
   * Frank	08-20-21	Issue 578 handled anonymous report option
+  * Frank	04-16-22	Issue# 634R2 use full topic list not activeTopics
  */
 
 
@@ -434,13 +440,109 @@ public class TTReportServiceImpl implements TTReportService {
             		ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
                     return classLiveDashboard.getProblemsSolved();       
 
+                case "classLiveGarden":
+
+                	List<Topic> gardenTopics = null;;
+                	try {
+                		// Can't use activeTopics since the teacher can change the topic selections
+                		// Instead grab full list and weed out topic that do not appear in the sudentproblehistory table                		
+                		gardenTopics = DbTopics.getClassGardenTopics(connection.getConnection(), Integer.valueOf(classId));
+                	}
+                	catch (Exception e) {
+                		System.out.println("classLiveGarden error " + e.getMessage());
+                	}
+                	JSONArray resultArr = new JSONArray();
+                	
+                    List<ClassStudents> gardenStudents = generateClassReportPerStudent(teacherId, classId, filter);
+
+                    
+                    int[] topicWasUsed = new int[400];
+                    
+                    
+                    for (ClassStudents t : gardenStudents) {
+                       	int topicProblemsSeen = 0;
+                    	for (Topic topic: gardenTopics) {
+                    		topicProblemsSeen = 0;
+                    		int tid = Integer.valueOf(topic.getId());
+                            int cid = Integer.valueOf(classId);
+                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
+                            int sid = Integer.valueOf(t.getStudentId());
+                        	try {
+                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
+                        		if (topicProblemsSeen > 0) {
+                        			topicWasUsed[tid] = topicWasUsed[tid] + 1;
+                        		}
+                        	}
+                        	catch (Exception e) {
+                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
+                        	}
+                    	}
+                    }
+                    if (true) {
+                    	JSONObject resultJson = new JSONObject();
+                    	resultJson.put(rb.getString("student_name"), "XXXX");                       		
+                    	for (Topic topic: gardenTopics) {
+                    		int tid = Integer.valueOf(topic.getId());
+                    		if (topicWasUsed[tid] <= 0) {
+                    			continue;
+                    		}
+                    		else {
+                        		resultJson.put(topic.getSummary(), "");                    			
+                    		}
+                    	}
+                    	resultArr.add(resultJson);
+                    }
+                    for (ClassStudents t : gardenStudents) {
+                       	JSONObject resultJson = new JSONObject();
+                       	if (filter.equals("Y")) {
+                       		resultJson.put(rb.getString("student_name"), t.getStudentName());
+                       	}
+                       	else {
+                       		resultJson.put(rb.getString("student_name"), "XXXX");                       		
+                       	}
+                       	String plantName = "";
+                       	int topicProblemsSeen = 0;
+                    	for (Topic topic: gardenTopics) {
+                    		int tid = Integer.valueOf(topic.getId());
+                    		if (topicWasUsed[tid] > 0) {
+	                            int cid = Integer.valueOf(classId);
+	                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
+	                            int sid = Integer.valueOf(t.getStudentId());
+	                        	try {
+	                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
+	                        		if (topicProblemsSeen == -1) {
+	                        			System.out.println("classLiveGarden error - No problems found for topic # " + String.valueOf(tid));
+	                        			plantName = "UNUSED";
+	                        		}
+	                        		else {
+	                        			plantName = ts.getPlantName();
+	                        		}
+	                        	}
+	                        	catch (Exception e) {
+	                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
+	                        	}
+	                        	if (topicProblemsSeen == 0 ) {
+	                        		resultJson.put(topic.getSummary(), "noPepper");
+	                        	}
+	                        	else {
+	                        		resultJson.put(topic.getSummary(), plantName);
+	                        	}
+                    		}
+//                        	System.out.println(resultJson.toString());
+                    	}
+                    	resultArr.add(resultJson);
+                    }
+                    
+                	
+                    return resultArr.toString();        
+
                 case "classMessage":
                 	
                 	String errorMsg = "";
                 	String fields[] = filter.split("~~~");
                 	
                 	if (fields.length < 4) {
-                		errorMsg += "You must complete all fields.  Please try again.  ";
+                		errorMsg += rb.getString("you_must_complete_all_fields");
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
 
                 	}
@@ -470,7 +572,7 @@ public class TTReportServiceImpl implements TTReportService {
                 	
                     try {
 	                	if (startDate.length() == 0) {
-	                		errorMsg += "You must select a date.  Choose date range again.  ";    		
+	                		errorMsg += rb.getString("you_must_select_date");    		
 	                	}
 
 	                	int intDuration = 0;
@@ -481,18 +583,18 @@ public class TTReportServiceImpl implements TTReportService {
 	                	try {
 	                		intDuration = Integer.parseInt(duration);
 		                	if (intDuration < 1) {
-		                		errorMsg += "duration must be a positive number of days.  Choose date range again.  ";    		
+		                		errorMsg += rb.getString("duration_must_be_number");    		
 		                	}
 	                	}
 	                	catch (Exception e) {
-	                		errorMsg += "duration must be a number of days.  Choose date range again. ";
+	                		errorMsg += rb.getString("duration_must_be_number");
 	                	}
 	                	if (msg.length() == 0) {
-	                		errorMsg += "You must enter a message for the students. ";
+	                		errorMsg += rb.getString("please_enter_your_message");
 	                	}
 	                	else {
 	                		if (hasBadCharacters(msg)) {
-		                		errorMsg += "Please use only letters, numbers and the following punctuation marks ( .,;?! ). ";	                			
+		                		errorMsg += rb.getString("use_only_valid_characters_in_message");	                			
 	                		}
 	                		else {
 	                			System.out.println(msg + " - Message validated!");
@@ -500,7 +602,7 @@ public class TTReportServiceImpl implements TTReportService {
 	                		
 	                	}
 	                	if (classesBundle.length() == 0) {
-	                		errorMsg += "You must select class(es) ";
+	                		errorMsg += rb.getString("you_must_select_classes");
 	                	}
 	                	if (errorMsg.length() == 0) {
 	                		String[] splitter = classesBundle.split(",");
@@ -529,7 +631,7 @@ public class TTReportServiceImpl implements TTReportService {
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
                     }
                     else {
-                    	String successMsg = "Message will be displayed at student login";
+                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login=");
                     	return "{\"status\": \"success\", \"message\" : \"" + successMsg + "\"}";                    	
                     }
         	}
@@ -1138,14 +1240,24 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
         String prevStudent = "";
+        int attemptTime = 0;
+        int endTimeElapsed = 0;
         int probElapsedTime = 0;
         String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
-        		case "EndProblem":
-        			countable = true;
-        			break;
+				case "Attempt":
+					attemptTime = Integer.valueOf(event.getProbElapsed());
+					countable = false;
+					break;
+	    		case "EndProblem":
+	    			endTimeElapsed = Integer.valueOf(event.getProbElapsed());
+	    			if (endTimeElapsed < attemptTime) {
+	    				endTimeElapsed = attemptTime;
+	    			}
+	    			countable = true;
+	    			break;
         		case "Student Access":
             		latestLoginMap.put(event.getStudentId(), event.getTimestampString("en"));
         			break;
@@ -1154,13 +1266,15 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         	if (event.getStudentId().equals(prevStudent)) {
             	if (countable) {
-            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            		probElapsedTime += attemptTime;
             	}
         	}
         	else {
             	if (prevStudent.length() > 0) {
 //                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
             		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+            		attemptTime = 0;
+                    endTimeElapsed = 0;
             		probElapsedTime = 0;
             	}
             	if (countable) {
@@ -1244,12 +1358,22 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
         String prevStudent = "";
+        int attemptTime = 0;
+        int endTimeElapsed = 0;
         int probElapsedTime = 0;
         String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
+    			case "Attempt":
+    				attemptTime = Integer.valueOf(event.getProbElapsed());
+    				countable = false;
+    				break;
         		case "EndProblem":
+        			endTimeElapsed = Integer.valueOf(event.getProbElapsed());
+        			if (endTimeElapsed < attemptTime) {
+        				endTimeElapsed = attemptTime;
+        			}
         			countable = true;
         			break;
         		case "Student Access":
@@ -1260,13 +1384,15 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         	if (event.getStudentId().equals(prevStudent)) {
             	if (countable) {
-            		probElapsedTime += Integer.valueOf(event.getProbElapsed());
+            		probElapsedTime += attemptTime;
             	}
         	}
         	else {
             	if (prevStudent.length() > 0) {
 //                	System.out.println("probElapsedTime = " + String.valueOf(probElapsedTime));
             		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
+                    attemptTime = 0;
+                    endTimeElapsed = 0;
             		probElapsedTime = 0;
             	}
             	if (countable) {

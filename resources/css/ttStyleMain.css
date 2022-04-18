@@ -489,7 +489,41 @@ background-color: #FF4766;
     padding:16px 16px;
     color:#FFF;
  }
-
+.tt-garden-header {
+  background-color: #996633;
+  overflow-x: visible;
+ }
+.tt-garden-body {
+  width: 2000px;
+  height: 500px; 
+  background-color:#b9f9b9; 
+  overflow-x: visible; 
+  overflow-y: scroll;
+}
+.tt-plant {
+  border-right: 1px dotted #996633;
+  border-top: 1px solid #b9f9b9;
+  border-bottom: 1px solid #b9f9b9;
+  width: 75px;	
+  min-width: 75px;	
+  max-width: 75px;	
+}
+.tt-plant-header {
+  border: 1px solid white;
+  color:white;
+  background-color: #996633;
+  width: 75px;	
+  min-width: 75px;	
+  max-width: 75px;	
+}
+.tt-plant-header0 {
+  border: 1px solid white;
+  color:white;
+  background-color: blue;
+  width: 75px;	
+  min-width: 75px;	
+  max-width: 75px;	
+}
 .tt-paused-logins-message {
   text-align: center;
   color:red;	

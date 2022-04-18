@@ -538,9 +538,14 @@ var Chart = {
         topicState_pepperPlant = "";
         var pepperPlant = "";
 
-        if (problemsDone>0){
+//        if (problemsDone0){
 
-            if (topicMastery>=.88)  {
+            if (problemsSolved == 0) {
+                pepperPlant = "noPepper";
+                topicState_pepperPlant = "topicEmpty";
+            }
+
+            else if (topicMastery>=.88)  {
                 if (SHINT_SOF_sequence >= 3)  pepperPlant = "rainbowPepper";
                 else if (SHINT_SOF_sequence > 0 && SHINT_SOF_sequence < 3) pepperPlant = "masteryPepper_bonusPeppers";
                 else if (SOF_SOF_sequence >=3)  pepperPlant = "monsterPepper";
@@ -570,7 +575,6 @@ var Chart = {
                 topicState_pepperPlant = "closeToMasteryGoodHelpUsage_flowerPepper_moreBonusFlowers";
             }
         }
-
 
         else if (problemsSolved == 1) {
             pepperPlant = "babyPepper";
@@ -631,7 +635,7 @@ var Chart = {
 
 
         }
-        }
+//        }
 
         if (remarksDiv != null) {
             this.giveFeedback(remarksDiv, topicState, topicState_pepperPlant, topicMastery, studentState_disengaged);

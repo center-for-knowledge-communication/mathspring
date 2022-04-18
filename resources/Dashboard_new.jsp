@@ -265,6 +265,7 @@ catch (Exception e) {
                     <c:set var="reviewTopicLink" value="${pageContext.request.contextPath}/TutorBrain?action=MPPReviewTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=review&location=Dashboard&comment=" />
                 </c:when>
                 <c:when test="${ts.problemsDone==0}">
+                    <c:set var="beginTopicLink" value="${pageContext.request.contextPath}/TutorBrain?action=MPPContinueTopic&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&studentAction=tryThis&var=b&comment=" />
                 </c:when>
                 <%--The tutor sometimes can't continue a topic if some criteria are satisfied, so we only offer review and challenge--%>
                 <c:otherwise>
@@ -307,6 +308,32 @@ catch (Exception e) {
                                 >
                                     <%= rb.getString("dashboard_challenge")%>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </c:if>
+            <c:if test="${ts.problemsDone == 0}">
+                <div class="topic-list__item">
+                    <div class="topic-list__flipper">
+                        <div class="topic-list__front topic-list__front--${colorClass}">
+                            <p class="topic-list__title">${topicName}</p>
+                            <p class="topic-list__info">${numTotalProblems} <%= rb.getString("problems_available")%></p>
+                            <p class="topic-list__info"><%= rb.getString("not_started_yet")%></p>
+                            <div class="pot" id="${plantDiv}">
+                            </div>
+                        </div>
+                        <div class="topic-list__back">
+                            <p class="topic-list__title">${topicName}</p>
+                            <p class="topic-list__info">${numTotalProblems} <%= rb.getString("problems_available")%></p>
+                            <div class="topic-list__buttons">
+                                <div
+                                        class="topic-list__button topic-list__button--green"
+                                        onclick="window.location='${beginTopicLink}'"
+                                >
+                                    <%= rb.getString("dashboard_begin")%>
+                                </div>
+
                             </div>
                         </div>
                     </div>
