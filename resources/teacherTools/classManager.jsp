@@ -857,7 +857,7 @@ function liveGardenPopulate(showNames) {
 			gardenShownames = "N";
 		}
 	}
-	
+
 	var filter = gardenShownames;
     $('#live-garden-loader').show();
     $.ajax({
@@ -953,7 +953,7 @@ function liveGardenPopulate(showNames) {
         	    lgt_body.style.width = "" + bodyWidth + "px";
 
                 // Adding the data to the table
-                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                for (var i = jsonData.length-1; i >= 1 ; i--) {
                      
                     // Create a new row
                     trow = lgt_body.insertRow(-1);

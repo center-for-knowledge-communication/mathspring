@@ -469,7 +469,7 @@ public class TTReportServiceImpl implements TTReportService {
                             int sid = Integer.valueOf(t.getStudentId());
                         	try {
                         		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
-                        		if (topicProblemsSeen >= 0) {
+                        		if (topicProblemsSeen > 0) {
                         			topicWasUsed[tid] = topicWasUsed[tid] + 1;
                         		}
                         	}
@@ -478,8 +478,20 @@ public class TTReportServiceImpl implements TTReportService {
                         	}
                     	}
                     }
-                    
-                    
+                    if (true) {
+                    	JSONObject resultJson = new JSONObject();
+                    	resultJson.put(rb.getString("student_name"), "XXXX");                       		
+                    	for (Topic topic: gardenTopics) {
+                    		int tid = Integer.valueOf(topic.getId());
+                    		if (topicWasUsed[tid] <= 0) {
+                    			continue;
+                    		}
+                    		else {
+                        		resultJson.put(topic.getSummary(), "");                    			
+                    		}
+                    	}
+                    	resultArr.add(resultJson);
+                    }
                     for (ClassStudents t : gardenStudents) {
                        	JSONObject resultJson = new JSONObject();
                        	if (filter.equals("Y")) {
@@ -492,33 +504,31 @@ public class TTReportServiceImpl implements TTReportService {
                        	int topicProblemsSeen = 0;
                     	for (Topic topic: gardenTopics) {
                     		int tid = Integer.valueOf(topic.getId());
-                    		if (topicWasUsed[tid] <= 0) {
-                    			continue;
+                    		if (topicWasUsed[tid] > 0) {
+	                            int cid = Integer.valueOf(classId);
+	                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
+	                            int sid = Integer.valueOf(t.getStudentId());
+	                        	try {
+	                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
+	                        		if (topicProblemsSeen == -1) {
+	                        			System.out.println("classLiveGarden error - No problems found for topic # " + String.valueOf(tid));
+	                        			plantName = "UNUSED";
+	                        		}
+	                        		else {
+	                        			plantName = ts.getPlantName();
+	                        		}
+	                        	}
+	                        	catch (Exception e) {
+	                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
+	                        	}
+	                        	if (topicProblemsSeen == 0 ) {
+	                        		resultJson.put(topic.getSummary(), "noPepper");
+	                        	}
+	                        	else {
+	                        		resultJson.put(topic.getSummary(), plantName);
+	                        	}
                     		}
-                            int cid = Integer.valueOf(classId);
-                            TopicSummaryGarden ts = new TopicSummaryGarden(connection.getConnection(), cid, tid,topic.getName());
-                            int sid = Integer.valueOf(t.getStudentId());
-                        	try {
-                        		topicProblemsSeen += ts.loadStudentDataForGarden(sid, tid);
-                        		if (topicProblemsSeen == -1) {
-                        			System.out.println("classLiveGarden error - No problems found for topic # " + String.valueOf(tid));
-                        			plantName = "UNUSED";
-                        		}
-                        		else {
-                        			plantName = ts.getPlantName();
-                        		}
-                        	}
-                        	catch (Exception e) {
-                        		System.out.println("classLiveGarden loadStudentDataForGarden() error " + e.getMessage());
-                        	}
-                        	if (topicProblemsSeen == 0 ) {
-                        		resultJson.put(topic.getSummary(), "noPepper");
-                        	}
-                        	else {
-                        		resultJson.put(topic.getSummary(), plantName);
-                        	}
-
-                        	System.out.println(resultJson.toString());
+//                        	System.out.println(resultJson.toString());
                     	}
                     	resultArr.add(resultJson);
                     }
