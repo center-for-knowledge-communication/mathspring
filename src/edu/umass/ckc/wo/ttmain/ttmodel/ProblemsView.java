@@ -1,5 +1,9 @@
 package edu.umass.ckc.wo.ttmain.ttmodel;
 
+/*
+ * Frank	05-11-2022 	issue #632 add sorted standards to view
+ */
+
 import edu.umass.ckc.wo.beans.SATProb;
 import edu.umass.ckc.wo.content.CCStandard;
 import edu.umass.ckc.wo.content.Problem;
@@ -15,6 +19,7 @@ import java.util.Set;
 public class ProblemsView {
     private String topicName;
     private Set<CCStandard> topicStandars;
+    private ArrayList<CCStandard> topicStandardsSorted;
     private String topicSummary;
     private List<SatProbNew> problems;
     private String uri;
@@ -69,6 +74,10 @@ public class ProblemsView {
         this.topicStandars = topicStandar;
     }
 
+    public void setTopicStandardsSorted(ArrayList<CCStandard> topicStandardsSorted) {
+    	this.topicStandardsSorted = topicStandardsSorted;
+    }
+    
     public String getTopicSummary() {
         return topicSummary;
     }
@@ -90,4 +99,5 @@ public class ProblemsView {
         }
         this.problems = SATProbListNew;
     }
+
 }
