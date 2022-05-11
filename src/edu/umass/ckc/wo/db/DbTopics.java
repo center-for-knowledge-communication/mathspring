@@ -27,6 +27,7 @@ import java.util.TreeSet;
  *  Frank	12-26-20	issue #329 added multi-lingual versions of getAllTopics() and getTopicName()
  *  Frank	01-03-21	issue #329R2 fixed bug missing parameter getDefaultTopicsSequence()
  *  Frank	04-16-22	Issue# 634R2 getGardenTopics
+ *  Frank	05-11-2022 	issue #632 add sorted standards to view
  */
 public class DbTopics {
 
@@ -153,6 +154,40 @@ public class DbTopics {
     }
 
     
+    public static ArrayList<CCStandard> getRptTopicStandardsSorted(Connection conn, int id) throws SQLException {
+        //List<CCStandard> result = new ArrayList<CCStandard>();
+    	ArrayList<CCStandard> list = new ArrayList<CCStandard>();
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            // the type indicates we want problems that relate to the standard (P means prereq)
+            String q = "select s.idABC,s.description,s.category,s.grade,s.idABC from topicstandardmap t, standard s where t.topicid=? and s.idABC=t.standardid order by s.idABC ;";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,id);
+            rs = stmt.executeQuery();
+            int count = 0;
+            while (rs.next()) {
+                String code= rs.getString(1);
+                String descr= rs.getString(2);
+                String category= rs.getString(3);
+                String grade = rs.getString(4);
+                String idABC = rs.getString(5);
+                list.add(new CCStandard(code,descr,category,grade,idABC));
+                count += 1;
+            }
+            if (count == 0) {
+            	System.out.println("Missing topic:" + String.valueOf(id));
+            }
+            return list;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        } 
+    }
+
     
  public static List<Topic> getClassInactiveTopics(Connection conn, List<Topic> activeTopics) throws SQLException {
         ResultSet rs=null;

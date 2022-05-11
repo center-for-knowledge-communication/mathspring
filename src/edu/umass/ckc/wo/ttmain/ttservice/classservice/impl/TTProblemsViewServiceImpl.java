@@ -48,6 +48,7 @@ import edu.umass.ckc.wo.smgr.User;
  * Frank    04-01-21  	Issue #418 getStudentList()
  * Frank    05-20-21  	Issue #473 crop lname and fix username update bug
  * Frank 	10-09-2021	issue #523 username prefix validation 
+ * Frank	05-11-2022 	issue #632 add sorted standards to view
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -75,6 +76,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
             
             view.setTopicName(topic.getMlName(lang));
             view.setTopicStandars(DbTopics.getRptTopicStandards(connection.getConnection(), topic.getId()));
+            view.setTopicStandardsSorted(DbTopics.getRptTopicStandardsSorted(connection.getConnection(), topic.getId()));
             view.setTopicSummary(topic.getMlDescription(lang));
             view.setUri(Settings.probPreviewerPath);
             view.setHtml5ProblemURI(Settings.html5ProblemURI);
