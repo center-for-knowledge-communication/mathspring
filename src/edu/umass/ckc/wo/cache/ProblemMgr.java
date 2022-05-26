@@ -51,6 +51,7 @@ import edu.umass.ckc.wo.util.Pair;
  * Frank 12-20-2020 issue #333 - handle mulit-lingual video selection
  * Frank 12-28-20	Issue #329 Added multi-lingual support for topic name put multi-lingual topic name in problem object
  * Frank 02-03-21	Issue #329R2 added mlDescription to new topic() call 
+ * Frank 05-26-22	Issue #651 Fixed problem difficulty computation
  * 
  * To change this template use File | Settings | File Templates.
  */
@@ -274,9 +275,15 @@ public class ProblemMgr {
 			totalAvgSecsProblem.add(statEntries.get(5));
 		});
 
-		double percentleHints = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgHints.stream().toArray(Double[]::new)));
-		double percentileAvgIncorrect = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgIncorrect.stream().toArray(Double[]::new)));
-		double percentileAvgSecsProblem = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgSecsProblem.stream().toArray(Double[]::new)));
+//		double percentleHints = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgHints.stream().toArray(Double[]::new)));
+//		double percentileAvgIncorrect = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgIncorrect.stream().toArray(Double[]::new)));
+//		double percentileAvgSecsProblem = new Percentile().evaluate(ArrayUtils.toPrimitive(totalAvgSecsProblem.stream().toArray(Double[]::new)));
+
+		double maxHints = Collections.max(totalAvgHints);		
+		double maxIncorrect = Collections.max(totalAvgIncorrect);		
+		double maxSecsProblem = Collections.max(totalAvgSecsProblem);		
+		
+	
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String q = "UPDATE overallprobdifficulty SET diff_hints = ?, diff_time = ?,diff_incorr = ?,diff_level=?  WHERE problemId = ?";
@@ -284,10 +291,17 @@ public class ProblemMgr {
 			ps = conn.prepareStatement(q);
 			for (Map.Entry<Integer, List<Double>> statEntries : probStatsEntries.entrySet()) {
 				
-				double diff_hints = statEntries.getValue().get(0) / percentleHints;
-				double diff_incorr = statEntries.getValue().get(1) / percentileAvgIncorrect;
-				double diff_time = statEntries.getValue().get(2) / percentileAvgSecsProblem;
+//				double diff_hints = statEntries.getValue().get(0) / percentleHints;
+//				double diff_incorr = statEntries.getValue().get(1) / percentileAvgIncorrect;
+//				double diff_time = statEntries.getValue().get(2) / percentileAvgSecsProblem;
+
+				double diff_hints = statEntries.getValue().get(0) / maxHints;
+				double diff_incorr = statEntries.getValue().get(1) / maxIncorrect;
+				double diff_time = statEntries.getValue().get(2) / maxSecsProblem;
+
 				double diff_level_compute = (diff_hints + diff_incorr + diff_time) / 3;
+				
+
 				
 				if (diff_level_compute == 0.0 || statEntries.getValue().get(7)< 10) {
 					diff_level_compute = 0.05;
@@ -300,6 +314,7 @@ public class ProblemMgr {
 				diff_hints = diff_hints < 1 ? diff_hints : 0.99;
 				diff_incorr = diff_incorr < 1 ? diff_incorr : 0.99;
 				diff_time = diff_time < 1 ? diff_time : 0.99;
+
 				
 				ps.setDouble(1, diff_hints);
 				ps.setDouble(2, diff_time);
@@ -308,6 +323,9 @@ public class ProblemMgr {
 				ps.setInt(5, statEntries.getKey());
 
 				ps.executeUpdate();
+
+				logger.error(String.valueOf(diff_level) + "," + String.valueOf(diff_hints) + "," + String.valueOf(diff_incorr) + "," + String.valueOf(diff_time));
+				
 			}
 
 		} finally {
