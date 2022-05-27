@@ -61,8 +61,8 @@ public class SATProb {
     }
 
     public String getDifficulty() {
-        DecimalFormat twoPlaces = new DecimalFormat("0.00");
-        return twoPlaces.format(problem.getDifficulty());
+        DecimalFormat sixPlaces = new DecimalFormat("0.000000");
+        return sixPlaces.format(problem.getDifficulty());
     }
 
 
