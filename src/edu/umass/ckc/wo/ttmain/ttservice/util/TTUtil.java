@@ -110,6 +110,8 @@ public class TTUtil {
     		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as summary\r\n" + 
     		"from problemgroup,problemgroup_description_multi_language pgl where active=1 and id=pgl.pg_pg_grp_id and id not in (:activeIds);";
     
+    //    query to collect student's cluster training data
+//    public static final String STUDENT_GROUP_CLUSTERING = 
     /**
      * Query for summary report
      */

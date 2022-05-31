@@ -170,6 +170,8 @@ System.out.println("msHost = " + msHost + msContext);
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js" />"></script>
     <script type="text/javascript"
             src="<c:url value="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" />"></script>
+	<script src="https://cdn.plot.ly/plotly-2.11.1.min.js"></script>
+	
 
 
 
@@ -2494,9 +2496,9 @@ var completeDataChart;
     });
 
     
-    $('#showReportSevenBtn').on('click', function ()  {    	
+    $('#showReportSevenBtn').on('click', function ()  {    
 
-    	   
+        
         getFilterSeven();
         $("#studentClusterReport").hide();
         $('#collapseSevenLoader').show();
@@ -2512,13 +2514,64 @@ var completeDataChart;
                 filter: filterSeven
             },
             success : function(data) {
-                $('#collapseSevenLoader').hide();
+            console.log(data);
+            var trace1 = {
+             x: [1, 2, 3, 4, 5],
+             y: [1, 4, 2.5, 4, 2],
+             mode: 'markers+text',
+             type: 'scatter',
+             name: 'Team A',
+             text: ['Dexter', 'Felix', 'Maria', 'Sasha', 'Calvin'],
+             textposition: 'top center',
+             textfont: {
+               family:  'Raleway, sans-serif'
+             },
+             marker: { size: 12 }
+            };
+
+            var trace2 = {
+             x: [1.5, 2.5, 3.5, 4.5, 5.5],
+             y: [5, 7, 6, 7, 8],
+             mode: 'markers+text',
+             type: 'scatter',
+             name: 'Team B',
+             text: ['Jim', 'Jane', 'Jose', 'Pedro', 'Arun'],
+             textfont : {
+               family:'Times New Roman'
+             },
+             textposition: 'bottom center',
+             marker: { size: 12 }
+            };
+
+            var data = [ trace1, trace2 ];
+
+            var layout = {
+             xaxis: {
+               range: [ 0.75, 7.25 ]
+             },
+             yaxis: {
+               range: [0, 10]
+             },
+             legend: {
+               y: 0.5,
+               yref: 'paper',
+               font: {
+                 family: 'Arial, sans-serif',
+                 size: 20,
+                 color: 'grey',
+               }
+             },
+             title:'Student Clusters'
+            };
+
+            Plotly.newPlot('studentClusterReport', data, layout, {displayModeBar: false});                
+            $('#collapseSevenLoader').hide();
                 $("#studentClusterReport").show();
-                
-                
-                
-                document.getElementById("studentClusterReport").innerHTML = "<table  class='table table-striped table-bordered hover' width='100%'></table><tr class='row'><td><h3>Under Constuction</h3></td></tr></table>";
-                
+               
+               
+               
+              // document.getElementById("studentClusterReport").innerHTML = data;
+               
             }
         });
 

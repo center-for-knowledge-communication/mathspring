@@ -67,6 +67,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import ca.pjer.*;
+import ca.pjer.ekmeans.EKmeans;
 /**
  * Created by nsmenon on 5/19/2017.
  * 
@@ -382,11 +384,30 @@ public class TTReportServiceImpl implements TTReportService {
                 case "classStudentClusterReport":
                 	
                 	// Run the K-Mean algorithm here
+                	int n = 100; // the number of data to cluster
+                	int k = 2; // the number of cluster
+                	Random random = new Random(System.currentTimeMillis());
+                	double[][] points = new double[n][2];
+                	// lets create random points between 0 and 100
+                	for (int i = 0; i < n; i++) {
+                	    points[i][0] = Math.abs(random.nextInt() % 100);
+                	    points[i][1] = Math.abs(random.nextInt() % 100);
+                	}
+                	double[][] centroids = new double[k][2];
+                	// lets create random centroids between 0 and 100 (in the same space as our points)
+                	for (int i = 0; i < k; i++) {
+                	    centroids[i][0] = Math.abs(random.nextInt() % 100);
+                	    centroids[i][1] = Math.abs(random.nextInt() % 100);
+                	}
+                	EKmeans eKmeans = new EKmeans(centroids, points);
+                	eKmeans.run();
+                	int[] assignments = eKmeans.getAssignments();
 
+                	
                 	// We'll need to discuss the report format
                 	String dummyReport = "<thead><tr><th>Cluster 1</th><th> 2</th></tr></thead><tbody><tr><td>Some Content</td></tr><tr><td>More Conent</td></tr></tbody>";
 
-                	return dummyReport;
+                	return assignments.toString();
                 case "perTeacherReport":
                 	// Note: classId parameter is used to communicate target teacherId for this report only
                 	if ("Normal".equals(teacherLoginType)) {
