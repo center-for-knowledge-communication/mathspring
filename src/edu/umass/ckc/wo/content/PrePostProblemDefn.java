@@ -11,6 +11,8 @@ import java.sql.Blob;
  * Written by: David Marshall
  * Date: Jul 11, 2005
  * Time: 11:09:23 AM
+ * 
+ * Frank 06-02-22 Issue 655 test for blank imagefilename
  */
 public class PrePostProblemDefn extends Problem {
     public static final int SHORT_ANSWER = 0;
@@ -69,7 +71,7 @@ public class PrePostProblemDefn extends Problem {
         this.eURL = cleanAns(eURL);
         this.waitTimeSecs = waitTimeSecs;
         this.imageFilename = imgFilename;
-        this.hasImage= (imgFilename != null);
+        this.hasImage= ((imgFilename != null && imageFilename.length() > 0));
     }
 
     private String cleanAns (String a) {
