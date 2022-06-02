@@ -6,6 +6,8 @@
   Date: 4/13/15
   Time: 3:42 PM
   To change this template use File | Settings | File Templates.
+  
+  Frank	06-02-22	Issue 655 - Comment out the score line until issue 647 applies the more comprehensive solution.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="edu.umass.ckc.wo.content.PrePostProblemDefn" %>
@@ -90,7 +92,7 @@ catch (Exception e) {
     <c:choose>
         <c:when test="${numSolvableProbsInTest > 0}">
             <%= rb.getString("thanks_for_taking_survey")%><br>
-            <%= rb.getString("your_score_is")%> ${numProbsCorrect}/${numSolvableProbsInTest} <br>
+<%--            <%= rb.getString("your_score_is")%> ${numProbsCorrect}/${numSolvableProbsInTest} <br> --%>
             <%= rb.getString("please_click_continue")%>
         </c:when>
         <c:otherwise>
