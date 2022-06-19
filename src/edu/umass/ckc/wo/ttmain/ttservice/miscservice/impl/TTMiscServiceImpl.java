@@ -1285,6 +1285,263 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
    	}
     
+    public String reportedProblemErrors(Connection conn, int cohort, String filter) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();
+    	
+    	int adjacentRows = 3;
+    	
+
+    	//String q_date = "select evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken = 1  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	//String q_class = "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	//String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken = 1  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError'  order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError'  order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+
+    	
+    	//String q_session = "select distinct evt.sessNum as sessId from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError'  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+
+    	
+    	if (filter.equals("date")) {
+        
+	         try {
+	        	
+	        	stmt = conn.prepareStatement(q_date);
+	            
+	            rs = stmt.executeQuery();
+	
+	            while (rs.next()) {
+	            	JSONObject resultJson = new JSONObject();
+	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
+//	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
+	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
+	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		String comment = rs.getString("comment");
+	        		if (comment == null) {
+	        			comment = " ";
+	        		}
+	        		else {
+	        			comment = comment.trim();
+	        		}
+	        		resultJson.put("Comment", comment);
+	        		resultJson.put("Event Id", String.valueOf(rs.getInt("evtid")));
+	            	resultArr.add(resultJson);
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	}
+
+    	if (filter.equals("classId")) {
+            
+	         try {
+	        	
+	        	stmt = conn.prepareStatement(q_class);
+	            
+	            rs = stmt.executeQuery();
+	
+	            while (rs.next()) {
+	            	JSONObject resultJson = new JSONObject();
+	        		resultJson.put("ClassId Id", String.valueOf(rs.getInt("classId")));
+	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
+	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
+	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
+	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		String comment = rs.getString("comment");
+	        		if (comment == null) {
+	        			comment = " ";
+	        		}
+	        		else {
+	        			comment = comment.trim();
+	        		}
+	        		resultJson.put("Comment", comment);
+	        		resultJson.put("Event Id", String.valueOf(rs.getInt("evtid")));
+
+	            	resultArr.add(resultJson);
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	}
+    	
+    	if (filter.equals("problemId")) {
+            
+	         try {
+	        	
+	        	stmt = conn.prepareStatement(q_problem);
+	            
+	            rs = stmt.executeQuery();
+	
+	            while (rs.next()) {
+	            	JSONObject resultJson = new JSONObject();
+	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
+	        		resultJson.put("Topic Id", String.valueOf(rs.getInt("curTopicId")));
+	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
+	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
+	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		String comment = rs.getString("comment");
+	        		if (comment == null) {
+	        			comment = " ";
+	        		}
+	        		else {
+	        			comment = comment.trim();
+	        		}
+	        		resultJson.put("Comment", comment);
+	        		resultJson.put("Event Id", String.valueOf(rs.getInt("evtid")));
+
+	            	resultArr.add(resultJson);
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	}
+
+    	
+    	return resultArr.toString();    	
+   	}
+    
+    public String sessionProblems(Connection conn, int cohort, String filter) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();
+    	
+    	int adjacentRows = 3;
+    	
+
+    	//String q_session = "select distinct evt.sessNum as sessId, evt.probkemId as problemId from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.ID = sph.ID order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_session = "select * from studentproblemhistory where sessionId = ?";
+    	
+        	int sessionId = Integer.valueOf(filter);
+	        try {
+	        	
+	        	stmt = conn.prepareStatement(q_session);
+	            stmt.setInt(1, sessionId);	            
+	            rs = stmt.executeQuery();
+	
+	            while (rs.next()) {
+	            	JSONObject resultJson = new JSONObject();
+	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("problemId")));
+	        		resultJson.put("Effort", rs.getString("effort"));
+	        		resultJson.put("Attempts to Solve", String.valueOf(rs.getInt("numAttemptsToSolve")));
+	        		resultJson.put("Mistakes", String.valueOf(rs.getInt("numMistakes")));
+	        		resultJson.put("Hints seen", String.valueOf(rs.getInt("numHints")));
+	            	resultArr.add(resultJson);
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	
+    	return resultArr.toString();    	
+   	}
+
+    
+
+    
+    public String getProblemHistoryErrorData(Connection conn, int cohort, String filter) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();
+    	JSONObject resultJson = new JSONObject();   	
+    	
+
+    	//String q_session = "select distinct evt.sessNum as sessId, evt.probkemId as problemId from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.ID = sph.ID order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_session = "select evt.probHistoryId as historyId, evt.userInput as comment, evt.problemId as problemId, sph.isProbBroken as isBroken from eventlog as evt, studentproblemhistory as sph where evt.Id = ? and evt.probHistoryId = sph.ID";
+    	
+        	int eventId = Integer.valueOf(filter);
+	        try {
+	        	
+	        	stmt = conn.prepareStatement(q_session);
+	            stmt.setInt(1, eventId);	            
+	            rs = stmt.executeQuery();
+	
+	            while (rs.next()) {
+	            		
+	        		resultJson.put("problemId", String.valueOf(rs.getInt("problemId")));
+	        		resultJson.put("comment", rs.getString("comment"));
+	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		resultJson.put("historyId", String.valueOf(rs.getInt("historyId")));
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	
+    	return resultJson.toString();    	
+   	}
+    
+    public String updateProblemHistoryErrorData(Connection conn, int cohort, String filter) throws SQLException {
+    	int result = 0;
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	
+        String[] splitter = filter.split("~");
+        if (!(splitter.length == 4) ) {
+        	return("must send 4 params");
+        }
+        else {
+	        int eventId = Integer.valueOf(splitter[0]);
+	        int historyId = Integer.valueOf(splitter[1]);
+	        int isBroken = Integer.valueOf(splitter[2]);
+	        String comment = splitter[3];
+	    	
+	    	String q_evt = "update eventlog set userInput = ? where id = ?;";
+	        try {
+	        	
+	        	stmt = conn.prepareStatement(q_evt);
+	            stmt.setString(1, comment);	            
+	            stmt.setInt(2, eventId);	            
+	            result = stmt.executeUpdate();		
+	            stmt.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	        }
+	
+	    	String q_sph = "update studentproblemhistory set isProbBroken =  ? where ID = ?;";
+	        try {
+	        	
+	        	stmt = conn.prepareStatement(q_sph);
+	            stmt.setInt(1, isBroken);	            
+	            stmt.setInt(2, historyId);	            
+	            result = stmt.executeUpdate();		
+	            stmt.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	        }        
+        }
+    	return "Success";    	
+   	}
+    
+    
+    
     public String teacherClassTableSlices(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1529,6 +1786,24 @@ public class TTMiscServiceImpl implements TTMiscService {
 				result = teacherClassTableSlices(conn, Integer.valueOf(cohortId));  
 				break;
     		
+    		case "getReportedProblemErrors":
+				result = reportedProblemErrors(conn, Integer.valueOf(cohortId), filter);  
+				break;
+    		
+    		case "getSessionProblems":
+				result = sessionProblems(conn, Integer.valueOf(cohortId), filter);  
+				break;
+
+    		case "getProblemHistoryErrorData":
+				result = getProblemHistoryErrorData(conn, Integer.valueOf(cohortId), filter);  
+				break;
+				
+    		case "updateProblemHistoryErrorData":
+				result = updateProblemHistoryErrorData(conn, Integer.valueOf(cohortId), filter);  
+				break;
+				
+				
+				
     		case "perTeacherReport":
             	String classId = filter;
             	String filters[] = filter.split("~");
