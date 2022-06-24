@@ -454,6 +454,11 @@ background-color: #FF4766;
   	font-size: 16px;
 	
 }
+.report_filters_help {
+	color: #000000;
+  	background-color: #78e9ef;
+  	font-size: 16px;	
+}
 .report_note {
 	color: black;
   	background-color: white;
