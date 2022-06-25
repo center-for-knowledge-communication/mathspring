@@ -1292,16 +1292,16 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     	int adjacentRows = 3;
     	
+    	String fromDate = "2020-09-01 00:00:00";
 
-    	//String q_date = "select evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken = 1  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	//String q_class = "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	//String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken = 1  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError'  order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as isBroken from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError'  order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	//String q_date = "select evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken = 1  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	//String q_class = "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	//String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken = 1  order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3and time > ? order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
 
     	
-    	//String q_session = "select distinct evt.sessNum as sessId from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError'  order by evt.sessNum DESC, sph.problemBeginTime DESC;";
 
     	
     	if (filter.equals("date")) {
@@ -1309,15 +1309,16 @@ public class TTMiscServiceImpl implements TTMiscService {
 	         try {
 	        	
 	        	stmt = conn.prepareStatement(q_date);
+	            stmt.setString(1, fromDate);       	
 	            
 	            rs = stmt.executeQuery();
-	
+	            
 	            while (rs.next()) {
 	            	JSONObject resultJson = new JSONObject();
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
 //	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
 	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
-	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1344,6 +1345,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	         try {
 	        	
 	        	stmt = conn.prepareStatement(q_class);
+	            stmt.setString(1, fromDate);
 	            
 	            rs = stmt.executeQuery();
 	
@@ -1353,7 +1355,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
 	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
-	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1381,6 +1383,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	         try {
 	        	
 	        	stmt = conn.prepareStatement(q_problem);
+	            stmt.setString(1, fromDate);
 	            
 	            rs = stmt.executeQuery();
 	
@@ -1390,7 +1393,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        		resultJson.put("Topic Id", String.valueOf(rs.getInt("curTopicId")));
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
 	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
-	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1467,7 +1470,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
 
     	//String q_session = "select distinct evt.sessNum as sessId, evt.probkemId as problemId from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.ID = sph.ID order by evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_session = "select evt.probHistoryId as historyId, evt.userInput as comment, evt.problemId as problemId, sph.isProbBroken as isBroken from eventlog as evt, studentproblemhistory as sph where evt.Id = ? and evt.probHistoryId = sph.ID";
+    	String q_session = "select evt.probHistoryId as historyId, evt.userInput as comment, evt.problemId as problemId, sph.isProbBroken as probStatus from eventlog as evt, studentproblemhistory as sph where evt.Id = ? and evt.probHistoryId = sph.ID";
     	
         	int eventId = Integer.valueOf(filter);
 	        try {
@@ -1480,7 +1483,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            		
 	        		resultJson.put("problemId", String.valueOf(rs.getInt("problemId")));
 	        		resultJson.put("comment", rs.getString("comment"));
-	        		resultJson.put("isBroken", String.valueOf(rs.getInt("isBroken")));
+	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
 	        		resultJson.put("historyId", String.valueOf(rs.getInt("historyId")));
 	            }            
 	            stmt.close();
@@ -1508,7 +1511,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         else {
 	        int eventId = Integer.valueOf(splitter[0]);
 	        int historyId = Integer.valueOf(splitter[1]);
-	        int isBroken = Integer.valueOf(splitter[2]);
+	        int probStatus = Integer.valueOf(splitter[2]);
 	        String comment = splitter[3];
 	    	
 	    	String q_evt = "update eventlog set userInput = ? where id = ?;";
@@ -1528,7 +1531,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        try {
 	        	
 	        	stmt = conn.prepareStatement(q_sph);
-	            stmt.setInt(1, isBroken);	            
+	            stmt.setInt(1, probStatus);	            
 	            stmt.setInt(2, historyId);	            
 	            result = stmt.executeUpdate();		
 	            stmt.close();
