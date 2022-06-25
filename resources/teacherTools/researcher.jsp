@@ -2510,7 +2510,7 @@ function updateProblemStatusForm() {
 
             	var problemId  = jsonData.problemId;
             	var comment  = jsonData.comment;
-            	var isBroken = jsonData.isBroken;
+            	var probStatus = jsonData.probStatus;
             	var historyId = jsonData.historyId;
 
             	document.getElementById("hiddentEventId").value = eventId;
@@ -2518,17 +2518,20 @@ function updateProblemStatusForm() {
             	document.getElementById("table4b_update_hdr").innerHTML = "<%= rb.getString("problem_id") %>: " + problemId;     
             	document.getElementById("message-text").value = comment;     
             	
-            	if (isBroken == "0") {
-            		document.getElementById("radio4bBroken").checked = true;
+            	if (probStatus == "0") {
+            		document.getElementById("radio4bReported").checked = true;
             	}            	
-            	if (isBroken == "1") {
+            	if (probStatus == "1") {
+            		document.getElementById("radio4bBroken").checked = true;
+            	}
+            	if (probStatus == "2") {
             		document.getElementById("radio4bFixed").checked = true;
             	}
-            	if (isBroken == "2") {
+            	if (probStatus == "3") {
             		document.getElementById("radio4bIgnore").checked = true;
             	}
         	
-        	//document.getElementById("is-broken").value = isBroken;     
+        	//document.getElementById("is-broken").value = probStatus;     
             	
             	
                 $('#updateProblemStatusModalPopup').modal('show');
@@ -2551,19 +2554,22 @@ function updateProblemStatusSubmit() {
 	
 	
 	
-	var isBroken = '0';
+	var probStatus = '0';
 	
+	if (document.getElementById("radio4bReported").checked == true) {
+		probStatus = '0';		
+	}
 	if (document.getElementById("radio4bBroken").checked == true) {
-		isBroken = '1';		
+		probStatus = '1';		
 	}
 	if (document.getElementById("radio4bFixed").checked == true) {
-		isBroken = '2';		
+		probStatus = '2';		
 	}
 	if (document.getElementById("radio4bIgnore").checked == true) {
-		isBroken = '0';		
+		probStatus = '3';		
 	}
 
-	var params = document.getElementById("hiddentEventId").value + "~" + document.getElementById("hiddenHistoryId").value + "~" + isBroken + "~" + document.getElementById("message-text").value + " UPDATED" ;
+	var params = document.getElementById("hiddentEventId").value + "~" + document.getElementById("hiddenHistoryId").value + "~" + probStatus + "~" + document.getElementById("message-text").value + " UPDATED" ;
 
 	
 	$.ajax({
@@ -5910,6 +5916,7 @@ function updateAllCohortSlices() {
 					<textarea id="message-text" name="message" style="width:500px; height:200px;overflow-x: auto;overflow-y: auto;"></textarea>
 				</div>
 				<div class="form-group">
+					<label class="radio-inline"><input id="radio4bReported"  value="Reported" type="radio" name="optRadio4bContent">Reported</label>
 					<label class="radio-inline"><input id="radio4bBroken"  value="Broken" type="radio" name="optRadio4bContent">Broken</label>
 					<label class="radio-inline"><input id="radio4bFixed"   value="Fixed" type="radio" name="optRadio4bContent">Fixed</label>
 					<label class="radio-inline"><input id="radio4bIgnore"  value="Ignore" type="radio" name="optRadio4bContent">Ignore</label>
