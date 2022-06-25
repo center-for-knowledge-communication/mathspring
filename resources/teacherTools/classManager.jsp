@@ -1403,7 +1403,7 @@ function displayActiveStandardsHelp() {
 	}
 	else {
 		document.getElementById("activeStandardsPopupHelp").style.visibility = 'visible';
-		hactiveHelpDisplayed = 1;
+		activeHelpDisplayed = 1;
 	}
 }
 
