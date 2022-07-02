@@ -51,32 +51,38 @@ public class GazeWanderingResponse extends Response {
     		gazintervJsonObject.putIfAbsent("newGazeEventId", newGazeEventId);
     	}
     	
-    	valueObj = gazeParamsJsonObject.get("gazinterv_flashScreen");
-    	flashScreen = (int)valueObj;
-    	if (flashScreen > 0) {
-    		gazintervJsonObject.putIfAbsent("flashScreen", flashScreen);
+    	if (gazeParamsJsonObject.get("gazinterv_flashScreen") == null) {
+       		gazintervJsonObject.putIfAbsent("flashScreen", 0);
+    	}
+    	else {
+    		gazintervJsonObject.putIfAbsent("flashScreen", gazeParamsJsonObject.get("gazinterv_flashScreen"));
     	}
     	
-    	valueObj = gazeParamsJsonObject.get("gazinterv_flashBox");
-    	flashBox = (int)valueObj;
-    	if (flashBox > 0) {
-    		gazintervJsonObject.putIfAbsent("flashBox", flashBox);
+    	if (gazeParamsJsonObject.get("gazinterv_flashBox") == null) {
+    		gazintervJsonObject.putIfAbsent("flashBox", 0);
     	}
-
+    	else {
+    		gazintervJsonObject.putIfAbsent("flashBox", gazeParamsJsonObject.get("gazinterv_flashBox"));
+    	}
     	
-    	valueObj = gazeParamsJsonObject.get("gazinterv_playSound");    	
-    	playSound = (int)valueObj;
-    	if (playSound > 0) {
-    		gazintervJsonObject.putIfAbsent("playSound", playSound);
+    	if (gazeParamsJsonObject.get("gazinterv_playSound") == null) {    	
+    		gazintervJsonObject.putIfAbsent("playSound", 0);
+    	}
+    	else {
+        	gazintervJsonObject.putIfAbsent("playSound", gazeParamsJsonObject.get("gazinterv_playSound"));    		
     	}
 
     	Random rand = new Random();
     	
-    	valueObj = gazeParamsJsonObject.get("gazinterv_LCompanion");   	
-    	LCompanion = (int)valueObj;
+    	if (gazeParamsJsonObject.get("gazinterv_LCompanion") == null) {   	
+    		LCompanion = 0;
+    		gazintervJsonObject.putIfAbsent("LCompanion", 0);
+    	}
+    	else {
+    		LCompanion = 1;
+    		gazintervJsonObject.putIfAbsent("LCompanion", gazeParamsJsonObject.get("gazinterv_LCompanion"));
+    	}
     	if (LCompanion > 0) {
-    		gazintervJsonObject.putIfAbsent("LCompanion", LCompanion);
-
     		valueObj = gazeParamsJsonObject.get("gazinterv_LCMessageIDs");
 	
 	    	String jsonAsString = valueObj.toString();
@@ -99,10 +105,15 @@ public class GazeWanderingResponse extends Response {
     		LCFilename = "";
     	}
 
-    	valueObj = gazeParamsJsonObject.get("gazinterv_textBox");
-    	textBox = (int)valueObj;
+    	if (gazeParamsJsonObject.get("gazinterv_textBox") == null) {
+    		textBox = 0;
+    		gazintervJsonObject.putIfAbsent("textBox", gazeParamsJsonObject.get("gazinterv_textBox"));
+    	}
+    	else {
+    		textBox = 1;
+    		gazintervJsonObject.putIfAbsent("textBox", gazeParamsJsonObject.get("gazinterv_textBox"));
+    	}
     	if (textBox > 0) {
-    		gazintervJsonObject.putIfAbsent("textBox", textBox);
     		JSONArray textArr = (JSONArray) gazeParamsJsonObject.get("gazinterv_textBoxChoices");
     		int textIndex = rand.nextInt(textArr.size());
     		textBoxChoice = textArr.getString(textIndex);

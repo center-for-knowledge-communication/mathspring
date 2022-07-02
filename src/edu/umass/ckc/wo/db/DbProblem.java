@@ -248,6 +248,49 @@ public class DbProblem extends BaseMgr {
     }
  */
 
+    public static String getProblemPreviewData (Connection conn, int studId) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int pid = 0;
+        int stid = 0;
+        float mast = 0;
+        float diff = 0;
+        
+        String problemId = "";
+        String studentId = "";
+        String mastery = "";
+        String diff_level = "";
+        String result = "";
+        try {
+            String q = "SELECT  sph.problemId as problemId, studid as studId, mastery as mastery, opd.diff_level as diff_level, sph.problemBeginTime as latest FROM studentproblemhistory as sph, overallprobdifficulty as opd where studid = ? and opd.problemId = sph.problemId and mastery > 0 order by latest desc limit 2";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1,studId);
+            
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                pid = rs.getInt("problemId");
+                problemId = Integer.toString(pid);
+                stid = rs.getInt("studId");
+                studentId = Integer.toString(stid);
+                mast = rs.getFloat("mastery");
+                mastery = Float.toString(mast);
+                diff = rs.getFloat("diff_level");
+                diff_level = Float.toString(diff);
+                
+                result = studentId + "~" + problemId  + "~" + mastery + "~" + diff_level;
+                System.out.println("previewProblemData = " + result);
+            }
+            return result;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }
+
+    
 
     public List<String> getClassOmittedTopicProblemIds(Connection conn, int classID, int topicId) throws SQLException {
 

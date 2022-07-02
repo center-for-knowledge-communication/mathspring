@@ -182,6 +182,11 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
             return r;
         }
 
+        else if (e instanceof PreviewProblemEvent) {
+            r =  processPreviewProblemRequest((PreviewProblemEvent) e);
+            studentModel.save();
+            return r;
+        }
 
 
         else if (e instanceof HintEvent) {
@@ -410,6 +415,8 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
     public abstract Response processGazeWanderingRequest (GazeWanderingEvent e) throws Exception;
     // results: ProblemResponse | InterventionResponse
     public abstract Response processNextProblemRequest (NextProblemEvent e) throws Exception;
+
+    public abstract Response processPreviewProblemRequest (PreviewProblemEvent e) throws Exception;
 
     public abstract Response processStudentSelectsProblemRequest (NextProblemEvent e) throws Exception;
 

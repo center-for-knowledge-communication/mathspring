@@ -144,6 +144,14 @@ function getNewAnswer() {
     return globals.newAnswer;
 }
 
+function getGazeDetectionOn() {
+	return globals.gazeDetectionOn;
+}
+
+function getGazeParamsJSON () {
+	return globals.gazeParamsJSON;
+}
+
 // each time we start a new problem, set global variables that contain info about its state.
 function setGlobalProblemInfo (activity) {
     globals.numHints = activity.numHints;
@@ -268,8 +276,23 @@ function nextProb(globals,isSessionBegin=false) {
             processNextProblemResult) ;
     // Normal Processing
     else
-        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);    	
+        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, previewProblemData: globals.previewProblemData}, processNextProblemResult);    	
 }
+
+function previewProb(globals,isSessionBegin=false) {
+    toggleSolveDialogue(false);
+    if (!globals.showMPP)
+        hideMPP()
+    if (globals.trace)
+        debugAlert("in previewProb ");
+    // call the server with a nextProblem event and the callback fn processNextProblemResult will deal with result
+    showHourglassCursor(true);
+    // A HACK.  Because the Topic Intro is an intervention but it doesn't show in a dialog, it is ended by clicking on New Problem button
+    // which comes in here.  We want to send back an InputResponse though becuase thats what TopicIntros should get back.
+    // TODO:  Probably should replace NewProblem button when a topic intro shows.  It could have the correct handler on it.
+    servletGet("PreviewProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processPreviewProblemResult);    	
+}
+
 
 // This function can only be called if the button is showing
 function selectProblemDialog () {
@@ -329,6 +352,7 @@ function myprogress() {
 ///////////////////////////////////////////////////////////////////////
 
 function callReadProb() {
+	
     debugAlert("In  callReadProb");
    	try {
 	    if (isFlashProblem() || isHTML5Problem())   {
@@ -343,8 +367,8 @@ function callReadProb() {
 	catch(err) {
     	console.log(err.message);
 	}    
-}
 
+}
 // fields the click on the hint button.
 function requestHint(globals) {
     if (isFlashProblem() || isHTML5Problem()) {
@@ -665,6 +689,33 @@ function showQuickAuthProblem (pid, solution, resource, mode, questType) {
         globals.probElapsedTime = 0;
         globals.lastProbType = HTML_PROB_TYPE;
         globals.lastProbId = pid;
+
+	    if (globals.gazeDetectionOn == 0) {
+	    	console.log("hidden");
+			document.getElementById("webcam").style.visibility = "hidden";
+	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
+	    }
+	    else {
+		    if ((globals.gazeDetectionOn == 2) && globals.gazeParamsJSON.gazinterv_monitor_on == 2) {
+		    	console.log("gazinterv_monitor_on" + globals.gazeParamsJSON.gazinterv_monitor_on);
+		    	console.log("gazing webcam");
+				if (globals.istestUser == "1") {
+					document.getElementById("webcam").style.visibility = "visible";
+					document.getElementById("monitorBox").style.visibility = "visible";
+				}
+				else {
+					document.getElementById("webcam").style.visibility = "hidden";
+					document.getElementById("monitorBox").style.visibility = "hidden";				
+				}
+		    	document.getElementById("webcam").style.zIndex = "3";    	
+		    	document.getElementById("monitorBox").style.zIndex = "3";    	
+		    }
+			else {
+				document.getElementById("webcam").style.visibility = "hidden";
+				document.getElementById("monitorBox").style.visibility = "hidden";				
+			}
+		    
+	    }        
     }
     var isDemo = mode === MODE_DEMO || mode == MODE_EXAMPLE;
     if (isDemo)
@@ -808,6 +859,100 @@ function checkError (responseText) {
     }
     return false;
 }
+
+function processPreviewProblemResult(responseText, textStatus, XMLHttpRequest) {
+
+	//alert("isTestUser" + globals.istestUser);
+	if (document.getElementById("previewInitStatus").innerHTML === initializing_camera) {
+		console.log("Predictor not ready yet");
+	}
+	else {
+		if ((globals.gazeDetectionOn == 2) && globals.gazeParamsJSON.gazinterv_monitor_on == 2) {
+			if (globals.istestUser == "1") {
+				document.getElementById("webcam").style.visibility = "visible";
+				document.getElementById("monitorBox").style.visibility = "visible";
+			}
+			else {
+				document.getElementById("webcam").style.visibility = "hidden";
+				document.getElementById("monitorBox").style.visibility = "hidden";				
+			}
+   	    	document.getElementById("previewInitStatus").innerHTML = "";
+   	    	var jsonPreviewResponse = $.parseJSON(responseText);
+			console.log("processing Preview Problem Result: " + jsonPreviewResponse.previewProblemResults );
+			if (jsonPreviewResponse.previewProblemResults === "NaN~undefined") {
+				document.getElementById("previewProbInData").innerHTML = "0.1~SAME";
+				document.getElementById("previewProbIn").innerHTML = "0.1~SAME";
+			}
+			else {
+				document.getElementById("previewProbInData").innerHTML = jsonPreviewResponse.previewProblemResults;
+				var rsp = jsonPreviewResponse.previewProblemResults;
+				var splitter = rsp.split("~");
+				document.getElementById("previewInitStatus").innerHTML = "";
+				document.getElementById("previewProbIn0").innerHTML = "Prev Diff: " + splitter[0];
+				document.getElementById("previewProbIn1").innerHTML = "Mastery:   " + splitter[1];
+				document.getElementById("previewProbIn2").innerHTML = "Easy/Hard: " + splitter[2];
+				var minDiff = splitter[3];
+				if (minDiff.length > 10) {
+					minDiff = minDiff.substr(10);
+				}
+				document.getElementById("previewProbIn3").innerHTML = "Min Diff:  " + splitter[3];
+				var maxDiff = splitter[3];
+				if (maxDiff.length > 10) {
+					maxDiff = maxDiff.substr(10);
+				}
+				document.getElementById("previewProbIn4").innerHTML = "Max Diff:  " + splitter[4];
+			}
+		
+		    selectdiff.predictDiff();
+		    globals.previewProblemData = document.getElementById("previewProbOutData").innerHTML; 
+			document.getElementById("previewProbOut").innerHTML = "New Diff:   " + globals.previewProblemData ;
+		    console.log(new Date());
+		    var tries = 1;
+		    problemPreviewTest();
+		}
+		else {
+			document.getElementById("webcam").style.visibility = "hidden";
+			document.getElementById("monitorBox").style.visibility = "hidden";				
+			nextProb(globals);   		
+		}
+	}
+}
+function problemPreviewTest() {
+
+	setTimeout(function() {
+    	document.getElementById("previewInitStatus").innerHTML = "";
+   		var tester = document.getElementById("previewProbOutData").innerHTML;
+   		if (tester.length > 0) {
+   	   		console.log("Problem Difficulty predicition is " + document.getElementById("previewProbOutData").innerHTML);
+		    globals.previewProblemData = document.getElementById("previewProbOutData").innerHTML; 
+		    document.getElementById("previewProbOut").innerHTML = "New Diff:   " + globals.previewProblemData ;
+   	   		
+   	   		console.log(new Date());
+   	   		console.log("problemPreviewTest in 1 sec");
+   	   		nextProb(globals);   		
+   	   	}
+   		else {
+   		    problemPreviewTest2();   			
+   		}
+	}, 2000);	
+}
+
+function problemPreviewTest2() {
+
+	setTimeout(function() {
+   		var tester = document.getElementById("previewProbOut").innerHTML;
+   		if (tester.length > 0) {
+   	   		console.log("Problem Difficulty predicition is " + document.getElementById("previewProbOutData").innerHTML);
+		    globals.previewProblemData = document.getElementById("previewProbOutData").innerHTML; 
+		    document.getElementById("previewProbOut").innerHTML = "New Diff:   " + globals.previewProblemData ;
+   	   		
+   	   		console.log(new Date());
+   	   		console.log("problemPreviewTest in 2 secs");
+   	   		nextProb(globals);   		
+   	   	}
+	}, 3000);	
+}
+
 
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $("#next_prob_spinner").show();
@@ -1126,8 +1271,13 @@ function exampleDialogCloseHandler () {
         globals.probMode = null;
         globals.probType = null;
         globals.exampleProbType = null;
-        nextProb(globals);
-    }
+//        if ((globals.gazeDetectionOn == 2) && globals.gazeParamsJSON.gazinterv_monitor_on == 2) {        
+//        	previewProb(globals,false);
+//       	}
+//	    else {
+	    	nextProb(globals);
+        }
+//    }
     sysGlobals.exampleWindowActive = false;
     globals.probMode = MODE_PRACTICE;
     //sendEndEvent(globals);
@@ -1263,16 +1413,39 @@ function clickHandling () {
     });
 
     $("#nextProb").click(function () {
-    	$("#next_prob_spinner").show();
-        if (!isWaiting()) {
-            nextProb(globals)
+       	$("#next_prob_spinner").show();
+       	
+       	if (!isWaiting()) {
+       		if ((globals.gazeDetectionOn == 2) && globals.gazeParamsJSON.gazinterv_monitor_on == 2) {
+
+    			if (globals.istestUser == "1") {
+    				document.getElementById("webcam").style.visibility = "visible";
+    				document.getElementById("monitorBox").style.visibility = "visible";
+    			}
+    			else {
+    				document.getElementById("webcam").style.visibility = "hidden";
+    				document.getElementById("monitorBox").style.visibility = "hidden";				
+    			}
+	       		if (document.getElementById("previewInitStatus").innerHTML === initializing_camera) {
+	       			alert(wait_for_camera);
+	       		}
+	       		else {
+	           		previewProb(globals,false);
+	       		}       			
+       		}
+	       	else {
+				document.getElementById("webcam").style.visibility = "hidden";
+				document.getElementById("monitorBox").style.visibility = "hidden";				
+	       		nextProb(globals);
+	       	}
         }
         $("#next_prob_spinner").hide();
     });
+    
     $("#read").click(function () {
         callReadProb()
     });
-
+    
     $("#hint").click(function () {
         clicks++;  //count clicks
         if(clicks === 1) {

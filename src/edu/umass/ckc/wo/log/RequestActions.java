@@ -21,6 +21,7 @@ public class RequestActions {
     public static final String BEGIN_EXAMPLE = "BeginExample";
     public static final String END_EXAMPLE = "EndExample";
     public static final String NEXT_PROBLEM = "NextProblem";
+    public static final String PREVIEW_PROBLEM = "previewProblem";
     public static final String HINT = "Hint";
     public static final String FORMALITY_HINT = "Formality_Hint";
     public static final String SHOW_EXAMPLE = "ShowExample";

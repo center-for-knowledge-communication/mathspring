@@ -40,6 +40,9 @@ public class TopicState extends State {
     private static final String PROBLEM_SELECTION_CRITERION= "st.probSelectionCriterion";
     private static final String LAST_INTERVENTION= "st.lastIntervention";
     private static final String LAST_ANSWER= "st.lastAnswer";
+    private static final String LAST_PREVIEW_DIFF= "st.lastPreviewDiff";
+    private static final String MIN_PREVIEW_DIFF= "st.minPreviewDiff";
+    private static final String MAX_PREVIEW_DIFF= "st.maxPreviewDiff";
     private static final String LAST_PROBLEM_MODE = "st.lastProblemMode";   //Example, Intro or Practice mode of last problem
     private static final String IN_BTW_PROB_INTERVENTION = "st.inBTWProbIntervention";
     private static final String TOPIC_NUM_PROBS_SEEN = "st.topicNumProbsSeen";
@@ -68,7 +71,7 @@ public class TopicState extends State {
             SECOND_EASIEST_PROBLEM_FAILED_SOLVE , PENULTIMATE_PROBLEM_SHOWN ,
             SECOND_EASIEST_PROBLEM_SHOWN , HARDEST_PROBLEM_SHOWN , EASIEST_PROBLEM_SHOWN ,
             HARDEST_PROBLEM_SOLVED_WELL, EASIEST_PROBLEM_SOLVED_FAILED,
-            PROBLEM_SELECTION_CRITERION, LAST_INTERVENTION, LAST_ANSWER,
+            PROBLEM_SELECTION_CRITERION, LAST_INTERVENTION, LAST_ANSWER, LAST_PREVIEW_DIFF,
             IN_BTW_PROB_INTERVENTION , TOPIC_NUM_PROBS_SEEN ,
             TOPIC_NUM_PRACTICE_PROBS_SEEN , TIME_IN_TOPIC , CONTENT_FAILURE_COUNTER , CLIP_NAMES ,
             CLIP_COUNTERS , STUDENT_SELECTED_TOPIC , SIDELINED_TOPIC , REVIEW_MODE ,EXAMPLE_SHOWN,
@@ -93,6 +96,9 @@ public class TopicState extends State {
     private List<String> problemSelectionCriterion;
     private String lastIntervention;
     private String lastAnswer;
+    private String lastPreviewDiff;
+    private String minPreviewDiff;
+    private String maxPreviewDiff;
     private long lastInterventionTime;
     private String lastProblemMode;
     private boolean inBtwProbIntervention;
@@ -154,6 +160,9 @@ public class TopicState extends State {
         problemSelectionCriterion = mapGetPropList(m, PROBLEM_SELECTION_CRITERION);
         lastIntervention = mapGetPropString(m, LAST_INTERVENTION, null);
         lastAnswer = mapGetPropString(m, LAST_ANSWER, null);
+        lastPreviewDiff = mapGetPropString(m, LAST_PREVIEW_DIFF, null);
+        minPreviewDiff = mapGetPropString(m, MIN_PREVIEW_DIFF, null);
+        maxPreviewDiff = mapGetPropString(m, MAX_PREVIEW_DIFF, null);
         inBtwProbIntervention = mapGetPropBoolean(m, IN_BTW_PROB_INTERVENTION, false);
         topicNumProbsSeen = mapGetPropInt(m, TOPIC_NUM_PROBS_SEEN, 0);
         topicNumPracticeProbsSeen = mapGetPropInt(m, TOPIC_NUM_PRACTICE_PROBS_SEEN, 0);
@@ -198,6 +207,9 @@ public class TopicState extends State {
         clearProblemSelectionCriterion();
         setLastIntervention(null);
         setLastAnswer(null);
+        setLastPreviewDiff("0.613~SAME");
+        setMinPreviewDiff("0.613");
+        setMaxPreviewDiff("0.65");
         setLastProblemMode(null);
         setInBtwProbIntervention(false);
         setTopicNumProbsSeen(0);
@@ -393,6 +405,35 @@ public class TopicState extends State {
         setProp(this.objid,LAST_ANSWER,this.lastAnswer);
     }
 
+    public void setLastPreviewDiff(String lastPreviewDiff) throws SQLException {
+        this.lastPreviewDiff = lastPreviewDiff;
+        setProp(this.objid,LAST_PREVIEW_DIFF,this.lastPreviewDiff);
+    }
+
+    public String getLastPreviewDiff() {
+        return this.lastPreviewDiff;
+    }
+
+
+    public void setMinPreviewDiff(String minPreviewDiff) throws SQLException {
+        this.minPreviewDiff = minPreviewDiff;
+        setProp(this.objid,MIN_PREVIEW_DIFF,this.minPreviewDiff);
+    }
+
+    public String getMinPreviewDiff() {
+        return this.minPreviewDiff;
+    }
+
+
+    public void setMaxPreviewDiff(String maxPreviewDiff) throws SQLException {
+        this.maxPreviewDiff = maxPreviewDiff;
+        setProp(this.objid,MAX_PREVIEW_DIFF,this.maxPreviewDiff);
+    }
+
+    public String getMaxPreviewDiff() {
+        return this.maxPreviewDiff;
+    }
+
     public String getLastProblemMode() {
         return lastProblemMode;
     }
@@ -559,7 +600,7 @@ public class TopicState extends State {
     public String getNextProblemMode() {
         return nextProblemMode;
     }
-
+    
     public void setNextProblemMode(String nextProblemMode) throws SQLException {
         this.nextProblemMode = nextProblemMode;
         setProp(this.objid,NEXT_PROBLEM_MODE,nextProblemMode);

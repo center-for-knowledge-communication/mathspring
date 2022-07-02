@@ -80,6 +80,7 @@ public class TopicModel extends LessonModel {
 
     private EndOfTopicInfo checkForEOT(long probElapsedTime) throws Exception {
         int curTopic = smgr.getStudentState().getCurTopic();
+        String previewData = smgr.getStudentState().getLastPreviewDiff();
         // If in interleaved Topic, need to see if the list of problems is all shown.
         if (curTopic == Settings.interleavedTopicID) {
             boolean b =BaseProblemSelector.hasInterleavedProblem(smgr.getConnection(),smgr.getStudentId());
