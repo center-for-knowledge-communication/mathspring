@@ -42,7 +42,7 @@ public class GazeWanderingResponse extends Response {
         
         Object valueObj = null;
     	// Get student gaze params
-        String gazeParams = DbGaze.getStudentParams(connection, studentId, classId);
+        String gazeParams = DbGaze.getStudentParams(connection, studentId, classId,1);
     	JSONObject gazeParamsJsonObject = (JSONObject)JSONSerializer.toJSON(gazeParams);    	
 
 		JSONObject gazintervJsonObject = new JSONObject();    	

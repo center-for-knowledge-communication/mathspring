@@ -190,7 +190,7 @@ window.selectdiff = {
         this.effort_model = await ort.InferenceSession.create("https://gritjsmodels.s3.us-east-2.amazonaws.com/effort_model.onnx");
         console.log("effort model loaded");
         console.log(new Date());
-        this.head_model = await tf.loadGraphModel("http://storage.googleapis.com/jsmodel/fsa/model1/model.json");
+        this.head_model = await tf.loadGraphModel("https://storage.googleapis.com/jsmodel/fsa/model1/model.json");
         console.log("head pose model loaded");
         console.log(new Date());
         this.au_model = await ort.InferenceSession.create("https://gritjsmodels.s3.us-east-2.amazonaws.com/au_model_uint8.onnx");

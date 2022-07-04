@@ -695,7 +695,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
          String gazeParamsSp1[] = gazeParams.split("gazinterv_monitor_on\":");
          String gazeParamsSp2[] = gazeParamsSp1[1].split(",");
          
-         String gaze_monitor_on = gazeParamsSp2[0];
+         String gaze_monitor_on = gazeParamsSp2[0].substring(0,1);
          
 
          if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2")) {

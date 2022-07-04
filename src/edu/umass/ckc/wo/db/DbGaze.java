@@ -23,7 +23,7 @@ import java.util.Iterator;
 public class DbGaze {
 
 
-	public static String getStudentParams(Connection conn, int studId, int classId) throws SQLException {
+	public static String getStudentParams(Connection conn, int studId, int classId, int gazeDetectionOn) throws SQLException {
 		String result = "";
 		String studentParams="";
 		String query = "select gaze_params_json from student where id = ?";
@@ -43,6 +43,12 @@ public class DbGaze {
                 rs.close();
         }
 
+        // No overrides for value of 2 - prediction version
+        if (gazeDetectionOn == 2) {
+        	return studentParams;
+        }        	
+        	
+        
         String classParams = getClassParams(conn, classId);
 
     	if ((studentParams == null) || (studentParams.length() == 0)) {
@@ -485,10 +491,10 @@ public class DbGaze {
             ResultSet rs = null;
             try {
             	    ps_evt = conn.prepareStatement(query_evt);
-                    ps_evt.setInt(1, eventLogId);
+                    ps_evt.setInt(1, sessionId);
         		    rs_evt = ps_evt.executeQuery();
         		    if (rs_evt.next()) { 
-        		    	eventLogId =  rs.getInt(1);
+        		    	eventLogId =  rs_evt.getInt(1);
         		    }
         		rs_evt.close();
                 ps_evt.close();
