@@ -148,7 +148,7 @@ window.selectdiff = {
         let next_diff = cur_diff;
         console.log(left, right);
         
-        let prob = 0;
+        let prob = -1;
         
         while (left < right - (0.1*(max_diff-min_diff))) {
             console.log(left + "|" + right);

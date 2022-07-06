@@ -428,34 +428,6 @@ public class BaseProblemSelector implements ProblemSelector {
 	        else {
 	           	curTopicHasHarderProblem = true;
 	        }
-/*            
-            else {
-            	curTopicHasHarderProblem = true;
-	        	if (curTopicHasEasierProblem) {
-	        		idx = -1;
-	    	        for (int i=probDiffs.size()-1;i>=0; i--) {
-	    	        	String tmp = (String) probDiffs.get(i);
-	    	        	String t2[] = tmp.split("~");
-	    	        	
-	    	        	Double probDiff = Double.valueOf(t2[1]);
-	    	        	if (probDiff < previewDiff) {
-	    	        		idx = i;
-	    	        		preview_nextIx = i;
-	    	            	probDiffEventJsonObject.put("previewSelectedDiffcultyValue", t2[1]);
-	    	        		break;
-	    	        	}
-	    	        }
-		            if (idx == topicProbIds.size() - 1) {
-		            	preview_nextIx = idx - 1;
-		                curTopicHasEasierProblem = false;
-			        	topicInternalState = TopicState.END_OF_TOPIC;
-		            }
-		            else {
-		            	curTopicHasEasierProblem = true;
-		            }
-	        	}
-            }
-*/        		        
             if ((curTopicHasEasierProblem == false) && (curTopicHasHarderProblem == false)) {
             	preview_nextIx = -1;
             }
@@ -463,9 +435,11 @@ public class BaseProblemSelector implements ProblemSelector {
         
         int binaryNextProbId  = topicProbIds.get( nextIx);;
         int previewNextProbId = -1;
-
-        
-        if (studentTestGroup.equals("201")) {
+        if (preview_nextIx >= 0) {
+            previewNextProbId = topicProbIds.get( preview_nextIx);
+        }
+        	
+        if (studentTestGroup.equals("200")) {        	
   	      state.setCurTopicHasEasierProblem(nextIx > 0);
   	      if (nextIx < topicProbIds.size() - 1)
   	          state.setCurTopicHasHarderProblem(true);
@@ -473,10 +447,10 @@ public class BaseProblemSelector implements ProblemSelector {
   	      binaryNextProbId = topicProbIds.get( nextIx);
   	      state.setCurProblemIndexInTopic( nextIx);
   	      selectedproblem = ProblemMgr.getProblem(binaryNextProbId);
+	        
         }
         else {
             if (preview_nextIx >= 0) {
-    	        previewNextProbId = topicProbIds.get( preview_nextIx);
     	        state.setCurProblemIndexInTopic( preview_nextIx);
     	        selectedproblem = ProblemMgr.getProblem(previewNextProbId);
     	        state.setCurTopicHasEasierProblem(curTopicHasEasierProblem);
@@ -484,6 +458,17 @@ public class BaseProblemSelector implements ProblemSelector {
     	        if (topicInternalState.length() > 0) {
     	        	state.setTopicInternalState(topicInternalState);
     	        }
+    	        for (int probId:topicProbIds) {
+    	            Problem p = ProblemMgr.getProblem(probId);            
+    	            probDiffs.add(String.valueOf(probId) + "~" + String.valueOf(p.getDifficulty()));
+    	            if (p.getDifficulty() < minDiff) {
+    	            	minDiff = p.getDifficulty();
+    	            }
+    	            if (p.getDifficulty() > maxDiff) {
+    	            	maxDiff = p.getDifficulty();
+    	            }
+    	        }
+    	        
             }
             else {
             	previewNextProbId = -1;
@@ -495,6 +480,16 @@ public class BaseProblemSelector implements ProblemSelector {
         }
 	    probDiffEventJsonObject.put("binarySelectedProblemId", String.valueOf(binaryNextProbId));
 	  	probDiffEventJsonObject.put("previewSelectedProblemId", String.valueOf(previewNextProbId));
+
+    	for (int i=0;i<probDiffs.size(); i++) {    		
+        	String tmp = (String) probDiffs.get(i);
+        	String t2[] = tmp.split("~");
+        	if (String.valueOf(binaryNextProbId).equals(t2[0]))  {
+        		Double probDiff = Double.valueOf(t2[1]);
+        		probDiffEventJsonObject.put("binarySelectedDiffcultyValue", t2[1]);
+        		break;
+        	}
+    	}
         probDiffEventJsonObject.put("expCondition", studentTestGroup);
         int gazeEventId = DbGaze.insertGazePredictionEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(),   probDiffEventJsonObject);   
         DbGaze.updateGazePredictionEvent(smgr.getConnection(), smgr.getSessionId(), gazeEventId);
