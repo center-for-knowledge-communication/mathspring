@@ -1124,7 +1124,7 @@ function registerAllEvents(){
                 <a id="class_message_handler"><i class="fa fa-fw fa-sticky-note-o"></i><%= rb.getString("messages_for_classes") %></a>
             </li>
             <li>
-                <a id="survey_problems_site" href="http://rose.cs.umass.edu/msadmin?${teacherId}"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_surveys_and_math_problems") %></a>
+                <a id="survey_problems_site" href="https://admin.mathspring.org/login"><i class="fa fa-fw fa-pencil"></i> <%= rb.getString("create_surveys_and_math_problems") %></a>
             </li>
             <li>
                 <a href="#" id="teacher_activities_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("view_teacher_activities") %></a>
