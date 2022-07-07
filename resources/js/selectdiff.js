@@ -169,12 +169,12 @@ window.selectdiff = {
                 right = next_diff;
             } else { // positive
                 // console.log(next_diff);
-                document.getElementById("previewProbOutData").innerHTML = "" + next_diff + "~" + strChange + "~" + prob;
+                document.getElementById("previewProbOutData").innerHTML = "" + next_diff + "~" + strChange + "~" + prob + "~" + params[1];
                 return;
             }
         }
         console.log(next_diff);
-        document.getElementById("previewProbOutData").innerHTML = "" + cur_diff + "~" + strChange + "~" + prob;;
+        document.getElementById("previewProbOutData").innerHTML = "" + cur_diff + "~" + strChange + "~" + prob + "~" + params[1];
         return;
     },
 
