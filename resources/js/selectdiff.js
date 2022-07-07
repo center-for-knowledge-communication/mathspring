@@ -161,20 +161,20 @@ window.selectdiff = {
             });
             // console.log(next_diff);
             // effort = [1, 0];
-            //console.log(effort['output']);
+            console.log("Raw output=" + effort['output']);
             prob = tf.softmax(effort['output'].data).dataSync()[1];
             console.log("Prob=" + prob);
             
             if (effort['output'].data[0] > effort['output'].data[1]) { // negative
                 right = next_diff;
             } else { // positive
-                // console.log(next_diff);
+                console.log("Positive:" + next_diff);
                 document.getElementById("previewProbOutData").innerHTML = "" + next_diff + "~" + strChange + "~" + prob + "~" + params[1];
                 return;
             }
         }
-        console.log(next_diff);
-        document.getElementById("previewProbOutData").innerHTML = "" + cur_diff + "~" + strChange + "~" + prob + "~" + params[1];
+        console.log("Search done:" + next_diff);
+        document.getElementById("previewProbOutData").innerHTML = "" + next_diff + "~" + strChange + "~" + prob + "~" + params[1];
         return;
     },
 
