@@ -685,7 +685,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 
 
     	 Problem curProb = null;
-    	 String defaultPreviewData = "0.613~SAME~0";
+    	 String defaultPreviewData = "0.715~SAME~0~0";
     	 String lastPreviewData = "";
 
          StudentState state = smgr.getStudentState();
