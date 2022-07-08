@@ -330,12 +330,16 @@ public class BaseProblemSelector implements ProblemSelector {
 
         // data for logging
 
-    	probDiffEventJsonObject.put("previewDiffcultyValue", previewData[0]);
+    	probDiffEventJsonObject.put("previousDiffcultyValue", previewData[0]);
     	probDiffEventJsonObject.put("previewDirection", previewData[1]);
     	probDiffEventJsonObject.put("previewPerformance", previewData[2]);
-    	//probDiffEventJsonObject.put("previewPerformance", ".27");
+    	probDiffEventJsonObject.put("previousMastery", previewData[3]);
 
+    	probDiffEventJsonObject.put("minDifficulty", String.valueOf(minDiff));
+    	probDiffEventJsonObject.put("maxDifficulty", String.valueOf(maxDiff));
+    	probDiffEventJsonObject.put("availableProblems", String.valueOf(probDiffs.size()));
 
+    	
         Double previewDiff = Double.valueOf(previewData[0]);
 
         TopicModel.difficulty previewNextDiff = LessonModel.difficulty.SAME;
