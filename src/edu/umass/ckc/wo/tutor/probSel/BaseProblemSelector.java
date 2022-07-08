@@ -315,7 +315,7 @@ public class BaseProblemSelector implements ProblemSelector {
       nextIx = Math.min(nextIx, topicProbIds.size()-1);
        
       probDiffEventJsonObject.put("binaryDirection",nextDiff);
-      //probDiffEventJsonObject.put("binarySelectedDiffcultyValue", previewData[0]);
+      //probDiffEventJsonObject.put("binarySelectedDifficultyValue", previewData[0]);
       
 
       // Start of problempreview section
@@ -330,7 +330,7 @@ public class BaseProblemSelector implements ProblemSelector {
 
         // data for logging
 
-    	probDiffEventJsonObject.put("previousDiffcultyValue", previewData[0]);
+    	probDiffEventJsonObject.put("previousDifficultyValue", previewData[0]);
     	probDiffEventJsonObject.put("previewDirection", previewData[1]);
     	probDiffEventJsonObject.put("previewPerformance", previewData[2]);
     	probDiffEventJsonObject.put("previousMastery", previewData[3]);
@@ -363,7 +363,7 @@ public class BaseProblemSelector implements ProblemSelector {
 	        		idx = i;
 	        		preview_nextIx = i;
 	        		testMinDiff = probDiff;
-	            	probDiffEventJsonObject.put("previewSelectedDiffcultyValue", t2[1]);
+	            	probDiffEventJsonObject.put("previewSelectedDifficultyValue", t2[1]);
 //		        	CurTopicHasEasierProblem = true;
 	        		break;
 	        	}
@@ -388,7 +388,7 @@ public class BaseProblemSelector implements ProblemSelector {
 	        	if (probDiff > previewDiff ) {
 	        		preview_nextIx = i;
 	        		testMaxDiff = probDiff;
-	            	probDiffEventJsonObject.put("previewSelectedDiffcultyValue", t2[1]);
+	            	probDiffEventJsonObject.put("previewSelectedDifficultyValue", t2[1]);
 //		            curTopicHasHarderProblem = true;	        	
 	        		break;
 	        	}
@@ -417,7 +417,7 @@ public class BaseProblemSelector implements ProblemSelector {
 	        	if (probDiff > previewDiff ) {
 	        		preview_nextIx = i;
 	        		testMaxDiff = probDiff;
-	            	probDiffEventJsonObject.put("previewSelectedDiffcultyValue", t2[1]);
+	            	probDiffEventJsonObject.put("previewSelectedDifficultyValue", t2[1]);
 //		            curTopicHasHarderProblem = true;	        	
 	        		break;
 	        	}
@@ -490,7 +490,7 @@ public class BaseProblemSelector implements ProblemSelector {
         	String t2[] = tmp.split("~");
         	if (String.valueOf(binaryNextProbId).equals(t2[0]))  {
         		Double probDiff = Double.valueOf(t2[1]);
-        		probDiffEventJsonObject.put("binarySelectedDiffcultyValue", t2[1]);
+        		probDiffEventJsonObject.put("binarySelectedDifficultyValue", t2[1]);
         		break;
         	}
     	}
