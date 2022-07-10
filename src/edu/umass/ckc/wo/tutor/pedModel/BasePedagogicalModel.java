@@ -692,13 +692,15 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 
          
          String gazeParams = smgr.getGazeParamsJSON();
-         String gazeParamsSp1[] = gazeParams.split("gazinterv_monitor_on\":");
-         String gazeParamsSp2[] = gazeParamsSp1[1].split(",");
+         String gazeParamsMon1[] = gazeParams.split("gazinterv_monitor_on\":");
+         String gazeParamsMon2[] = gazeParamsMon1[1].split(",");         
+         String gaze_monitor_on  = gazeParamsMon2[0].substring(0,1);
          
-         String gaze_monitor_on = gazeParamsSp2[0].substring(0,1);
-         
+         String gazeParamsCon1[] = gazeParams.split("expCondition\":");
+         String gazeParamsCon2[] = gazeParamsCon1[1].split(",");        
+         String expCondition     = gazeParamsCon2[0];
 
-         if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2")) {
+         if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2") && expCondition.equals("201")) {
         		  
 	    	 if (e == null) {
 	    		 System.out.println("NextProblemEvent is null");
@@ -768,10 +770,18 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
          PreviewProblemResponse r=null;
 
          
-    	 String defaultPreviewData = "0.613~0.1~SAME~0.401~0.799";
-    	 String previewProblemResult = "";    	 
+    	 String defaultPreviewData = "0.613~0.1~SAME~0.601~0.85";
+    	 String previewProblemResult = ""; 
+    	 String mastery = "";
          
-         String previewParams = DbProblem.getProblemPreviewData(smgr.getConnection(),smgr.getStudentId());
+    	 String oldPreviewParams = DbProblem.getProblemPreviewData(smgr.getConnection(),smgr.getStudentId());
+    	 String ppo[] = oldPreviewParams.split("~");
+    	 
+    	 if (ppo[0].equals(String.valueOf(smgr.getStudentId()))) {
+    		 mastery = ppo[2];
+    	 }
+    	 String previewParams = DbGaze.getLastPreviewTopicId(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId());
+         
 
     	 if ((previewParams == null) || (previewParams.length() == 0)) {
     		 previewProblemResult = defaultPreviewData;
@@ -779,29 +789,38 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 else {
              TopicModel.difficulty nextDiff = getLastProblemDifficulty(smgr, e, lastProblemScore);
              String ppa[] = previewParams.split("~");
-             previewProblemResult =  ppa[3] + "~" + ppa[2] + "~" + nextDiff;
+             previewProblemResult =  "";
+             
 	         try {
-	        	 state.getTopicState().getMinPreviewDiff();
-	      	     previewProblemResult =  previewProblemResult + "~" + state.getTopicState().getMinPreviewDiff();
+	             int topicId = Integer.valueOf(ppo[1]);
+	             if (topicId == state.getCurTopic()) {
+	            	 if (mastery.length() > 0) {            		 
+	            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
+	            	 }
+	            	 else {
+	            		 previewProblemResult =  ppa[1] + "~" + ppa[2] + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
+	            	 }
+	             }
+	             else {
+	            	 previewProblemResult = defaultPreviewData;
+	            	 //previewProblemResult = String.valueOf(state.getCurTopic()) + "~" + "0.1" + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
+	            	 
+	            	 // Set defaults for new target
+	            	 //previewProblemResult =  defaultPreviewData;
+	             }
 	         }
-	        	 catch (Exception er1) {
-	        		 System.out.println(er1.getMessage());
+	         catch (Exception er1) {
+	        	 System.out.println(er1.getMessage());
 	       	 }
-	         
-	         try {
-	        	 state.getTopicState().getMaxPreviewDiff();
-	      	     previewProblemResult =  previewProblemResult +  "~" + state.getTopicState().getMaxPreviewDiff();
-	         }
-	        	 catch (Exception er2) {
-	        		 System.out.println(er2.getMessage());        		 
-	       	 }
+
     	 }
     	 
          if (previewProblemResult.length() > 0) { 
        		r = new PreviewProblemResponse(previewProblemResult);
          }
          else {
-       		r = new PreviewProblemResponse("No results");
+        	 previewProblemResult = defaultPreviewData;
+       		r = new PreviewProblemResponse(previewProblemResult);
          }
          return r;
      }

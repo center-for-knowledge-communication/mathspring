@@ -521,5 +521,34 @@ public class DbGaze {
         }
     }
 
-}
 
+
+    public static String getLastPreviewTopicId (Connection conn, int studentId, int sessionId) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String result ="";
+
+		
+		try {
+		    String q = "SELECT  curTopic, previousDifficultyValue, previousMastery from gazepredictionevents as gaz where gaz.studentId = ? and gaz.sessionId = ? order by id desc limit 1";
+		    ps = conn.prepareStatement(q);
+		    ps.setInt(1,studentId);
+		    ps.setInt(2,sessionId);
+		    
+		    rs = ps.executeQuery();
+		    if (rs.next()) {
+		        int topicId = rs.getInt(1);
+		        double diff = rs.getDouble(2);
+		        double mastery = rs.getDouble(3);
+		        result = String.valueOf(topicId) + "~" + String.valueOf(diff) + "~" + String.valueOf(mastery);
+		        System.out.println("previewProblemData = " + result);
+		    }
+		    return result;
+		} finally {
+	        if (rs != null)
+	            rs.close();
+	        if (ps != null)
+	            ps.close();
+		}
+	}
+}

@@ -223,7 +223,7 @@ public class BaseProblemSelector implements ProblemSelector {
         String gazeParamsSp1[] = gazeParams.split("expCondition\":");
         String gazeParamsSp2[] = gazeParamsSp1[1].split(",");
         
-        String studentTestGroup = gazeParamsSp2[0];
+        String expCondition = gazeParamsSp2[0];
         
     	JSONObject probDiffEventJsonObject = new JSONObject();
     	
@@ -254,6 +254,9 @@ public class BaseProblemSelector implements ProblemSelector {
         
         Double minDiff = 9.99;
         Double maxDiff = 0.0;
+
+
+        
         ArrayList<String> probDiffs = new ArrayList<String>();        
         for (int probId:topicProbIds) {
             Problem p = ProblemMgr.getProblem(probId);            
@@ -265,6 +268,8 @@ public class BaseProblemSelector implements ProblemSelector {
             	maxDiff = p.getDifficulty();
             }
         }
+
+        
         state.getTopicState().setMinPreviewDiff(String.valueOf(minDiff));
         state.getTopicState().setMaxPreviewDiff(String.valueOf(maxDiff));
         
@@ -274,49 +279,6 @@ public class BaseProblemSelector implements ProblemSelector {
         // lastIx is -1 when the topic is new.
         if (lastIx == -1)
             nextIx = (int) Math.round((topicProbIds.size()-1) / parameters.getDifficultyRate());
-
-
-        
-      // Start of binary section
-
-      // Error in setting of difficulty Rate is possible if configuration of the strategy was not done well.
-      // Must correct it to a default because will lead to malfunction; set to the default difficulty rate
-      if (parameters.getDifficultyRate() == 0.0)
-          parameters.setDifficultyRate(PedagogicalModelParameters.DIFFICULTY_RATE);
-      // lastIx is -1 when the topic is new.
-      if (lastIx == -1)
-          nextIx = (int) Math.round((topicProbIds.size()-1) / parameters.getDifficultyRate());
-
-      if (nextIx == -1 && nextDiff == LessonModel.difficulty.EASIER) {
-          if (lastIx <= 0) {
-          	System.out.println("lastIx=" + String.valueOf(lastIx));
-          	System.out.println("topicProbIds.size=" + String.valueOf(topicProbIds.size()));
-              throw new DeveloperException("Last problem index=0 and want easier problem.   Content failure NOT PREDICTED by TopicSelector");
-          }
-          else {
-              nextIx =(int) Math.round(lastIx / parameters.getDifficultyRate());
-          }
-      }
-      else if (nextIx == -1 && nextDiff == LessonModel.difficulty.HARDER) {
-          if (lastIx >= topicProbIds.size()) {
-          	System.out.println("lastIx=" + String.valueOf(lastIx));
-          	System.out.println("topicProbIds.size=" + String.valueOf(topicProbIds.size()));
-          	System.out.println("Last problem >= number of problems in topic.   Content failure NOT PREDICTED by TopicSelector");
-//              throw new DeveloperException("Last problem >= number of problems in topic.   Content failure NOT PREDICTED by TopicSelector");
-              nextIx = lastIx;
-              
-          }
-          nextIx = lastIx + ((int) Math.round((topicProbIds.size()-1 - lastIx) / parameters.getDifficultyRate()));
-
-      }
-      else if (nextIx == -1 && nextDiff == LessonModel.difficulty.SAME) {
-          nextIx = Math.min(lastIx, topicProbIds.size()-1);
-      }
-      nextIx = Math.min(nextIx, topicProbIds.size()-1);
-       
-      probDiffEventJsonObject.put("binaryDirection",nextDiff);
-      //probDiffEventJsonObject.put("binarySelectedDifficultyValue", previewData[0]);
-      
 
       // Start of problempreview section
       
@@ -338,6 +300,7 @@ public class BaseProblemSelector implements ProblemSelector {
     	probDiffEventJsonObject.put("minDifficulty", String.valueOf(minDiff));
     	probDiffEventJsonObject.put("maxDifficulty", String.valueOf(maxDiff));
     	probDiffEventJsonObject.put("availableProblems", String.valueOf(probDiffs.size()));
+    	probDiffEventJsonObject.put("curTopic", String.valueOf(state.getCurTopic()));
 
     	
         Double previewDiff = Double.valueOf(previewData[0]);
@@ -437,64 +400,42 @@ public class BaseProblemSelector implements ProblemSelector {
             }
         }
         
-        int binaryNextProbId  = topicProbIds.get( nextIx);;
         int previewNextProbId = -1;
         if (preview_nextIx >= 0) {
             previewNextProbId = topicProbIds.get( preview_nextIx);
         }
-        	
-        if (studentTestGroup.equals("200")) {        	
-  	      state.setCurTopicHasEasierProblem(nextIx > 0);
-  	      if (nextIx < topicProbIds.size() - 1)
-  	          state.setCurTopicHasHarderProblem(true);
-  	      else state.setCurTopicHasHarderProblem(false);
-  	      binaryNextProbId = topicProbIds.get( nextIx);
-  	      state.setCurProblemIndexInTopic( nextIx);
-  	      selectedproblem = ProblemMgr.getProblem(binaryNextProbId);
+        
+        if (preview_nextIx >= 0) {
+	        state.setCurProblemIndexInTopic( preview_nextIx);
+	        selectedproblem = ProblemMgr.getProblem(previewNextProbId);
+	        state.setCurTopicHasEasierProblem(curTopicHasEasierProblem);
+	        state.setCurTopicHasHarderProblem(curTopicHasHarderProblem);
+	        if (topicInternalState.length() > 0) {
+	        	state.setTopicInternalState(topicInternalState);
+	        }
+	        for (int probId:topicProbIds) {
+	            Problem p = ProblemMgr.getProblem(probId);            
+	            probDiffs.add(String.valueOf(probId) + "~" + String.valueOf(p.getDifficulty()));
+	            if (p.getDifficulty() < minDiff) {
+	            	minDiff = p.getDifficulty();
+	            }
+	            if (p.getDifficulty() > maxDiff) {
+	            	maxDiff = p.getDifficulty();
+	            }
+	        }
 	        
         }
         else {
-            if (preview_nextIx >= 0) {
-    	        state.setCurProblemIndexInTopic( preview_nextIx);
-    	        selectedproblem = ProblemMgr.getProblem(previewNextProbId);
-    	        state.setCurTopicHasEasierProblem(curTopicHasEasierProblem);
-    	        state.setCurTopicHasHarderProblem(curTopicHasHarderProblem);
-    	        if (topicInternalState.length() > 0) {
-    	        	state.setTopicInternalState(topicInternalState);
-    	        }
-    	        for (int probId:topicProbIds) {
-    	            Problem p = ProblemMgr.getProblem(probId);            
-    	            probDiffs.add(String.valueOf(probId) + "~" + String.valueOf(p.getDifficulty()));
-    	            if (p.getDifficulty() < minDiff) {
-    	            	minDiff = p.getDifficulty();
-    	            }
-    	            if (p.getDifficulty() > maxDiff) {
-    	            	maxDiff = p.getDifficulty();
-    	            }
-    	        }
-    	        
-            }
-            else {
-            	previewNextProbId = -1;
-            	selectedproblem = null;
-    	        if (topicInternalState.length() > 0) {
-    	        	state.setTopicInternalState(topicInternalState);
-    	        }
-            }
+        	previewNextProbId = -1;
+        	selectedproblem = null;
+	        if (topicInternalState.length() > 0) {
+	        	state.setTopicInternalState(topicInternalState);
+	        }
         }
-	    probDiffEventJsonObject.put("binarySelectedProblemId", String.valueOf(binaryNextProbId));
+      
 	  	probDiffEventJsonObject.put("previewSelectedProblemId", String.valueOf(previewNextProbId));
-
-    	for (int i=0;i<probDiffs.size(); i++) {    		
-        	String tmp = (String) probDiffs.get(i);
-        	String t2[] = tmp.split("~");
-        	if (String.valueOf(binaryNextProbId).equals(t2[0]))  {
-        		Double probDiff = Double.valueOf(t2[1]);
-        		probDiffEventJsonObject.put("binarySelectedDifficultyValue", t2[1]);
-        		break;
-        	}
-    	}
-        probDiffEventJsonObject.put("expCondition", studentTestGroup);
+        
+        probDiffEventJsonObject.put("expCondition", expCondition);
         int gazeEventId = DbGaze.insertGazePredictionEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(),   probDiffEventJsonObject);   
         DbGaze.updateGazePredictionEvent(smgr.getConnection(), smgr.getSessionId(), gazeEventId);
         return selectedproblem;
