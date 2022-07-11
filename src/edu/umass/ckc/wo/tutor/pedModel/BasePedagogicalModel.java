@@ -683,9 +683,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
      */
      public ProblemResponse getNextProblem(NextProblemEvent e) throws Exception {
 
-
+    	 
     	 Problem curProb = null;
-    	 String defaultPreviewData = "0.715~SAME~0~0";
+//    	 String defaultPreviewData = "0.715~SAME~0~0";
+    	 String defaultPreviewData = "0.715~0.1~SAME~0.601~0.85";
     	 String lastPreviewData = "";
 
          StudentState state = smgr.getStudentState();
@@ -770,7 +771,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
          PreviewProblemResponse r=null;
 
          
-    	 String defaultPreviewData = "0.613~0.1~SAME~0.601~0.85";
+    	 String defaultPreviewData = "0.715~0.1~SAME~0.601~0.85";
     	 String previewProblemResult = ""; 
     	 String mastery = "";
          
@@ -795,8 +796,13 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	             int topicId = Integer.valueOf(ppo[1]);
 	             if (topicId == state.getCurTopic()) {
 	            	 if (mastery.length() > 0) {            		 
-	            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
-	            	 }
+		            	 if (ppo[4].equals("Y")) {
+		            		 previewProblemResult =  ppo[3] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();
+		            	 }
+		            	 else {
+		            		 previewProblemResult =  ppo[3] + "~" + mastery + "~" + "EASIER" + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
+		            	 }
+		             }
 	            	 else {
 	            		 previewProblemResult =  ppa[1] + "~" + ppa[2] + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
 	            	 }

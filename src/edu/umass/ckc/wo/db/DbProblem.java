@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 
@@ -261,8 +262,12 @@ public class DbProblem extends BaseMgr {
         String mastery = "";
         String diff_level = "";
         String result = "";
+        int isSolved = 0;
+        String problemEnded = "Y";
+        
+       
         try {
-            String q = "SELECT  sph.problemId as problemId, sph.topicID as topicId, studid as studId, mastery as mastery, opd.diff_level as diff_level, sph.problemBeginTime as latest FROM studentproblemhistory as sph, overallprobdifficulty as opd where studid = ? and opd.problemId = sph.problemId and mastery > 0 order by latest desc limit 2";
+            String q = "SELECT  sph.problemId as problemId, sph.topicID as topicId, studid as studId, sph.isSolved as isSolved, mastery as mastery, opd.diff_level as diff_level, sph.problemBeginTime as latest FROM studentproblemhistory as sph, overallprobdifficulty as opd where studid = ? and opd.problemId = sph.problemId and mastery > 0 order by latest desc limit 1";
             ps = conn.prepareStatement(q);
             ps.setInt(1,studId);
             
@@ -276,8 +281,14 @@ public class DbProblem extends BaseMgr {
                 mastery = Float.toString(mast);
                 diff = rs.getFloat("diff_level");
                 diff_level = Float.toString(diff);
-                
-                result = studentId + "~" + topicId  + "~" + mastery + "~" + diff_level;
+                isSolved = rs.getInt("isSolved");
+                if (isSolved == 1) {
+                	problemEnded = "Y";
+                }
+                else {
+                	problemEnded = "N";                	
+                }
+                result = studentId + "~" + topicId  + "~" + mastery + "~" + diff_level + "~" + problemEnded;
                 System.out.println("previewProblemData = " + result);
             }
             return result;
