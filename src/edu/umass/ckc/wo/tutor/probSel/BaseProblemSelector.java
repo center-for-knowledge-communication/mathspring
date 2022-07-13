@@ -437,7 +437,12 @@ public class BaseProblemSelector implements ProblemSelector {
         
         probDiffEventJsonObject.put("expCondition", expCondition);
         int gazeEventId = DbGaze.insertGazePredictionEvent(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId(),   probDiffEventJsonObject);   
-        DbGaze.updateGazePredictionEvent(smgr.getConnection(), smgr.getSessionId(), gazeEventId);
+        if (gazeEventId > 0) {
+        	DbGaze.updateGazePredictionEvent(smgr.getConnection(), smgr.getSessionId(), gazeEventId);
+        }
+        else {
+        	System.out.println("insertGazePredictionEvent - failed");
+        }
         return selectedproblem;
     }
 

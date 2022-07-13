@@ -350,7 +350,7 @@ public class DbGaze {
 	        
             String query =  query_p1 + query_p2 + query_p3;
             ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-
+ //           String key = "";
             Iterator<?> valueIterator = gazeEventJsonObject.keys();
             while (valueIterator.hasNext()) {        	        
                 String key = (String)valueIterator.next();
@@ -369,8 +369,16 @@ public class DbGaze {
 	                    ps.setInt(count++, ti);                	
                 		break;
                 	case "double":
-                		double td = Double.parseDouble((String)valueObj);
-	                    ps.setDouble(count++, td);                	
+                		String test = (String)valueObj;
+                		if (test.equals("SAME")) {
+                    		System.out.println("invalid data " + key + ":" + test);
+                			double td = 0.0;                			
+                			ps.setDouble(count++, td);
+                		}
+                		else {
+                			double td = Double.parseDouble((String)valueObj);
+                			ps.setDouble(count++, td);
+                		}
                 		break;
                 	default:
 	                    ps.setString(count++, (String) valueObj);                	
@@ -383,7 +391,11 @@ public class DbGaze {
             rs.next();
             newId = rs.getInt(1);
             ps.close();
-        } finally {
+        }
+        catch (Exception e) {        	
+            System.out.println(e.getMessage());        
+        }
+        finally {
             if (ps != null)
                 ps.close();
         }
