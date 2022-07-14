@@ -685,8 +685,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 
     	 
     	 Problem curProb = null;
-//    	 String defaultPreviewData = "0.715~SAME~0~0";
-    	 String defaultPreviewData = "0.715~0.1~SAME~0.601~0.85";
+
+    	 String defaultPreviewData = "0.715~SAME~0~0";
     	 String lastPreviewData = "";
 
          StudentState state = smgr.getStudentState();
@@ -771,7 +771,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
          PreviewProblemResponse r=null;
 
          
-    	 String defaultPreviewData = "0.715~0.1~SAME~0.601~0.85";
+    	 String defaultPreviewResponse = "0.715~0.1~SAME~0.601~0.85";
     	 String previewProblemResult = ""; 
     	 String mastery = "";
          
@@ -785,7 +785,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
          
 
     	 if ((previewParams == null) || (previewParams.length() == 0)) {
-    		 previewProblemResult = defaultPreviewData;
+    		 previewProblemResult = defaultPreviewResponse;
     	 }
     	 else {
              TopicModel.difficulty nextDiff = getLastProblemDifficulty(smgr, e, lastProblemScore);
@@ -808,7 +808,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	            	 }
 	             }
 	             else {
-	            	 previewProblemResult = defaultPreviewData;
+	            	 previewProblemResult = defaultPreviewResponse;
 	            	 //previewProblemResult = String.valueOf(state.getCurTopic()) + "~" + "0.1" + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
 	            	 
 	            	 // Set defaults for new target
@@ -825,7 +825,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
        		r = new PreviewProblemResponse(previewProblemResult);
          }
          else {
-        	 previewProblemResult = defaultPreviewData;
+        	 previewProblemResult = defaultPreviewResponse;
        		r = new PreviewProblemResponse(previewProblemResult);
          }
          return r;
