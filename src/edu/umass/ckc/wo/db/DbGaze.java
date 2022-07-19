@@ -527,7 +527,11 @@ public class DbGaze {
             ps.setInt(2, gazeEventId);
             ps.executeUpdate();
             ps.close();
-        } finally {
+        }
+        catch (Exception e) {        	
+            System.out.println(e.getMessage());        
+        }
+        finally {
             if (ps != null)
                 ps.close();
         }

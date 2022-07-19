@@ -69,6 +69,8 @@ async function doPrediction(){
     if (resizedResults.length >= 1) {
         img = selectdiff.getImage(resizedResults[0]);
         await selectdiff.predict(img);
+        img[0].dispose();
+        img[1].dispose();
     }
 
 	this.timer = requestAnimationFrame(this.doPrediction.bind(this));

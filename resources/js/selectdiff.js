@@ -45,10 +45,14 @@ window.selectdiff = {
 
 	        // au
 	        // TODO: more aus
-	        let au_img = tf.image.resizeBilinear(tf.transpose(img[1], [0, 2, 3, 1]), [170, 170]); // TODO: should be CenterCrop(170)
-	        au_img = tf.transpose(au_img, [0, 3, 1, 2]);
+	        const au_img_ori = tf.transpose(img[1], [0, 2, 3, 1])
+	        const au_img_resize = tf.image.resizeBilinear(au_img_ori, [170, 170]); // TODO: should be CenterCrop(170)
+	        const au_img = tf.transpose(au_img_resize, [0, 3, 1, 2]);
 	        const au_input = new ort.Tensor(new Float32Array(au_img.dataSync()), [1, 3, 170, 170]);
 	        const au_feat = await this.au_model.run({'input.1': au_input});
+	        au_img_ori.dispose();
+	        au_img_resize.dispose();
+	        au_img.dispose();
 	        // au: [1, 2, 4, 6, 7, 10, 12, 14, 15, 17, 23, 24] need first 11
 	        let au = Array.from(au_feat['839'].data.map(a => Math.exp(a)));
 	        // console.log(au.slice(12, 23));

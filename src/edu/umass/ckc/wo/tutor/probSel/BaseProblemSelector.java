@@ -219,12 +219,20 @@ public class BaseProblemSelector implements ProblemSelector {
     public Problem selectProblemUsingPreviewDifficulty(SessionManager smgr, ProblemScore lastProblemScore, String problemPreviewData) throws Exception {
         
 
-        String gazeParams = smgr.getGazeParamsJSON();
-        String gazeParamsSp1[] = gazeParams.split("expCondition\":");
-        String gazeParamsSp2[] = gazeParamsSp1[1].split(",");
-        
-        String expCondition = gazeParamsSp2[0];
-        
+        String expCondition = "201";
+
+    	try {
+	        String gazeParams = smgr.getGazeParamsJSON();
+	        String gazeParamsSp1[] = gazeParams.split("expCondition\":");
+	        String gazeParamsSp2[] = gazeParamsSp1[1].split(",");
+	        
+	        expCondition = gazeParamsSp2[0];
+    	}
+    	catch (Exception e) {
+    		
+    		System.out.println("gazeParams not set");
+    	}
+
     	JSONObject probDiffEventJsonObject = new JSONObject();
     	
     	Problem selectedproblem = null;

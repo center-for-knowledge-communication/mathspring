@@ -690,19 +690,27 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 String lastPreviewData = "";
 
          StudentState state = smgr.getStudentState();
-    	 
-         
-         String gazeParams = smgr.getGazeParamsJSON();
-         String gazeParamsMon1[] = gazeParams.split("gazinterv_monitor_on\":");
-         String gazeParamsMon2[] = gazeParamsMon1[1].split(",");         
-         String gaze_monitor_on  = gazeParamsMon2[0].substring(0,1);
-         
-         String gazeParamsCon1[] = gazeParams.split("expCondition\":");
-         String gazeParamsCon2[] = gazeParamsCon1[1].split(",");        
-         String expCondition     = gazeParamsCon2[0];
 
-         if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2") && expCondition.equals("201")) {
-        		  
+         boolean previewActive = false;
+         try {
+	         String gazeParams = smgr.getGazeParamsJSON();
+	         String gazeParamsMon1[] = gazeParams.split("gazinterv_monitor_on\":");
+	         String gazeParamsMon2[] = gazeParamsMon1[1].split(",");         
+	         String gaze_monitor_on  = gazeParamsMon2[0].substring(0,1);
+	         
+	         String gazeParamsCon1[] = gazeParams.split("expCondition\":");
+	         String gazeParamsCon2[] = gazeParamsCon1[1].split(",");        
+	         String expCondition     = gazeParamsCon2[0];
+	
+	         if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2") && expCondition.equals("201")) {
+	        	 previewActive = true;
+	         }
+         }
+         catch (Exception er) {
+        	 System.out.println("Preview not active");
+        	 previewActive = false;
+         }
+         if (previewActive) {		  
 	    	 if (e == null) {
 	    		 System.out.println("NextProblemEvent is null");
 	             lastPreviewData = state.getLastPreviewDiff();
@@ -775,13 +783,30 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 String previewProblemResult = ""; 
     	 String mastery = "";
          
-    	 String oldPreviewParams = DbProblem.getProblemPreviewData(smgr.getConnection(),smgr.getStudentId());
-    	 String ppo[] = oldPreviewParams.split("~");
+    	 String oldPreviewParams = "";
+    	 String previewParams = "";
     	 
+    	 try {
+    		 oldPreviewParams = DbProblem.getProblemPreviewData(smgr.getConnection(),smgr.getStudentId());
+    	 }
+    	 catch (Exception er1) {
+        	 System.out.println(er1.getMessage());    		 
+    	 }
+    	 if (oldPreviewParams.length() == 0) {
+    		 oldPreviewParams = String.valueOf(smgr.getStudentId()) + "~0~0.1~0.715~N";
+    	 }
+    	 String ppo[] = oldPreviewParams.split("~");
+    	
     	 if (ppo[0].equals(String.valueOf(smgr.getStudentId()))) {
     		 mastery = ppo[2];
     	 }
-    	 String previewParams = DbGaze.getLastPreviewTopicId(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId());
+    	 
+    	 try {
+    		 previewParams = DbGaze.getLastPreviewTopicId(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId());
+    	 }
+    	 catch (Exception er2) {
+        	 System.out.println(er2.getMessage());    		 
+    	 }
          
 
     	 if ((previewParams == null) || (previewParams.length() == 0)) {
@@ -800,7 +825,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 		            		 previewProblemResult =  ppo[3] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();
 		            	 }
 		            	 else {
-		            		 previewProblemResult =  ppo[3] + "~" + mastery + "~" + "EASIER" + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
+		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + "EASIER" + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
 		            	 }
 		             }
 	            	 else {
@@ -815,8 +840,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	            	 //previewProblemResult =  defaultPreviewData;
 	             }
 	         }
-	         catch (Exception er1) {
-	        	 System.out.println(er1.getMessage());
+	         catch (Exception er3) {
+	        	 System.out.println(er3.getMessage());
 	       	 }
 
     	 }
