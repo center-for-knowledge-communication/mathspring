@@ -782,7 +782,27 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 String defaultPreviewResponse = "0.715~0.1~SAME~0.601~0.85";
     	 String previewProblemResult = ""; 
     	 String mastery = "";
-         
+   
+    	 int testTopic =state.getCurTopic();
+    	 
+    	 switch (testTopic) {
+    	 case 54:
+    		 defaultPreviewResponse = "0.620~0.1~SAME~0.607990~0.743331";
+    		 break;
+    	 
+	 	 case 82:
+			 defaultPreviewResponse = "0.720~0.1~SAME~0.702403~0.743585";
+			 break;
+		 
+		case 10:
+			 defaultPreviewResponse = "0.620~0.1~SAME~0.610767~0.850000";
+			 break;
+		
+	 	 case 19:
+			 defaultPreviewResponse = "0.720~0.1~SAME~0.711540~0.750000";
+			 break;
+		 }
+    	 
     	 String oldPreviewParams = "";
     	 String previewParams = "";
     	 
@@ -834,10 +854,6 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	             }
 	             else {
 	            	 previewProblemResult = defaultPreviewResponse;
-	            	 //previewProblemResult = String.valueOf(state.getCurTopic()) + "~" + "0.1" + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
-	            	 
-	            	 // Set defaults for new target
-	            	 //previewProblemResult =  defaultPreviewData;
 	             }
 	         }
 	         catch (Exception er3) {
