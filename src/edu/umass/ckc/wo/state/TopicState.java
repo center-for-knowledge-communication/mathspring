@@ -207,9 +207,9 @@ public class TopicState extends State {
         clearProblemSelectionCriterion();
         setLastIntervention(null);
         setLastAnswer(null);
-        setLastPreviewDiff("0.715~SAME~0~0");
-        setMinPreviewDiff("0.6");
-        setMaxPreviewDiff("0.75");
+        setLastPreviewDiff(null);
+        setMinPreviewDiff(null);
+        setMaxPreviewDiff(null);
         setLastProblemMode(null);
         setInBtwProbIntervention(false);
         setTopicNumProbsSeen(0);

@@ -788,18 +788,30 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     	 switch (testTopic) {
     	 case 54:
     		 defaultPreviewResponse = "0.620~0.1~SAME~0.607990~0.743331";
+//    		 state.setLastPreviewDiff("0.620");
+    		 state.setMinPreviewDiff("0.607990");
+    		 state.setMaxPreviewDiff("0.743331");
     		 break;
     	 
 	 	 case 82:
 			 defaultPreviewResponse = "0.720~0.1~SAME~0.702403~0.743585";
+//    		 state.setLastPreviewDiff("0.720");
+    		 state.setMinPreviewDiff("0.702403");
+    		 state.setMaxPreviewDiff("0.743585");
 			 break;
 		 
 		case 10:
 			 defaultPreviewResponse = "0.620~0.1~SAME~0.610767~0.850000";
+//    		 state.setLastPreviewDiff("0.620");
+    		 state.setMinPreviewDiff("0.610767");
+    		 state.setMaxPreviewDiff("0.850000");
 			 break;
 		
 	 	 case 19:
 			 defaultPreviewResponse = "0.720~0.1~SAME~0.711540~0.750000";
+//    		 state.setLastPreviewDiff("0.720");
+    		 state.setMinPreviewDiff("0.711540");
+    		 state.setMaxPreviewDiff("0.750000");
 			 break;
 		 }
     	 
@@ -842,10 +854,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	             if (topicId == state.getCurTopic()) {
 	            	 if (mastery.length() > 0) {            		 
 		            	 if (ppo[4].equals("Y")) {
-		            		 previewProblemResult =  ppo[3] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();
+		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();
 		            	 }
 		            	 else {
-		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + "EASIER" + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
+		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
 		            	 }
 		             }
 	            	 else {
