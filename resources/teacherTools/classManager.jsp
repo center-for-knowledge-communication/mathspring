@@ -1892,6 +1892,12 @@ function handleclickHandlers() {
 
     });
 
+    $("#teacher_feedback_handler").click(function () { 
+        window.open( 
+          "${pageContext.request.contextPath}/teacherTools/feedbackRequest.jsp", "_blank"); 
+    });
+    
+    
     $('#inActiveProbSetTable input[type="checkbox"]').click(function () {
         if ($('#inActiveProbSetTable input[type="checkbox"]:checked').size()) {
             $('#activateProblemSets').prop('disabled', false);
@@ -3084,6 +3090,9 @@ function registerAllEvents(){
              <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
              <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
+            <li>
+                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
+            </li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -3652,6 +3661,7 @@ function registerAllEvents(){
 				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
 				                                            <springForm:option value="2021">2020/2021</springForm:option>
 				                                            <springForm:option value="2022">2021/2022</springForm:option>
+				                                            <springForm:option value="2023">2022/2023</springForm:option>
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
