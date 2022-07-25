@@ -1538,6 +1538,7 @@ function registerAllEvents(){
                                             <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
                                             <springForm:option value="2021">2020/2021</springForm:option>
                                             <springForm:option value="2022">2021/2022</springForm:option>
+                                            <springForm:option value="2023">2022/2023</springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
