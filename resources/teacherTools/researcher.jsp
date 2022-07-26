@@ -2402,6 +2402,131 @@ function showTable4a() {
 
 }
 
+function showTable4b() {
+
+
+	var filter = "";
+
+    const rb4bContent = document.querySelectorAll('input[name="optRadio4bContent"]');
+    for (const rb4bc of rb4bContent) {
+        if (rb4bc.checked) {
+        	filter = rb4bc.value;
+            break;
+        }
+    }
+    	
+    var jsonData_4b = null;
+    var cols_4b = [];
+
+    var tbl_4b = document.getElementById("table4b");
+    tbl_4b.innerHTML = "";
+	$('#table4b-loader').show();
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getReportedProblemErrors',
+            lang: loc,
+            filter: filter 
+        },
+        success : function(data) {
+        	if (data) {
+
+        		var commentIndex = -1;
+        		var sessionIndex = -1;
+        		var eventIndex = -1;
+        		
+        		$('#table4b-loader').hide();
+
+        		//              var resultData = $.parseJSON(data);
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+
+            	jsonData_4b = $.parseJSON(data);	
+               	
+            	var index = 0;
+                 
+                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData_4b[i]) {
+                        if (cols_4b.indexOf(k) === -1) {                       
+                            if (k == 'Comment') {
+                            	commentIndex = index;
+                            }
+                            if (k == 'Session Id') {
+                            	sessionIndex = index;
+                            }
+                            if (k == 'Event Id') {
+                            	eventIndex = index;
+                            }
+                        	index = index + 1;	
+                            // Push all keys to the array
+                            cols_4b.push(k);
+                        }
+                    }
+                }
+                 
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_4b.insertRow(-1);
+                 
+
+                for (var i = 0; i < cols_4b.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols_4b[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_4b.insertRow(-1);
+                    for (var j = 0; j < cols_4b.length; j++) {
+                        var cid = "td4b_" + i + "_" + j;
+                    	var cell = trow.insertCell(-1);
+                       
+                       	cell.innerHTML = jsonData_4b[i][cols_4b[j]];                       	
+
+
+                       	if (j == eventIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + "Update" + "</button>";
+                        	document.getElementById(cid).addEventListener("click", updateProblemStatusForm, false);                       	
+                       	}
+                       	if (j == commentIndex) {
+                        	cell.style.color="red";
+	                       	cell.style.width="500px";
+	                       	cell.style.maxWidth = "500px";
+	                       	cell.style.wordWrap = "break-word";
+	                       	cell.style.textAlign = 'left';
+
+                        }
+                        if (j == sessionIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + jsonData_4b[i][cols_4b[j]] + "</button>";
+                        	cell.style.color="green";
+                        	document.getElementById(cid).addEventListener("click", showSessionProblems, false);
+                        	
+                        }
+                    }
+                }              
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+
+}
+
 
 function showSessionProblems() {
 	
@@ -2602,114 +2727,103 @@ function updateProblemStatusSubmit() {
 }
 
 
-function showTable4b() {
+function showTable4c() {
 
 
-	var filter = "";
+	var filter = "teacherId";
 
-    const rb4bContent = document.querySelectorAll('input[name="optRadio4bContent"]');
-    for (const rb4bc of rb4bContent) {
-        if (rb4bc.checked) {
-        	filter = rb4bc.value;
+    const rb4cContent = document.querySelectorAll('input[name="optRadio4cContent"]');
+    for (const rb4cc of rb4cContent) {
+        if (rb4cc.checked) {
+        	filter = rb4cc.value;
             break;
         }
     }
     	
-    var jsonData_4b = null;
-    var cols_4b = [];
+    var jsonData_4c = null;
+    var cols_4c = [];
 
-    var tbl_4b = document.getElementById("table4b");
-    tbl_4b.innerHTML = "";
-	$('#table4b-loader').show();
+    var tbl_4c = document.getElementById("table4c");
+    tbl_4c.innerHTML = "";
+	$('#table4c-loader').show();
     
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
         data : {
             cohortId: currentCohortId,
-            reportType: 'getReportedProblemErrors',
+            reportType: 'getTeacherFeedback',
             lang: loc,
             filter: filter 
         },
         success : function(data) {
         	if (data) {
 
-        		var commentIndex = -1;
-        		var sessionIndex = -1;
-        		var eventIndex = -1;
         		
-        		$('#table4b-loader').hide();
+        		$('#table4c-loader').hide();
 
         		//              var resultData = $.parseJSON(data);
 //            	var jsonData = resultData[0];
 //            	var footerData = resultData[1];
 
-            	jsonData_4b = $.parseJSON(data);	
+            	jsonData_4c = $.parseJSON(data);	
                	
             	var index = 0;
+            	var commentIndex = 0;
+            	var teacherIndex = 0;
                  
-                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
-                    for (var k in jsonData_4b[i]) {
-                        if (cols_4b.indexOf(k) === -1) {                       
+                for (var i = jsonData_4c.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData_4c[i]) {
+                        if (cols_4c.indexOf(k) === -1) {                       
                             if (k == 'Comment') {
                             	commentIndex = index;
                             }
-                            if (k == 'Session Id') {
-                            	sessionIndex = index;
-                            }
-                            if (k == 'Event Id') {
-                            	eventIndex = index;
+                            if (k == 'TeacherId') {
+                            	teacherIndex = index;
                             }
                         	index = index + 1;	
                             // Push all keys to the array
-                            cols_4b.push(k);
+                            cols_4c.push(k);
                         }
                     }
                 }
                  
                                  
                 // Create table row tr element of a table
-                var tr = tbl_4b.insertRow(-1);
+                var tr = tbl_4c.insertRow(-1);
                  
 
-                for (var i = 0; i < cols_4b.length; i++) {
+                for (var i = 0; i < cols_4c.length; i++) {
                      
                     // Create the table header th element
                     var theader = document.createElement("th");
-                    theader.innerHTML = cols_4b[i];
+                    theader.innerHTML = cols_4c[i];
                      
                     // Append columnName to the table row
                     tr.appendChild(theader);
                 }
                 // Adding the data to the table
-                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
+                for (var i = jsonData_4c.length-1; i >= 0 ; i--) {
                      
                     // Create a new row
-                    trow = tbl_4b.insertRow(-1);
-                    for (var j = 0; j < cols_4b.length; j++) {
-                        var cid = "td4b_" + i + "_" + j;
+                    trow = tbl_4c.insertRow(-1);
+                    for (var j = 0; j < cols_4c.length; j++) {
+                        var cid = "td4c_" + i + "_" + j;
                     	var cell = trow.insertCell(-1);
                        
-                       	cell.innerHTML = jsonData_4b[i][cols_4b[j]];                       	
+                       	cell.innerHTML = jsonData_4c[i][cols_4c[j]];                       	
 
-
-                       	if (j == eventIndex) {
-                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + "Update" + "</button>";
-                        	document.getElementById(cid).addEventListener("click", updateProblemStatusForm, false);                       	
-                       	}
                        	if (j == commentIndex) {
-                        	cell.style.color="red";
+                        	cell.style.color="black";
 	                       	cell.style.width="500px";
 	                       	cell.style.maxWidth = "500px";
 	                       	cell.style.wordWrap = "break-word";
 	                       	cell.style.textAlign = 'left';
 
                         }
-                        if (j == sessionIndex) {
-                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + jsonData_4b[i][cols_4b[j]] + "</button>";
-                        	cell.style.color="green";
-                        	document.getElementById(cid).addEventListener("click", showSessionProblems, false);
-                        	
+                        if (j == teacherIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4c[i][cols_4c[j]] + "'>" + jsonData_4c[i][cols_4c[j]] + "</button>";
+                        	cell.style.color="green";                        	
                         }
                     }
                 }              
@@ -5661,6 +5775,41 @@ function updateAllCohortSlices() {
 					            	<div id="table_4b_panel" class="col-md-12" style="width:1200px; height:800px;overflow-x: auto;overflow-y: auto;">
 					            	   <table align = "center"
 	            							id="table4b" border="1">
+	    							   </table>
+					            	</div> 
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	
+	                   <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4c">
+	                                    Teacher Feedback 
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+                            <div id="table_4c" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+	                            	<div class="row">                           
+										<div class="form-group">
+											<label class="radio-inline"><input id="radioFeedbackDate"  value="teacherId" type="radio" name="optRadio4cContent" checked>Order By Teacher Id</label>
+											<label class="radio-inline"><input id="radioFeedbackPriority" value="priority" type="radio" name="optRadio4cContent">Order By Priority</label>
+											<label class="radio-inline"><input id="radioFeedbackDate" value="date" type="radio" name="optRadio4cContent">Order By Date</label>
+										</div>
+									</div>    
+								</div>                           
+								<div class="panel-body report_filters"> 
+									  <input class="btn btn-lg btn-primary" onclick="showTable4c();" type="submit" value="<%= rwrb.getString("show_table") %>">
+	                            </div>
+	                            <div id="table4c-loader" class="loader" style="display: none"></div>
+	 
+	                            <div class="panel-body">
+					            	<div id="table_4c_panel" class="col-md-12" style="width:1200px; height:800px;overflow-x: auto;overflow-y: auto;">
+					            	   <table align = "center"
+	            							id="table4c" border="1">
 	    							   </table>
 					            	</div> 
 	                            </div>
