@@ -54,6 +54,8 @@
 <!-- Frank 02-11-22     Issue #599 - live dashboard added 2 charts -->
 <!-- Frank 05-11-22     Issue #632 - Manage Topics - add ability to select problems by standard -->
 <!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
+<!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
+
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -3693,9 +3695,6 @@ function registerAllEvents(){
 				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
 				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
 				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
-				                                            <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
-				                                            <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
-				                                            <springForm:option value="adult"><%= rb.getString("adult") %></springForm:option>
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
