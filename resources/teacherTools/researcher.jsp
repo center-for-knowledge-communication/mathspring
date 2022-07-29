@@ -107,6 +107,11 @@ catch (Exception e) {
 
 <style>
 
+.comment-style {
+  width: 800px;
+  word-wrap: break-word;
+}
+
 div.scroll {
     overflow-x: auto;
     overflow-y: hidden;
@@ -2397,6 +2402,444 @@ function showTable4a() {
 
 }
 
+function showTable4b() {
+
+
+	var filter = "";
+
+    const rb4bContent = document.querySelectorAll('input[name="optRadio4bContent"]');
+    for (const rb4bc of rb4bContent) {
+        if (rb4bc.checked) {
+        	filter = rb4bc.value;
+            break;
+        }
+    }
+    	
+    var jsonData_4b = null;
+    var cols_4b = [];
+
+    var tbl_4b = document.getElementById("table4b");
+    tbl_4b.innerHTML = "";
+	$('#table4b-loader').show();
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getReportedProblemErrors',
+            lang: loc,
+            filter: filter 
+        },
+        success : function(data) {
+        	if (data) {
+
+        		var commentIndex = -1;
+        		var sessionIndex = -1;
+        		var eventIndex = -1;
+        		
+        		$('#table4b-loader').hide();
+
+        		//              var resultData = $.parseJSON(data);
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+
+            	jsonData_4b = $.parseJSON(data);	
+               	
+            	var index = 0;
+                 
+                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData_4b[i]) {
+                        if (cols_4b.indexOf(k) === -1) {                       
+                            if (k == 'Comment') {
+                            	commentIndex = index;
+                            }
+                            if (k == 'Session Id') {
+                            	sessionIndex = index;
+                            }
+                            if (k == 'Event Id') {
+                            	eventIndex = index;
+                            }
+                        	index = index + 1;	
+                            // Push all keys to the array
+                            cols_4b.push(k);
+                        }
+                    }
+                }
+                 
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_4b.insertRow(-1);
+                 
+
+                for (var i = 0; i < cols_4b.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols_4b[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData_4b.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_4b.insertRow(-1);
+                    for (var j = 0; j < cols_4b.length; j++) {
+                        var cid = "td4b_" + i + "_" + j;
+                    	var cell = trow.insertCell(-1);
+                       
+                       	cell.innerHTML = jsonData_4b[i][cols_4b[j]];                       	
+
+
+                       	if (j == eventIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + "Update" + "</button>";
+                        	document.getElementById(cid).addEventListener("click", updateProblemStatusForm, false);                       	
+                       	}
+                       	if (j == commentIndex) {
+                        	cell.style.color="red";
+	                       	cell.style.width="500px";
+	                       	cell.style.maxWidth = "500px";
+	                       	cell.style.wordWrap = "break-word";
+	                       	cell.style.textAlign = 'left';
+
+                        }
+                        if (j == sessionIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4b[i][cols_4b[j]] + "'>" + jsonData_4b[i][cols_4b[j]] + "</button>";
+                        	cell.style.color="green";
+                        	document.getElementById(cid).addEventListener("click", showSessionProblems, false);
+                        	
+                        }
+                    }
+                }              
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+
+}
+
+
+function showSessionProblems() {
+	
+	var sessionId = this.value;
+
+    $('#showSessionProblemsModalPopup').modal('hide');
+    
+    var jsonData = null;
+    var cols = [];
+
+    var tbl_4b_session = document.getElementById("table4b_session");
+    tbl_4b_session.innerHTML = "";
+    var tbl_4b_session_hdr = document.getElementById("table4b_session_hdr");
+    tbl_4b_session_hdr.innerHTML = "Session: " + sessionId;
+
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getSessionProblems',
+            lang: loc,
+            filter: sessionId 
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	var index = 0;
+            	var cols = [];
+                 
+            	jsonData = $.parseJSON(data);	
+
+            	for (var i = jsonData.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData[i]) {
+                        if (cols.indexOf(k) === -1) {                       
+                        	index = index + 1;	
+                            // Push all keys to the array
+                            cols.push(k);
+                        }
+                    }
+                }
+                 
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_4b_session.insertRow(-1);
+                 
+                for (var i = 0; i < cols.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_4b_session.insertRow(-1);
+                    for (var j = 0; j < cols.length; j++) {
+                        var cell = trow.insertCell(-1);
+                        // Inserting the cell at particular place
+                       	cell.innerHTML = jsonData[i][cols[j]];
+                    }
+                }              
+                $('#showSessionProblemsModalPopup').modal('show');
+            
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
+function updateProblemStatusForm() {
+	
+	var eventId = this.value;
+
+    $('#updateProblemStatusModalPopup').modal('hide');
+    
+    var jsonData = null;
+    var cols = [];
+
+   
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getProblemHistoryErrorData',
+            lang: loc,
+            filter: eventId 
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	jsonData = $.parseJSON(data);	
+
+            	var problemId  = jsonData.problemId;
+            	var comment  = jsonData.comment;
+            	var probStatus = jsonData.probStatus;
+            	var historyId = jsonData.historyId;
+
+            	document.getElementById("hiddentEventId").value = eventId;
+            	document.getElementById("hiddenHistoryId").value = historyId;
+            	document.getElementById("table4b_update_hdr").innerHTML = "<%= rb.getString("problem_id") %>: " + problemId;     
+            	document.getElementById("message-text").value = comment;     
+            	
+            	if (probStatus == "0") {
+            		document.getElementById("radio4bReported").checked = true;
+            	}            	
+            	if (probStatus == "1") {
+            		document.getElementById("radio4bBroken").checked = true;
+            	}
+            	if (probStatus == "2") {
+            		document.getElementById("radio4bFixed").checked = true;
+            	}
+            	if (probStatus == "3") {
+            		document.getElementById("radio4bIgnore").checked = true;
+            	}
+        	
+        	//document.getElementById("is-broken").value = probStatus;     
+            	
+            	
+                $('#updateProblemStatusModalPopup').modal('show');
+            
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
+function updateProblemStatusSubmit() {
+	
+	
+	
+	var probStatus = '0';
+	
+	if (document.getElementById("radio4bReported").checked == true) {
+		probStatus = '0';		
+	}
+	if (document.getElementById("radio4bBroken").checked == true) {
+		probStatus = '1';		
+	}
+	if (document.getElementById("radio4bFixed").checked == true) {
+		probStatus = '2';		
+	}
+	if (document.getElementById("radio4bIgnore").checked == true) {
+		probStatus = '3';		
+	}
+
+	var params = document.getElementById("hiddentEventId").value + "~" + document.getElementById("hiddenHistoryId").value + "~" + probStatus + "~" + document.getElementById("message-text").value + " UPDATED" ;
+
+	
+	$.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'updateProblemHistoryErrorData',
+            lang: loc,
+            filter: params
+        },
+        success : function(data) {
+        	if (data) {
+               	alert(data);
+                $('#updateProblemStatusModalPopup').modal('hide');
+        	}
+        	else {
+            	alert("error" + data);
+                $('#updateProblemStatusModalPopup').modal('hide');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error" + " - no reponse");
+            console.log(e);
+            $('#updateProblemStatusModalPopup').modal('hide');
+        }
+    });
+
+}
+
+
+function showTable4c() {
+
+
+	var filter = "teacherId";
+
+    const rb4cContent = document.querySelectorAll('input[name="optRadio4cContent"]');
+    for (const rb4cc of rb4cContent) {
+        if (rb4cc.checked) {
+        	filter = rb4cc.value;
+            break;
+        }
+    }
+    	
+    var jsonData_4c = null;
+    var cols_4c = [];
+
+    var tbl_4c = document.getElementById("table4c");
+    tbl_4c.innerHTML = "";
+	$('#table4c-loader').show();
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: currentCohortId,
+            reportType: 'getTeacherFeedback',
+            lang: loc,
+            filter: filter 
+        },
+        success : function(data) {
+        	if (data) {
+
+        		
+        		$('#table4c-loader').hide();
+
+        		//              var resultData = $.parseJSON(data);
+//            	var jsonData = resultData[0];
+//            	var footerData = resultData[1];
+
+            	jsonData_4c = $.parseJSON(data);	
+               	
+            	var index = 0;
+            	var commentIndex = 0;
+            	var teacherIndex = 0;
+                 
+                for (var i = jsonData_4c.length-1; i >= 0 ; i--) {
+                    for (var k in jsonData_4c[i]) {
+                        if (cols_4c.indexOf(k) === -1) {                       
+                            if (k == 'Comment') {
+                            	commentIndex = index;
+                            }
+                            if (k == 'TeacherId') {
+                            	teacherIndex = index;
+                            }
+                        	index = index + 1;	
+                            // Push all keys to the array
+                            cols_4c.push(k);
+                        }
+                    }
+                }
+                 
+                                 
+                // Create table row tr element of a table
+                var tr = tbl_4c.insertRow(-1);
+                 
+
+                for (var i = 0; i < cols_4c.length; i++) {
+                     
+                    // Create the table header th element
+                    var theader = document.createElement("th");
+                    theader.innerHTML = cols_4c[i];
+                     
+                    // Append columnName to the table row
+                    tr.appendChild(theader);
+                }
+                // Adding the data to the table
+                for (var i = jsonData_4c.length-1; i >= 0 ; i--) {
+                     
+                    // Create a new row
+                    trow = tbl_4c.insertRow(-1);
+                    for (var j = 0; j < cols_4c.length; j++) {
+                        var cid = "td4c_" + i + "_" + j;
+                    	var cell = trow.insertCell(-1);
+                       
+                       	cell.innerHTML = jsonData_4c[i][cols_4c[j]];                       	
+
+                       	if (j == commentIndex) {
+                        	cell.style.color="black";
+	                       	cell.style.width="500px";
+	                       	cell.style.maxWidth = "500px";
+	                       	cell.style.wordWrap = "break-word";
+	                       	cell.style.textAlign = 'left';
+
+                        }
+                        if (j == teacherIndex) {
+                           	cell.innerHTML = "<button id='" + cid + "' value='" + jsonData_4c[i][cols_4c[j]] + "'>" + jsonData_4c[i][cols_4c[j]] + "</button>";
+                        	cell.style.color="green";                        	
+                        }
+                    }
+                }              
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+
+}
 
 
 function showReport_tcp() {
@@ -5293,11 +5736,80 @@ function updateAllCohortSlices() {
 									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="<%= rwrb.getString("show_table") %>">
 	                            </div>
 	 
-	 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
 	                            <div class="panel-body">
 					            	<div id="table_4a_panel" class="col-md-12" style="width:1600px; height:800px;overflow-x: auto;overflow-y: auto;">
 					            	   <table align = "center"
 	            							id="table4a" border="1">
+	    							   </table>
+					            	</div> 
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	
+	                   <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4b">
+	                                    Errors Reported by Students 
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+                            <div id="table_4b" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">
+	                            	<div class="row">                           
+										<div class="form-group">
+											<label class="radio-inline"><input id="radioErrorsDate"  value="date" type="radio" name="optRadio4bContent" checked>Order By Date</label>
+											<label class="radio-inline"><input id="radioErrorsClassId" value="classId" type="radio" name="optRadio4bContent">Order By Class Id</label>
+											<label class="radio-inline"><input id="radioErrorsProdlemId" value="problemId" type="radio" name="optRadio4bContent">Order By Problem Id</label>
+										</div>
+									</div>                            
+	                            </div>	                        
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="showTable4b();" type="submit" value="<%= rwrb.getString("show_table") %>">
+	                            </div>
+	                            <div id="table4b-loader" class="loader" style="display: none"></div>
+	 
+	                            <div class="panel-body">
+					            	<div id="table_4b_panel" class="col-md-12" style="width:1200px; height:800px;overflow-x: auto;overflow-y: auto;">
+					            	   <table align = "center"
+	            							id="table4b" border="1">
+	    							   </table>
+					            	</div> 
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	
+	                   <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4c">
+	                                    Teacher Feedback 
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+                            <div id="table_4c" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+	                            	<div class="row">                           
+										<div class="form-group">
+											<label class="radio-inline"><input id="radioFeedbackDate"  value="teacherId" type="radio" name="optRadio4cContent" checked>Order By Teacher Id</label>
+											<label class="radio-inline"><input id="radioFeedbackPriority" value="priority" type="radio" name="optRadio4cContent">Order By Priority</label>
+											<label class="radio-inline"><input id="radioFeedbackDate" value="date" type="radio" name="optRadio4cContent">Order By Date</label>
+										</div>
+									</div>    
+								</div>                           
+								<div class="panel-body report_filters"> 
+									  <input class="btn btn-lg btn-primary" onclick="showTable4c();" type="submit" value="<%= rwrb.getString("show_table") %>">
+	                            </div>
+	                            <div id="table4c-loader" class="loader" style="display: none"></div>
+	 
+	                            <div class="panel-body">
+					            	<div id="table_4c_panel" class="col-md-12" style="width:1200px; height:800px;overflow-x: auto;overflow-y: auto;">
+					            	   <table align = "center"
+	            							id="table4c" border="1">
 	    							   </table>
 					            	</div> 
 	                            </div>
@@ -5514,6 +6026,64 @@ function updateAllCohortSlices() {
 
 
 </div>
+
+<div id="showSessionProblemsModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="table4b_session_hdr"></div></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+	           	<div id="table_4b_session_panel" class="col-md-12" style="width:600px; height:400px;overflow-x: auto;overflow-y: auto;">
+	           	   <table align = "center"
+	       				id="table4b_session" border="1">
+					</table>
+	           	</div>           	
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="updateProblemStatusModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="table4b_update_hdr"></div></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="message-text" ><%= rb.getString("message")%>:</label>
+					<br>
+					<textarea id="message-text" name="message" style="width:500px; height:200px;overflow-x: auto;overflow-y: auto;"></textarea>
+				</div>
+				<div class="form-group">
+					<label class="radio-inline"><input id="radio4bReported"  value="Reported" type="radio" name="optRadio4bContent">Reported</label>
+					<label class="radio-inline"><input id="radio4bBroken"  value="Broken" type="radio" name="optRadio4bContent">Broken</label>
+					<label class="radio-inline"><input id="radio4bFixed"   value="Fixed" type="radio" name="optRadio4bContent">Fixed</label>
+					<label class="radio-inline"><input id="radio4bIgnore"  value="Ignore" type="radio" name="optRadio4bContent">Ignore</label>
+				</div>                            
+				<div 
+					<input type="hidden" id="hiddentEventId">
+					<input type="hidden" id="hiddenHistoryId">
+				</div>
+				<button type="button" class="btn btn-success" onclick="updateProblemStatusSubmit();"><%= rb.getString("submit")%></button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 
 <div id="calendarModalPopupOne" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg">

@@ -53,6 +53,9 @@
 <!-- Frank 11-30-21     Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022 -->  
 <!-- Frank 02-11-22     Issue #599 - live dashboard added 2 charts -->
 <!-- Frank 05-11-22     Issue #632 - Manage Topics - add ability to select problems by standard -->
+<!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
+<!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
+
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -239,18 +242,24 @@ System.out.println("msHost = " + msHost + msContext);
 .centerDiv
 {
 
-  height:220px;
-  width: 300px; 
+  height:250px;
+  width: 240px; 
   border-radius: 1em;
   border-width:thin;
   border-color:blue;
   padding: 1em; 
   position: fixed;
   top: 30%;
-  left: 50%;
+  left: 37%;
   margin-right: -50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+}
+
+.standardsHelpBox {
+  border-radius: 1em;
+  padding: 1em; 
+  border: 1px solid black;
 }
 </style>
 
@@ -1378,6 +1387,28 @@ function handleActiveStandardsSelect() {
 
 }
 
+function handleActiveStandardsReset() {
+ 
+    var elements = document.getElementById("activeStandardsList").options;
+    for(var i = 0; i < elements.length; i++){
+      if(elements[i].selected)
+	    elements[i].selected = false;
+    }
+}
+
+
+var activeHelpDisplayed = 0;
+function displayActiveStandardsHelp() {
+	if (activeHelpDisplayed == 1) {
+		document.getElementById("activeStandardsPopupHelp").style.visibility = 'hidden';		
+		activeHelpDisplayed = 0;
+	}
+	else {
+		document.getElementById("activeStandardsPopupHelp").style.visibility = 'visible';
+		activeHelpDisplayed = 1;
+	}
+}
+
 
 function handlePassiveStandardsSelect() {
     selectedStandard = "";
@@ -1406,6 +1437,26 @@ function handlePassiveStandardsSelect() {
 
 }
 
+function handlePassiveStandardsReset() {
+	 
+    var elements = document.getElementById("passiveStandardsList").options;
+    for(var i = 0; i < elements.length; i++){
+      if(elements[i].selected)
+	    elements[i].selected = false;
+    }
+}
+
+var passiveHelpDisplayed = 0;
+function displayPassiveStandardsHelp() {
+	if (passiveHelpDisplayed == 1) {
+		document.getElementById("passiveStandardsPopupHelp").style.visibility = 'hidden';		
+		passiveHelpDisplayed = 0;
+	}
+	else {
+		document.getElementById("passiveStandardsPopupHelp").style.visibility = 'visible';
+		passiveHelpDisplayed = 1;
+	}
+}
 
 function activeStandardsFilter() {
 	  var input, filter, ul, li, a, i;
@@ -1843,6 +1894,12 @@ function handleclickHandlers() {
 
     });
 
+    $("#teacher_feedback_handler").click(function () { 
+        window.open( 
+          "${pageContext.request.contextPath}/teacherTools/feedbackRequest.jsp", "_blank"); 
+    });
+    
+    
     $('#inActiveProbSetTable input[type="checkbox"]').click(function () {
         if ($('#inActiveProbSetTable input[type="checkbox"]:checked').size()) {
             $('#activateProblemSets').prop('disabled', false);
@@ -2762,7 +2819,7 @@ function registerAllEvents(){
             highGradeLevel = classGrade + parseInt(simpleHighDiff);
    
         	
-        	generate_year_range(2020,2022);
+        	generate_year_range(2021,2023);
             registerAllEvents();
             handleclickHandlers();
 
@@ -3035,6 +3092,9 @@ function registerAllEvents(){
              <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
              <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
+            <li>
+                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
+            </li>
         </ul>
         <!-- /#sidebar-end -->
     </nav>
@@ -3072,7 +3132,17 @@ function registerAllEvents(){
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myActiveInput" multiple onkeyup="activeStandardsFilter()">
                         <select name="activeStandardsList" id="activeStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="activeFilterSubmit" type="btn btn-primary btn-sm" class="report_filters" onclick="handleActiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="activeFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handleActiveStandardsReset()"><%= rb.getString("reset") %></button> 
+                       	<button id="activeFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayActiveStandardsHelp()"><%= rb.getString("help") %></button> 
+						<div id="activeStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_1") %></label><br>
+							<label><%= rb.getString("popup_btn_help_2") %></label><br>
+							<label><%= rb.getString("popup_btn_help_3") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
+							
+						</div>
 					</div>
 
                     <div class="panel panel-default">
@@ -3155,7 +3225,17 @@ function registerAllEvents(){
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myPassiveInput" multiple onkeyup="passiveStandardsFilter()">
                         <select name="passiveStandardsList" id="passiveStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="passiveFilterSubmit" type="btn btn-primary btn-sm" class="report_filters" onclick="handlePassiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="passiveFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handlePassiveStandardsReset()"><%= rb.getString("reset") %></button> 
+                       	<button id="passiveFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayPassiveStandardsHelp()"><%= rb.getString("help") %></button> 
+						<div id="passiveStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_1") %></label><br>
+							<label><%= rb.getString("popup_btn_help_2") %></label><br>
+							<label><%= rb.getString("popup_btn_help_3") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
+							
+						</div>
 					</div>
 
                     <div class="panel panel-default">
@@ -3583,6 +3663,7 @@ function registerAllEvents(){
 				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
 				                                            <springForm:option value="2021">2020/2021</springForm:option>
 				                                            <springForm:option value="2022">2021/2022</springForm:option>
+				                                            <springForm:option value="2023">2022/2023</springForm:option>
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
@@ -3614,9 +3695,6 @@ function registerAllEvents(){
 				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
 				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
 				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
-				                                            <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
-				                                            <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
-				                                            <springForm:option value="adult"><%= rb.getString("adult") %></springForm:option>
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>

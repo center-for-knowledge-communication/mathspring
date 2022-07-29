@@ -28,6 +28,7 @@ import java.util.TreeSet;
  *  Frank	01-03-21	issue #329R2 fixed bug missing parameter getDefaultTopicsSequence()
  *  Frank	04-16-22	Issue# 634R2 getGardenTopics
  *  Frank	05-11-2022 	issue #632 add sorted standards to view
+ *  Frank	07-28-2022  issue# 676 - sql query error - missing space in getClassActiveTopicsHelper()
  */
 public class DbTopics {
 
@@ -286,7 +287,7 @@ public class DbTopics {
             		"json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as description, seqPos,\r\n" + 
             		"json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (?))))) as summary \r\n" + 
             		"from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where "
-            		+(isDefault ? "isDefault=1" : "classid=? ")+ 
+            		+(isDefault ? "isDefault=1 " : "classid=? ")+ 
             		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
             		"and topic.id=probGroupId and seqPos > 0 and topic.active=1 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
             		"order by seqPos;";
