@@ -1295,8 +1295,8 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String fromDate = "2020-09-01 00:00:00";
 
     	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
     	
     	if (filter.equals("date")) {
         
@@ -1312,7 +1312,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            	Timestamp ts = rs.getTimestamp("timestamp");
                 	long dt =  ts.getTime();
                 	Date da = new Date(dt);
-                	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 	String fd = formatter.format(da);
                 	resultJson.put("Date logged", (String) fd);
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
@@ -1356,6 +1356,12 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
 	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("probId")));
 	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
+	            	Timestamp ts = rs.getTimestamp("timestamp");
+                	long dt =  ts.getTime();
+                	Date da = new Date(dt);
+                	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd  hh:mm:ss");
+                	String fd = formatter.format(da);
+                	resultJson.put("Date logged", (String) fd);
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1394,6 +1400,12 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        		resultJson.put("Session Id", String.valueOf(rs.getInt("sessId")));
 	        		resultJson.put("Student Id", String.valueOf(rs.getInt("sid")));
 	        		resultJson.put("probStatus", String.valueOf(rs.getInt("probStatus")));
+	            	Timestamp ts = rs.getTimestamp("timestamp");
+                	long dt =  ts.getTime();
+                	Date da = new Date(dt);
+                	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                	String fd = formatter.format(da);
+                	resultJson.put("Date logged", (String) fd);
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1441,6 +1453,12 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            while (rs.next()) {
 	            	JSONObject resultJson = new JSONObject();
 	        		resultJson.put("Problem Id", String.valueOf(rs.getInt("problemId")));
+	            	Timestamp ts = rs.getTimestamp("problemBeginTime");
+                	long dt =  ts.getTime();
+                	Date da = new Date(dt);
+                	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                	String fd = formatter.format(da);
+                	resultJson.put("Begin time", (String) fd);
 	        		resultJson.put("Effort", rs.getString("effort"));
 	        		resultJson.put("Attempts to Solve", String.valueOf(rs.getInt("numAttemptsToSolve")));
 	        		resultJson.put("Mistakes", String.valueOf(rs.getInt("numMistakes")));
@@ -1467,8 +1485,8 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     	String q = "";
     	
-    	String q_teacher = "select teacherId, priority, message as comment from teacher_feedback order by teacherid, timestamp";
-    	String q_priority = "select teacherId, priority, message as comment from teacher_feedback order by priority, timestamp";
+    	String q_teacher = "select teacherId, priority, message as comment, timestamp from teacher_feedback order by teacherid, timestamp";
+    	String q_priority = "select teacherId, priority, message as comment, timestamp from teacher_feedback order by priority, timestamp";
     	String q_date = "select teacherId, priority, message as comment, timestamp from teacher_feedback order by timestamp";
 
     	if (filter.equals("teacherId")) {
@@ -1483,7 +1501,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            	JSONObject resultJson = new JSONObject();
 	            	resultJson.put("TeacherId", String.valueOf(rs.getInt("teacherId")));
 	        		resultJson.put("Priority", rs.getString("priority"));
-//	        		resultJson.put("Date", rs.getString("timestamp"));
+	        		resultJson.put("Date", rs.getString("timestamp"));
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1516,7 +1534,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	            	JSONObject resultJson = new JSONObject();
 	        		resultJson.put("Priority", rs.getString("priority"));
 	            	resultJson.put("TeacherId", String.valueOf(rs.getInt("teacherId")));
-//	        		resultJson.put("Date", rs.getString("timestamp"));
+	        		resultJson.put("Date", rs.getString("timestamp"));
 	        		String comment = rs.getString("comment");
 	        		if (comment == null) {
 	        			comment = " ";
@@ -1961,8 +1979,11 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "getCohortWeeks":
     			result = getCohortWeeks(conn, Integer.valueOf(cohortId),filter);
     			break;
-    		case "adminCohortInfo":
-    			result = adminCohortInfo(conn, Integer.valueOf(cohortId),filter);
+    		case "getCohortInfo":
+    			result = getCohortInfo(conn, Integer.valueOf(cohortId),filter);
+    			break;
+    		case "updateCohortInfo":
+    			result = updateCohortInfo(conn, Integer.valueOf(cohortId),filter);
     			break;
     		case "adminCohortTeachers":
     			result = adminCohortTeachers(conn, Integer.valueOf(cohortId),filter);
@@ -2654,14 +2675,129 @@ public class TTMiscServiceImpl implements TTMiscService {
     }
     
 
-    public String adminCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
+    public String getCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
+    	   	
+        JSONObject cohortJson = new JSONObject();
+    	
+    	String result = "success";
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;    	
+	    	
+    	String q = "select name,schoolYear, startdate, enddate from  research_cohort where researchcohortid = ?;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+        	rs = stmt.executeQuery();
+            if (rs.next()) {
+                cohortJson.put("cohortName", rs.getString("name"));
+                
+                cohortJson.put("cohortSchoolYear", String.valueOf(rs.getInt("schoolYear")));
+
+            	long dt =  0;
+            	Date da = null;
+            	String fd = "";
+            	SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+                
+            	Timestamp ts = rs.getTimestamp("startdate");
+            	if (ts == null) {
+            		cohortJson.put("cohortStartDate", "");
+            	}
+            	else {
+	            	dt =  ts.getTime();
+	            	da = new Date(dt);
+	            	formatter = new SimpleDateFormat("MM/dd/yyyy");
+	            	fd = formatter.format(da);
+	            	cohortJson.put("cohortStartDate", (String) fd);		            	
+            	}
+            	ts = rs.getTimestamp("enddate");
+            	if (ts == null) {
+            		cohortJson.put("cohortEndDate", "");
+            	}
+            	else {
+	            	dt =  ts.getTime();
+	            	da = new Date(dt);
+	            	formatter = new SimpleDateFormat("MM/dd/yyyy");
+	            	fd = formatter.format(da);
+	            	cohortJson.put("cohortEndDate", (String) fd);		            	
+            	}
+            }
+
+            stmt.close();
+        }
+        catch (Exception e) {
+        	result = "DB error";
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+    	
+    	return cohortJson.toString();
+    	
+    	
+    }
+
+    public String updateCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
     	
 
     	String[] splitter = filter.split("~");
+    	    	
+    	String result = "success";
+    	boolean dateError = false;
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;    	
+        Timestamp tsStartDate = null;
+        Timestamp tsEndDate = null;
+        
+        
+        String regex = "^(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])/[0-9]{4}$";
+        
+        if ((!(splitter[2].matches(regex))) && (!splitter[2].equals("empty"))) {
+        	return "error - start date format invalid";
+        }
+        
+        if ((!(splitter[3].matches(regex))) && (!splitter[3].equals("empty"))) {
+        	return "error - end date format invalid";
+        }
+                
+        if (!(splitter[1].startsWith("202"))) {
+        	return "error - school year invalid";
+        }
+
+        
+        
+        
+    	String q = "update research_cohort set name = ?, schoolYear = ?, startDate = ?, endDate = ? where researchcohortid = ?;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setString(1, splitter[0]);	            
+            stmt.setString(2, splitter[1]);
+            if (splitter[2].equals("empty")) { 
+            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            }
+            else {            
+            	tsStartDate = convertStartDate(splitter[2]);
+            }
+            stmt.setTimestamp(3, tsStartDate);            
+            if (splitter[3].equals("empty")) { 
+            	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            }
+            else {
+            	tsEndDate = convertEndDate(splitter[3]);
+            }
+            stmt.setTimestamp(4, tsEndDate);	            
+            stmt.setInt(5, cohortId);	            
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
     	
-    	String startDate = splitter[0];
-    	
-    	return "adminCohortInfo Status";
+    	return result;
     	
     }
 
@@ -3225,5 +3361,24 @@ public class TTMiscServiceImpl implements TTMiscService {
 		return ts;
     }
     
+    private Timestamp convertEndDate(String filter) {
+		Timestamp ts = null;
+
+		try {
+			Date fDate=new SimpleDateFormat("MM/dd/yyyy").parse(filter);
+			Calendar c = Calendar.getInstance();
+			c.setTime(fDate);
+			c.set(Calendar.HOUR_OF_DAY, 23);
+			c.set(Calendar.MINUTE, 59);
+			c.set(Calendar.SECOND, 59);
+			// convert calendar to date
+			Date xDate = c.getTime();
+			ts = new Timestamp(xDate.getTime());
+		}
+		catch (Exception e) {
+			
+		}
+		return ts;
+    }
     
 }
