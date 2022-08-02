@@ -807,8 +807,8 @@ function handleClassSelect(event) {
 
 
 function editCohort(cmd) {
-	alert(cmd + '(tbd)');
-	adminCohortInfo();
+
+	editCohortForm();
 }
 
 function editCohortTeachers(cmd) {
@@ -860,6 +860,73 @@ function editCohortClasses(cmd) {
 		}
 	}
 }
+
+function editCohortForm() {
+	
+
+	if (currentCohortId == "") {
+		alert('<%= rwrb.getString("must_select_cohort") %>');
+	}
+
+	$('#editCohortFormModalPopup').modal('hide');
+    
+    var jsonData = null;
+    var cols = [];
+
+   
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'getCohortInfo',
+            lang: loc,
+            filter: currentCohortId 
+       
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	jsonData = $.parseJSON(data);	
+
+            	document.getElementById("cohort_update_hdr").html = "Cohort Id# " + currentCohortId;            	
+
+            	var cohortName  = jsonData.cohortName;
+            	document.getElementById("cohortName").value = cohortName;
+            	var cohortSchoolYear  = jsonData.cohortSchoolYear;
+            	document.getElementById("cohortSchoolYear").value = cohortSchoolYear;
+            	var cohortStartDate  = jsonData.cohortStartDate;
+            	if (jsonData.cohortStartDate == "01/01/2000") {
+            		document.getElementById("cohortStartDate").value = "";
+            	}
+            	else {
+                	document.getElementById("cohortStartDate").value = cohortStartDate;            		
+            	}
+
+            	var cohortEndDate  = jsonData.cohortEndDate;
+            	if (jsonData.cohortEndDate == "01/01/2000") {
+            		document.getElementById("cohortEndDate").value = "";
+            	}
+            	else {
+                	document.getElementById("cohortEndDate").value = cohortEndDate;            		
+            	}
+
+                $('#editCohortFormModalPopup').modal('show');
+            
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
 
 function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
 	var languagePreference = window.navigator.language;
@@ -4538,21 +4605,40 @@ function createCohortSlice() {
 }
 
 
-function adminCohortInfo() {
+function editCohortFormSubmit() {
 
-	
-    $.ajax({
+	var filter = document.getElementById("cohortName").value;
+	filter = filter + "~" + document.getElementById("cohortSchoolYear").value;
+	var startDate = document.getElementById("cohortStartDate").value;
+	if (startDate.length == 0) {
+		filter = filter + "~" + "empty";		
+	}
+	else {
+		filter = filter + "~" + document.getElementById("cohortStartDate").value;
+	}
+
+	var endDate = document.getElementById("cohortEndDate").value;
+	if (endDate.length == 0) {
+		filter = filter + "~" + "empty";		
+	}
+	else {
+		filter = filter + "~" + document.getElementById("cohortEndDate").value;
+	}
+
+	$.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
         data : {
             cohortId: currentCohortId,
-            command: 'adminCohortInfo',
+            command: 'updateCohortInfo',
             lang: loc,
-            filter: ''
+            filter: filter
         },
         success : function(data) {
         	if (data) {
-            	alert(data);
+        		if (data.substring(0,5) == "error") {        	
+            		alert(data);
+        		}
         	}
         	else {
         		alert('<%= rwrb.getString("response_data_null") %>');
@@ -4904,8 +4990,8 @@ function updateAllCohortSlices() {
     <li><a data-toggle="tab" href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
     <li><a data-toggle="tab" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
     <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" ><%= rwrb.getString("class_report_card") %></a></li>
-    <li><a data-toggle="tab" href="#Tables"><%= rwrb.getString("tables") %></a></li>
-    <li><a data-toggle="tab" href="#AdminTools"><%= rwrb.getString("admin_tools") %></a></li>
+    <li><a data-toggle="tab" href="#MSViewerTools">MS Viewer Tools</a></li>
+    <li><a data-toggle="tab" href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
     <li>
         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
@@ -5711,8 +5797,8 @@ function updateAllCohortSlices() {
 		</div>
 
 
-	    <div id="Tables" class="col-sm-12 tab-pane fade container">
-	    	<h3><%= rwrb.getString("tables") %></h3>
+	    <div id="MSViewerTools" class="col-sm-12 tab-pane fade container">
+	    	<h3>MS Support Tools</h3>
 			<div class="row">
 				<div id="tablesCohortName">				
 				</div>
@@ -5721,31 +5807,6 @@ function updateAllCohortSlices() {
 	        <div id="tables-container" class="container-fluid">
 	
 	            <div id="tables-wrapper" class="row" width: 100%;">
-	
-	                   <div class="panel panel-default">
-	                        <div class="panel-heading">
-	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4a">
-	                                    Teacher Class Weekly Slices 
-	                                </a>
-	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-	                            </h4>
-	                        </div>
-	                        <div id="table_4a" class="panel-collapse collapse">  
-	                            <div class="panel-body report_filters">                           
-									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="<%= rwrb.getString("show_table") %>">
-	                            </div>
-	 
-	                            <div class="panel-body">
-					            	<div id="table_4a_panel" class="col-md-12" style="width:1600px; height:800px;overflow-x: auto;overflow-y: auto;">
-					            	   <table align = "center"
-	            							id="table4a" border="1">
-	    							   </table>
-					            	</div> 
-	                            </div>
-	
-	                        </div>
-	                    </div>
 	
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
@@ -5823,6 +5884,7 @@ function updateAllCohortSlices() {
 	
 	            	</div>
 	        	</div>
+<!--
 	      	<p>Tabular formats for export</p>
 				<label for="uname">paste your query here</label>
 			    <input type="text" class="form-control" id="uname" placeholder="Enter other" name="uname" required>
@@ -5835,11 +5897,12 @@ function updateAllCohortSlices() {
 				    <li><a href="#">PDF</a></li>
 				  </ul>
 				</div>
+  -->				
 	    </div>
 	
 	
 	
-	    <div id="AdminTools" class="col-sm-12 tab-pane fade container">
+	    <div id="CohortAdminTools" class="col-sm-12 tab-pane fade container">
 			<div class="row">
 				<div id="adminCohortName">				
 				</div>
@@ -5854,6 +5917,7 @@ function updateAllCohortSlices() {
 	
 	                <div class="panel-group" id="adminCommands">
 	
+<!--
 	                    <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
@@ -5865,7 +5929,7 @@ function updateAllCohortSlices() {
 	                        </div>
 	                        <div id="admin1" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
-									  <input id="admin1Btn" class="btn btn-lg btn-primary" onclick="createCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+									  <input id="admin1Btn" class="btn btn-lg btn-primary" onclick="createCohortSlice();" type="submit" value="submit">
 	                            </div>
 	 
 	                            <div class="panel-body">
@@ -5874,7 +5938,7 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>
-<!-- 	                    
+ 	                    
 	                    <div id="updateWeeklySlices" class="panel panel-default hidden">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
@@ -5886,7 +5950,7 @@ function updateAllCohortSlices() {
 	                        </div>
 	                        <div id="admin2" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
-									  <input id="admin2Btn" class="btn btn-lg btn-primary" onclick="updateCohortSlice();" type="submit" value="<%= rb.getString("submit") %>">
+									  <input id="admin2Btn" class="btn btn-lg btn-primary" onclick="updateCohortSlice();" type="submit" value="submit">
 	                            </div>
 	 
 	                            <div class="panel-body">
@@ -5895,31 +5959,7 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>
-	                    -->
-	                    <div  id="updateAllSlices" class="panel panel-default">
-	                        <div class="panel-heading">
-	                            <h4 class="panel-title">
-	                                <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
-	                                    <%= rwrb.getString("update_all_cohort_slices") %>
-	                                </a>
-	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
-	                            </h4>
-	                        </div>
-	                        <div id="admin3" class="panel-collapse collapse">  
-	                            <div class="panel-body report_filters">                           
-									  <input id="admin3Btn" class="btn btn-lg btn-primary" onclick="updateAllCohortSlices();" type="submit" value="<%= rb.getString("submit") %>">
-	                            </div>
-	                            <div class="loader" style="display: none"></div>
-	 
-	                            <div class="panel-body">
-	                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%">
-	
-	                                </div>
-	                            </div>
-	
-	                        </div>
-	                    </div>                   
-	                    
+-->
 	                    <div  id="editCohort" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
@@ -5990,6 +6030,58 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>                   
+
+	                    <div  id="updateAllSlices" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_three" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin3">
+	                                    <%= rwrb.getString("update_all_cohort_slices") %>
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin3" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input id="admin3Btn" class="btn btn-lg btn-primary" onclick="updateAllCohortSlices();" type="submit" value="<%= rb.getString("submit") %>">
+	                            </div>
+	                            <div class="loader" style="display: none"></div>
+	 
+	                            <div class="panel-body">
+	                                <div id="admin3Status" class="table table-striped table-bordered hover display nowrap" width="100%">
+	
+	                                </div>
+	                            </div>
+	
+	                        </div>
+	                    </div>                   
+
+	                   <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4a">
+	                                    Teacher Class Weekly Data Table
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="table_4a" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+									  <input class="btn btn-lg btn-primary" onclick="showTable4a();" type="submit" value="<%= rwrb.getString("show_table") %>">
+	                            </div>
+	 
+	                            <div class="panel-body">
+					            	<div id="table_4a_panel" class="col-md-12" style="width:1600px; height:800px;overflow-x: auto;overflow-y: auto;">
+					            	   <table align = "center"
+	            							id="table4a" border="1">
+	    							   </table>
+					            	</div> 
+	                            </div>
+	
+	                        </div>
+	                    </div>
+	
+
+	                    
 	            	</div>
 	        	</div>
 			</div>
@@ -6008,9 +6100,9 @@ function updateAllCohortSlices() {
 			  </div>
 			</div>
 	    </div>
-	</div>
 
-    <div id="classViews" class="col-sm-12 tab-pane fade">
+<!--
+    <div id="classViews" class="col-md-12" tab-pane fade">
       <h3>Tables</h3>
       <p>View report card</p>
 			<div class="dropdown">
@@ -6021,14 +6113,16 @@ function updateAllCohortSlices() {
 			  </ul>
 			</div>
     </div>
+-->
 
-  </div>
+</div>
 
 
 </div>
 
+
 <div id="showSessionProblemsModalPopup" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -6036,14 +6130,15 @@ function updateAllCohortSlices() {
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-	           	<div id="table_4b_session_panel" class="col-md-12" style="width:600px; height:400px;overflow-x: auto;overflow-y: auto;">
+	           	<div id="table_4b_session_panel" class="col-md-12" style="width:900px; height:400px;overflow-x: auto;overflow-y: auto;">
 	           	   <table align = "center"
 	       				id="table4b_session" border="1">
 					</table>
 	           	</div>           	
             </div>
+            <br>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-dismiss="modal"><%= rb.getString("close") %></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
             </div>
         </div>
 
@@ -6070,17 +6165,47 @@ function updateAllCohortSlices() {
 					<label class="radio-inline"><input id="radio4bFixed"   value="Fixed" type="radio" name="optRadio4bContent">Fixed</label>
 					<label class="radio-inline"><input id="radio4bIgnore"  value="Ignore" type="radio" name="optRadio4bContent">Ignore</label>
 				</div>                            
-				<div 
+				<div> 
 					<input type="hidden" id="hiddentEventId">
 					<input type="hidden" id="hiddenHistoryId">
 				</div>
-				<button type="button" class="btn btn-success" onclick="updateProblemStatusSubmit();"><%= rb.getString("submit")%></button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-dismiss="modal"><%= rb.getString("close") %></button>
+				<button type="button" class="btn btn-success" onclick="updateProblemStatusSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
             </div>
         </div>
 
+    </div>
+</div>
+
+<div id="editCohortFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="cohort_update_hdr"></div></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="cohortName" style="width:100px">Cohort Name:</label><input id="cohortName" name="cohortName" style="width:300px"></input>
+				</div>
+				<div>			
+					<label for="cohortSchoolYear" style="width:100px">School Year:</label><input id="cohortSchoolYear" name="cohortSchoolYear"style="width:60px"></input>
+				</div>
+				<div>
+					<label for="cohortStartDate" style="width:100px">Start Date:</label><input id="cohortStartDate" name="cohortStartDate"style="width:200px"></input>
+				</div>
+				<div>
+					<label for="cohortEndDate" style="width:100px">End Date:</label><input id="cohortEndDate" name="cohortEndDate"style="width:200px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" onclick="editCohortFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
     </div>
 </div>
 
