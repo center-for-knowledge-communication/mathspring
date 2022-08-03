@@ -4,11 +4,13 @@ import edu.umass.ckc.wo.content.Problem;
 //import edu.umass.ckc.wo.content.ProblemImpl;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.state.StudentState;
+import edu.umass.ckc.wo.tutor.model.TopicModel;
 import edu.umass.ckc.wo.tutor.pedModel.ProblemScore;
 import edu.umass.ckc.wo.tutormeta.BaseProblemSelectorOld;
 import edu.umass.ckc.wo.tutormeta.StudentModel;
 import edu.umass.ckc.wo.interventions.SelectProblemSpecs;
 import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
+import edu.umass.ckc.wo.event.tutorhut.PreviewProblemEvent;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.servlet.servbase.UserException;
 import org.apache.log4j.Logger;
@@ -1129,6 +1131,20 @@ public class BaseTopicProblemSelector extends BaseProblemSelectorOld {
 
     }
 
+    /**
+     * precondition:  This method is only called if we know the topic has no upcoming content failure and all other conditions for continuing in a topic
+     * are met.    In theory,  there should be no fencepost errors based on this.
+     */
+    public TopicModel.difficulty getNextProblemDifficulty(SessionManager smgr, PreviewProblemEvent e, ProblemScore lastProblemScore) throws Exception {
+        long t = System.currentTimeMillis();
+        // DM 2/18 - note that this will take into account if curProb is broken and return SAME difficulty
+        return TopicModel.difficulty.SAME;
+    }
 
+    public Problem selectProblemUsingPreviewDifficulty(SessionManager smgr, ProblemScore lastProblemScore, String problemPreviewData) throws Exception, SQLException {
+        logger.debug("not implemented selecting Problem");
+        return null;
+    }
+    
 
 }

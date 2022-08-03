@@ -45,6 +45,100 @@ catch (Exception e) {
 <!DOCTYPE HTML>
 <html>
 <head>
+<script type="text/javascript">
+
+
+        var globals = {
+            lastProbType: '${lastProbType}',
+            isBeginningOfSession: ${isBeginningOfSession},
+            sessionId: ${sessionId},
+            timeInSession: ${timeInSession},
+            elapsedTime: ${elapsedTime},
+            probElapsedTime: 0,
+            clock: 0,
+            curHint: null,
+            exampleCurHint: null,
+            hintSequence: null,
+            exampleHintSequence: null,
+            lastProbId: ${lastProbId},
+            trace: false,
+            debug: false,
+            topicId: ${topicId},
+            guiLock: false,
+            learningCompanion: '${learningCompanion}',
+            learningCompanionMessageSelectionStrategy: '${learningCompanionMessageSelectionStrategy}',
+            userName: "${userName}",
+            studId : ${studId} ,
+            className : "${className}" ,
+            teacherName : "${teacherName}" ,
+            gazeDetectionOn: ${gazeDetectionOn},
+            gazeParamsJSON: ${gazeParamsJSON},
+            gazeWanderingUI: "",
+            previewProblemData: "",
+            istestUser: ${isTestUser},
+            probType : '${probType}',
+            exampleProbType : null,
+            probId : ${probId},
+            probMode: '${probMode}',
+            tutoringMode: '${tutoringMode}',
+            instructions : '${instructions}',
+            resource : '${resource}',
+            form : '${form}',
+            answer : '${answer}',
+            interventionType: null,
+            isInputIntervention: false ,
+            learningCompanionClip: null,
+            activityJSON: ${activityJSON},
+            showMPP: ${showMPP},
+            units: null,
+            showSelectProblemButton: ${showProblemSelector},
+            showAnswer: ${showAnswer},
+            newAnswer: null,
+            params: null ,
+            resumeProblem: ${resumeProblem},
+            statementHTML: null,
+            questionAudio: null,
+            questionImage: null,
+            hints: null,
+            answers: null ,
+            numHintsSeen: 0,
+            numHints: 0 ,
+            destinationInterventionSelector: null ,
+            clickTime: 0,
+            mouseSaveInterval: ${mouseSaveInterval},
+            mouseHistory: []
+
+        }
+
+        var sysGlobals = {
+            isDevEnv: ${isDevEnv},
+            wayangServletContext: '${wayangServletContext}',
+            gritServletContext: '${gritServletContext}',
+            gritServletName: '${gritServletName}',
+            problemContentDomain : '${problemContentDomain}',
+            problemContentPath : '${problemContentPath}',
+            webContentPath : '${webContentPath}',
+            <%--servletContextPath : '${pageContext.request.contextPath}',--%>
+            servletName : '${servletName}',
+            probplayerPath : '${probplayerPath}',
+            wait: false,
+            eventCounter: ${eventCounter},
+            huygui: true
+
+
+        }
+
+        var transients = {
+            answerChoice: null  ,
+            selectedButton: null ,
+            answersChosenSoFar: [] ,
+            sym: null,
+            component: null,
+            componentAction: null,
+            learningCompanionTextMessage: null
+        }
+        </script>
+
 <meta charset="utf-8">
 <title>MathSpring | Tutoring</title>
 <link rel="apple-touch-icon" sizes="180x180"
@@ -77,6 +171,10 @@ else
 <%
 }
 %>
+
+
+
+
 
 <link rel="stylesheet"
 	href="<c:url value="/js/bootstrap/css/bootstrap.css" />" />
@@ -141,6 +239,10 @@ else
 	var what_are_your_goals = "<%= rb.getString("what_are_your_goals") %>";
 	var lets_see_our_progress = "<%= rb.getString("lets_see_our_progress") %>";
 	var waiting_for_partner = "<%= rb.getString("waiting_for_partner") %>";
+	var initializing_camera = "<%= rb.getString("initializing_camera") %>";
+	var wait_for_camera = "<%= rb.getString("wait_for_camera") %>";
+	var camera_initialized = "<%= rb.getString("camera_initialized") %>";
+
 </script>
 
 
@@ -157,97 +259,9 @@ else
 
 
 
-<script type="text/javascript">
 
-
-        var globals = {
-            lastProbType: '${lastProbType}',
-            isBeginningOfSession: ${isBeginningOfSession},
-            sessionId: ${sessionId},
-            timeInSession: ${timeInSession},
-            elapsedTime: ${elapsedTime},
-            probElapsedTime: 0,
-            clock: 0,
-            curHint: null,
-            exampleCurHint: null,
-            hintSequence: null,
-            exampleHintSequence: null,
-            lastProbId: ${lastProbId},
-            trace: false,
-            debug: false,
-            topicId: ${topicId},
-            guiLock: false,
-            learningCompanion: '${learningCompanion}',
-            learningCompanionMessageSelectionStrategy: '${learningCompanionMessageSelectionStrategy}',
-            userName: "${userName}",
-            studId : ${studId} ,
-            className : "${className}" ,
-            teacherName : "${teacherName}" ,
-            gazeDetectionOn: ${gazeDetectionOn},
-            gazeParamsJSON: ${gazeParamsJSON},
-            gazeWanderingUI: "",
-            probType : '${probType}',
-            exampleProbType : null,
-            probId : ${probId},
-            probMode: '${probMode}',
-            tutoringMode: '${tutoringMode}',
-            instructions : '${instructions}',
-            resource : '${resource}',
-            form : '${form}',
-            answer : '${answer}',
-            interventionType: null,
-            isInputIntervention: false ,
-            learningCompanionClip: null,
-            activityJSON: ${activityJSON},
-            showMPP: ${showMPP},
-            units: null,
-            showSelectProblemButton: ${showProblemSelector},
-            showAnswer: ${showAnswer},
-            newAnswer: null,
-            params: null ,
-            resumeProblem: ${resumeProblem},
-            statementHTML: null,
-            questionAudio: null,
-            questionImage: null,
-            hints: null,
-            answers: null ,
-            numHintsSeen: 0,
-            numHints: 0 ,
-            destinationInterventionSelector: null ,
-            clickTime: 0,
-            mouseSaveInterval: ${mouseSaveInterval},
-            mouseHistory: []
-
-        }
-
-        var sysGlobals = {
-            isDevEnv: ${isDevEnv},
-            wayangServletContext: '${wayangServletContext}',
-            gritServletContext: '${gritServletContext}',
-            gritServletName: '${gritServletName}',
-            problemContentDomain : '${problemContentDomain}',
-            problemContentPath : '${problemContentPath}',
-            webContentPath : '${webContentPath}',
-            <%--servletContextPath : '${pageContext.request.contextPath}',--%>
-            servletName : '${servletName}',
-            probplayerPath : '${probplayerPath}',
-            wait: false,
-            eventCounter: ${eventCounter},
-            huygui: true
-
-
-        }
-
-        var transients = {
-            answerChoice: null  ,
-            selectedButton: null ,
-            answersChosenSoFar: [] ,
-            sym: null,
-            component: null,
-            componentAction: null,
-            learningCompanionTextMessage: null
-        }
-
+	<script type="text/javascript">
+        
         // Unfortunately the back button will run this function too which means that it can generate a BeginExternalActivity
         $(document).ready(function () {
             tutorhut_main(globals,sysGlobals,transients, "${learningCompanionMovie}");
@@ -328,9 +342,10 @@ label {
 </head>
 <body>
 
+	
 	<video id="webcam" width="180" height="180" autoplay></video>
 	<canvas id="overlay" width="180" height="180"></canvas>
-	<div id="monitorBox" width="240px" height="150px">
+	<div id="monitorBox" width="180px" height="180px">	
 		<span id="p1"></span>
 		<span id="gazeMonitor1"></span>
 		<span id="gazeMonitor2"></span>
@@ -338,15 +353,39 @@ label {
 		<span id="gazeMonitor4"></span>
 		<span id="gazeMonitor5"></span>
 		<span id="gazeMonitor6"></span>
+		<span id="previewInitStatus"></span>
+		<span id="previewProbIn0" ></span><br>
+		<span id="previewProbIn1" ></span><br>
+		<span id="previewProbIn2" ></span><br>
+		<span id="previewProbIn3" ></span><br>
+		<span id="previewProbIn4" ></span><br>
+		<span id="previewProbOut"></span><br>
 	</div>
-
+	<div id="previewProbInData"></div>
+	<div id="previewProbOutData"></div>
+	
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script>
+	
+<!-- 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script> -->
 <!-- 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+
   	<script src="js/face-api.js?ver=<%=versions.getString("js_version")%>"></script>
+  	
+<!--     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.12.0-dev.20220607-40d2c98e4/dist/ort.min.js"></script>     	
   	<script src="js/ui.js?ver=<%=versions.getString("js_version")%>"></script>
-  	<script src="js/headmodel.js?ver=<%=versions.getString("js_version")%>"></script>
-  	<script src="js/main.js?ver=<%=versions.getString("js_version")%>"></script>
+<!-- 
+    <script src="js/headmodel.js></script>
+  	<script src="js/main.js"></script>
+
+	    <script src="js/selectdiff.js></script>
+  		<script src="js/main_selectdiff.js></script>
+-->
+<script src="<%=versions.getString("mainAppCode")%>?ver=<%=versions.getString("js_version")%>"></script>
+<script src="<%=versions.getString("mainApp")%>?ver=<%=versions.getString("js_version")%>"></script>
+
   	<script src="js/calibration.js?ver=<%=versions.getString("js_version")%>"></script>
   	<script src="js/plain-overlay.min.js"></script>
   	<script src="js/jquery.plainoverlay.min.js"></script>
@@ -388,8 +427,8 @@ label {
 
 			<div class="huytran-sitenav__main">
 				<input type="checkbox" class="huytran-sitenav__showmore-state"
-					id="post" /> <a href="#"
-					class="huytran-sitenav__button huytran-sitenav__button--first"
+					id="post" /> 
+				<a href="#" class="huytran-sitenav__button huytran-sitenav__button--first"
 					id="nextProb"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-plus" aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
@@ -876,19 +915,30 @@ label {
     }
 
     $(document).ready(function() {
-	    if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
-	    	document.getElementById("webcam").style.zIndex = "3";    	
-	    	document.getElementById("monitorBox").style.visibility = "visible";	    
-	    	document.getElementById("monitorBox").style.zIndex = "3";    	
-	    	document.getElementById("gazeMonitor2").innerHTML = "";
-	    	document.getElementById("gazeMonitor3").innerHTML = "";
-	    	document.getElementById("gazeMonitor4").innerHTML = "";
-	    	document.getElementById("gazeMonitor5").innerHTML = "";
-	    	document.getElementById("gazeMonitor6").innerHTML = "";
-	    }
-	    else {
+    	
+    	document.getElementById("previewProbInData").style.display = "none";	    
+       	document.getElementById("previewProbOutData").style.display = "none";	    
+           	document.getElementById("monitorBox").style.visibility = "hidden";	    
+	    if (globals.gazeDetectionOn == 0) {
+	    	console.log("hidden");
 	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
 	    }
+	    else {
+	    	if (!(document.getElementById("monitorBox").style.visibility == "visible")) {
+			    if ((globals.gazeDetectionOn == 1) && globals.gazeParamsJSON.gazinterv_monitor_on == 1) {
+			    	//console.log("gazinterv_monitor_on" + globals.gazeParamsJSON.gazinterv_monitor_on);
+			    	console.log("gazing webcam");
+			    	document.getElementById("webcam").style.zIndex = "3";    	
+			    	document.getElementById("monitorBox").style.visibility = "visible";	    
+			    	document.getElementById("monitorBox").style.zIndex = "3";    	
+			    	document.getElementById("gazeMonitor2").innerHTML = "";
+			    	document.getElementById("gazeMonitor3").innerHTML = "";
+			    	document.getElementById("gazeMonitor4").innerHTML = "";
+			    	document.getElementById("gazeMonitor5").innerHTML = "";
+			    	document.getElementById("gazeMonitor6").innerHTML = "";
+			    }
+	    	}
+	    }        
     });
     
     $(document).ready(function() {

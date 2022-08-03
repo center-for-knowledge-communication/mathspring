@@ -4,6 +4,7 @@ import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
+import edu.umass.ckc.wo.event.tutorhut.PreviewProblemEvent;
 import edu.umass.ckc.wo.exc.DeveloperException;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.state.StudentState;
@@ -139,6 +140,19 @@ public class CCSSProblemSelector implements ProblemSelector {
         return p;
     }
 
+    /**
+     * precondition:  This method is only called if we know the topic has no upcoming content failure and all other conditions for continuing in a topic
+     * are met.    In theory,  there should be no fencepost errors based on this.
+     */
+    public TopicModel.difficulty getNextProblemDifficulty(SessionManager smgr, PreviewProblemEvent e, ProblemScore lastProblemScore) throws Exception {
+        long t = System.currentTimeMillis();
+        // DM 2/18 - note that this will take into account if curProb is broken and return SAME difficulty
+        return TopicModel.difficulty.SAME;
+    }
+
+    public Problem selectProblemUsingPreviewDifficulty(SessionManager smgr, ProblemScore lastProblemScore, String problemPreviewData) throws Exception, SQLException {
+        return null;
+    }
 
 
 

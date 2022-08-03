@@ -26,6 +26,7 @@ public class NextProblemEvent extends IntraProblemEvent {
     public static final String EXTERNAL = "isExternal";
     public static final String ENTER_PRACTICE_AREA = "isEnteringPracticeArea";
     public static final String LAST_LOCATION = "lastLocation";
+    public static final String PREVIEW_PROB_DATA = "previewProblemData";
 
     private boolean intervene;
     private boolean forceIntro=false;
@@ -39,7 +40,8 @@ public class NextProblemEvent extends IntraProblemEvent {
     private boolean isEnteringPracticeArea=false;  // true if this NPEvent is the first one on entering into the practice area from some other place.
     private String lastLocation="";  // one of: Login, Dashboard-ReviewTopic, Dashboard-ChallengeTopic, Dashboard-ContinueTopic, MPP-ChallengeTopic, MPP-ReviewTopic, MPP-ContinueTopic, MPP-TryProblem
     private boolean problemBroken = false; // added to support reporting on broken problems and getting a new problem in response
-
+    private String previewProblemData=null;
+    
     private Lesson lesson; // a way to force a Lesson
 
     public NextProblemEvent (ServletParams p) throws Exception {
@@ -60,7 +62,8 @@ public class NextProblemEvent extends IntraProblemEvent {
         isExternal=p.getBoolean(EXTERNAL,false);   // if external not passed, problem will not be external
         isEnteringPracticeArea=p.getBoolean(ENTER_PRACTICE_AREA,false);   // if enterPracticeArea not passed, defaults to false
         lastLocation=p.getString(LAST_LOCATION,"Login");   // if lastLocation not passed, assume coming from login area.
-
+        previewProblemData=p.getString(PREVIEW_PROB_DATA,"");
+        
         setIntervene(Boolean.parseBoolean(interv));
         setForceIntro(Boolean.parseBoolean(intro));
     }
@@ -201,6 +204,13 @@ public class NextProblemEvent extends IntraProblemEvent {
     }
     public void setLastLocation (String loc) {
         this.lastLocation = loc;
+    }
+
+    public String getPreviewProblemData () {
+        return previewProblemData;
+    }
+    public void setPreviewProblemData (String ppd) {
+        this.previewProblemData = ppd;
     }
 
     public boolean isProblemIsBroken() {

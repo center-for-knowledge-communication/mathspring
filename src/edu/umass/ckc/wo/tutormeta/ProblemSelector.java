@@ -4,6 +4,7 @@ package edu.umass.ckc.wo.tutormeta;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.event.tutorhut.NextProblemEvent;
+import edu.umass.ckc.wo.event.tutorhut.PreviewProblemEvent;
 import edu.umass.ckc.wo.tutor.model.TopicModel;
 import edu.umass.ckc.wo.tutor.pedModel.ProblemScore;
 import edu.umass.ckc.wo.tutor.probSel.PedagogicalModelParameters;
@@ -23,4 +24,8 @@ public interface ProblemSelector {
     void setParameters(PedagogicalModelParameters params);
 
     public Problem selectProblem(SessionManager smgr, NextProblemEvent e, ProblemScore lastProblemScore) throws Exception;
+
+    public TopicModel.difficulty getNextProblemDifficulty(SessionManager smgr, PreviewProblemEvent e, ProblemScore lastProblemScore) throws Exception;
+
+    public Problem selectProblemUsingPreviewDifficulty(SessionManager smgr, ProblemScore lastProblemScore, String previewData) throws Exception;
 }

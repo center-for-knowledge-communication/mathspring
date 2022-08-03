@@ -18,6 +18,7 @@ import edu.umass.ckc.wo.interventions.SelectHintSpecs;
 import edu.umass.ckc.wo.log.TutorLogger;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.state.StudentState;
+import edu.umass.ckc.wo.state.TopicState;
 import edu.umass.ckc.wo.strat.TutorStrategy;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.Settings;
@@ -32,6 +33,8 @@ import edu.umass.ckc.wo.tutor.response.*;
 import edu.umass.ckc.wo.tutor.vid.BaseVideoSelector;
 import edu.umass.ckc.wo.tutormeta.*;
 import edu.umass.ckc.wo.db.DbGaze;
+import edu.umass.ckc.wo.db.DbProblem;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.jdom.Element;
@@ -56,6 +59,7 @@ import net.sf.json.JSONObject;
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 
     private static Logger logger = Logger.getLogger(BasePedagogicalModel.class);
+    protected TopicModel topicModel;
 //    protected TopicSelector topicSelector;
 //    TopicModel.difficulty nextDiff;
     List<PedagogicalMoveListener> pedagogicalMoveListeners;
@@ -78,6 +82,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         else
             params = getPedagogicalModelParametersForUser(smgr.getConnection(),pedagogy,smgr.getClassID(),smgr.getStudentId());
 //        lessonModelParameters = getLessonModelParametersForUser(smgr.getConnection(),pedagogy,smgr.getClassID(),smgr.getStudentId());
+        
         buildComponents(smgr,pedagogy);
     }
 
@@ -677,7 +682,68 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
      * @throws Exception
      */
      public ProblemResponse getNextProblem(NextProblemEvent e) throws Exception {
-        Problem curProb = problemSelector.selectProblem(smgr, e, lastProblemScore);
+
+    	 
+    	 Problem curProb = null;
+
+    	 String defaultPreviewData = "0.715~SAME~0~0";
+    	 String lastPreviewData = "";
+
+         StudentState state = smgr.getStudentState();
+
+         boolean previewActive = false;
+         try {
+	         String gazeParams = smgr.getGazeParamsJSON();
+	         String gazeParamsMon1[] = gazeParams.split("gazinterv_monitor_on\":");
+	         String gazeParamsMon2[] = gazeParamsMon1[1].split(",");         
+	         String gaze_monitor_on  = gazeParamsMon2[0].substring(0,1);
+	         
+	         String gazeParamsCon1[] = gazeParams.split("expCondition\":");
+	         String gazeParamsCon2[] = gazeParamsCon1[1].split(",");        
+	         String expCondition     = gazeParamsCon2[0];
+	
+	         if ((smgr.getGazeDetectionOn() == 2) && gaze_monitor_on.equals("2") && expCondition.equals("201")) {
+	        	 previewActive = true;
+	         }
+         }
+         catch (Exception er) {
+        	 System.out.println("Preview not active");
+        	 previewActive = false;
+         }
+         if (previewActive) {		  
+	    	 if (e == null) {
+	    		 System.out.println("NextProblemEvent is null");
+	             lastPreviewData = state.getLastPreviewDiff();
+	
+	             if ((lastPreviewData == null) || (lastPreviewData.equals("NONE")) ) {
+	    			 curProb = problemSelector.selectProblemUsingPreviewDifficulty(smgr, lastProblemScore, defaultPreviewData);    			 
+	            	 
+	             }
+	             else {
+	    			 curProb = problemSelector.selectProblemUsingPreviewDifficulty(smgr, lastProblemScore, lastPreviewData);    			             	 
+	             }
+	    	 }
+	    	 else {
+	    		 String params = e.getPreviewProblemData();
+	    		 if (params.length() == 0) {
+	        		 curProb = problemSelector.selectProblemUsingPreviewDifficulty(smgr, lastProblemScore, defaultPreviewData);
+	    		 }
+	    		 else {
+	    			 if (e.getPreviewProblemData().equals("NaN~undefined")) {
+	    				 curProb = problemSelector.selectProblemUsingPreviewDifficulty(smgr, lastProblemScore, defaultPreviewData);
+	    			 }
+	    			 else {
+	    				 curProb = problemSelector.selectProblemUsingPreviewDifficulty(smgr, lastProblemScore, e.getPreviewProblemData());
+	    			 }
+	    		 }
+	    		 
+	    	 }
+         }
+         else {
+        	 curProb = problemSelector.selectProblem(smgr, e, lastProblemScore);
+         }
+    	
+    	   	
         // typically it takes 125 ms to finish the above call
         ProblemResponse r=null;
         if (curProb != null) {
@@ -696,6 +762,145 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         return r;
     }
 
+     public TopicModel.difficulty getLastProblemDifficulty(SessionManager smgr, PreviewProblemEvent e, ProblemScore lastProblemScore) throws Exception {
+         
+     	return problemSelector.getNextProblemDifficulty(smgr, e, lastProblemScore);
+  	    	
+     }
+     /**
+      * Note that this always returns a non-null problem even if to just indicate no more problems
+      *
+      * @param e
+      * @return
+      * @throws Exception
+      */
+      public PreviewProblemResponse getPreviewProblemParams(PreviewProblemEvent e, ProblemScore lastProblemScore, StudentState state) throws Exception {
+
+         PreviewProblemResponse r=null;
+
+         
+    	 String defaultPreviewResponse = "0.715~0.1~SAME~0.601~0.85";
+    	 String previewProblemResult = ""; 
+    	 String mastery = "";
+   
+    	 int testTopic =state.getCurTopic();
+    	 
+    	 switch (testTopic) {
+    	 case 54:
+    		 defaultPreviewResponse = "0.620~0.1~SAME~0.607990~0.743331";
+//    		 state.setLastPreviewDiff("0.620");
+    		 state.setMinPreviewDiff("0.607990");
+    		 state.setMaxPreviewDiff("0.743331");
+    		 break;
+    	 
+	 	 case 82:
+			 defaultPreviewResponse = "0.720~0.1~SAME~0.702403~0.743585";
+//    		 state.setLastPreviewDiff("0.720");
+    		 state.setMinPreviewDiff("0.709098");
+    		 state.setMaxPreviewDiff("0.743585");
+			 break;
+		 
+		case 10:
+			 defaultPreviewResponse = "0.620~0.1~SAME~0.610767~0.850000";
+//    		 state.setLastPreviewDiff("0.620");
+    		 state.setMinPreviewDiff("0.610767");
+    		 state.setMaxPreviewDiff("0.850000");
+			 break;
+		
+	 	 case 19:
+			 defaultPreviewResponse = "0.720~0.1~SAME~0.711540~0.750000";
+//    		 state.setLastPreviewDiff("0.720");
+    		 state.setMinPreviewDiff("0.711540");
+    		 state.setMaxPreviewDiff("0.750000");
+			 break;
+		 }
+    	 
+    	 String oldPreviewParams = "";
+    	 String previewParams = "";
+    	 
+    	 try {
+    		 oldPreviewParams = DbProblem.getProblemPreviewData(smgr.getConnection(),smgr.getStudentId());
+    	 }
+    	 catch (Exception er1) {
+        	 System.out.println(er1.getMessage());    		 
+    	 }
+    	 if (oldPreviewParams.length() == 0) {
+    		 oldPreviewParams = String.valueOf(smgr.getStudentId()) + "~0~0.1~0.715~N";
+    	 }
+    	 String ppo[] = oldPreviewParams.split("~");
+    	
+    	 if (ppo[0].equals(String.valueOf(smgr.getStudentId()))) {
+    		 mastery = ppo[2];
+    	 }
+    	 
+    	 try {
+    		 previewParams = DbGaze.getLastPreviewTopicId(smgr.getConnection(),smgr.getStudentId(), smgr.getSessionId());
+    	 }
+    	 catch (Exception er2) {
+        	 System.out.println(er2.getMessage());    		 
+    	 }
+         
+
+    	 if ((previewParams == null) || (previewParams.length() == 0)) {
+    		 previewProblemResult = defaultPreviewResponse;
+    	 }
+    	 else {
+             TopicModel.difficulty nextDiff = getLastProblemDifficulty(smgr, e, lastProblemScore);             
+
+             String ppa[] = previewParams.split("~");
+             previewProblemResult =  "";
+             
+
+             String nextDiffValue = ppa[1];
+             Float testNextDiffValue = Float.valueOf(nextDiffValue);
+             
+             String minDiffStr = state.getTopicState().getMinPreviewDiff();
+             Float minDiff = Float.valueOf(minDiffStr);
+             if (testNextDiffValue < minDiff) {
+            	 nextDiffValue = minDiffStr;
+             }
+             
+             String maxDiffStr = state.getTopicState().getMaxPreviewDiff();
+             Float maxDiff = Float.valueOf(maxDiffStr);
+             if (testNextDiffValue > maxDiff) {
+            	 nextDiffValue = maxDiffStr;
+             }
+             
+             
+	         try {
+	             int topicId = Integer.valueOf(ppo[1]);
+	             if (topicId == state.getCurTopic()) {
+	            	 if (mastery.length() > 0) {            		 
+		            	 if (ppo[4].equals("Y")) {
+		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();
+		            	 }
+		            	 else {
+		            		 previewProblemResult =  ppa[1] + "~" + mastery + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();		            		 
+		            	 }
+		             }
+	            	 else {
+	            		 previewProblemResult =  ppa[1] + "~" + ppa[2] + "~" + nextDiff + "~" + state.getTopicState().getMinPreviewDiff() + "~" + state.getTopicState().getMaxPreviewDiff();;
+	            	 }
+	             }
+	             else {
+	            	 previewProblemResult = defaultPreviewResponse;
+	             }
+	         }
+	         catch (Exception er3) {
+	        	 System.out.println(er3.getMessage());
+	       	 }
+
+    	 }
+    	 
+         if (previewProblemResult.length() > 0) { 
+       		r = new PreviewProblemResponse(previewProblemResult);
+         }
+         else {
+        	 previewProblemResult = defaultPreviewResponse;
+       		r = new PreviewProblemResponse(previewProblemResult);
+         }
+         return r;
+     }
 
 
 
@@ -734,7 +939,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         Problem curProb=null;
         // First grade the last practice problem which sets the lastProblemScore property of this class (used by subsequent code)
         this.lastProblemScore = gradeLastProblem();
-
+        String previewData = e.getPreviewProblemData();
+        state.setLastPreviewDiff(previewData);
         // NextProblem is an event that the lesson/topic models want to watch.   They may change their internal state or return EndOfLesson/Topic
         // Many interventions are generated in this call because the Lesson Model wants to notify the student about beginnings of new
         // lessons, endings of lessons, etc.
@@ -779,6 +985,28 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         return r;
     }
 
+
+    /**
+     * Process a request for a next problem
+     * @param  e  NextProblemEvent asks for the next problem
+     * @return
+     * @throws Exception
+     */
+    public Response processPreviewProblemRequest(PreviewProblemEvent e) throws Exception {
+
+        // We have a fixed sequence which prefers forced problems, followed by topic intros, examples, interventions, regular problems.
+        // If we ever want something more customized (e.g. from a XML pedagogy defn),  this would have to operate based on that defn
+        long t = System.currentTimeMillis();
+        Response r=null;
+        StudentState state = smgr.getStudentState();
+        if (r == null) {
+            this.lastProblemScore = gradeLastProblem();
+             
+            r =  getPreviewProblemParams(e,this.lastProblemScore,state); // takes about 300 ms
+        }
+
+        return r;
+    }
 
 
 //    private ProblemResponse getTopicIntroDemoOrProblem(NextProblemEvent e, StudentState state, int curTopic, boolean topicDone) throws Exception {

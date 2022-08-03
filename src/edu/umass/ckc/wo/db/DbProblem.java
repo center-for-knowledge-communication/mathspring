@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Iterator;
+import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 
@@ -248,6 +249,59 @@ public class DbProblem extends BaseMgr {
     }
  */
 
+    public static String getProblemPreviewData (Connection conn, int studId) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int topic = 0;
+        int stid = 0;
+        float mast = 0;
+        float diff = 0;
+        
+        String topicId = "";
+        String studentId = "";
+        String mastery = "";
+        String diff_level = "";
+        String result = "";
+        int isSolved = 0;
+        String problemEnded = "Y";
+        
+       
+        try {
+            String q = "SELECT  sph.problemId as problemId, sph.topicID as topicId, studid as studId, sph.isSolved as isSolved, mastery as mastery, opd.diff_level as diff_level, sph.problemBeginTime as latest FROM studentproblemhistory as sph, overallprobdifficulty as opd where studid = ? and opd.problemId = sph.problemId and mastery > 0 order by latest desc limit 1";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1,studId);
+            
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                topic = rs.getInt("topicId");
+                topicId = Integer.toString(topic);
+                stid = rs.getInt("studId");
+                studentId = Integer.toString(stid);
+                mast = rs.getFloat("mastery");
+                mastery = Float.toString(mast);
+                diff = rs.getFloat("diff_level");
+                diff_level = Float.toString(diff);
+                isSolved = rs.getInt("isSolved");
+                if (isSolved == 1) {
+                	problemEnded = "Y";
+                }
+                else {
+                	problemEnded = "N";                	
+                }
+                result = studentId + "~" + topicId  + "~" + mastery + "~" + diff_level + "~" + problemEnded;
+                System.out.println("previewProblemData = " + result);
+            }
+            return result;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }
+
+    
 
     public List<String> getClassOmittedTopicProblemIds(Connection conn, int classID, int topicId) throws SQLException {
 

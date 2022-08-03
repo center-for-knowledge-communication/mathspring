@@ -45,7 +45,9 @@ public class StudentState extends State implements TutorEventHandler {
     private int curProblemIndexInTopic;
     private boolean curProblemIsTopicIntro;
     private String pedagogicalModelInternalState;
-
+    private String previewDiff;
+    private String minPreviewDiff;
+    private String maxPreviewDiff;
 
     public StudentState(Connection conn, SessionManager smgr) throws SQLException {
         this.smgr = smgr;
@@ -257,7 +259,30 @@ public class StudentState extends State implements TutorEventHandler {
         topicState.setLastAnswer(lastAnswer);
     }
 
+    public void setLastPreviewDiff(String lastPreviewDiff) throws SQLException {
+        topicState.setLastPreviewDiff(lastPreviewDiff);
+    }
 
+    public String getLastPreviewDiff() throws SQLException {
+    	return topicState.getLastPreviewDiff();
+    }
+
+    public void setMinPreviewDiff(String minPreviewDiff) throws SQLException {
+        topicState.setMinPreviewDiff(minPreviewDiff);
+    }
+
+    public String getMinPreviewDiff() throws SQLException {
+    	return topicState.getMinPreviewDiff();
+    }
+
+    public void setMaxPreviewDiff(String maxPreviewDiff) throws SQLException {
+        topicState.setMaxPreviewDiff(maxPreviewDiff);
+    }
+
+    public String getMaxPreviewDiff() throws SQLException {
+    	return topicState.getMaxPreviewDiff();
+    }
+    
     public boolean getInBtwProbIntervention () {
         return topicState.getInBtwProbIntervention();
     }

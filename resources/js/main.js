@@ -4,15 +4,15 @@ const webcamElement = document.getElementById('webcam');
 async function appGaze() {
 
 
-    $('#ok').click(function (e) {
-        ui.showInfo("Detecting...", true);
-        document.getElementById("ok").style.visibility = "hidden";
-        headmodel.up = headmodel.down = headmodel.left = headmodel.right = -1;
-    });
-
     if (globals.gazeDetectionOn == 1) {    	
 
-	    await setupWebcam();
+    	$('#ok').click(function (e) {
+	        ui.showInfo("Detecting...", true);
+	        document.getElementById("ok").style.visibility = "hidden";
+	        headmodel.up = headmodel.down = headmodel.left = headmodel.right = -1;
+	    });
+
+	    await gazeSetupWebcam();
 	
 	    ui.showInfo("Loading model...", true);
 	
@@ -25,26 +25,26 @@ async function appGaze() {
 	    //ui.showInfo("Calibration...", true);
 	    headmodel.calibrated = true;
 	    ui.showInfo("Detecting...", true);
-	    await start();
+	    await appGazeStart();
 
     }
 	
 }
 
- async function start() {
+ async function appGazeStart() {
     if (this.timer) {
       this.stop();
     }
     //this.video.play();
-    this.timer = requestAnimationFrame(this.doPrediction.bind(this));
+    this.timer = requestAnimationFrame(this.doGazePrediction.bind(this));
 }
 
-function stop() {
+function appGazeStop() {
     //this.video.pause();
     cancelAnimationFrame(this.timer);
 }
 
-async function doPrediction(){
+async function doGazePrediction(){
 
 	const displaySize = { width: webcamElement.width, height: webcamElement.height };
     const detections = await faceapi.detectAllFaces(webcamElement);
@@ -63,12 +63,12 @@ async function doPrediction(){
         await headmodel.predict(img);
     }
 
-	this.timer = requestAnimationFrame(this.doPrediction.bind(this));
+	this.timer = requestAnimationFrame(this.doGazePrediction.bind(this));
 }
 
 
 
-async function setupWebcam() {
+async function gazeSetupWebcam() {
   return new Promise((resolve, reject) => {
     const navigatorAny = navigator;
     navigator.getUserMedia = navigator.getUserMedia ||
@@ -91,5 +91,8 @@ async function setupWebcam() {
 //     head.up = head.down = head.left = head.right = -1;
 // }
 
-appGaze();
+if (globals.gazeDetectionOn == 1) {    	
+	appGaze();
+}
+
 // document.addEventListener('mousemove', mouseMove, false);

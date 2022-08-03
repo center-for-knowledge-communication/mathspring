@@ -119,7 +119,8 @@ public class TopicSwitchAskIS extends NextProblemInterventionSelector {
                 intervention = getInterleavedTopicIntervention();
 
             }
-            else if (this.ask && !reasons.isContentFailure())
+            else if (!reasons.isContentFailure())
+//                else if (this.ask && !reasons.isContentFailure())
                 intervention = new TopicSwitchAskIntervention(expl,smgr.getSessionNum(),smgr.getLocale());
                 // just inform that we are moving to next topic
             else intervention = new TopicSwitchIntervention(expl,seen,solved,smgr.getLocale());
