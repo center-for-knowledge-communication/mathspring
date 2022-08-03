@@ -342,6 +342,9 @@ public class BaseProblemSelector implements ProblemSelector {
 	        if ((preview_nextIx == -1) || (testMinDiff <= minDiff)) {
 	        	curTopicHasEasierProblem = false;	        	
 	        	topicInternalState = TopicState.END_OF_TOPIC;
+	        	if (probDiffs.size() > 1) {
+	        		curTopicHasHarderProblem = true;
+	        	}
 	        }
             else {
             	curTopicHasEasierProblem = true;
@@ -365,11 +368,14 @@ public class BaseProblemSelector implements ProblemSelector {
 	        	}
 
 	        }
-	        if ((preview_nextIx == -1) || (testMaxDiff >= maxDiff)) {
+	        if ((preview_nextIx == -1) || (testMaxDiff > maxDiff)) {
 
             	preview_nextIx = idx - 1;
                 curTopicHasHarderProblem = false;
 	        	topicInternalState = TopicState.END_OF_TOPIC;
+	        	if (probDiffs.size() > 1) {
+	        		curTopicHasEasierProblem = true;
+	        	}
             }
             else {
             	curTopicHasHarderProblem = true;
@@ -394,11 +400,14 @@ public class BaseProblemSelector implements ProblemSelector {
 	        	}
 
 	        }
-	        if ((preview_nextIx == -1) || (testMaxDiff >= maxDiff)) {
+	        if ((preview_nextIx == -1) || (testMaxDiff > maxDiff)) {
 
             	preview_nextIx = idx - 1;
                 curTopicHasHarderProblem = false;
 	        	topicInternalState = TopicState.END_OF_TOPIC;
+	        	if (probDiffs.size() > 1) {
+	        		curTopicHasEasierProblem = true;
+	        	}
 	        }
 	        else {
 	           	curTopicHasHarderProblem = true;

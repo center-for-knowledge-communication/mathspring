@@ -796,7 +796,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	 	 case 82:
 			 defaultPreviewResponse = "0.720~0.1~SAME~0.702403~0.743585";
 //    		 state.setLastPreviewDiff("0.720");
-    		 state.setMinPreviewDiff("0.702403");
+    		 state.setMinPreviewDiff("0.709098");
     		 state.setMaxPreviewDiff("0.743585");
 			 break;
 		 
@@ -845,9 +845,27 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     		 previewProblemResult = defaultPreviewResponse;
     	 }
     	 else {
-             TopicModel.difficulty nextDiff = getLastProblemDifficulty(smgr, e, lastProblemScore);
+             TopicModel.difficulty nextDiff = getLastProblemDifficulty(smgr, e, lastProblemScore);             
+
              String ppa[] = previewParams.split("~");
              previewProblemResult =  "";
+             
+
+             String nextDiffValue = ppa[1];
+             Float testNextDiffValue = Float.valueOf(nextDiffValue);
+             
+             String minDiffStr = state.getTopicState().getMinPreviewDiff();
+             Float minDiff = Float.valueOf(minDiffStr);
+             if (testNextDiffValue < minDiff) {
+            	 nextDiffValue = minDiffStr;
+             }
+             
+             String maxDiffStr = state.getTopicState().getMaxPreviewDiff();
+             Float maxDiff = Float.valueOf(maxDiffStr);
+             if (testNextDiffValue > maxDiff) {
+            	 nextDiffValue = maxDiffStr;
+             }
+             
              
 	         try {
 	             int topicId = Integer.valueOf(ppo[1]);
