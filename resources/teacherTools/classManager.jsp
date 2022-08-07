@@ -55,7 +55,7 @@
 <!-- Frank 05-11-22     Issue #632 - Manage Topics - add ability to select problems by standard -->
 <!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
 <!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
-
+<!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -817,7 +817,17 @@ function liveDashboardPopulate() {
 	               			theInterval = 50;
 	               		}
 	               		else {
-	               			theInterval = 100;               			
+		               		if (liveMax <= 2000) {
+		               			theInterval = 100;
+		               		}
+		               		else {
+			               		if (liveMax <= 4000) {
+			               			theInterval = 200;
+			               		}
+			               		else {
+			               			theInterval = 400;               			
+			               		}
+		               		}
 	               		}
 	               	}
                	}
@@ -3695,6 +3705,11 @@ function registerAllEvents(){
 				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
 				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
 				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
+<!--                                        
+                                            				<springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
+                                            				<springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+                                            				<springForm:option value="adult"><%= rb.getString("grade") %> adult</springForm:option>
+-->                                           
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
@@ -3861,8 +3876,14 @@ function registerAllEvents(){
 	                    </div>
 	                    <div id="liveDashboardEffortPane" class="col-md-8 tt-LiveDashboardEffortPane">
 	                        <div style="text-align:center;"> <h2><%= rb.getString("problem_solving_effort") %></h2></div>
+	                        <div class="row">	                        	
+	                        	<div class="col-md-2"></div>
+	                        	<div class="col-md-2">
+									<button type="button" class="btn btn-primary btn-small" id="live-dashboard-effort-button" onclick="showReport3d();">Refresh Chart</button>
+								</div>
+							</div>
 	                        <div class="row">
-				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:80px; width:400px; height:400px;"></div> 
+				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:50px; width:400px; height:400px;"></div> 
 				            	<div id="chart3d_legend" class="col-md-5 float-left" style="margin-top:20px";> 		            	
 				            	     <table class="table table-striped table-bordered hover">
 	                                    <tbody>
