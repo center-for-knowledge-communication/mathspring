@@ -40,20 +40,17 @@ Where the "[ ]" is a check box you select, and the "_______" is a multi-choice (
 
  
 ResourceBundle rb = null;
+ResourceBundle rwrb = null;
+ResourceBundle rhrb = null;
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
+	rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
+	rhrb = ResourceBundle.getBundle("MSResearcherHelp",loc);
 }
 catch (Exception e) {
 //	logger.error(e.getMessage());	
 }
 
-ResourceBundle rwrb = null;
-try {
-	rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
-}
-catch (Exception e) {
-//	logger.error(e.getMessage());	
-}
 
 %>
 
@@ -106,6 +103,11 @@ catch (Exception e) {
 
 
 <style>
+
+.li-disabled {
+    pointer-events:none; //This makes it not clickable
+    opacity:0.6;         //This grays it out to look disabled
+}
 
 .comment-style {
   width: 800px;
@@ -270,6 +272,8 @@ var currentCohortWeeks = {};
 var cohortWeeks = [];
 var currentCohortDateArr = [];
 
+var noEndDate = "2000-01-01 00:00:00.0";
+
 var currentTeachersArr = [];
 
 var trendDate = '7';
@@ -346,6 +350,61 @@ function launchReportCard() {
 		document.getElementById("reportCardLink").href = a_href;
 		document.getElementById("reportCardLink").click();
 	}
+}
+
+function launchCreateCohortHelp() {
+
+	
+	var a_href = '${pageContext.request.contextPath}';
+	a_href = a_href + "/img/video_help_add_cohort.mp4";
+	document.getElementById("createCohortHelpLink").href = a_href;
+	document.getElementById("createCohortHelpLink").click();
+	
+}
+
+function launchCohortSlicesHelp() {
+
+	
+	document.getElementById("cohort_help_hdr").innerHTML = "Cohort Help";
+
+	var helpDivContent = "";
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortHelp",
+        data : {
+            helpTopic: 'cohort_slices',
+            lang: loc,
+            filter: ''
+        },
+        success : function(data) {
+        	if (data) {
+
+            	var jsonData = $.parseJSON(data);	
+               	
+
+                for (var i = 0; i < jsonData.length; i++) {
+            		helpDivContent += "<div style='overflow-x: auto;overflow-y: auto; display: block;'>";
+            		helpDivContent += "<label>" + jsonData[i].label + ":</label>";
+            		helpDivContent += "<br>";
+            		helpDivContent += "<p>" + jsonData[i].paragraph + "<p>";
+            		helpDivContent += "</div";
+                }
+        		document.getElementById("cohortHelpPopupBody").innerHTML = helpDivContent;
+        		$('#cohortHelpModalPopup').modal('show');         			
+
+        	}
+        	else {
+        		alert("error");
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+
+    });
 }
 
 
@@ -575,6 +634,8 @@ function clearSettings() {
 
     document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
 
+	document.getElementById('population').addClass("li-disabled");
+    
     showCohorts();
 }
 
@@ -606,7 +667,9 @@ function gotoSettingsPane() {
     document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
     document.getElementById('trendsTeacherName').innerHTML = "";
 
-    showCohorts();
+	document.getElementById('population').addClass("li-disabled");
+
+	showCohorts();
 }
 
 
@@ -687,37 +750,44 @@ function handleCohortSelect(event) {
     var currentWeekRaw = 1;
     currentCohortIndex = Number(splitValue[0]);
     currentCohortId = Number(splitValue[1]);
-	const msToday = Date.now();        	
+	var msToday = new Date(Date.now());        	
    	var msStartDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
-   	currentWeekRaw = ((msToday - msStartDate)  / 7);
+   	var intStartDate = msStartDate.getTime();
+   	var intToday = msToday.getTime();
+   	currentWeekRaw = ((intToday - intStartDate)  / 7);
    	currentWeekRaw = (currentWeekRaw / (1000 * 3600 * 24));
    	currentWeek = Math.ceil(currentWeekRaw);
 
-   	if (cohortsArr[currentCohortIndex].cohortEnddate == null) {
-   		finalWeek = -1;
+	var currentWeekHdr = "";
+   	
+   	if (currentWeek < 1) {
+   		currentWeek = 0;
+   		currentWeekHdr = " has not started yet."
    	}
    	else {
+	   	if (cohortsArr[currentCohortIndex].cohortEnddate == noEndDate) {
+	   		finalWeek = -1;
+	   	}
+	   	else {
+		   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
+		   	finalWeekRaw = ((msToday - msEndDate)  / 7);
+		   	finalWeekRaw = (finalWeekRaw / (1000 * 3600 * 24));
+		   	finalWeek = Math.ceil(finalWeekRaw);
+	   	}
 	   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
-	   	finalWeekRaw = ((msToday - msEndDate)  / 7);
-	   	finalWeekRaw = (finalWeekRaw / (1000 * 3600 * 24));
-	   	finalWeek = Math.ceil(finalWeekRaw);
+		var msEndDateStr = msEndDate.toLocaleDateString();
+	   	
+	   	if (msEndDate != "1/1/2000") {
+	   		currentWeekHdr = " - ended " + msEndDateStr;   		
+	   	}
+	   	else {
+	   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
+	   		
+	   	}
    	}
+
    	console.log("currentWeek = " + currentWeek);
    	console.log("finalWeek = " + finalWeek);
-   	
-	var currentWeekHdr = "";
-	
-   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
-	var msEndDateStr = msEndDate.toLocaleDateString();
-   	
-   	if (msEndDate > 0) {
-   		currentWeekHdr = " - ended " + msEndDateStr;   		
-   	}
-   	else {
-   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
-   		
-   	}
-   	
    	
 	document.getElementById('chartsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
 	document.getElementById('trendsCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
@@ -725,6 +795,10 @@ function handleCohortSelect(event) {
 	document.getElementById('populationCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
 	document.getElementById('dashboardCohortName').innerHTML = "<h3>" + cohortsArr[currentCohortIndex].cohortName + currentWeekHdr + "</h3>";
       
+	$(".how-long li").slice(3).addClass('change-color');
+	
+	document.getElementById('population').removeClass("li-disabled");
+	
     showTeachers();
 
     currentCohortDateArr = [];
@@ -739,23 +813,25 @@ function showTeachers() {
 	
     currentTeacher.id = "0";
     currentTeacher.username = "";
-	var teacherArr = allCohortsArr[currentCohortIndex];    	
- 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
-
- 	var prevname = "";
-    for (var i=0;i<teacherArr.cohortArr.length;i++) {
-		var name = "" + teacherArr.cohortArr[i].userName;
-		if (name != prevname) {
-			var id = "" + teacherArr.cohortArr[i].ID;
-        	var teacherStr = '<option id="teacher' + id + '" value="' + id + '~' + name + '">' + name + '</option>';
-        	teachersDiv = teachersDiv + teacherStr;
-        	prevname = name;
+//    if (allCohortsArr.length < currentCohortIndex) {
+		var teacherArr = allCohortsArr[currentCohortIndex];
+		
+	 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+	
+	 	var prevname = "";
+	    for (var i=0;i<teacherArr.cohortArr.length;i++) {
+			var name = "" + teacherArr.cohortArr[i].userName;
+			if (name != prevname) {
+				var id = "" + teacherArr.cohortArr[i].ID;
+	        	var teacherStr = '<option id="teacher' + id + '" value="' + id + '~' + name + '">' + name + '</option>';
+	        	teachersDiv = teachersDiv + teacherStr;
+	        	prevname = name;
+			}
 		}
-	}
-   	teachersDiv = teachersDiv + '</select>';  				
-    document.getElementById('teacherSelect').innerHTML = teachersDiv;
-    document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
-        	
+	   	teachersDiv = teachersDiv + '</select>';  				
+	    document.getElementById('teacherSelect').innerHTML = teachersDiv;
+	    document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
+//    }        	
 }
 
 function handleTeacherSelect(event) {
@@ -774,22 +850,24 @@ function handleTeacherSelect(event) {
 
 function showClasses() {
 	
-	var teacherArr = allCohortsArr[currentCohortIndex];    	
- 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
-
- 	var prevClassName = "";
-    for (var i=0;i<teacherArr.cohortArr.length;i++) {
-		var userName = "" + teacherArr.cohortArr[i].userName;
-		if (userName === currentTeacher.username) {
-			var className = "" + teacherArr.cohortArr[i].name;
-			if (className != prevClassName) {
-				var classId = "" + teacherArr.cohortArr[i].id;
-    	    	var classStr = '<option id="class' + classId + '" value="' + classId + '">' + className + '</option>';
-    	    	classesDiv = classesDiv + classStr;
-        		prevClassName = className;
+//    if (allCohortsArr.length < currentCohortIndex) {
+		var teacherArr = allCohortsArr[currentCohortIndex];    	
+	 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+	
+	 	var prevClassName = "";
+	    for (var i=0;i<teacherArr.cohortArr.length;i++) {
+			var userName = "" + teacherArr.cohortArr[i].userName;
+			if (userName === currentTeacher.username) {
+				var className = "" + teacherArr.cohortArr[i].name;
+				if (className != prevClassName) {
+					var classId = "" + teacherArr.cohortArr[i].id;
+	    	    	var classStr = '<option id="class' + classId + '" value="' + classId + '">' + className + '</option>';
+	    	    	classesDiv = classesDiv + classStr;
+	        		prevClassName = className;
+				}
 			}
-		}
-	}
+	    }
+//	}
     classesDiv = classesDiv + '</select>';  				
     document.getElementById('classSelect').innerHTML = classesDiv;
 //    document.getElementById('classSelect').style.visibility = "visible";
@@ -806,10 +884,6 @@ function handleClassSelect(event) {
 }
 
 
-function editCohort(cmd) {
-
-	editCohortForm();
-}
 
 function editCohortTeachers(cmd) {
 
@@ -861,11 +935,61 @@ function editCohortClasses(cmd) {
 	}
 }
 
+function addCohortForm() {
+	
+
+	$('#addCohortFormModalPopup').modal('hide');
+    
+    var jsonData = null;
+    var cols = [];
+
+   
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: currentCohortId,
+            command: 'getNewCohortId',
+            lang: loc,
+            filter: "0" 
+       
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	jsonData = $.parseJSON(data);	
+            	var newCohortId  = jsonData.newCohortId;
+            	document.getElementById("add_cohort_hdr").innerHTML = "Cohort Id# " + newCohortId;            	
+
+            	document.getElementById("newCohortId").value = newCohortId;
+            	document.getElementById("cohortName").value = "";
+            	document.getElementById("cohortSchoolYear").value = "";
+            	var cohortStartDate  = jsonData.cohortStartDate;
+           		document.getElementById("cohortStartDate").value = "";
+
+                $('#addCohortFormModalPopup').modal('show');
+            
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
+
 function editCohortForm() {
 	
 
 	if (currentCohortId == "") {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
+		return;
 	}
 
 	$('#editCohortFormModalPopup').modal('hide');
@@ -889,7 +1013,7 @@ function editCohortForm() {
                	
             	jsonData = $.parseJSON(data);	
 
-            	document.getElementById("cohort_update_hdr").html = "Cohort Id# " + currentCohortId;            	
+            	document.getElementById("edit_cohort_hdr").innerHTML = "Cohort Id# " + currentCohortId;            	
 
             	var cohortName  = jsonData.cohortName;
             	document.getElementById("cohortName").value = cohortName;
@@ -4604,6 +4728,55 @@ function createCohortSlice() {
     
 }
 
+function addCohortFormSubmit() {
+
+	var teacherId =  document.getElementById("addCohortTeacherId").value;
+	var classId =  document.getElementById("addCohortClassId").value;
+	if ((teacherId.length == 0) || (classId.length == 0)) {
+		alert("Must provide a valid teacher Id and a valid class id for that teahcer");
+		return;
+	}
+	var filter = document.getElementById("addCohortName").value;
+	filter = filter + "~" + document.getElementById("addCohortSchoolYear").value;
+	var startDate = document.getElementById("addCohortStartDate").value;
+	if (startDate.length == 0) {
+		filter = filter + "~" + "empty";		
+	}
+	else {
+		filter = filter + "~" + document.getElementById("addCohortStartDate").value;
+	}
+	filter = filter + "~" + teacherId + "~" + classId;
+
+	$.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/cohortAdmin",
+        data : {
+            cohortId: document.getElementById("newCohortId").value,
+            command: 'addNewCohortInfo',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+        		if (data.substring(0,5) == "error") {        	
+            		alert(data);
+        		}
+        		else {        			
+        			alert(document.getElementById("addCohortName").value + " added successfully");
+        			$('#addCohortFormModalPopup').modal('hide');        			        			
+        		}
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
 
 function editCohortFormSubmit() {
 
@@ -4638,6 +4811,10 @@ function editCohortFormSubmit() {
         	if (data) {
         		if (data.substring(0,5) == "error") {        	
             		alert(data);
+        		}
+        		else {
+        			alert(document.getElementById("cohortName").value + " changed successfully");
+        			$('#editCohortFormModalPopup').modal('hide');         			
         		}
         	}
         	else {
@@ -4770,133 +4947,29 @@ function updateCohortSlice() {
 
 function updateAllCohortSlices() {
 
-	if (currentCohortId < 0) {	
+	var updateCohortFilter = "";
+	
+	var pwd = prompt("Enter magic word");
+	if (pwd != "keylimepie") {
+		alert("The magic word is not " + pwd);
+		return;
+	}
+
+	if (currentCohortId == "") {	
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 		return;
 	}
 	
 	
-    $('#admin3').find('.loader').show();
 	
-	if (currentCohortId == "1") {
+//	if (currentCohortId == "5") {
 		
-//		if (cohortsArr[currentCohortIndex].cohortEnddate != null) {		
-//			alert(cohortsArr[currentCohortIndex].cohortName +  " has ended.  No more updates allowed.");
-//			return;
-//		}
+		if (!(cohortsArr[currentCohortIndex].cohortEnddate == noEndDate)) {		
+			alert(cohortsArr[currentCohortIndex].cohortName +  " has ended.  No more updates allowed.");
+			return;
+		}
 
-		$('#admin3').find('.loader').show();
-	
-	    $.ajax({
-	        type : "POST",
-	        url : pgContext+"/tt/tt/cohortAdmin",
-	        data : {
-	            cohortId: 1,
-	            command: 'updateAllCohortSlicesTeacherActivity',
-	            lang: loc,
-	            filter: '08/04/2020~7~34'
-	        },
-	        success : function(data) {
-	        	if (data) {
-	            	alert(data);
-	        	}
-	        	else {
-	        		alert('<%= rwrb.getString("response_data_null") %>');
-	        	}
-	    	    $.ajax({
-	    	        type : "POST",
-	    	        url : pgContext+"/tt/tt/cohortAdmin",
-	    	        data : {
-	    	            cohortId: 1,
-	    	            command: 'updateAllCohortClassStudentSlices',
-	    	            lang: loc,
-	    	            filter: '08/04/2020~7~34'
-	    	        },
-	    	        success : function(data) {
-	    	        	$('#admin3').find('.loader').hide();
-	    	        	if (data) {
-	    	            	alert(data);
-	    	        	}
-	    	        	else {
-	    	        		alert('<%= rwrb.getString("response_data_null") %>');
-	    	        	}
-	    	        },
-	    	        error : function(e) {
-	    	        	$('#admin3').find('.loader').hide();
-	    	        	alert("error");
-	    	            console.log(e);
-	    	        }
-	    	    });
-	        },
-	        error : function(e) {
-	        	$('#admin3').find('.loader').hide();
-	        	alert("error");
-	            console.log(e);
-	        }
-	    });
-	    
-	}
-
-	if (currentCohortId == "2") {
-	
-		var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
-	    
-		$('#admin3').find('.loader').show();
-	    $.ajax({
-	        type : "POST",
-	        url : pgContext+"/tt/tt/cohortAdmin",
-	        data : {
-	            cohortId: 2,
-	            command: 'updateAllCohortSlicesTeacherActivity',
-	            lang: loc,
-	            filter: updateCohortFilter
-	        },
-	        success : function(data) {
-	        	if (data) {
-	            	alert(data);
-	        	    $.ajax({
-	        	        type : "POST",
-	        	        url : pgContext+"/tt/tt/cohortAdmin",
-	        	        data : {
-	        	            cohortId: 2,
-	        	            command: 'updateAllCohortClassStudentSlices',
-	        	            lang: loc,
-	        	            filter: updateCohortFilter
-	        	        },
-	        	        success : function(data) {
-	        	        	$('#admin3').find('.loader').hide();
-	        	        	if (data) {
-	        	            	alert(data);
-	        	        	}
-	        	        	else {
-	        	        		alert('<%= rwrb.getString("response_data_null") %>');
-	        	        	}
-	        	        },
-	        	        error : function(e) {
-	        	        	$('#admin3').find('.loader').hide();
-	        	        	alert("error");
-	        	            console.log(e);
-	        	        }
-	        	    });
-	        	}
-	        	else {
-	        		alert('<%= rwrb.getString("response_data_null") %>');
-	        	}
-	        },
-	        error : function(e) {
-	        	$('#admin3').find('.loader').hide();
-	        	alert("error");
-	            console.log(e);
-	        }
-	    });
-	    
-	
-	}    
-
-
-	if (currentCohortId == "3") {
-		
-		var updateCohortFilter = currentCohortDateArr[1] + "~7~" + currentWeek;
+		updateCohortFilter = currentCohortDateArr[currentCohortIndex] + "~7~" + currentWeek;
 	    
 		$('#admin3').find('.loader').show();
 	    $.ajax({
@@ -4948,7 +5021,8 @@ function updateAllCohortSlices() {
 	    });
 	    
 	
-	}    
+//	}    
+
 
 }
 
@@ -4984,14 +5058,15 @@ function updateAllCohortSlices() {
 
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
-    <li><a data-toggle="tab" href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
-    <li><a data-toggle="tab" href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
-    <li><a data-toggle="tab" href="#TeacherToolsActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
-    <li><a data-toggle="tab" href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
-    <li><a data-toggle="tab" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
-    <li id="ReportCardLink" onclick="launchReportCard();"><a data-toggle="tab" ><%= rwrb.getString("class_report_card") %></a></li>
-    <li><a data-toggle="tab" href="#MSViewerTools">MS Viewer Tools</a></li>
-    <li><a data-toggle="tab" href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
+    <li><a data-toggle="tab" id="settings" style="background-color: lightgreen;"href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
+    <li><a data-toggle="tab" id="population" class= "li-disabled" href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
+    <li><a data-toggle="tab" id="TeacherToolsActivityReports" href="#TeacherToolsActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
+    <li><a data-toggle="tab" id="classroomTrends" href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
+    <li><a data-toggle="tab" id="classroomDashboard" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
+    <li id="ReportCard" onclick="launchReportCard();"><a data-toggle="tab" ><%= rwrb.getString("class_report_card") %></a></li>
+    <li><a data-toggle="tab" style="background-color: lightgreen;"href="#MSViewerTools">MS Viewer Tools</a></li>
+    <li><a data-toggle="tab" style="background-color: lightgreen;"href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
+    <li><a data-toggle="tab" style="background-color: lightgreen;" href="#Help">Help</a></li>
     <li>
         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
@@ -5916,50 +5991,38 @@ function updateAllCohortSlices() {
 	            <div id="admin-wrapper" class="row" width: 100%;">
 	
 	                <div class="panel-group" id="adminCommands">
-	
-<!--
-	                    <div class="panel panel-default">
+
+	                    <div  id="helpCohort" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
 	                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
-	                                    Create Cohort Slice
+	                                    Display Cohort Help
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
 	                            </h4>
 	                        </div>
 	                        <div id="admin1" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
-									  <input id="admin1Btn" class="btn btn-lg btn-primary" onclick="createCohortSlice();" type="submit" value="submit">
 	                            </div>
 	 
 	                            <div class="panel-body">
-	                                <div id="admin1Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
-	                            </div>
-	
+	                            	<div class="col-md-3"></div>
+	                            	<div class="col-md-6">
+										<div class="dropdown">
+										  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select Topic
+										  <span class="caret"></span></button>
+										  <ul class="dropdown-menu">
+										    <li onclick="launchCreateCohortHelp();"><a id="createCohortHelpLink"></a>Creating a New Cohort</li>
+										    <li onclick="launchCohortSlicesHelp();"><a id="cohortSlicesHelpLink"></a>About Cohort Slices</li>
+										  </ul>
+										</div>
+									</div>
+	                            	<div class="col-md-3"></div>
+	                            </div>	
 	                        </div>
-	                    </div>
- 	                    
-	                    <div id="updateWeeklySlices" class="panel panel-default hidden">
-	                        <div class="panel-heading">
-	                            <h4 class="panel-title">
-	                                <a id="admin_two" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin2">
-	                                    Update Cohort Weekly Slice
-	                                </a>
-	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
-	                            </h4>
-	                        </div>
-	                        <div id="admin2" class="panel-collapse collapse">  
-	                            <div class="panel-body report_filters">                           
-									  <input id="admin2Btn" class="btn btn-lg btn-primary" onclick="updateCohortSlice();" type="submit" value="submit">
-	                            </div>
-	 
-	                            <div class="panel-body">
-	                                <div id="admin2Status" class="table table-striped table-bordered hover display nowrap" width="100%"></div>
-	                            </div>
-	
-	                        </div>
-	                    </div>
--->
+	                    </div>                   
+
+
 	                    <div  id="editCohort" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
@@ -5971,12 +6034,12 @@ function updateAllCohortSlices() {
 	                        </div>
 	                        <div id="admin4" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
-									  <input class="btn btn-lg btn-primary" onclick="editCohort('add');" type="submit" value="<%= rwrb.getString("add") %>">
-									  <input class="btn btn-lg btn-primary" onclick="editCohort('change');" type="submit" value="<%= rwrb.getString("change") %>">
+									  <input class="btn btn-lg btn-primary" onclick="addCohortForm();" type="submit" value="<%= rwrb.getString("add") %>">
+									  <input class="btn btn-lg btn-primary" onclick="editCohortForm();" type="submit" value="<%= rwrb.getString("change") %>">
 	                            </div>
 	 
 	                            <div class="panel-body">
-	                                <div class="table table-striped table-bordered hover display nowrap" width="100%">
+	                                <div id="admin4Form" class="table table-striped table-bordered hover display nowrap" width="100%">
 	
 	                                </div>
 	                            </div>	
@@ -5986,7 +6049,7 @@ function updateAllCohortSlices() {
 	                    <div  id="addCohortTeacher" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin5">
+	                                <a id="admin_five" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin5">
 	                                    <%= rwrb.getString("add_remove_cohort_teacher") %>
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
@@ -6010,7 +6073,7 @@ function updateAllCohortSlices() {
 	                    <div  id="addCohortClass" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a id="admin_four" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin6">
+	                                <a id="admin_six" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin6">
 	                                    <%= rwrb.getString("add_remove_cohort_classes") %>
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
@@ -6086,6 +6149,64 @@ function updateAllCohortSlices() {
 	        	</div>
 			</div>
 	  </div>
+	  
+	  
+	    <div id="Help" class="col-sm-12 tab-pane fade container">
+			<div class="row">
+				<div id="adminCohortName">				
+				</div>
+			</div>			
+	        <h1 class="page-header">
+	            Help
+	        </h1>
+	
+	        <div id="admin-container" class="container-fluid">
+	
+	            <div id="admin-wrapper" class="row" width: 100%;">
+	
+	                <div class="panel-group" id="adminCommands">
+
+	                    <div  id="helpCohort" class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <h4 class="panel-title">
+	                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
+	                                    Display Cohort Help
+	                                </a>
+	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                            </h4>
+	                        </div>
+	                        <div id="admin1" class="panel-collapse collapse">  
+	                            <div class="panel-body report_filters">                           
+	                            </div>
+	 
+	                            <div class="panel-body">
+	                            	<div class="col-md-3"></div>
+	                            	<div class="col-md-6">
+										<div class="dropdown">
+										  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select Topic
+										  <span class="caret"></span></button>
+										  <ul class="dropdown-menu">
+										    <li onclick="launchCreateCohortHelp();"><a id="createCohortHelpLink"></a>Creating a New Cohort</li>
+										    <li onclick="launchCohortSlicesHelp();"><a id="cohortSlicesHelpLink"></a>About Cohort Slices</li>
+										  </ul>
+										</div>
+									</div>
+	                            	<div class="col-md-3"></div>
+	                            </div>	
+	                        </div>
+	                    </div>                   	                    
+	            	</div>
+	        	</div>
+			</div>
+	  </div>
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
 	    <div id="Notifications" class="col-sm-12 tab-pane fade">
 	      <h3>Notifications</h3>
 	      <p>Tools used to support Mathspring</p>
@@ -6101,10 +6222,8 @@ function updateAllCohortSlices() {
 			</div>
 	    </div>
 
-<!--
-    <div id="classViews" class="col-md-12" tab-pane fade">
-      <h3>Tables</h3>
-      <p>View report card</p>
+
+    <div id="classViews" class="col-md-12 hidden">
 			<div class="dropdown">
 			  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select View
 			  <span class="caret"></span></button>
@@ -6113,7 +6232,7 @@ function updateAllCohortSlices() {
 			  </ul>
 			</div>
     </div>
--->
+
 
 </div>
 
@@ -6179,12 +6298,49 @@ function updateAllCohortSlices() {
     </div>
 </div>
 
+<div id="addCohortFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<div id="add_cohort_hdr">Update Cohort header</div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="newCohortId" style="width:100px">Cohort Id:</label><input id="newCohortId" name="newCohortId" style="width:300px readonly"></input>
+				</div>
+				<div>
+					<label for="addCohortName" style="width:100px">Cohort Name:</label><input id="addCohortName" name="addCohortName" style="width:300px"></input>
+				</div>
+				<div>			
+					<label for="addCohortSchoolYear" style="width:100px">School Year:</label><input id="addCohortSchoolYear" name="addCohortSchoolYear"style="width:60px"></input>
+				</div>
+				<div>
+					<label for="addCohortStartDate" style="width:100px">Start Date:</label><input id="addCohortStartDate" name="addCohortStartDate"style="width:200px"></input>
+				</div>
+				<div>
+					<label for="addCohortTeacherId" style="width:100px">A Teacher Id:</label><input id="addCohortTeacherId" name="addCohortTeacherId"style="width:200px"></input>
+				</div>
+				<div>
+					<label for="addCohortClassId" style="width:100px">A Class Id:</label><input id="addCohortClassId" name="addCohortClassId"style="width:200px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" onclick="addCohortFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div id="editCohortFormModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-            	<h3><div id="cohort_update_hdr"></div></h3>
+            	<h3><div id="edit_cohort_hdr"></div></h3>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -6209,6 +6365,23 @@ function updateAllCohortSlices() {
     </div>
 </div>
 
+<div id="cohortHelpModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="cohort_help_hdr" style="center-text"></div></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div id="cohortHelpPopupBody"class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <div id="calendarModalPopupOne" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg">
