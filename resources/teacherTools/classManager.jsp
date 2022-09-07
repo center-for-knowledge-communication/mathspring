@@ -3879,7 +3879,7 @@ function registerAllEvents(){
 	                        <div class="row">	                        	
 	                        	<div class="col-md-2"></div>
 	                        	<div class="col-md-2">
-									<button type="button" class="btn btn-primary btn-small" id="live-dashboard-effort-button" onclick="showReport3d();">Refresh Chart</button>
+									<button type="button" class="btn btn-primary btn-small" id="live-dashboard-effort-button" onclick="showReport3d();"><%= rb.getString("refresh_chart") %></button>
 								</div>
 							</div>
 	                        <div class="row">

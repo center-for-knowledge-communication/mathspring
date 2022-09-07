@@ -70,6 +70,13 @@ public class TeacherToolsResearchController {
     	return miscService.getCohortReport(cohortId, reportType, lang, filter);
     }
 
+    @RequestMapping(value = "/tt/getCohortHelp", method = RequestMethod.POST)
+    public @ResponseBody String getCohortHelp(ModelMap map, @RequestParam("helpTopic") String helpTopic,  @RequestParam("lang") String lang, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
+
+
+    	return miscService.getCohortHelp(helpTopic, lang, filter);
+    }
+
     @RequestMapping(value = "/tt/cohortAdmin", method = RequestMethod.POST)
     public @ResponseBody String cohortAdmin(ModelMap map, @RequestParam("cohortId") String cohortId, @RequestParam("command") String command,  @RequestParam("lang") String lang, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
 
