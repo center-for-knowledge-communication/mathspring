@@ -105,8 +105,12 @@ catch (Exception e) {
 <style>
 
 .li-disabled {
-    pointer-events:none; //This makes it not clickable
-    opacity:0.6;         //This grays it out to look disabled
+    pointer-events:none; 
+    opacity:0.6;         
+}
+
+.li-enabled {
+    opacity:1.0;      
 }
 
 .comment-style {
@@ -427,9 +431,21 @@ function refreshLocalData() {
         }
     });
     
+	document.getElementById("chart2_div").style.visibility = 'hidden';
+	document.getElementById("chart2b_div").style.visibility = 'hidden';
+	document.getElementById("chart2c_div").style.visibility = 'hidden';
+	document.getElementById("chart3_div").style.visibility = 'hidden';
+	document.getElementById("chart3a_div").style.visibility = 'hidden';
+	document.getElementById("chart3b_div").style.visibility = 'hidden';
+	document.getElementById("chart3c_div1").style.visibility = 'hidden';
+	document.getElementById("chart3c_div2").style.visibility = 'hidden';
+	document.getElementById("chart5_div").style.visibility = 'hidden';
+
+
+	document.getElementById("liveDashboardProblemPane").style.visibility = 'hidden';
+	document.getElementById("liveDashboardEffortPane").style.visibility = 'hidden';
 	
 }
-
 
 $(document).ready(function () {
 	
@@ -622,7 +638,8 @@ function openSettingsPane() {
 	
 	
 function clearSettings() {
-	var cohortsDiv = '<label for="cohortList">Select cohort</label> <select name="cohortList" id="cohortList" class="form-control selectpicker" onblur="handleCohortSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;"></select>';  				
+	refreshLocalData();
+	var cohortsDiv = '<label for="cohortList">Select cohort</label> <select name="cohortList" id="cohortList" class="form-control selectpicker" onblur="handleCohortSelect(event);" data-show-subtext="true" data-live-search="true" size="8" style="width: 270px;"></select>';  				
 	document.getElementById('cohortSelect').innerHTML = cohortsDiv;
 	currentCohortId = -1;
 	
@@ -634,8 +651,18 @@ function clearSettings() {
 
     document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
 
-	document.getElementById('population').addClass("li-disabled");
-    
+    $("#li-population").removeClass("li-enabled");
+    $("#li-population").addClass("li-disabled");
+    $("#li-ttActivityReports").removeClass("li-enabled");
+    $("#li-ttActivityReports").addClass("li-disabled");
+    $("#li-classroomTrends").removeClass("li-enabled");
+    $("#li-classroomTrends").addClass("li-disabled");
+    $("#li-classroomDashboard").removeClass("li-enabled");
+    $("#li-classroomDashboard").addClass("li-disabled");
+    $("#li-reportCard").removeClass("li-enabled");
+    $("#li-reportCard").addClass("li-disabled");
+   
+	
     showCohorts();
 }
 
@@ -649,6 +676,7 @@ function clearTeachers() {
 
     document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
     document.getElementById('trendsTeacherName').innerHTML = "";
+    document.getElementById('dashboardTeacherName').innerHTML = "";
     
     document.getElementById('rpt5PopulateSelect').style.visibility = 'hidden';
 
@@ -667,8 +695,17 @@ function gotoSettingsPane() {
     document.getElementById('chartUsername').innerHTML = '<%= rwrb.getString("please_select_teacher") %>';
     document.getElementById('trendsTeacherName').innerHTML = "";
 
-	document.getElementById('population').addClass("li-disabled");
-
+    $("#li-population").removeClass("li-enabled");
+    $("#li-population").addClass("li-disabled");
+    $("#li-ttActivityReports").removeClass("li-enabled");
+    $("#li-ttActivityReports").addClass("li-disabled");
+    $("#li-classroomTrends").removeClass("li-enabled");
+    $("#li-classroomTrends").addClass("li-disabled");
+    $("#li-classroomDashboard").removeClass("li-enabled");
+    $("#li-classroomDashboard").addClass("li-disabled");
+    $("#li-reportCard").removeClass("li-enabled");
+    $("#li-reportCard").addClass("li-disabled");
+    
 	showCohorts();
 }
 
@@ -797,8 +834,8 @@ function handleCohortSelect(event) {
       
 	$(".how-long li").slice(3).addClass('change-color');
 	
-	document.getElementById('population').removeClass("li-disabled");
-	
+    $("#li-population").removeClass("li-disabled");
+    $("#li-population").addClass("li-enabled");
     showTeachers();
 
     currentCohortDateArr = [];
@@ -816,7 +853,7 @@ function showTeachers() {
 //    if (allCohortsArr.length < currentCohortIndex) {
 		var teacherArr = allCohortsArr[currentCohortIndex];
 		
-	 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+	 	var teachersDiv = '<label for="teacherList"><%= rwrb.getString("select_teacher") %></label> <select name="teacherList" id="teacherList" class="form-control selectpicker" onblur="handleTeacherSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px; border: solid">';  
 	
 	 	var prevname = "";
 	    for (var i=0;i<teacherArr.cohortArr.length;i++) {
@@ -836,8 +873,16 @@ function showTeachers() {
 
 function handleTeacherSelect(event) {
 
-    var selectElement = event.target;
-    var value = "" + selectElement.value;
+	var selectedTeachers = [];
+	for (var option of document.getElementById('teacherList').options) {
+		if (option.selected) {
+			selectedTeachers.push(option.value);
+		}
+	}
+	
+	
+	var selectElement = event.target;
+    var value = "" + selectedTeachers[0];
     var splitter = value.split("~");
     currentTeacher.id = splitter[0];
     currentTeacher.username = splitter[1];
@@ -846,13 +891,26 @@ function handleTeacherSelect(event) {
     document.getElementById('rpt5PopulateSelect').style.visibility = 'visible';
     
     showClasses();
+    
+    $("#li-ttActivityReports").removeClass("li-disabled");
+    $("#li-ttActivityReports").addClass("li-enabled");
+    $("#li-classroomTrends").removeClass("li-disabled");
+    $("#li-classroomTrends").addClass("li-enabled");
+    $("#li-classroomDashboard").removeClass("li-disabled");
+    $("#li-classroomDashboard").addClass("li-enabled");
+    $("#li-reportCard").removeClass("li-disabled");
+    $("#li-reportCard").addClass("li-enabled");
+
+	document.getElementById("liveDashboardProblemPane").style.visibility = 'hidden';
+	document.getElementById("liveDashboardEffortPane").style.visibility = 'hidden';
+    
 }
 
 function showClasses() {
 	
 //    if (allCohortsArr.length < currentCohortIndex) {
 		var teacherArr = allCohortsArr[currentCohortIndex];    	
-	 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;">';  
+	 	var classesDiv = '<label for="classList"><%= rwrb.getString("select_class") %></label> <select name="classList" id="classList" class="form-control selectpicker" onblur="handleClassSelect(event);" data-show-subtext="true" data-live-search="true" size="5" style="width: 270px;; border: solid">';  
 	
 	 	var prevClassName = "";
 	    for (var i=0;i<teacherArr.cohortArr.length;i++) {
@@ -881,6 +939,9 @@ function handleClassSelect(event) {
 
     var selectElement = event.target;
     currentClass = Number(selectElement.value);
+
+    document.getElementById('dashboardTeacherName').innerHTML =  "<h3>" + currentTeacher.username + " ClassId:" + selectElement.value + "</h3>";
+
 }
 
 
@@ -1217,8 +1278,8 @@ function rptTeacherClassesCount() {
             	    ],
                     axes: {
                         yaxis: {
-                            renderer: $.jqplot.CategoryAxisRenderer,
-                            ticks: ticks            
+							renderer: $.jqplot.CategoryAxisRenderer,
+							ticks: ticks            
              			}
                     },
 
@@ -1248,7 +1309,8 @@ function showReport2() {
 		plot2.destroy();
 		plot2 = null;
 	}	
-		
+
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1290,6 +1352,7 @@ function showReport2() {
             	theSeries.push(row2);
             	theSeries.push(row3);
 
+        		document.getElementById("chart2_div").style.visibility = 'visible';
             	plot2 = $.jqplot('chart2_canvas', theSeries, {
 
                     seriesDefaults: {
@@ -1347,7 +1410,6 @@ function showReport2b() {
 		plot2b = null;
 	}	
 	
-	
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1370,6 +1432,8 @@ function showReport2b() {
             		s1.push(jsonData[i].logins);
             	}
                 // var ticks = ['Paul', 'John', 'George', 'Ringo'];
+
+           		document.getElementById("chart2b_div").style.visibility = 'visible';
 
                 plot2b = $.jqplot('chart2b_canvas', [s1], {
             	    seriesDefaults:{
@@ -1428,8 +1492,7 @@ function showReport2c() {
 		plot2c.destroy();
 		plot2c = null;
 	}	
-	
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1472,7 +1535,9 @@ function showReport2c() {
             		//series.push(element);
             	}
 
-                plot2c = $.jqplot('chart2c_canvas', [s1], {
+        		document.getElementById("chart2c_div").style.visibility = 'visible';
+
+            	plot2c = $.jqplot('chart2c_canvas', [s1], {
             	    seriesDefaults:{
             	        renderer:$.jqplot.BarRenderer,
             	        rendererOptions: {
@@ -1568,6 +1633,7 @@ function showReport3() {
 		plot3.destroy();
 		plot3 = null;
 	}	
+
 	
     $.ajax({
         type : "POST",
@@ -1594,6 +1660,8 @@ function showReport3() {
 				// Ticks should match up one for each y value (category) in the series.
 			
 				
+				document.getElementById("chart3_div").style.visibility = 'visible';
+
 				plot3 = $.jqplot('chart3_canvas', [s1], {
 				    // The "seriesDefaults" option is an options object that will
 				    // be applied to all series in the chart.
@@ -1663,7 +1731,7 @@ function showReport3a() {
 		plot3a.destroy();
 		plot3a = null;
 	}	
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1688,6 +1756,7 @@ function showReport3a() {
 				// Can specify a custom tick Array.
 				// Ticks should match up one for each y value (category) in the series.
 			
+				document.getElementById("chart3a_div").style.visibility = 'visible';
 				
 				plot3a = $.jqplot('chart3a_canvas', [s1], {
 				    // The "seriesDefaults" option is an options object that will
@@ -1863,7 +1932,7 @@ function showReport3b() {
 		plot3b.destroy();
 		plot3b = null;
 	}	
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -1889,6 +1958,7 @@ function showReport3b() {
 				// Can specify a custom tick Array.
 				// Ticks should match up one for each y value (category) in the series.
 			
+				document.getElementById("chart3b_div").style.visibility = 'visible';
 				
 				plot3b = $.jqplot('chart3b_canvas', [s1], {
 				    // The "seriesDefaults" option is an options object that will
@@ -2131,7 +2201,7 @@ function showReport3c() {
 		plot3cf0.destroy();
 		plot3cf0 = null;
 	}
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -2148,6 +2218,9 @@ function showReport3c() {
 
             	var jsonData = resultData[0];
             	var footerData = resultData[1];
+
+				document.getElementById("chart3c_div1").style.visibility = 'visible';
+				document.getElementById("chart3c_div2").style.visibility = 'visible';
             	
             	for (var i=0;i<jsonData.length;i = i + 1) {
             		var teacherName = jsonData[i].teacherName;
@@ -2262,7 +2335,7 @@ function showReport3d() {
 		plot3d.destroy();
 		plot3d = null;
 	}
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -2275,7 +2348,8 @@ function showReport3d() {
         success : function(data) {
         	if (data) {
         		
-                $("#liveDashboardEffortPane").show();
+				document.getElementById("liveDashboardEffortPane").style.visibility = 'visible';
+                //$("#liveDashboardEffortPane").show();
                 
                	var resultData = $.parseJSON(data);
                 var jsonData = resultData[0];
@@ -2338,7 +2412,7 @@ function showReport3e() {
 		plot3e.destroy();
 		plot3e = null;
 	}
-	
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -2352,7 +2426,8 @@ function showReport3e() {
         	if (data) {
             	var jsonData = $.parseJSON(data);	
             	
-                $("#liveDashboardProblemPane").show();
+				document.getElementById("liveDashboardProblemPane").style.visibility = 'visible';
+                //$("#liveDashboardProblemPane").show();
             	var s1 = [];
             	var ticks = [];
             	
@@ -3123,8 +3198,8 @@ function showReport_tcp() {
 
                     axes: {
                         yaxis: {
-                            renderer: $.jqplot.CategoryAxisRenderer,
-                            ticks: ticks            
+							renderer: $.jqplot.CategoryAxisRenderer,
+							ticks: ticks            
              			}
                     }
             	});
@@ -3330,10 +3405,10 @@ function showReport_tp() {
 
                     axes: {
                         yaxis: {
-                            renderer: $.jqplot.CategoryAxisRenderer,
+							renderer: $.jqplot.CategoryAxisRenderer,
 			             	fontFamily: 'Georgia',
              			 	fontSize: '10pt',
-                            ticks: ticks            
+							ticks: ticks            
              			}
                     }
             	});
@@ -3734,20 +3809,20 @@ function showReport_tcs() {
 
                     axes: {
                         xaxis: {
-                            min: 0,
+							min: 0,
              				max: 600,
              				interval: 25,
                             font: '15px sans-serif'				
                			},
                         yaxis: {
-                            renderer: $.jqplot.CategoryAxisRenderer,
-                            ticks: ticks            
+							renderer: $.jqplot.CategoryAxisRenderer,
+							ticks: ticks            
              			}
                     }
             	});
         	}
         	else {
-        		gotoSettingsPane
+        		alert('<%= rwrb.getString("response_data_null") %>');
         	}
         },
         error : function(e) {
@@ -3984,7 +4059,7 @@ function showReport5() {
             	
             	}
             	
-        	  var teacher0 = [];
+          	  var teacher0 = [];
         	  var teacher1 = [];
         	  var teacher2 = [];
         	  var teacher3 = [];
@@ -4046,6 +4121,7 @@ function showReport5() {
 				  canvas_width = 600;
 			  }
 			  document.getElementById("chart5_canvas").style.width = "" + canvas_width + "px";      	  			  
+			  document.getElementById("chart5_div").style.visibility = 'visible';
         	  
         	  plot5 = $.jqplot('chart5_canvas', teachersFound, 
         	    { 
@@ -4393,6 +4469,7 @@ function showReport6() {
         	  var p1_teacher8 = [];
         	  var p1_teacher9 = [];
         	  var p1_teacher10 = [];
+
 
 
         	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9, p1_teacher10];
@@ -5058,15 +5135,15 @@ function updateAllCohortSlices() {
 
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
-    <li><a data-toggle="tab" id="settings" style="background-color: lightgreen;"href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
-    <li><a data-toggle="tab" id="population" class= "li-disabled" href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
-    <li><a data-toggle="tab" id="TeacherToolsActivityReports" href="#TeacherToolsActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
-    <li><a data-toggle="tab" id="classroomTrends" href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
-    <li><a data-toggle="tab" id="classroomDashboard" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
-    <li id="ReportCard" onclick="launchReportCard();"><a data-toggle="tab" ><%= rwrb.getString("class_report_card") %></a></li>
-    <li><a data-toggle="tab" style="background-color: lightgreen;"href="#MSViewerTools">MS Viewer Tools</a></li>
-    <li><a data-toggle="tab" style="background-color: lightgreen;"href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
-    <li><a data-toggle="tab" style="background-color: lightgreen;" href="#Help">Help</a></li>
+    <li><a data-toggle="tab" id="settings"  href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
+    <li><a data-toggle="tab" id="li-population" class="li-disabled"   href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
+    <li><a data-toggle="tab" id="li-ttActivityReports" class="li-disabled"  href="#ttActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
+    <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
+    <li><a data-toggle="tab" id="li-classroomDashboard" class="li-disabled"  class="li-disabled" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
+    <li onclick="launchReportCard();"><a data-toggle="tab"id="li-reportCard" class="li-disabled"   ><%= rwrb.getString("class_report_card") %></a></li>
+    <li><a data-toggle="tab"  href="#MSViewerTools">MS Viewer Tools</a></li>
+    <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
+    <li><a data-toggle="tab"  href="#Help">Help</a></li>
     <li>
         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
                 class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
@@ -5092,7 +5169,7 @@ function updateAllCohortSlices() {
 				</div>
 				<div id="teacherSelect" class="col-sm-3">
 				</div>
-				<div id="classSelect" class="col-sm-3">
+				<div id="classSelect" class="col-sm-3" border-style: solid>
 				</div>
 			</div>
 			<br>
@@ -5136,10 +5213,10 @@ function updateAllCohortSlices() {
 	
 	
 	
-    <div id="TeacherToolsActivityReports" class="col-sm-12 tab-pane fade">
-        <h1 class="page-header">
+    <div id="ttActivityReports" class="col-sm-12 tab-pane fade">
+        <h2 class="page-header">
             <%= rwrb.getString("teacher_tools_activities") %>
-        </h1>
+        </h2>
 		<div class="row">
 			<div id="chartsCohortName">				
 			</div>
@@ -5216,17 +5293,14 @@ function updateAllCohortSlices() {
                                 <a id="report_2" class="accordion-toggle" data-toggle="collapse" data-parent="#teacherGroup" href="#chartTwo">
                                     <%= rwrb.getString("teacher_activity_metrics") %>
                                 </a>
-                               	<button id="Button2" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                               	<button id="Button2" type="button" class="close" onclick="$('.collapse').collapse('hide');">&times;</button>                             
                             </h4>
                         </div>
-                        <div id="chartTwo" class="panel-collapse collapse">  
+                        <div id="chartTwo" class="panel-collapse collapse" >  
                             <div class="panel-body report_filters">                           
 								  <input id="showReport2Btn" class="btn btn-lg btn-primary" onclick="showReport2();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
- 
- 							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
- -->
-                            <div class="panel-body">
+                            <div id="chart2_div" class="panel-body">
 				            	<div id="chart2_canvas" style="width:800px; height:600px;"></div> 
                             </div>
 
@@ -5247,10 +5321,8 @@ function updateAllCohortSlices() {
 								  <input id="showReport2bBtn" class="btn btn-lg btn-primary" onclick="showReport2b();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
- 							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
- -->
-                            <div class="panel-body">
-				            	<div id="chart2b_canvas" style="width:800px; height:400px;"></div> 
+                             <div id="chart2b_div" class="panel-body">
+				            	<div id="chart2b_canvas" style="width:800px; height:600px;"></div> 
                             </div>
 
                         </div>
@@ -5271,10 +5343,8 @@ function updateAllCohortSlices() {
 								  <input id="showReport2cBtn" class="btn btn-lg btn-primary" onclick="showReport2c();" type="submit" value="<%= rwrb.getString("show_chart") %>">
                             </div>
  
- 							<!-- SELECT teacherlog.teacherId, COUNT(*) AS total FROM teacherlog, teacher_map_cohort where teacherlog.teacherId = teacher_map_cohort.teacherid and action = "login" GROUP BY teacherId;
- -->
-                            <div class="panel-body">
-				            	<div id="chart2c_canvas" style="width:800px; height:400px;"></div> 
+                            <div id="chart2c_div" class="panel-body">
+				            	<div id="chart2c_canvas" style="width:800px; height:600px;"></div> 
                             </div>
 
                         </div>
@@ -5324,7 +5394,7 @@ function updateAllCohortSlices() {
 								  <input id="showReport5Btn" class="btn btn-lg btn-primary" onclick="showReport5();" type="submit" value="<%= rwrb.getString("show_graph") %>">
                             </div>
  
-                            <div  class="panel-body">
+                            <div  id="chart5_div" class="panel-body">
 			            		<div id="chart5_canvas" style="width:1000px; height:600px;overflow-x: auto;"></div>
                             </div>
 
@@ -5341,10 +5411,10 @@ function updateAllCohortSlices() {
 
 
     <div id="classroomTrends" class="col-sm-12 tab-pane fade container">
-        <h1 class="page-header">
+        <h2 class="page-header">
             <%= rwrb.getString("classroom_activities") %>
             <br>
-        </h1>
+        </h2>
 		<div class="row">
 			<div id="trendsCohortName">				
 			</div>
@@ -5463,7 +5533,7 @@ function updateAllCohortSlices() {
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
-                            <div class="panel-body">
+                            <div id="chart3c_div1" class="panel-body">
                                 <table id="effortLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
                                     <thead>
                                     <tr>
@@ -5483,7 +5553,8 @@ function updateAllCohortSlices() {
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="panel-body">
+                            
+                            <div id="chart3c_div2" class="panel-body">
                             	<div class="row">
 					            	<div id="chart3c_canvas0" class="col-md-3" style="width:300px; height:300px;"></div> 
 					            	<div id="chart3c_canvas1" class="col-md-3" style="width:300px; height:300px;"></div> 
@@ -5607,10 +5678,9 @@ function updateAllCohortSlices() {
 	</div>
 
     <div id="classroomDashboard" class="col-sm-12 tab-pane fade container">
-        <h1 class="page-header">
+        <h2 class="page-header">
             <%= rwrb.getString("classroom_dashboard") %>
-            <br>
-        </h1>
+        </h2>
 		<div class="row">
 			<div id="dashboardCohortName">				
 			</div>
@@ -5630,7 +5700,7 @@ function updateAllCohortSlices() {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#dashboardGroup" href="#chartThreeD">
-                                    Live Dashboard
+                                    Live Dashboard 
                                 </a>
                                	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
@@ -5642,7 +5712,6 @@ function updateAllCohortSlices() {
 								  <a id="hideDashboardLegendBtn" class="btn btn-lg btn-primary" style="display: none" role="button" value="show" onclick="hideDashboardLegend();"><%= rb.getString("hide_legend") %></a>
                             </div>
  
- 							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
                             <div class="panel-body">
                                 <table id="dashboardEffortLegend" class="table table-striped table-bordered hover" width="40%" style="display: none">
                                     <thead>
@@ -5698,10 +5767,10 @@ function updateAllCohortSlices() {
 
 
     <div id="Population" class="col-sm-12 tab-pane fade container">
-        <h1 class="page-header">
+        <h2 class="page-header">
             <%= rwrb.getString("status_and_population") %>
             <br>
-        </h1>
+        </h2>
 		<div class="row">
 			<div id="populationCohortName">				
 			</div>
@@ -5778,7 +5847,7 @@ function updateAllCohortSlices() {
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
-                            <div class="panel-body">
+                            <div id="chart3_div" class="panel-body">
 				            	<div id="chart3_canvas" style="width:800px; height:400px;"></div> 
                             </div>
 
@@ -5801,7 +5870,7 @@ function updateAllCohortSlices() {
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
-                            <div class="panel-body">
+                            <div id="chart3a_div" class="panel-body">
 				            	<div id="chart3a_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
 				            	<div id="table3a_panel" class="col-md-6" style="width:800px; height:800px;">
 				            	   <table align = "center"
@@ -5829,7 +5898,7 @@ function updateAllCohortSlices() {
                             </div>
  
  							<!-- SELECT teacherId, COUNT(*) AS total FROM teacherlog where action = "login" GROUP BY teacherId; -->
-                            <div class="panel-body">
+                            <div id="chart3b_div" class="panel-body">
 				            	<div id="chart3b_canvas" class="col-md-6" style="width:800px; height:800px;"></div> 
 				            	<div id="table3b_panel" class="col-md-6" style="width:800px; height:800px;">
 				            	   <table align = "center"
@@ -5982,9 +6051,9 @@ function updateAllCohortSlices() {
 				<div id="adminCohortName">				
 				</div>
 			</div>			
-	        <h1 class="page-header">
+	        <h2 class="page-header">
 	            <%= rwrb.getString("admin_tools") %>
-	        </h1>
+	        </h2>
 	
 	        <div id="admin-container" class="container-fluid">
 	
@@ -6152,30 +6221,26 @@ function updateAllCohortSlices() {
 	  
 	  
 	    <div id="Help" class="col-sm-12 tab-pane fade container">
-			<div class="row">
-				<div id="adminCohortName">				
-				</div>
-			</div>			
-	        <h1 class="page-header">
+	        <h2 class="page-header">
 	            Help
-	        </h1>
+	        </h2>
 	
-	        <div id="admin-container" class="container-fluid">
+	        <div id="help-container" class="container-fluid">
 	
-	            <div id="admin-wrapper" class="row" width: 100%;">
+	            <div id="help-wrapper" class="row" width: 100%;">
 	
-	                <div class="panel-group" id="adminCommands">
+	                <div class="panel-group" id="helpCommands">
 
 	                    <div  id="helpCohort" class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
+	                                <a id="hrlp_one" class="accordion-toggle" data-toggle="collapse" data-parent="#helpCommands" href="#help1">
 	                                    Display Cohort Help
 	                                </a>
-	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+	                               	<button type="button" class="close" onclick="$('.collapseHelp').collapse('hide')">&times;</button>                             
 	                            </h4>
 	                        </div>
-	                        <div id="admin1" class="panel-collapse collapse">  
+	                        <div id="help1" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
 	                            </div>
 	 
