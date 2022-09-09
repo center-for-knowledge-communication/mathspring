@@ -356,20 +356,28 @@ function launchReportCard() {
 	}
 }
 
-function launchCreateCohortHelp() {
-
-	
-	var a_href = '${pageContext.request.contextPath}';
-	a_href = a_href + "/img/video_help_add_cohort.mp4";
-	document.getElementById("createCohortHelpLink").href = a_href;
-	document.getElementById("createCohortHelpLink").click();
-	
-}
 
 function launchCohortSlicesHelp() {
 
+	displayHelpPopup('cohort_slices','Weekly Slices');
 	
-	document.getElementById("cohort_help_hdr").innerHTML = "Cohort Help";
+}
+
+function launchCreateCohortHelp() {
+	
+//		var a_href = '${pageContext.request.contextPath}';
+//		a_href = a_href + "/img/video_help_add_cohort.mp4";
+//		document.getElementById("createCohortHelpLink").href = a_href;
+//		document.getElementById("createCohortHelpLink").click();
+		
+	
+	displayHelpPopup('cohort_admin','Admin Commands');
+}
+
+function displayHelpPopup(helpTopic, helpHdr) {
+	
+
+	document.getElementById("cohort_help_hdr").innerHTML = "Cohort Help - " + helpHdr;
 
 	var helpDivContent = "";
 
@@ -378,7 +386,7 @@ function launchCohortSlicesHelp() {
         type : "POST",
         url : pgContext+"/tt/tt/getCohortHelp",
         data : {
-            helpTopic: 'cohort_slices',
+            helpTopic: helpTopic,
             lang: loc,
             filter: ''
         },
@@ -802,7 +810,8 @@ function handleCohortSelect(event) {
    		currentWeekHdr = " has not started yet."
    	}
    	else {
-	   	if (cohortsArr[currentCohortIndex].cohortEnddate == noEndDate) {
+   		var testEndDate = cohortsArr[currentCohortIndex].cohortEnddate;
+	   	if ((typeof testEndDate === 'undefined') || (cohortsArr[currentCohortIndex].cohortEnddate == noEndDate)) {
 	   		finalWeek = -1;
 	   	}
 	   	else {
@@ -814,12 +823,11 @@ function handleCohortSelect(event) {
 	   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
 		var msEndDateStr = msEndDate.toLocaleDateString();
 	   	
-	   	if (msEndDate != "1/1/2000") {
-	   		currentWeekHdr = " - ended " + msEndDateStr;   		
+	   	if ((typeof testEndDate === 'undefined') || (msEndDate == "1/1/2000")) {
+	   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
 	   	}
 	   	else {
-	   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
-	   		
+	   		currentWeekHdr = " - ended " + msEndDateStr;   			   		
 	   	}
    	}
 
@@ -836,6 +844,7 @@ function handleCohortSelect(event) {
 	
     $("#li-population").removeClass("li-disabled");
     $("#li-population").addClass("li-enabled");
+    $("#tpsa-panel").hide();	
     showTeachers();
 
     currentCohortDateArr = [];
@@ -859,8 +868,9 @@ function showTeachers() {
 	    for (var i=0;i<teacherArr.cohortArr.length;i++) {
 			var name = "" + teacherArr.cohortArr[i].userName;
 			if (name != prevname) {
+				var lname = "" + teacherArr.cohortArr[i].lname;
 				var id = "" + teacherArr.cohortArr[i].ID;
-	        	var teacherStr = '<option id="teacher' + id + '" value="' + id + '~' + name + '">' + name + '</option>';
+	        	var teacherStr = '<option id="teacher' + id + '" value="' + id + '~' + name + '">' + lname + " [" +  name + "]" + '</option>';
 	        	teachersDiv = teachersDiv + teacherStr;
 	        	prevname = name;
 			}
@@ -954,22 +964,19 @@ function editCohortTeachers(cmd) {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	if (cmd === "remove") {
-		var id = prompt("Enter teacher id");
 		var tname = prompt("Enter teacher last name;");
-		var conf = confirm("Are you sure you want to remove teacher " + tname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
+		var id = prompt("Enter teacher id");
+		var conf = confirm("Are you sure you want to remove teacher: " + tname + " with id: " + id + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			filter = filter + "remove" + "~" +  id + "~" + tname;
+			filter = "remove" + "~" +  id + "~" + tname;
 			adminCohortTeachers(filter);		
 		}
 	}
 	if (cmd === "add") {
 		var tname = prompt("Enter teacher last name;");
 		var id = prompt("Enter teacher id");
-		var conf = confirm("Are you sure you want to add teacher " + tname + " with id: " + id + " to " + cohortsArr[currentCohortIndex].cohortName);
-		if (conf) {
-			filter = filter + "add" + "~" +  id + "~" + tname;
-			adminCohortTeachers(filter);		
-		}
+		filter = "add" + "~" +  id + "~" + tname;
+		adminCohortTeachers(filter);		
 	}
 }
 
@@ -977,22 +984,19 @@ function editCohortClasses(cmd) {
 
 	var filter = "";
 	if (cmd === "remove") {
-		var id = prompt("Enter class id");
 		var tname = prompt("Enter teacher last name");
+		var id = prompt("Enter class id");
 		var conf = confirm("Are you sure you want to remove class id: " + id + " of teacher " + tname + " from " + cohortsArr[currentCohortIndex].cohortName);
 		if (conf) {
-			filter = filter + "remove" + "~" +  id + "~" + tname;
+			filter = "remove" + "~" +  id + "~" + tname;
 			adminCohortClasses(filter);				
 		}
 	}
 	if (cmd === "add") {
-		var id = prompt("Enter class id");
 		var tname = prompt("Enter teacher last name");
-		var conf = confirm("Are you sure you want to add class id " + id + " of teacher " + tname + " to " + cohortsArr[currentCohortIndex].cohortName);
-		if (conf) {
-			filter = filter + "add" + "~" +  id + "~" + tname;
-			adminCohortClasses(filter);				
-		}
+		var id = prompt("Enter class id");
+		filter = "add" + "~" +  id + "~" + tname;
+		adminCohortClasses(filter);				
 	}
 }
 
@@ -3536,7 +3540,7 @@ function showTable_tpsa() {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	
-	
+		
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -5165,11 +5169,11 @@ function updateAllCohortSlices() {
 		<div id="selections">
 			<div class="row">
 				<br>
-				<div id="cohortSelect" class="offset-md-2 col-sm-3 border offset-md-1 border-dark">
+				<div id="cohortSelect" class="offset-md-2 col-sm-3 border">
 				</div>
-				<div id="teacherSelect" class="col-sm-3">
+				<div id="teacherSelect" class="col-sm-3 border">
 				</div>
-				<div id="classSelect" class="col-sm-3" border-style: solid>
+				<div id="classSelect" class="col-sm-3 border">
 				</div>
 			</div>
 			<br>
@@ -6060,37 +6064,6 @@ function updateAllCohortSlices() {
 	            <div id="admin-wrapper" class="row" width: 100%;">
 	
 	                <div class="panel-group" id="adminCommands">
-
-	                    <div  id="helpCohort" class="panel panel-default">
-	                        <div class="panel-heading">
-	                            <h4 class="panel-title">
-	                                <a id="admin_one" class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#admin1">
-	                                    Display Cohort Help
-	                                </a>
-	                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
-	                            </h4>
-	                        </div>
-	                        <div id="admin1" class="panel-collapse collapse">  
-	                            <div class="panel-body report_filters">                           
-	                            </div>
-	 
-	                            <div class="panel-body">
-	                            	<div class="col-md-3"></div>
-	                            	<div class="col-md-6">
-										<div class="dropdown">
-										  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select Topic
-										  <span class="caret"></span></button>
-										  <ul class="dropdown-menu">
-										    <li onclick="launchCreateCohortHelp();"><a id="createCohortHelpLink"></a>Creating a New Cohort</li>
-										    <li onclick="launchCohortSlicesHelp();"><a id="cohortSlicesHelpLink"></a>About Cohort Slices</li>
-										  </ul>
-										</div>
-									</div>
-	                            	<div class="col-md-3"></div>
-	                            </div>	
-	                        </div>
-	                    </div>                   
-
 
 	                    <div  id="editCohort" class="panel panel-default">
 	                        <div class="panel-heading">
