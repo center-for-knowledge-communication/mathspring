@@ -49,6 +49,13 @@ catch (Exception e) {
     <script src="js/jquery-1.10.2.js"></script>
     <script src="js/jchart.js"></script>
     <script type="text/javascript" src="js/tutorutils.js"></script>
+    
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/jquery.jqplot.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasTextRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pieRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.enhancedPieLegendRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.highlighter.js" />"></script>
+    
     <script>
         $.extend({
             getUrlVars: function () {
@@ -78,7 +85,10 @@ catch (Exception e) {
         var startElapsedTime=0;
         var problemsDoneWithEffort=2;
         var useHybridTutor =${useHybridTutor};
-
+ 
+        var effort_legend_labels = ["<%= rb.getString("sof_tooltip") %>", "<%= rb.getString("att_tooltip") %>",   "<%= rb.getString("shint_tooltip") %>", "<%= rb.getString("shelp_tooltip") %>",  "<%= rb.getString("guess_tooltip") %>",   "<%= rb.getString("notr_tooltip") %>",  "<%= rb.getString("skip_tooltip") %>", "<%= rb.getString("giveup_tooltip") %>"];
+		// Note; colors are in reverse order
+        var effort_series_colors = ['#bebada','#8dd3c7', '#ffffb3', '#fb8072', '#fdb462', '#80b1d3', '#9beb94',  '#26f213'];
 
         var globals = {
                 mouseSaveInterval: ${mouseSaveInterval},
@@ -122,11 +132,56 @@ catch (Exception e) {
             var neglectful_count= ${ts.neglectful_count};
             var studentState_disengaged=false;
             var chart = Chart;
-
+            
             chart.init();
             chart.renderMastery("masteryChart_"+topicId,topicMastery,problemsDone);
             chart.problemsDone("problemsDone_"+topicId,problemsSolved,totalProblems);
             chart.giveFeedbackAndPlant ("remarks_"+topicId,"plant_"+topicId,topicState,studentState_disengaged,topicMastery,problemsDoneWithEffort,SHINT_SOF_sequence,SOF_SOF_sequence,neglectful_count,problemsDone,problemsSolved);
+
+			console.log(topicId);
+            var effortsForGraph = "${ts.effortsForGraph}";
+            if (effortsForGraph.length == 0) {
+            	return;
+            }
+			console.log(effortsForGraph);
+			var effortValueArr = effortsForGraph.split(',');
+			
+    		var line = [];
+  			
+  			for (j=7;j>=0;j = j - 1) {
+  				var eff = [];
+	  			eff.push(effort_legend_labels[j],Number(effortValueArr[j]));
+	  			console.log(effort_legend_labels[j] + " " + effortValueArr[j]);
+	  			line.push(eff);
+  			}
+			var canvasName = 'pie_' + topicId;
+			
+			plot_live_dashboard = $.jqplot(canvasName, [line], {
+		    seriesDefaults: {
+              renderer: $.jqplot.PieRenderer,
+		      rendererOptions: {
+		        showDataLabels: true,
+			    startAngle: -90,
+			    padding: 10,
+		        sliceMargin: 4,
+			    seriesColors: effort_series_colors
+		      },
+		    },
+//		    legend:{
+//	            show:true, 
+//	            location:'e',
+//	            fontSize: '8pt'
+//	        },
+		    highlighter: {
+		        show: true,
+		        useAxesFormatters: false,
+	            location:'n',
+	            fontSize: '12pt',
+		        tooltipFormatString: '%s%2d'
+
+		      }
+		 
+		  });
             </c:forEach>
         }
 
@@ -536,6 +591,7 @@ catch (Exception e) {
                 <th><%= rb.getString("remark") %></th>
                 <th><%= rb.getString("performance") %></th>
                 <th><%= rb.getString("effort") %></th>
+                <th><%= rb.getString("progress") %></th>
                 <th><%= rb.getString("actions") %></th>
             </tr>
             </thead>
@@ -547,6 +603,7 @@ catch (Exception e) {
                 <c:set var="remarksDiv" value="remarks_${topicId}"/>
                 <c:set var="problemsDiv" value="problemsDone_${topicId}"/>
                 <c:set var="plantDiv" value="plant_${topicId}"/>
+                <c:set var="pieDiv" value="pie_${topicId}"/>
                 <c:set var="commentLink" value="commentLink_${topicId}"/>
                 <c:set var="plantLink" value="plantLink_${topicId}"/>
                 <c:set var="backToVillageURL" value="${backToVillageURL}"/>
@@ -568,6 +625,9 @@ catch (Exception e) {
                        id="LearnMore"
                        onclick="window.location='${pageContext.request.contextPath}/TutorBrain?action=TopicDetail&sessionId=${sessionId}&elapsedTime='+updateElapsedTime()+'&mastery=${ts.mastery}&eventCounter=${eventCounter + 1}&topicId=${ts.topicId}&topicName=${topicName}&problemsDone=${ts.problemsDone}&totalProblems=${ts.totalProblems}&var=b'"
                        class="littleLink btn mathspring-important-btn"><%= rb.getString("learn_more") %></a>
+                </td>
+                <td align="center" valign="bottom" class="pie_wrapper col-md-1" >
+					<div id="${pieDiv}" style="width:200px; height:200px;"></div>
                 </td>
                 <td align="center" valign="bottom" class="plant_wrapper col-md-1">
                     <a href="#" id=${plantLink}><div id=${plantDiv}></div></a>
