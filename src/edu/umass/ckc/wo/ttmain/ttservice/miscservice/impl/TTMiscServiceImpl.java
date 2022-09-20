@@ -1750,7 +1750,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
-    	int intDuration = Integer.valueOf(splitter[1]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}    	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
 
     		
@@ -3390,6 +3392,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
     	if (splitter.length > 3) {
@@ -3466,6 +3471,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
     	if (splitter.length > 3) {
