@@ -138,12 +138,12 @@ catch (Exception e) {
             chart.problemsDone("problemsDone_"+topicId,problemsSolved,totalProblems);
             chart.giveFeedbackAndPlant ("remarks_"+topicId,"plant_"+topicId,topicState,studentState_disengaged,topicMastery,problemsDoneWithEffort,SHINT_SOF_sequence,SOF_SOF_sequence,neglectful_count,problemsDone,problemsSolved);
 
-			console.log(topicId);
+//			console.log(topicId);
             var effortsForGraph = "${ts.effortsForGraph}";
             if (effortsForGraph.length == 0) {
             	return;
             }
-			console.log(effortsForGraph);
+//			console.log(effortsForGraph);
 			var effortValueArr = effortsForGraph.split(',');
 			
     		var line = [];
@@ -151,7 +151,7 @@ catch (Exception e) {
   			for (j=7;j>=0;j = j - 1) {
   				var eff = [];
 	  			eff.push(effort_legend_labels[j],Number(effortValueArr[j]));
-	  			console.log(effort_legend_labels[j] + " " + effortValueArr[j]);
+//	  			console.log(effort_legend_labels[j] + " " + effortValueArr[j]);
 	  			line.push(eff);
   			}
 			var canvasName = 'pie_' + topicId;

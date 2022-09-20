@@ -310,6 +310,16 @@ var plot3c6 = null;
 var plot3c7 = null;
 var plot3c8 = null;
 var plot3c9 = null;
+var plot3c10 = null;
+var plot3c11 = null;
+var plot3c12 = null;
+var plot3c13 = null;
+var plot3c14 = null;
+var plot3c15 = null;
+var plot3c16 = null;
+var plot3c17 = null;
+var plot3c18 = null;
+var plot3c19 = null;
 
 var plots3c = [plot3c0,plot3c1,plot3c2,plot3c3];
 
@@ -770,8 +780,6 @@ function buildCurrentCohortDateArr() {
 	tempCohortDateArr = [];
 	tempCohortDateArr.push("");
 	var startDate = new Date(cohortsArr[currentCohortIndex].cohortStartdate);
-//	var temp = startWeek * 7;
-//	var startDate = new Date(addDays(startDate,(temp)));
 	var startDateStr = startDate.toLocaleDateString();
 	tempCohortDateArr.push(startDateStr);
 	
@@ -816,14 +824,15 @@ function handleCohortSelect(event) {
 	   	}
 	   	else {
 		   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
-		   	finalWeekRaw = ((msToday - msEndDate)  / 7);
+		   	finalWeekRaw = (msEndDate - msStartDate)  / 7;
 		   	finalWeekRaw = (finalWeekRaw / (1000 * 3600 * 24));
 		   	finalWeek = Math.ceil(finalWeekRaw);
+		   	currentWeek = finalWeek;
 	   	}
 	   	var msEndDate = new Date(cohortsArr[currentCohortIndex].cohortEnddate);
 		var msEndDateStr = msEndDate.toLocaleDateString();
 	   	
-	   	if ((typeof testEndDate === 'undefined') || (msEndDate == "1/1/2000")) {
+	   	if ((typeof testEndDate === 'undefined') || (msEndDateStr == "1/1/2000")) {
 	   	   	var currentWeekHdr = " (Week # " + currentWeek + ")";
 	   	}
 	   	else {
@@ -2201,6 +2210,51 @@ function showReport3c() {
 		plot3c9.destroy();
 		plot3c9 = null;
 	}
+	
+
+	if (plot3c10 != null) {
+		plot3c20.destroy();
+		plot3c10 = null;
+	}
+	if (plot3c11 != null) {
+		plot3c11.destroy();
+		plot3c11 = null;
+	}
+	if (plot3c12 != null) {
+		plot3c12.destroy();
+		plot3c12 = null;
+	}
+	if (plot3c13 != null) {
+		plot3c13.destroy();
+		plot3c13 = null;
+	}
+	if (plot3c14 != null) {
+		plot3c14.destroy();
+		plot3c14 = null;
+	}
+	if (plot3c15 != null) {
+		plot3c15.destroy();
+		plot3c15 = null;
+	}
+	if (plot3c16 != null) {
+		plot3c16.destroy();
+		plot3c16 = null;
+	}
+	if (plot3c17 != null) {
+		plot3c17.destroy();
+		plot3c17 = null;
+	}
+	if (plot3c18 != null) {
+		plot3c18.destroy();
+		plot3c18 = null;
+	}
+	if (plot3c19 != null) {
+		plot3c19.destroy();
+		plot3c19 = null;
+	}
+	
+	
+	
 	if (plot3cf0 != null) {
 		plot3cf0.destroy();
 		plot3cf0 = null;
@@ -2242,7 +2296,17 @@ function showReport3c() {
 		  			var line7 = [];
 		  			var line8 = [];
 		  			var line9 = [];
-		  			var lines = [line0,line1,line2,line3,line4,line5,line6,line7,line8,line9]
+		  			var line10 = [];
+		  			var line11 = [];
+		  			var line12 = [];
+		  			var line13 = [];
+		  			var line14 = [];
+		  			var line15 = [];
+		  			var line16 = [];
+		  			var line17 = [];
+		  			var line18 = [];
+		  			var line19 = [];
+		  			var lines = [line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12,line13,line14,line15,line16,line17,line18,line19]
 		  			lines[i].push(jsonData[i].SOF);
 		  			lines[i].push(jsonData[i].ATT);
 		  			lines[i].push(jsonData[i].SHINT);
@@ -3708,7 +3772,6 @@ function showReport_tcs() {
     }
     
 	if (rpt_tcs_Weeks == "all") {
-		trendNumberOfUnits = currentWeek - 1;
 		document.getElementById('tcs_PriorWeeks').value = "";
 	}
 	else {     
@@ -3721,7 +3784,7 @@ function showReport_tcs() {
 	    }
 	}
 
-	var startWeek = currentWeek - 1;
+	var startWeek = currentWeek;
     var intNumberOfUnits = Number(trendNumberOfUnits);
     if (intNumberOfUnits < 1) {
     	intNumberOfUnits = 1;
@@ -3903,9 +3966,10 @@ function rpt5getUsernameDisplay(index) {
 	
 }
 
-var msTeacherColors = ['#FF0000','#FFFF00','#0000FF','#999966','#008B8B','#FFA500','#4B0082','#008000','#ff99cc','#00ffcc'];
+var msTeacherColors = [ "#4bb2c5", "#EAA228", "#c5b47f", "#579575", "#839557", "#958c12", "#953579", "#4b5de4", "#d8b83f", "#ff5800", "#0085cc", "#c747a3", "#cddf54", "#FBD178", "#26B4E3", "#bd70c7",'#FFA500','#4B0082','#ff99cc','#00ffcc'];
+//var msTeacherColors = ['#FF0000','#FFFF00','#0000FF','#999966','#008B8B','#FFA500','#4B0082','#008000','#ff99cc','#00ffcc','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
 
-var greyTeacherColors = ['#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
+var greyTeacherColors = ['#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
 
 var rpt5Colors = [];
 
@@ -3965,7 +4029,7 @@ function showReport5() {
     }
     
 	if (rpt5Weeks == "all") {
-		trendNumberOfUnits = currentWeek - 1;
+		trendNumberOfUnits = currentWeek;
 		document.getElementById('rpt5PriorWeeks').value = "";
 	}
 	else {     
@@ -3978,7 +4042,8 @@ function showReport5() {
 	    }
 	}
     
-	var startWeek = currentWeek - 1;
+	var startWeek = currentWeek;
+	
     var intNumberOfUnits = Number(trendNumberOfUnits);
     if (intNumberOfUnits < 1) {
     	intNumberOfUnits = 1;
@@ -3986,7 +4051,7 @@ function showReport5() {
     if (intNumberOfUnits > 1) {
     	startWeek = startWeek - intNumberOfUnits;
     }
-    	
+    
 	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
 	var teacherFilter = "";
 	if (!(currentTeacher.id === "0")) {
@@ -4074,9 +4139,19 @@ function showReport5() {
         	  var teacher8 = [];
         	  var teacher9 = [];
         	  var teacher10 = [];
+        	  var teacher11 = [];
+        	  var teacher12 = [];
+        	  var teacher13 = [];
+        	  var teacher14 = [];
+        	  var teacher15 = [];
+        	  var teacher16 = [];
+        	  var teacher17 = [];
+        	  var teacher18 = [];
+        	  var teacher19 = [];
+        	  var teacher20 = [];
 
 
-        	  var teachers = [teacher0, teacher1, teacher2, teacher3, teacher4, teacher5, teacher6, teacher7, teacher8, teacher9, teacher10];
+        	  var teachers = [teacher0, teacher1, teacher2, teacher3, teacher4, teacher5, teacher6, teacher7, teacher8, teacher9, teacher10, teacher11, teacher12, teacher13, teacher14, teacher15, teacher16, teacher17, teacher18, teacher19, teacher20 ];
         	  var teachersFound = [];
         	  
         	  for (var w=0; w < jsonWeekArr.length; w++ ) {
@@ -4118,8 +4193,8 @@ function showReport5() {
 				  teachersFound.push(teachers[t]);
 			  }
 			  var canvas_width = jsonWeekArr.length * 80;
-			  if (canvas_width > 1200) {
-				  canvas_width =  1200;
+			  if (canvas_width > 1600) {
+				  canvas_width =  1600;
 			  }
 			  if (canvas_width < 600) {
 				  canvas_width = 600;
@@ -4234,8 +4309,70 @@ function showReport5() {
         	            label: rpt5getUsernameDisplay(9),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
-          	          }
-        	          
+          	          },
+        	          {
+          	            label: rpt5getUsernameDisplay(10),
+          	            lineWidth:3, 
+          	            markerOptions: { style:'circle' }
+          	          }, 
+          	          {
+          	            // Don't show a line, just show markers.
+          	            // Make the markers 7 pixels with an 'x' style
+          	            label: rpt5getUsernameDisplay(11),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          },
+          	          { 
+          	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(12),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }, 
+          	          {
+          	            // Use a thicker, 5 pixel line and 10 pixel
+          	            // filled square markers.
+          	            label: rpt5getUsernameDisplay(13),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          },
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(14),
+           	            lineWidth:3, 
+           	            markerOptions: { style:"circle" }
+           	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(15),
+           	            lineWidth:3, 
+           	            markerOptions: { style:"circle" }
+           	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(16),
+           	            lineWidth:3, 
+           	            markerOptions: { style:"circle" }
+           	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(17),
+           	            lineWidth:3, 
+           	            markerOptions: { style:"circle" }
+           	          },
+          	          { 
+              	            // Use (open) circlular markers.
+           	            label: rpt5getUsernameDisplay(18),
+              	        lineWidth:3, 
+              	        markerOptions: { style:"circle" }
+              	      },
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt5getUsernameDisplay(19),
+           	            lineWidth:3, 
+           	            markerOptions: { style:"circle" }
+           	      	  }
+
+            	      
         	      ]
         	    }
         	  );
@@ -4376,7 +4513,7 @@ function showReport6() {
     }
 	
 	if (rpt6Weeks == "all") {
-		trendNumberOfUnits = currentWeek - 1;
+		trendNumberOfUnits = currentWeek;
 		document.getElementById('rpt6PriorWeeks').value = "";
 	}
 	else { 
@@ -4395,10 +4532,10 @@ function showReport6() {
     	intNumberOfUnits = 1;
     }
     if (intNumberOfUnits > 1) {
-    	startWeek = startWeek - (intNumberOfUnits+1);
+    	startWeek = startWeek - intNumberOfUnits;
     }
     	
-	var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
+    var trendFilter = "" + startWeek + "~" + trendUnit + "~" + trendNumberOfUnits;
 	var teacherFilter = "";
 	if (!(currentTeacher.id === "0")) {
 		trendFilter += "~" + currentTeacher.id;
@@ -4461,6 +4598,13 @@ function showReport6() {
                 	jsonWeekArr.push(jsonRangeData[j]);
             	
             	}
+ 
+            	var rpt6MaxVal = 20;
+            	var rpt6Interval = 1;
+            	if (trendNumberOfUnits > 5 ) {
+            		rpt6MaxVal = trendNumberOfUnits * 25;
+            		rpt6Interval = rpt6MaxVal / 20;
+            	}
             	
         	  var p1_teacher0 = [];
         	  var p1_teacher1 = [];
@@ -4473,10 +4617,20 @@ function showReport6() {
         	  var p1_teacher8 = [];
         	  var p1_teacher9 = [];
         	  var p1_teacher10 = [];
+        	  var p1_teacher11 = [];
+        	  var p1_teacher12 = [];
+        	  var p1_teacher13 = [];
+        	  var p1_teacher14 = [];
+        	  var p1_teacher15 = [];
+        	  var p1_teacher16 = [];
+        	  var p1_teacher17 = [];
+        	  var p1_teacher18 = [];
+        	  var p1_teacher19 = [];
+        	  var p1_teacher20 = [];
 
 
 
-        	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9, p1_teacher10];
+        	  var p1_teachers = [p1_teacher0, p1_teacher1, p1_teacher2, p1_teacher3, p1_teacher4, p1_teacher5, p1_teacher6, p1_teacher7, p1_teacher8, p1_teacher9, p1_teacher10, p1_teacher11, p1_teacher12, p1_teacher13, p1_teacher14, p1_teacher15, p1_teacher16, p1_teacher17, p1_teacher18, p1_teacher19, p1_teacher20 ];
         	  var p1_teachersFound = [];
 
         	  var p2_teacher0 = [];
@@ -4490,9 +4644,19 @@ function showReport6() {
         	  var p2_teacher8 = [];
         	  var p2_teacher9 = [];
         	  var p2_teacher10 = [];
+        	  var p2_teacher11 = [];
+        	  var p2_teacher12 = [];
+        	  var p2_teacher13 = [];
+        	  var p2_teacher14 = [];
+        	  var p2_teacher15 = [];
+        	  var p2_teacher16 = [];
+        	  var p2_teacher17 = [];
+        	  var p2_teacher18 = [];
+        	  var p2_teacher19 = [];
+        	  var p2_teacher20 = [];
 
 
-        	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9, p2_teacher10];
+        	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9, p2_teacher10, p2_teacher11, p2_teacher12, p2_teacher13, p2_teacher14, p2_teacher15, p2_teacher16, p2_teacher17, p2_teacher18, p2_teacher19, p2_teacher20];
         	  var p2_teachersFound = [];
         	  
         	  for (var w=0; w < jsonWeekArr.length; w++ ) {
@@ -4564,8 +4728,8 @@ function showReport6() {
         	                  //fontSize: '14pt'
         	              },
         	              min: 0,
-        	              max: 1000,
-        	              tickInterval: 25, 
+        	              max: rpt6MaxVal,
+        	              tickInterval: rpt6Interval, 
         	              tickOptions: { 
         	                      formatString: '%d' 
         	              }, 
@@ -4643,9 +4807,72 @@ function showReport6() {
         	            label: rpt6getUsernameDisplay(9),
           	            lineWidth:3, 
           	            markerOptions: { style:"circle" }
-          	          }
+          	          },
+        	          {
+          	            // Change our line width and use a diamond shaped marker.
+          	            label: rpt6getUsernameDisplay(10),
+          	            lineWidth:3, 
+          	            markerOptions: { style:'circle' }
+          	          }, 
+          	          {
+          	            // Don't show a line, just show markers.
+          	            // Make the markers 7 pixels with an 'x' style
+          	            label: rpt6getUsernameDisplay(11),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          },
+          	          { 
+          	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(12),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          }, 
+          	          {
+          	            // Use a thicker, 5 pixel line and 10 pixel
+          	            // filled square markers.
+          	            label: rpt6getUsernameDisplay(13),
+          	            lineWidth:3, 
+          	            markerOptions: { style:"circle" }
+          	          },
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(14),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(15),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(16),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          }, 
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(17),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	          },
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(18),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	      	  },
+          	          { 
+            	            // Use (open) circlular markers.
+          	            label: rpt6getUsernameDisplay(19),
+            	            lineWidth:3, 
+            	            markerOptions: { style:"circle" }
+            	      }
         	          
-        	      ]
+
+          	    ]
         	    }
         	  );
 
@@ -4679,8 +4906,8 @@ function showReport6() {
               	                  //fontSize: '14pt'
               	              },
               	              min: 0,
-              	              max: 1000,
-              	              tickInterval: 25, 
+              	              max: rpt6MaxVal,
+              	              tickInterval: rpt6Interval, 
               	              tickOptions: { 
               	                      formatString: '%d' 
               	              }, 
@@ -4758,7 +4985,69 @@ function showReport6() {
                   	        label: rpt6getUsernameDisplay(9),
                     	    lineWidth:3, 
                     	    markerOptions: { style:"circle" }
-                    	  }
+                    	  },
+              	          {
+               	            // Change our line width and use a diamond shaped marker.
+               	            label: rpt6getUsernameDisplay(0),
+               	            lineWidth:3, 
+               	            markerOptions: { style:'circle' }
+               	          }, 
+               	          {
+               	            // Don't show a line, just show markers.
+               	            // Make the markers 7 pixels with an 'x' style
+               	            label: rpt6getUsernameDisplay(1),
+               	            lineWidth:3, 
+               	            markerOptions: { style:"circle" }
+               	          },
+               	          { 
+               	            // Use (open) circlular markers.
+               	            label: rpt6getUsernameDisplay(2),
+               	            lineWidth:3, 
+               	            markerOptions: { style:"circle" }
+               	          }, 
+               	          {
+               	            // Use a thicker, 5 pixel line and 10 pixel
+               	            // filled square markers.
+               	            label: rpt6getUsernameDisplay(3),
+               	            lineWidth:3, 
+               	            markerOptions: { style:"circle" }
+               	          },
+               	          { 
+                 	            // Use (open) circlular markers.
+               	            label: rpt6getUsernameDisplay(4),
+                 	            lineWidth:3, 
+                 	            markerOptions: { style:"circle" }
+                 	      }, 
+               	          { 
+                 	            // Use (open) circlular markers.
+               	            label: rpt6getUsernameDisplay(5),
+                 	            lineWidth:3, 
+                 	            markerOptions: { style:"circle" }
+                 	      }, 
+               	          { 
+                 	            // Use (open) circlular markers.
+               	            	label: rpt6getUsernameDisplay(6),
+                 	            lineWidth:3, 
+                 	            markerOptions: { style:"circle" }
+                 	      }, 
+                	      { 
+                  	           // Use (open) circlular markers.
+                	            label: rpt6getUsernameDisplay(7),
+                  	        	lineWidth:3, 
+                  	        	markerOptions: { style:"circle" }
+                  	      },
+                    	      { 
+                      	        // Use (open) circlular markers.
+                    	        label: rpt6getUsernameDisplay(8),
+                      	        lineWidth:3, 
+                      	        markerOptions: { style:"circle" }
+                      	  },
+                    	  { 
+                      	        // Use (open) circlular markers.
+                    	        label: rpt6getUsernameDisplay(9),
+                      	    	lineWidth:3, 
+                      	   		markerOptions: { style:"circle" }
+                      	  }
               	          
               	      ]
               	    }
@@ -5560,16 +5849,26 @@ function updateAllCohortSlices() {
                             
                             <div id="chart3c_div2" class="panel-body">
                             	<div class="row">
-					            	<div id="chart3c_canvas0" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas1" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas2" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas3" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas4" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas5" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas6" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas7" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas8" class="col-md-3" style="width:300px; height:300px;"></div> 
-					            	<div id="chart3c_canvas9" class="col-md-3" style="width:300px; height:300px;"></div> 
+					            	<div id="chart3c_canvas0" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas1" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas2" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas3" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas4" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas5" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas6" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas7" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas8" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas9" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas10" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas11" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas12" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas13" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas14" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas15" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas16" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas17" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas18" class="col-md-3" style="width:200px; height:200px;"></div> 
+					            	<div id="chart3c_canvas19" class="col-md-3" style="width:200px; height:200px;"></div> 
 				            	</div>
 				            	<hr>
                             	<div class="row">

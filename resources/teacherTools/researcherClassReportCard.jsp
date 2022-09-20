@@ -3187,12 +3187,6 @@ var completeDataChart;
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
                         class="fa fa-user"></i> ${fn:toUpperCase(teacherName)} <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
-                                class="fa fa-fw fa-power-off"></i><%= rb.getString("log_out") %></a>
-                    </li>
-                </ul>
             </li>
         </ul>
     </nav>
