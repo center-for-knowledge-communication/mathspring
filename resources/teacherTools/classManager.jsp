@@ -56,6 +56,7 @@
 <!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
 <!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
 <!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
+<!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown draggable -->
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -242,18 +243,29 @@ System.out.println("msHost = " + msHost + msContext);
 .centerDiv
 {
 
-  height:250px;
-  width: 240px; 
+  height:280px;
+  width: 260px; 
   border-radius: 1em;
   border-width:thin;
   border-color:blue;
   padding: 1em; 
-  position: fixed;
+  position: absolute;
   top: 30%;
   left: 37%;
   margin-right: -50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+}
+
+.centerDivHdr {
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196F3;
+  color: #fff;
 }
 
 .standardsHelpBox {
@@ -1312,7 +1324,7 @@ function problemDetails(data, response) {
 
     });	
 
-var save_changes = "<%= rb.getString("save_changes")%>";
+var save_selections = "<%= rb.getString("save_selections")%>";
 var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
@@ -1322,7 +1334,7 @@ var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoom
     " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
     " <div class='panel-body'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
     "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
+    "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
 
@@ -1514,9 +1526,9 @@ function standardsProblemDetails(data, response, state) {
     });
 
     
-    var selector = "#"+JSONData["problemLevelId"]+"_handler";
+    var saveSelector = "#"+JSONData["problemLevelId"]+"_save_handler";
 
-    $(document.body).on('click', selector ,function(){
+    $(document.body).on('click', saveSelector ,function(){
         var rows = $("#"+JSONData["problemLevelId"]).dataTable(
             { "bPaginate": false,
                 <%=jc_rb.getString("language_text")%>
@@ -1561,7 +1573,107 @@ function standardsProblemDetails(data, response, state) {
 
     });	
 
-	var save_changes = "<%= rb.getString("save_changes")%>";
+    var selectallSelector = "#"+JSONData["problemLevelId"]+"_selectall_handler";    
+    
+    $(document.body).on('click', selectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var problemIds = [""];
+        
+	    $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+  
+    
+    var deselectallSelector = "#"+JSONData["problemLevelId"]+"_deselectall_handler";    
+    
+    $(document.body).on('click', deselectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var j=0;
+        var rowsArray = [];
+        var problemIds = [""];
+        var i = 0;
+        $("input:checkbox:not(:checked)", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+
+        $("input:checkbox:checked", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+        
+        for(j=0; j < rowsArray.length; j++)
+            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
+
+        
+        $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+    
+    
+    
+    
+	var save_selections = "<%= rb.getString("save_selections")%>";
+	var activate_save_all = "<%= rb.getString("activate_save_all")%>";
+	var deactivate_save_all = "<%= rb.getString("deactivate_save_all")%>";
 	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
@@ -1572,9 +1684,9 @@ function standardsProblemDetails(data, response, state) {
     " <div class='panel-body detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
     "<div class='panel-body detail_table_bg'>"+higherlevelDetailp3+"</div>"+
     "<div class='panel-body detail_table_bg'>"+
-    "<button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button>&nbsp;&nbsp;"+
-//    "<button class='btn btn-primary btn-lg' aria-disabled='true'>Activate All</button>&nbsp;&nbsp;"+
-//    "<button class='btn btn-primary btn-lg' aria-disabled='true'>Deactivate All</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
     "</div>"+
     "</div>";
 
@@ -2016,9 +2128,52 @@ function changeLandingPageHeader2AccordingToLanguage(){
 	}
 }
 
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "Hdr")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "Hdr").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
 
 
 function registerAllEvents(){
+	
+	dragElement(document.getElementById("activeProblemsFilter"));
+
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
 //    $('#reorg_prob_sets_handler').css('color', '#ffffff');
@@ -3138,11 +3293,12 @@ function registerAllEvents(){
                         <small><%= rb.getString("active_problem_sets") %></small>
                     </h3>
 					<div id="activeProblemsFilter" class="centerDiv report_filters" style="display:none;">
+  						<div id="activeProblemsFilterHdr" class="centerDivHdr"><%= rb.getString("click_here_to_drag") %></div>
 						<label><%= rb.getString("select_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myActiveInput" multiple onkeyup="activeStandardsFilter()">
                         <select name="activeStandardsList" id="activeStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
                        	<button id="activeFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handleActiveStandardsReset()"><%= rb.getString("reset") %></button> 
                        	<button id="activeFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayActiveStandardsHelp()"><%= rb.getString("help") %></button> 
 						<div id="activeStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
@@ -3231,6 +3387,7 @@ function registerAllEvents(){
                     </h3>
 
 					<div id="passiveProblemsFilter" class="centerDiv report_filters" style="display:none;">
+  						<div id="activeProblemsFilterHdr" class="centerDivHdr"><%= rb.getString("click_here_to_drag") %></div>
 						<label><%= rb.getString("select_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myPassiveInput" multiple onkeyup="passiveStandardsFilter()">
                         <select name="passiveStandardsList" id="passiveStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
