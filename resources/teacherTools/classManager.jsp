@@ -240,33 +240,64 @@ System.out.println("msHost = " + msHost + msContext);
 
 }
 
-.centerDiv
+.activeCenterDiv
 {
 
   height:280px;
   width: 260px; 
   border-radius: 1em;
   border-width:thin;
-  border-color:blue;
+  border-color:black;
+  background-color: #33ffff;
   padding: 1em; 
   position: absolute;
   top: 30%;
-  left: 37%;
+  left: 65%;
   margin-right: -50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
 
-.centerDivHdr {
+.activeCenterDivHdr {
   border-radius: 1em;
   border-width:thin;
   border-color:black;
   padding: 10px;
   cursor: move;
   z-index: 10;
-  background-color: #2196F3;
-  color: #fff;
+  color: white;
+  background-color:black;
 }
+
+
+.passiveCenterDiv
+{
+
+  height:280px;
+  width: 260px; 
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  background-color: #00cccc;
+  padding: 1em; 
+  position: absolute;
+  bottom: 20%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.passiveCenterDivHdr {
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  color: white;
+  background-color:black;
+}
+
 
 .standardsHelpBox {
   border-radius: 1em;
@@ -357,7 +388,8 @@ var lowGradeLevel;
 var highGradeLevel;
 
 var topicSelectionInProgress = "";
-var topicStandardSelectedInProgress = "";
+var topicActiveStandardInProgress = "";
+var topicPassiveStandardInProgress = "";
 
 var activeStandardsRow = null;
 var activeStandardsChild = null;
@@ -365,7 +397,7 @@ var activeStandardsResponse = null;
 var activeStandardsJSONData = null;
 var activeStandardsTopicStandards = null;
 var activeStandardsTopicStandardsSorted = null;
-var activeStandardsRowID = null;
+var activeStandardsRowID = "";
 
 var passiveStandardsRow = null;
 var passiveStandardsChild = null;
@@ -373,7 +405,7 @@ var passiveStandardsResponse = null;
 var passiveStandardsJSONData = null;
 var passiveStandardsTopicStandards = null;
 var passiveStandardsTopicStandardsSorted = null;
-var passiveStandardsRowID = null;
+var passiveStandardsRowID = "";
 
 var plot_live_dashboard = null;
 var plot_effort_chart = null;
@@ -1481,13 +1513,13 @@ function displayPassiveStandardsHelp() {
 }
 
 function activeStandardsFilter() {
-	  var input, filter, ul, li, a, i;
+	  var div, input, filter, ul, li, a, i;
 	  input = document.getElementById("myActiveInput");
 	  filter = input.value.toUpperCase();
 	  div = document.getElementById("activeStandardsList");
 	  a = div.getElementsByTagName("option");
 	  for (i = 0; i < a.length; i++) {
-	    txtValue = a[i].textContent || a[i].innerText;
+	    var txtValue = a[i].textContent || a[i].innerText;
 	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
 	      a[i].style.display = "";
 	    } else {
@@ -1497,13 +1529,13 @@ function activeStandardsFilter() {
 	}
 	
 function passiveStandardsFilter() {
-	  var input, filter, ul, li, a, i;
+	  var div, input, filter, ul, li, a, i;
 	  input = document.getElementById("myPassiveInput");
 	  filter = input.value.toUpperCase();
 	  div = document.getElementById("passiveStandardsList");
 	  a = div.getElementsByTagName("option");
 	  for (i = 0; i < a.length; i++) {
-	    txtValue = a[i].textContent || a[i].innerText;
+	    var txtValue = a[i].textContent || a[i].innerText;
 	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
 	      a[i].style.display = "";
 	    } else {
@@ -2173,6 +2205,7 @@ function dragElement(elmnt) {
 function registerAllEvents(){
 	
 	dragElement(document.getElementById("activeProblemsFilter"));
+	dragElement(document.getElementById("passiveProblemsFilter"));
 
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
@@ -2463,8 +2496,8 @@ function registerAllEvents(){
 	
 	 $(".active").click(function () {
 
-		 if (topicSelectionInProgress === "standards") {
-        	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
+		 if (topicSelectionInProgress == "standards") {
+        	alert("<%= rb.getString("standards_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	       	return;
 		 }            
 
@@ -2540,22 +2573,35 @@ function registerAllEvents(){
 	 $(".activeStandards").click(function () {
 
 		 	if (topicSelectionInProgress === "listall") {
-	        	alert("<%= rb.getString("full_list_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
+	        	alert("<%= rb.getString("full_list_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	        	return;
 	        }	        
 
-		 	$(this).children(':first').toggleClass('rotate-icon');
-	        var tr = $(this).closest('tr');
-	        activeStandardsRow = activetable.row( tr );
+	        var test_tr = $(this).closest('tr');
+	        var testActiveStandardsRow = activetable.row( test_tr );
+            var testActiveStandardsRowID = '#'+testActiveStandardsRow.data()[0];
 
-	        if ( activeStandardsRow.child.isShown() || (topicSelectionInProgress === "standards")) {
-	        	activeStandardsRow.child.hide();
+	        if (testActiveStandardsRowID === activeStandardsRowID) { 
+	        	activeStandardsRowID = "";
+			 	$(this).children(':first').toggleClass('rotate-icon');
+	        	testActiveStandardsRow.child.hide();
                 $('#activeProblemsFilter').hide();
                 topicSelectionInProgress = "";
+	        	topicActiveStandardInProgress = "";
 
 	        }else{
+				if (activeStandardsRowID.length > 0) {
+		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
+		        	return;					
+				}
+				
+	        	$(this).children(':first').toggleClass('rotate-icon');
+		        var tr = $(this).closest('tr');
+		        activeStandardsRow = activetable.row( tr );
 	        	topicSelectionInProgress = "standards";
+	        	topicActiveStandardInProgress = "activeStandards";
 	            activeStandardsRowID = '#'+activeStandardsRow.data()[0];
+	            
 	            $.ajax({
 	                type : "POST",
 	                url :pgContext+"/tt/tt/getProblemForProblemSets",
@@ -2583,7 +2629,7 @@ function registerAllEvents(){
 	                        });
 
 	                        document.getElementById('activeStandardsList').innerHTML = activeStandardsList;
-	                        $('#activeProblemsFilter').show();
+	        	        	$('#activeProblemsFilter').show();
 	                        document.getElementById("activeStandardsList").focus();
 	                    }
 	                }
@@ -2664,7 +2710,7 @@ function registerAllEvents(){
 	
     $(".passive").click(function () {
     	
-		if (topicSelectionInProgress === "standards") {
+		if (topicSelectionInProgress == "standards") {
         	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
 		   	return;
 		}            
@@ -2721,18 +2767,31 @@ function registerAllEvents(){
 	        	return;
 	        }	        
 
-	        $(this).children(':first').toggleClass('rotate-icon');
-	        var tr = $(this).closest('tr');
-	        passiveStandardsRow = inactivetable.row( tr );
+	        var test_tr = $(this).closest('tr');
+	        var testPassiveStandardsRow = inactivetable.row( test_tr );
+            var testPassiveStandardsRowID = '#'+testPassiveStandardsRow.data()[0];
 
-	        if ( passiveStandardsRow.child.isShown() || (topicSelectionInProgress === "standards")) {
-	        	passiveStandardsRow.child.hide();
-             	$('#passiveProblemsFilter').hide();
-             	topicSelectionInProgress = "";
+	        if (testPassiveStandardsRowID === passiveStandardsRowID) { 
+	        	passiveStandardsRowID = "";
+			 	$(this).children(':first').toggleClass('rotate-icon');
+	        	testPassiveStandardsRow.child.hide();
+                $('#passiveProblemsFilter').hide();
+                topicSelectionInProgress = "";
+	        	topicPassiveStandardInProgress = "";
 
 	        }else{
+				if (passiveStandardsRowID.length > 0) {
+		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
+		        	return;					
+				}
+				
+	            $(this).children(':first').toggleClass('rotate-icon');
+		        var tr = $(this).closest('tr');
+		        passiveStandardsRow = inactivetable.row( tr );
 	        	topicSelectionInProgress = "standards";
+	        	topicPassiveStandardInProgress = "passiveStandards";
 	            passiveStandardsRowID = '#'+passiveStandardsRow.data()[0];
+
 	            $.ajax({
 	                type : "POST",
 	                url :pgContext+"/tt/tt/getProblemForProblemSets",
@@ -2758,7 +2817,7 @@ function registerAllEvents(){
 	                        		passiveStandardsList += '<option  id="std_' + obj.code + '" value="' + obj.code + '">' + obj.code + '</option>';
 	                       		}
 	                        });
-
+	                        
 	                        document.getElementById('passiveStandardsList').innerHTML = passiveStandardsList;
 	                        $('#passiveProblemsFilter').show();
 	                        document.getElementById("passiveStandardsList").focus();
@@ -3292,9 +3351,9 @@ function registerAllEvents(){
                     <h3 class="tt-page-header">
                         <small><%= rb.getString("active_problem_sets") %></small>
                     </h3>
-					<div id="activeProblemsFilter" class="centerDiv report_filters" style="display:none;">
-  						<div id="activeProblemsFilterHdr" class="centerDivHdr"><%= rb.getString("click_here_to_drag") %></div>
-						<label><%= rb.getString("select_standard") %></label>
+					<div id="activeProblemsFilter" class="activeCenterDiv report_filters" style="display:none;">
+  						<div id="activeProblemsFilterHdr" class="activeCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
+						<label><%= rb.getString("select_active_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myActiveInput" multiple onkeyup="activeStandardsFilter()">
                         <select name="activeStandardsList" id="activeStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
@@ -3302,11 +3361,11 @@ function registerAllEvents(){
                        	<button id="activeFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handleActiveStandardsReset()"><%= rb.getString("reset") %></button> 
                        	<button id="activeFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayActiveStandardsHelp()"><%= rb.getString("help") %></button> 
 						<div id="activeStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							<label><%= rb.getString("popup_btn_help_1") %></label><br>
 							<label><%= rb.getString("popup_btn_help_2") %></label><br>
 							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							
 						</div>
 					</div>
@@ -3325,9 +3384,9 @@ function registerAllEvents(){
                         <tr>
                             <th rowspan="2" align="center"><span><%= rb.getString("order") %>&nbsp;&nbsp;</span><a rel="popoverOrder"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span></span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span></span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th style="text-align: center;" colspan="<c:out value='${activeproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
                             <th rowspan="2"><%= rb.getString("deactivate_problem_set") %></th>
@@ -3386,21 +3445,21 @@ function registerAllEvents(){
                         <small><%= rb.getString("inactive_problem_sets") %></small>
                     </h3>
 
-					<div id="passiveProblemsFilter" class="centerDiv report_filters" style="display:none;">
-  						<div id="activeProblemsFilterHdr" class="centerDivHdr"><%= rb.getString("click_here_to_drag") %></div>
-						<label><%= rb.getString("select_standard") %></label>
+					<div id="passiveProblemsFilter" class="passiveCenterDiv report_filters" style="display:none;">
+  						<div id="passiveProblemsFilterHdr" class="passiveCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
+						<label><%= rb.getString("select_inactive_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myPassiveInput" multiple onkeyup="passiveStandardsFilter()">
                         <select name="passiveStandardsList" id="passiveStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
                        	<button id="passiveFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handlePassiveStandardsReset()"><%= rb.getString("reset") %></button> 
                        	<button id="passiveFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayPassiveStandardsHelp()"><%= rb.getString("help") %></button> 
 						<div id="passiveStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							<label><%= rb.getString("popup_btn_help_1") %></label><br>
 							<label><%= rb.getString("popup_btn_help_2") %></label><br>
 							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							
 						</div>
 					</div>
@@ -3418,9 +3477,9 @@ function registerAllEvents(){
                         <tr>
                             <th rowspan="2"><%= rb.getString("order") %></th>
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span></span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span></span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th style="text-align: center;" colspan="<c:out value='${inActiveproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
                             <th rowspan="2"><%= rb.getString("activate_problem_sets") %></th>
