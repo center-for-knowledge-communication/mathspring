@@ -469,6 +469,82 @@ $(document).ready(function () {
 	
 	headers = changeTeacherActivitiesReportHeaderAccordingToLanguage();
 
+	
+	//You can fire the function and get the corresponding id of that opened accordion with this code.
+
+	jQuery(document).on('show.bs.collapse','#classroomTrendsGroup',function (e){
+	    var clicked = $(document).find("[href='#" + $(e.target).attr('id') + "']");
+	    if ($(e.target).attr('id') == "chartTP") {
+		    document.getElementById("tp_canvas").innerHTML = "";      	  			  
+		    document.getElementById("tp_table").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartTCP") {
+		    document.getElementById("tcp_canvas").innerHTML = "";      	  			  
+		    document.getElementById("tcp_table").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartTCS") {
+		    document.getElementById("tcs_canvas").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartSix") {
+		    document.getElementById("chart6_canvas1").innerHTML = "";      	  			  
+		    document.getElementById("chart6_canvas2").innerHTML = "";      	  			  
+	    }
+	    
+	});	
+	
+	jQuery(document).on('show.bs.collapse','#teacherGroup',function (e){
+	    var clicked = $(document).find("[href='#" + $(e.target).attr('id') + "']");
+	    if ($(e.target).attr('id') == "chartTwo") {
+		    document.getElementById("chart2_canvas").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartTwoB") {
+		    document.getElementById("chart2b_canvas").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartTwoC") {
+		    document.getElementById("chart2c_canvas").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartFive") {
+		    document.getElementById("chart5_canvas").innerHTML = "";      	  			  
+	    }	    
+	});	
+	
+	jQuery(document).on('show.bs.collapse','#msviewerGroup',function (e){
+	    var clicked = $(document).find("[href='#" + $(e.target).attr('id') + "']");
+
+	    if ($(e.target).attr('id') == "table_4b") {
+		    document.getElementById("table4b").innerHTML = "";      	  			  
+		}
+	    if ($(e.target).attr('id') == "table_4c") {
+		    document.getElementById("table4c").innerHTML = "";      	  			  
+		}
+	});	
+
+
+	jQuery(document).on('show.bs.collapse','#populationGroup',function (e){
+	    var clicked = $(document).find("[href='#" + $(e.target).attr('id') + "']");
+	    if ($(e.target).attr('id') == "chartThree") {
+		    document.getElementById("tpsa-thead").innerHTML = "";      	  			  
+		    document.getElementById("tpsa-tbody").innerHTML = "";      	  			  
+	    }
+	    if ($(e.target).attr('id') == "chartThree") {
+		    document.getElementById("chart3_canvas").innerHTML = "";      	  			  
+		}
+	    if ($(e.target).attr('id') == "chartThreeA") {
+		    document.getElementById("chart3a_canvas").innerHTML = "";      	  			  
+		    document.getElementById("table3a").innerHTML = "";      	  			  
+		}
+	    if ($(e.target).attr('id') == "chartThreeB") {
+		    document.getElementById("chart3b_canvas").innerHTML = "";      	  			  
+		    document.getElementById("table3b").innerHTML = "";      	  			  
+		}
+	    if ($(e.target).attr('id') == "chartThreeF") {
+		    document.getElementById("table3f").innerHTML = "";      	  			  
+		}
+	});	
+
+		
+	
+	
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/researchServices",
@@ -1229,89 +1305,6 @@ function showReport1() {
     
 }
 
-/*
-function rptTeacherClassesCount() {
-
-	if (currentCohortId == "") {
-		alert('<%= rwrb.getString("must_select_cohort") %>');
-		return;
-	}
-
-	
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/getCohortReport",
-        data : {
-            cohortId: currentCohortId,
-            reportType: 'teacherClassesCount',
-            lang: loc,
-            filter: ''
-        },
-        success : function(data) {
-        	if (data) {
-            	var jsonData = $.parseJSON(data);
-            	var ticks = [];
-            	for (var i=0;i<10;i = i + 1) {
-            		ticks.push(jsonData[i].username);
-            	}
-            	var series = [];
-        		var row = [];
-            	for (var i=0;i<10;i = i + 1) {
-            	
-            		var element = [];
-            		element.push(jsonData[i].logins);
-            		element.push(i+1);
-            		row.push(element);
-            	}
-        		series.push(row);
-                // var ticks = ['Paul', 'John', 'George', 'Ringo'];
-
-                var plot2b = $.jqplot('chart2b_canvas', series, {
-                    seriesDefaults: {
-                        renderer:$.jqplot.BarRenderer,
-                        // Show point labels to the right ('e'ast) of each bar.
-                        // edgeTolerance of -15 allows labels flow outside the grid
-                        // up to 15 pixels.  If they flow out more than that, they 
-                        // will be hidden.
-					    seriesDefaults:{
-					        renderer:$.jqplot.BarRenderer,
-				            varyBarColor: true
-					    },                        
-					    pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
-                        // Rotate the bar shadow as if bar is lit from top right.
-                        shadowAngle: 135,
-                        // Here's where we tell the chart it is oriented horizontally.
-                        rendererOptions: {
-                            barDirection: 'horizontal',
-                            varyBarColor: true
-                        }
-                    },
-            	    series:[
-            	        {label:'<%= rwrb.getString("logins") %>'}
-            	    ],
-                    axes: {
-                        yaxis: {
-							renderer: $.jqplot.CategoryAxisRenderer,
-							ticks: ticks            
-             			}
-                    },
-
-
-                });
-
-        	}
-        	else {
-        		alert('<%= rwrb.getString("response_data_null") %>');
-        	}
-        },
-        error : function(e) {
-        	alert("error");
-            console.log(e);
-        }
-    });
-
-}
-*/
 function showReport2() {
 
 	if (currentCohortId == "") {
@@ -2753,7 +2746,7 @@ function showTable4b() {
     var cols_4b = [];
 
     var tbl_4b = document.getElementById("table4b");
-    tbl_4b.innerHTML = "";
+    
 	$('#table4b-loader').show();
     
     $.ajax({
@@ -3078,7 +3071,7 @@ function showTable4c() {
     var cols_4c = [];
 
     var tbl_4c = document.getElementById("table4c");
-    tbl_4c.innerHTML = "";
+    
 	$('#table4c-loader').show();
     
     $.ajax({
@@ -3635,7 +3628,7 @@ function showTable_tpsa() {
                     }
                 }
                  
-        	    var tpsa_head = document.getElementById("tpsa_header_table");
+        	    var tpsa_head = document.getElementById("tpsa-thead");
         	    tpsa_head.innerHTML = "";
         	    var headerWidth = cols.length * 100;
                                  
@@ -3664,7 +3657,7 @@ function showTable_tpsa() {
                 }
 
                 
-        	    var tpsa_body = document.getElementById("tpsa_body_table");
+        	    var tpsa_body = document.getElementById("tpsa-tbody");
 				// Adding the data to the table
 				tpsa_body.innerHTML = "";
 				teacherComments = '';
@@ -6083,12 +6076,13 @@ function updateAllCohortSlices() {
 
             <div id="population-wrapper" class="row" width: 100%;">
 
+                <div class="panel-group" id="populationGroup">
 
 
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartTPSA">
+                                <a id="report_tpsa" class="accordion-toggle" data-toggle="collapse" data-parent="#populationGroup" href="#chartTPSA">
                                    Study Status Snapshot
                                 </a>
                                	<button id="ButtonTPSA" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6129,7 +6123,6 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
-
              </div>
 
 
@@ -6138,7 +6131,7 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_3" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThree">
+                                <a id="report_3" class="accordion-toggle" data-toggle="collapse" data-parent="#populationGroup" href="#chartThree">
                                     Teacher Class Count
                                 </a>
                                	<button id="Button3" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6160,7 +6153,7 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_3a" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeA">
+                                <a id="report_3a" class="accordion-toggle" data-toggle="collapse" data-parent="#populationGroup" href="#chartThreeA">
                                     Teacher Student Counts 
                                 </a>
                                	<button id="Button3a" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6188,7 +6181,7 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_3b" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeB">
+                                <a id="report_3b" class="accordion-toggle" data-toggle="collapse" data-parent="#populationGroup" href="#chartThreeB">
                                     Class Student Counts 
                                 </a>
                                	<button id="Button3b" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6216,7 +6209,7 @@ function updateAllCohortSlices() {
                    <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a id="report_3f" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#chartThreeF">
+                                <a id="report_3f" class="accordion-toggle" data-toggle="collapse" data-parent="#populationGroup" href="#chartThreeF">
                                     Student Census 
                                 </a>
                                	<button id="Button3f" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6238,7 +6231,7 @@ function updateAllCohortSlices() {
                         </div>
                     </div>
 
-
+				    </div>					
             	</div>
         	</div>
 		</div>
@@ -6255,10 +6248,12 @@ function updateAllCohortSlices() {
 	
 	            <div id="tables-wrapper" class="row" width: 100%;">
 	
+	                <div class="panel-group" id="msviewerGroup">
+	                
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4b">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msviewerGroup" href="#table_4b">
 	                                    Errors Reported by Students 
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6293,7 +6288,7 @@ function updateAllCohortSlices() {
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4c">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msviewerGroup" href="#table_4c">
 	                                    Teacher Feedback 
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6324,7 +6319,7 @@ function updateAllCohortSlices() {
 	
 	                        </div>
 	                    </div>
-	
+					</div>
 	
 	
 	                    
@@ -6462,7 +6457,7 @@ function updateAllCohortSlices() {
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#table_4a">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#adminCommands" href="#table_4a">
 	                                    Teacher Class Weekly Data Table
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
