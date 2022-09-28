@@ -387,7 +387,8 @@ var inactiveProblemSet;
 var lowGradeLevel;
 var highGradeLevel;
 
-var topicSelectionInProgress = "";
+var topicActiveSelectionInProgress = "";
+var topicPassiveSelectionInProgress = "";
 var topicActiveStandardInProgress = "";
 var topicPassiveStandardInProgress = "";
 
@@ -2496,10 +2497,10 @@ function registerAllEvents(){
 	
 	 $(".active").click(function () {
 
-		 if (topicSelectionInProgress == "standards") {
+		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
         	alert("<%= rb.getString("standards_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	       	return;
-		 }            
+		}            
 
         $(this).children(':first').toggleClass('rotate-icon');
         var tr = $(this).closest('tr');
@@ -2507,10 +2508,10 @@ function registerAllEvents(){
 
         if ( row.child.isShown() ) {
             row.child.hide();
-            topicSelectionInProgress = "";
+            topicActiveSelectionInProgress = "";
         }else{
 
-			topicSelectionInProgress = "listall";
+			topicActiveSelectionInProgress = "listall";
 			
         	var rowID = '#'+row.data()[0];
             $.ajax({
@@ -2572,7 +2573,7 @@ function registerAllEvents(){
 		
 	 $(".activeStandards").click(function () {
 
-		 	if (topicSelectionInProgress === "listall") {
+		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
 	        	alert("<%= rb.getString("full_list_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	        	return;
 	        }	        
@@ -2710,7 +2711,7 @@ function registerAllEvents(){
 	
     $(".passive").click(function () {
     	
-		if (topicSelectionInProgress == "standards") {
+		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
         	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
 		   	return;
 		}            
@@ -2721,10 +2722,10 @@ function registerAllEvents(){
 
         if ( row.child.isShown() ) {
             row.child.hide();
-            topicSelectionInProgress = "";
+            topicPassiveSelectionInProgress = "";
         }else{
 
-			topicSelectionInProgress = "listall";
+			topicPassiveSelectionInProgress = "listall";
 			
             var rowID = '#'+row.data()[0];
     	    $('#problem_set_content').find('.loader').show();
@@ -2762,7 +2763,7 @@ function registerAllEvents(){
 
 	 $(".passiveStandards").click(function () {
 
-		 	if (topicSelectionInProgress === "listall") {
+		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
 	        	alert("<%= rb.getString("full_list_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
 	        	return;
 	        }	        
