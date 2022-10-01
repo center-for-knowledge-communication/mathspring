@@ -537,6 +537,17 @@ background-color: #FF4766;
   border-bottom: 1px solid #eee;
 }
 
+.home-page-header {
+  padding-bottom: 9px;
+  margin: 25px 0 10px;
+}
+
+.home-page-header2 {
+  padding-bottom: 9px;
+  margin: 10px 0 10px;
+  border-bottom: 1px solid #eee;
+}
+
 .tt-page-header {
   padding-bottom: 9px;
   margin: 20px 0 20px;
