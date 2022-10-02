@@ -382,10 +382,14 @@ var apply_content_table;
 var filterLandingOne = "~7";
 var filterLandingTwo = "~0";
 
-var activeProblemSet;;
-var inactiveProblemSet;
+var activeProblemSet;
+var inactiveProblemSets;
 var lowGradeLevel;
 var highGradeLevel;
+var gradesLevelsUsedInThisClass = "";
+
+var activeProblemSetsize = 0;
+var inactiveProblemSetsize = 0;
 
 var topicActiveSelectionInProgress = "";
 var topicPassiveSelectionInProgress = "";
@@ -1298,8 +1302,6 @@ function updateStudentInfo(formName){
     });
 }
 
-
-
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -1307,7 +1309,11 @@ function problemDetails(data, response) {
     var problems = JSONData["problems"];
     var html = "";
     $.each(standardsSorted, function (i, obj) {
-        html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	var stdClass = "" + obj.code;
+    	var stdGrade = stdClass.substring(0,2);
+    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
+        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	}
     });
 
     var selector = "#"+JSONData["problemLevelId"]+"_handler";
@@ -1555,7 +1561,11 @@ function standardsProblemDetails(data, response, state) {
     var html = "";
     var html = "";
     $.each(standardsSorted, function (i, obj) {
-        html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	var stdClass = "" + obj.code;
+    	var stdGrade = stdClass.substring(0,2);
+    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
+        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	}
     });
 
     
@@ -2205,9 +2215,12 @@ function dragElement(elmnt) {
 
 function registerAllEvents(){
 	
-	dragElement(document.getElementById("activeProblemsFilter"));
-	dragElement(document.getElementById("passiveProblemsFilter"));
-
+	if (activeProblemSetsize != 0) {
+		dragElement(document.getElementById("activeProblemsFilter"));
+	}
+	if (inactiveProblemSetsize != 0) {
+		dragElement(document.getElementById("passiveProblemsFilter"));
+	}
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
 //    $('#reorg_prob_sets_handler').css('color', '#ffffff');
@@ -2429,7 +2442,7 @@ function registerAllEvents(){
 	
  	}
         
-	var activeProblemSetsize = $('#activeproblemSetSize').val();
+	activeProblemSetsize = $('#activeproblemSetSize').val();
     if(activeProblemSetsize != 0){
 
     	activetable = $('#activateProbSetTable').DataTable({
@@ -2641,7 +2654,7 @@ function registerAllEvents(){
 
     }
 
-    var inactiveProblemSetsize = $('#inactiveproblemSetSize').val();
+    inactiveProblemSetsize = $('#inactiveproblemSetsSize').val();
     if(inactiveProblemSetsize != 0){
 
     	inactivetable = $('#inActiveProbSetTable').DataTable({
@@ -3032,9 +3045,6 @@ function registerAllEvents(){
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         $(document).ready(function () {
 
-        	activeProblemSet = $('#activeproblemSet');
-        	inactiveProblemSet = $('#inactiveproblemSet');
-        	
         	var classGrade = parseInt('${classInfo.grade}');
         	var simpleLowDiff = '${classInfo.simpleLowDiff}';
         	simpleLowDiff = simpleLowDiff.replace('below',"");
@@ -3042,8 +3052,13 @@ function registerAllEvents(){
         	simpleHighDiff = simpleHighDiff.replace('above',"");
             lowGradeLevel = classGrade - parseInt(simpleLowDiff);
             highGradeLevel = classGrade + parseInt(simpleHighDiff);
-   
-        	
+   			gradesLevelsUsedInThisClass = "";
+            for (var gradeLevel = lowGradeLevel; gradeLevel <= highGradeLevel;gradeLevel = gradeLevel + 1) {
+            	gradesLevelsUsedInThisClass = gradesLevelsUsedInThisClass + gradeLevel + ".";
+            } 
+            var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
+   			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
+   		
         	generate_year_range(2021,2023);
             registerAllEvents();
             handleclickHandlers();
@@ -3325,9 +3340,11 @@ function registerAllEvents(){
     </nav>
     <div id="page-content-wrapper">
 
-        <h1 class="page-header">
-            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong>
+        <h1 id="classManagerHeader" class="home-page-header">
+            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong> 
         </h1>
+        <div id="classGrades" style="font-size:16px;" class="home-page-header2">
+        </div>
 
         <div id="content-conatiner" class="container-fluid">
 
@@ -3346,7 +3363,7 @@ function registerAllEvents(){
 				<div id="problem_set_content" style="width: 100%;">
                 <div class="loader" style="display: none" ></div>               
 			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
-			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
+			<input type="hidden" id="inactiveproblemSetsSize" name="inactiveproblemSetsSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
                 <div>
                     <h3 class="tt-page-header">
