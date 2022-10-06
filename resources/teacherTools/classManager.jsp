@@ -56,7 +56,8 @@
 <!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
 <!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
 <!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
-<!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown draggable -->
+<!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
+<!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -235,10 +236,16 @@ System.out.println("msHost = " + msHost + msContext);
 }
 
 
-.detail_table_bg {
+.standards_detail_table_bg {
   	background-color: #ddd78a;
 
 }
+
+.full_detail_table_bg {
+  	background-color: #cbc34d;
+
+}
+
 
 .activeCenterDiv
 {
@@ -1368,12 +1375,12 @@ var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
 var summaryLabel="<%= rb.getString("summary")%>"; 
-var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
-    " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
+var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut full_detail_table_bg'> " +
+    " <div class='panel panel-default full_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+    " <div class='panel-body full_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
+    " <div class='panel-body full_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
+    "<div class='panel-body full_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
+    "<div class='panel-body full_detail_table_bg'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
 
@@ -1721,12 +1728,12 @@ function standardsProblemDetails(data, response, state) {
 	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
 	var summaryLabel="<%= rb.getString("summary")%>"; 
-	var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut detail_table_bg'> " +
-    " <div class='panel panel-default detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body detail_table_bg'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body detail_table_bg'>"+
+	var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut standards_detail_table_bg'> " +
+    " <div class='panel panel-default standards_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+    " <div class='panel-body standards_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
+    " <div class='panel-body standards_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
+    "<div class='panel-body standards_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
+    "<div class='panel-body standards_detail_table_bg'>"+
     "<button id="+JSONData["problemLevelId"]+'_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
     "<button id="+JSONData["problemLevelId"]+'_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
     "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
@@ -2215,12 +2222,6 @@ function dragElement(elmnt) {
 
 function registerAllEvents(){
 	
-	if (activeProblemSetsize != 0) {
-		dragElement(document.getElementById("activeProblemsFilter"));
-	}
-	if (inactiveProblemSetsize != 0) {
-		dragElement(document.getElementById("passiveProblemsFilter"));
-	}
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
 //    $('#reorg_prob_sets_handler').css('color', '#ffffff');
@@ -2445,7 +2446,9 @@ function registerAllEvents(){
 	activeProblemSetsize = $('#activeproblemSetSize').val();
     if(activeProblemSetsize != 0){
 
-    	activetable = $('#activateProbSetTable').DataTable({
+		dragElement(document.getElementById("activeProblemsFilter"));
+
+		activetable = $('#activateProbSetTable').DataTable({
         "bPaginate": false,
         <%=jc_rb.getString("language_text")%>
     	"bFilter": false,
@@ -2657,7 +2660,9 @@ function registerAllEvents(){
     inactiveProblemSetsize = $('#inactiveproblemSetsSize').val();
     if(inactiveProblemSetsize != 0){
 
-    	inactivetable = $('#inActiveProbSetTable').DataTable({
+		dragElement(document.getElementById("passiveProblemsFilter"));
+
+		inactivetable = $('#inActiveProbSetTable').DataTable({
         "bPaginate": false,
         <%=jc_rb.getString("language_text")%>
     	"bFilter": false,
