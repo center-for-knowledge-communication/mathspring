@@ -81,7 +81,8 @@ public class TeacherRegistrationHandler {
     	catch (Exception e) {
 //    		logger.error(e.getMessage());	
     	}
-    	    			
+
+    	
 
     	String regexPwd = "^[a-zA-Z0-9!]+$";    	
 //    	String regexPwd = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";    	
@@ -97,7 +98,7 @@ public class TeacherRegistrationHandler {
                     ? "/teacherTools/teacherRegister_new.jsp"
                     : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }
-        else if (isNotValidField(event.getFname(),"^[A-Za-z]\\w{3,30}$"))
+        else if (isNotValidField(event.getFname(),"^[A-Za-z_]\\w{0,30}$"))
         {
             req.setAttribute("message",rb.getString("names_must_use_letters_or_"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
@@ -106,7 +107,7 @@ public class TeacherRegistrationHandler {
                     ? "/teacherTools/teacherRegister_new.jsp"
                     : "/teacherTools/teacherRegister_new.jsp").forward(req ,resp);
         }
-        else if (isNotValidField(event.getLname(),"^[A-Za-z]\\w{3,30}$"))
+        else if (isNotValidField(event.getLname(),"^[A-Za-z_]\\w{1,30}$"))
         {
             req.setAttribute("message",rb.getString("names_must_use_letters_or_"));
             Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
