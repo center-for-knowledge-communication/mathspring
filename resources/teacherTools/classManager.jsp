@@ -55,7 +55,9 @@
 <!-- Frank 05-11-22     Issue #632 - Manage Topics - add ability to select problems by standard -->
 <!-- Frank 06-24-22     Issue #632R2 - added reset and help to standards list popup -->
 <!-- Frank 07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them -->
-
+<!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
+<!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
+<!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -234,27 +236,75 @@ System.out.println("msHost = " + msHost + msContext);
 }
 
 
-.detail_table_bg {
+.standards_detail_table_bg {
   	background-color: #ddd78a;
 
 }
 
-.centerDiv
+.full_detail_table_bg {
+  	background-color: #cbc34d;
+
+}
+
+
+.activeCenterDiv
 {
 
-  height:250px;
-  width: 240px; 
+  height:280px;
+  width: 260px; 
   border-radius: 1em;
   border-width:thin;
-  border-color:blue;
+  border-color:black;
+  background-color: #33ffff;
   padding: 1em; 
-  position: fixed;
+  position: absolute;
   top: 30%;
-  left: 37%;
+  left: 65%;
   margin-right: -50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
+
+.activeCenterDivHdr {
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  color: white;
+  background-color:black;
+}
+
+
+.passiveCenterDiv
+{
+
+  height:280px;
+  width: 260px; 
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  background-color: #00cccc;
+  padding: 1em; 
+  position: absolute;
+  bottom: 20%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.passiveCenterDivHdr {
+  border-radius: 1em;
+  border-width:thin;
+  border-color:black;
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  color: white;
+  background-color:black;
+}
+
 
 .standardsHelpBox {
   border-radius: 1em;
@@ -339,13 +389,19 @@ var apply_content_table;
 var filterLandingOne = "~7";
 var filterLandingTwo = "~0";
 
-var activeProblemSet;;
-var inactiveProblemSet;
+var activeProblemSet;
+var inactiveProblemSets;
 var lowGradeLevel;
 var highGradeLevel;
+var gradesLevelsUsedInThisClass = "";
 
-var topicSelectionInProgress = "";
-var topicStandardSelectedInProgress = "";
+var activeProblemSetsize = 0;
+var inactiveProblemSetsize = 0;
+
+var topicActiveSelectionInProgress = "";
+var topicPassiveSelectionInProgress = "";
+var topicActiveStandardInProgress = "";
+var topicPassiveStandardInProgress = "";
 
 var activeStandardsRow = null;
 var activeStandardsChild = null;
@@ -353,7 +409,7 @@ var activeStandardsResponse = null;
 var activeStandardsJSONData = null;
 var activeStandardsTopicStandards = null;
 var activeStandardsTopicStandardsSorted = null;
-var activeStandardsRowID = null;
+var activeStandardsRowID = "";
 
 var passiveStandardsRow = null;
 var passiveStandardsChild = null;
@@ -361,7 +417,7 @@ var passiveStandardsResponse = null;
 var passiveStandardsJSONData = null;
 var passiveStandardsTopicStandards = null;
 var passiveStandardsTopicStandardsSorted = null;
-var passiveStandardsRowID = null;
+var passiveStandardsRowID = "";
 
 var plot_live_dashboard = null;
 var plot_effort_chart = null;
@@ -817,7 +873,17 @@ function liveDashboardPopulate() {
 	               			theInterval = 50;
 	               		}
 	               		else {
-	               			theInterval = 100;               			
+		               		if (liveMax <= 2000) {
+		               			theInterval = 100;
+		               		}
+		               		else {
+			               		if (liveMax <= 4000) {
+			               			theInterval = 200;
+			               		}
+			               		else {
+			               			theInterval = 400;               			
+			               		}
+		               		}
 	               		}
 	               	}
                	}
@@ -1243,8 +1309,6 @@ function updateStudentInfo(formName){
     });
 }
 
-
-
 function problemDetails(data, response) {
     var JSONData = JSON.parse(response);
     var standards = JSONData["topicStandars"];
@@ -1252,7 +1316,11 @@ function problemDetails(data, response) {
     var problems = JSONData["problems"];
     var html = "";
     $.each(standardsSorted, function (i, obj) {
-        html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	var stdClass = "" + obj.code;
+    	var stdGrade = stdClass.substring(0,2);
+    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
+        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	}
     });
 
     var selector = "#"+JSONData["problemLevelId"]+"_handler";
@@ -1302,17 +1370,17 @@ function problemDetails(data, response) {
 
     });	
 
-var save_changes = "<%= rb.getString("save_changes")%>";
+var save_selections = "<%= rb.getString("save_selections")%>";
 var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
 var summaryLabel="<%= rb.getString("summary")%>"; 
-var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut'> " +
-    " <div class='panel panel-default'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button></div></div>";
+var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut full_detail_table_bg'> " +
+    " <div class='panel panel-default full_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+    " <div class='panel-body full_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
+    " <div class='panel-body full_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
+    "<div class='panel-body full_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
+    "<div class='panel-body full_detail_table_bg'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
 
@@ -1459,13 +1527,13 @@ function displayPassiveStandardsHelp() {
 }
 
 function activeStandardsFilter() {
-	  var input, filter, ul, li, a, i;
+	  var div, input, filter, ul, li, a, i;
 	  input = document.getElementById("myActiveInput");
 	  filter = input.value.toUpperCase();
 	  div = document.getElementById("activeStandardsList");
 	  a = div.getElementsByTagName("option");
 	  for (i = 0; i < a.length; i++) {
-	    txtValue = a[i].textContent || a[i].innerText;
+	    var txtValue = a[i].textContent || a[i].innerText;
 	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
 	      a[i].style.display = "";
 	    } else {
@@ -1475,13 +1543,13 @@ function activeStandardsFilter() {
 	}
 	
 function passiveStandardsFilter() {
-	  var input, filter, ul, li, a, i;
+	  var div, input, filter, ul, li, a, i;
 	  input = document.getElementById("myPassiveInput");
 	  filter = input.value.toUpperCase();
 	  div = document.getElementById("passiveStandardsList");
 	  a = div.getElementsByTagName("option");
 	  for (i = 0; i < a.length; i++) {
-	    txtValue = a[i].textContent || a[i].innerText;
+	    var txtValue = a[i].textContent || a[i].innerText;
 	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
 	      a[i].style.display = "";
 	    } else {
@@ -1500,13 +1568,17 @@ function standardsProblemDetails(data, response, state) {
     var html = "";
     var html = "";
     $.each(standardsSorted, function (i, obj) {
-        html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	var stdClass = "" + obj.code;
+    	var stdGrade = stdClass.substring(0,2);
+    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
+        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
+    	}
     });
 
     
-    var selector = "#"+JSONData["problemLevelId"]+"_handler";
+    var saveSelector = "#"+JSONData["problemLevelId"]+"_save_handler";
 
-    $(document.body).on('click', selector ,function(){
+    $(document.body).on('click', saveSelector ,function(){
         var rows = $("#"+JSONData["problemLevelId"]).dataTable(
             { "bPaginate": false,
                 <%=jc_rb.getString("language_text")%>
@@ -1551,20 +1623,120 @@ function standardsProblemDetails(data, response, state) {
 
     });	
 
-	var save_changes = "<%= rb.getString("save_changes")%>";
+    var selectallSelector = "#"+JSONData["problemLevelId"]+"_selectall_handler";    
+    
+    $(document.body).on('click', selectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var problemIds = [""];
+        
+	    $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+  
+    
+    var deselectallSelector = "#"+JSONData["problemLevelId"]+"_deselectall_handler";    
+    
+    $(document.body).on('click', deselectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var j=0;
+        var rowsArray = [];
+        var problemIds = [""];
+        var i = 0;
+        $("input:checkbox:not(:checked)", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+
+        $("input:checkbox:checked", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+        
+        for(j=0; j < rowsArray.length; j++)
+            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
+
+        
+        $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+    
+    
+    
+    
+	var save_selections = "<%= rb.getString("save_selections")%>";
+	var activate_save_all = "<%= rb.getString("activate_save_all")%>";
+	var deactivate_save_all = "<%= rb.getString("deactivate_save_all")%>";
 	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
 	var summaryLabel="<%= rb.getString("summary")%>"; 
-	var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut detail_table_bg'> " +
-    " <div class='panel panel-default detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body detail_table_bg'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body detail_table_bg'>"+
-    "<button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_changes+"</button>&nbsp;&nbsp;"+
-//    "<button class='btn btn-primary btn-lg' aria-disabled='true'>Activate All</button>&nbsp;&nbsp;"+
-//    "<button class='btn btn-primary btn-lg' aria-disabled='true'>Deactivate All</button>&nbsp;&nbsp;"+
+	var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut standards_detail_table_bg'> " +
+    " <div class='panel panel-default standards_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
+    " <div class='panel-body standards_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
+    " <div class='panel-body standards_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
+    "<div class='panel-body standards_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
+    "<div class='panel-body standards_detail_table_bg'>"+
+    "<button id="+JSONData["problemLevelId"]+'_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
     "</div>"+
     "</div>";
 
@@ -2006,9 +2178,50 @@ function changeLandingPageHeader2AccordingToLanguage(){
 	}
 }
 
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "Hdr")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "Hdr").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
 
 
 function registerAllEvents(){
+	
     $('#wrapper').toggleClass('toggled');
 //    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
 //    $('#reorg_prob_sets_handler').css('color', '#ffffff');
@@ -2230,10 +2443,12 @@ function registerAllEvents(){
 	
  	}
         
-	var activeProblemSetsize = $('#activeproblemSetSize').val();
+	activeProblemSetsize = $('#activeproblemSetSize').val();
     if(activeProblemSetsize != 0){
 
-    	activetable = $('#activateProbSetTable').DataTable({
+		dragElement(document.getElementById("activeProblemsFilter"));
+
+		activetable = $('#activateProbSetTable').DataTable({
         "bPaginate": false,
         <%=jc_rb.getString("language_text")%>
     	"bFilter": false,
@@ -2298,10 +2513,10 @@ function registerAllEvents(){
 	
 	 $(".active").click(function () {
 
-		 if (topicSelectionInProgress === "standards") {
-        	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
+		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
+        	alert("<%= rb.getString("standards_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	       	return;
-		 }            
+		}            
 
         $(this).children(':first').toggleClass('rotate-icon');
         var tr = $(this).closest('tr');
@@ -2309,10 +2524,10 @@ function registerAllEvents(){
 
         if ( row.child.isShown() ) {
             row.child.hide();
-            topicSelectionInProgress = "";
+            topicActiveSelectionInProgress = "";
         }else{
 
-			topicSelectionInProgress = "listall";
+			topicActiveSelectionInProgress = "listall";
 			
         	var rowID = '#'+row.data()[0];
             $.ajax({
@@ -2374,23 +2589,36 @@ function registerAllEvents(){
 		
 	 $(".activeStandards").click(function () {
 
-		 	if (topicSelectionInProgress === "listall") {
-	        	alert("<%= rb.getString("full_list_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
+		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
+	        	alert("<%= rb.getString("full_list_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
 	        	return;
 	        }	        
 
-		 	$(this).children(':first').toggleClass('rotate-icon');
-	        var tr = $(this).closest('tr');
-	        activeStandardsRow = activetable.row( tr );
+	        var test_tr = $(this).closest('tr');
+	        var testActiveStandardsRow = activetable.row( test_tr );
+            var testActiveStandardsRowID = '#'+testActiveStandardsRow.data()[0];
 
-	        if ( activeStandardsRow.child.isShown() || (topicSelectionInProgress === "standards")) {
-	        	activeStandardsRow.child.hide();
+	        if (testActiveStandardsRowID === activeStandardsRowID) { 
+	        	activeStandardsRowID = "";
+			 	$(this).children(':first').toggleClass('rotate-icon');
+	        	testActiveStandardsRow.child.hide();
                 $('#activeProblemsFilter').hide();
                 topicSelectionInProgress = "";
+	        	topicActiveStandardInProgress = "";
 
 	        }else{
+				if (activeStandardsRowID.length > 0) {
+		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
+		        	return;					
+				}
+				
+	        	$(this).children(':first').toggleClass('rotate-icon');
+		        var tr = $(this).closest('tr');
+		        activeStandardsRow = activetable.row( tr );
 	        	topicSelectionInProgress = "standards";
+	        	topicActiveStandardInProgress = "activeStandards";
 	            activeStandardsRowID = '#'+activeStandardsRow.data()[0];
+	            
 	            $.ajax({
 	                type : "POST",
 	                url :pgContext+"/tt/tt/getProblemForProblemSets",
@@ -2418,7 +2646,7 @@ function registerAllEvents(){
 	                        });
 
 	                        document.getElementById('activeStandardsList').innerHTML = activeStandardsList;
-	                        $('#activeProblemsFilter').show();
+	        	        	$('#activeProblemsFilter').show();
 	                        document.getElementById("activeStandardsList").focus();
 	                    }
 	                }
@@ -2429,10 +2657,12 @@ function registerAllEvents(){
 
     }
 
-    var inactiveProblemSetsize = $('#inactiveproblemSetSize').val();
+    inactiveProblemSetsize = $('#inactiveproblemSetsSize').val();
     if(inactiveProblemSetsize != 0){
 
-    	inactivetable = $('#inActiveProbSetTable').DataTable({
+		dragElement(document.getElementById("passiveProblemsFilter"));
+
+		inactivetable = $('#inActiveProbSetTable').DataTable({
         "bPaginate": false,
         <%=jc_rb.getString("language_text")%>
     	"bFilter": false,
@@ -2499,7 +2729,7 @@ function registerAllEvents(){
 	
     $(".passive").click(function () {
     	
-		if (topicSelectionInProgress === "standards") {
+		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
         	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
 		   	return;
 		}            
@@ -2510,10 +2740,10 @@ function registerAllEvents(){
 
         if ( row.child.isShown() ) {
             row.child.hide();
-            topicSelectionInProgress = "";
+            topicPassiveSelectionInProgress = "";
         }else{
 
-			topicSelectionInProgress = "listall";
+			topicPassiveSelectionInProgress = "listall";
 			
             var rowID = '#'+row.data()[0];
     	    $('#problem_set_content').find('.loader').show();
@@ -2551,23 +2781,36 @@ function registerAllEvents(){
 
 	 $(".passiveStandards").click(function () {
 
-		 	if (topicSelectionInProgress === "listall") {
+		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
 	        	alert("<%= rb.getString("full_list_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
 	        	return;
 	        }	        
 
-	        $(this).children(':first').toggleClass('rotate-icon');
-	        var tr = $(this).closest('tr');
-	        passiveStandardsRow = inactivetable.row( tr );
+	        var test_tr = $(this).closest('tr');
+	        var testPassiveStandardsRow = inactivetable.row( test_tr );
+            var testPassiveStandardsRowID = '#'+testPassiveStandardsRow.data()[0];
 
-	        if ( passiveStandardsRow.child.isShown() || (topicSelectionInProgress === "standards")) {
-	        	passiveStandardsRow.child.hide();
-             	$('#passiveProblemsFilter').hide();
-             	topicSelectionInProgress = "";
+	        if (testPassiveStandardsRowID === passiveStandardsRowID) { 
+	        	passiveStandardsRowID = "";
+			 	$(this).children(':first').toggleClass('rotate-icon');
+	        	testPassiveStandardsRow.child.hide();
+                $('#passiveProblemsFilter').hide();
+                topicSelectionInProgress = "";
+	        	topicPassiveStandardInProgress = "";
 
 	        }else{
+				if (passiveStandardsRowID.length > 0) {
+		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
+		        	return;					
+				}
+				
+	            $(this).children(':first').toggleClass('rotate-icon');
+		        var tr = $(this).closest('tr');
+		        passiveStandardsRow = inactivetable.row( tr );
 	        	topicSelectionInProgress = "standards";
+	        	topicPassiveStandardInProgress = "passiveStandards";
 	            passiveStandardsRowID = '#'+passiveStandardsRow.data()[0];
+
 	            $.ajax({
 	                type : "POST",
 	                url :pgContext+"/tt/tt/getProblemForProblemSets",
@@ -2593,7 +2836,7 @@ function registerAllEvents(){
 	                        		passiveStandardsList += '<option  id="std_' + obj.code + '" value="' + obj.code + '">' + obj.code + '</option>';
 	                       		}
 	                        });
-
+	                        
 	                        document.getElementById('passiveStandardsList').innerHTML = passiveStandardsList;
 	                        $('#passiveProblemsFilter').show();
 	                        document.getElementById("passiveStandardsList").focus();
@@ -2807,9 +3050,6 @@ function registerAllEvents(){
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         $(document).ready(function () {
 
-        	activeProblemSet = $('#activeproblemSet');
-        	inactiveProblemSet = $('#inactiveproblemSet');
-        	
         	var classGrade = parseInt('${classInfo.grade}');
         	var simpleLowDiff = '${classInfo.simpleLowDiff}';
         	simpleLowDiff = simpleLowDiff.replace('below',"");
@@ -2817,8 +3057,13 @@ function registerAllEvents(){
         	simpleHighDiff = simpleHighDiff.replace('above',"");
             lowGradeLevel = classGrade - parseInt(simpleLowDiff);
             highGradeLevel = classGrade + parseInt(simpleHighDiff);
-   
-        	
+   			gradesLevelsUsedInThisClass = "";
+            for (var gradeLevel = lowGradeLevel; gradeLevel <= highGradeLevel;gradeLevel = gradeLevel + 1) {
+            	gradesLevelsUsedInThisClass = gradesLevelsUsedInThisClass + gradeLevel + ".";
+            } 
+            var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
+   			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
+   		
         	generate_year_range(2021,2023);
             registerAllEvents();
             handleclickHandlers();
@@ -3100,9 +3345,11 @@ function registerAllEvents(){
     </nav>
     <div id="page-content-wrapper">
 
-        <h1 class="page-header">
-            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong>
+        <h1 id="classManagerHeader" class="home-page-header">
+            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong> 
         </h1>
+        <div id="classGrades" style="font-size:16px;" class="home-page-header2">
+        </div>
 
         <div id="content-conatiner" class="container-fluid">
 
@@ -3121,26 +3368,27 @@ function registerAllEvents(){
 				<div id="problem_set_content" style="width: 100%;">
                 <div class="loader" style="display: none" ></div>               
 			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
-			<input type="hidden" id="inactiveproblemSetSize" name="inactiveproblemSetSize" value="${inactiveproblemSets.size()}">
+			<input type="hidden" id="inactiveproblemSetsSize" name="inactiveproblemSetsSize" value="${inactiveproblemSets.size()}">
 			<c:if test="${activeproblemSet.size() != 0}">
                 <div>
                     <h3 class="tt-page-header">
                         <small><%= rb.getString("active_problem_sets") %></small>
                     </h3>
-					<div id="activeProblemsFilter" class="centerDiv report_filters" style="display:none;">
-						<label><%= rb.getString("select_standard") %></label>
+					<div id="activeProblemsFilter" class="activeCenterDiv report_filters" style="display:none;">
+  						<div id="activeProblemsFilterHdr" class="activeCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
+						<label><%= rb.getString("select_active_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myActiveInput" multiple onkeyup="activeStandardsFilter()">
                         <select name="activeStandardsList" id="activeStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
                        	<button id="activeFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handleActiveStandardsReset()"><%= rb.getString("reset") %></button> 
                        	<button id="activeFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayActiveStandardsHelp()"><%= rb.getString("help") %></button> 
 						<div id="activeStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							<label><%= rb.getString("popup_btn_help_1") %></label><br>
 							<label><%= rb.getString("popup_btn_help_2") %></label><br>
 							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							
 						</div>
 					</div>
@@ -3159,9 +3407,9 @@ function registerAllEvents(){
                         <tr>
                             <th rowspan="2" align="center"><span><%= rb.getString("order") %>&nbsp;&nbsp;</span><a rel="popoverOrder"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span></span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span></span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th style="text-align: center;" colspan="<c:out value='${activeproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
                             <th rowspan="2"><%= rb.getString("deactivate_problem_set") %></th>
@@ -3220,20 +3468,21 @@ function registerAllEvents(){
                         <small><%= rb.getString("inactive_problem_sets") %></small>
                     </h3>
 
-					<div id="passiveProblemsFilter" class="centerDiv report_filters" style="display:none;">
-						<label><%= rb.getString("select_standard") %></label>
+					<div id="passiveProblemsFilter" class="passiveCenterDiv report_filters" style="display:none;">
+  						<div id="passiveProblemsFilterHdr" class="passiveCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
+						<label><%= rb.getString("select_inactive_standard") %></label>
                      	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myPassiveInput" multiple onkeyup="passiveStandardsFilter()">
                         <select name="passiveStandardsList" id="passiveStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
                        	</select>
-                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("submit") %></button> 
+                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
                        	<button id="passiveFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handlePassiveStandardsReset()"><%= rb.getString("reset") %></button> 
                        	<button id="passiveFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayPassiveStandardsHelp()"><%= rb.getString("help") %></button> 
 						<div id="passiveStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br><br>
+							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
+							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							<label><%= rb.getString("popup_btn_help_1") %></label><br>
 							<label><%= rb.getString("popup_btn_help_2") %></label><br>
 							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
 							
 						</div>
 					</div>
@@ -3251,9 +3500,9 @@ function registerAllEvents(){
                         <tr>
                             <th rowspan="2"><%= rb.getString("order") %></th>
                             <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span></span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span></span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
+                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
                             <th style="text-align: center;" colspan="<c:out value='${inActiveproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
                             <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
                             <th rowspan="2"><%= rb.getString("activate_problem_sets") %></th>
@@ -3695,6 +3944,11 @@ function registerAllEvents(){
 				                                            <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
 				                                            <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
 				                                            <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
+<!--                                        
+                                            				<springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
+                                            				<springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+                                            				<springForm:option value="adult"><%= rb.getString("grade") %> adult</springForm:option>
+-->                                           
 				                                        </springForm:select>
 				                                    </div>
 				                                </div>
@@ -3861,8 +4115,14 @@ function registerAllEvents(){
 	                    </div>
 	                    <div id="liveDashboardEffortPane" class="col-md-8 tt-LiveDashboardEffortPane">
 	                        <div style="text-align:center;"> <h2><%= rb.getString("problem_solving_effort") %></h2></div>
+	                        <div class="row">	                        	
+	                        	<div class="col-md-2"></div>
+	                        	<div class="col-md-2">
+									<button type="button" class="btn btn-primary btn-small" id="live-dashboard-effort-button" onclick="showReport3d();"><%= rb.getString("refresh_chart") %></button>
+								</div>
+							</div>
 	                        <div class="row">
-				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:80px; width:400px; height:400px;"></div> 
+				            	<div id="chart3d_canvas" class="col-md-4 float-left" style="margin-top:50px; width:400px; height:400px;"></div> 
 				            	<div id="chart3d_legend" class="col-md-5 float-left" style="margin-top:20px";> 		            	
 				            	     <table class="table table-striped table-bordered hover">
 	                                    <tbody>

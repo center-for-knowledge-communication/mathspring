@@ -1635,6 +1635,14 @@ textarea:focus {
     vertical-align:middle;
 }
 
+.progress_table td.pie_wrapper
+{
+
+    text-align:center;
+    padding:0px;
+    vertical-align:middle;
+}
+
 
 .progress_table td.performance
 {

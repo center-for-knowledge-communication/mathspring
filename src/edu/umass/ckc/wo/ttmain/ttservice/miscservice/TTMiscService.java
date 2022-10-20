@@ -20,5 +20,7 @@ public interface TTMiscService {
     public List<TeacherLogEntry> generateTeacherLogReport(String filter);
 
     public String cohortAdmin(String cohortId, String reportType, String lang, String filter) throws TTCustomException;
+
+    public String getCohortHelp(String helpTopic, String lang, String filter) throws TTCustomException;
     
 }

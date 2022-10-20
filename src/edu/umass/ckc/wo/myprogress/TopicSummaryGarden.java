@@ -299,7 +299,6 @@ public class TopicSummaryGarden {
 
                 } else {
                     if (masteryArray[0] >= masteryThreshold) { //mastered
-                        System.out.println("mastered" + masteryArray[0]);
 
                         if (masteryArray[1] >= masteryThreshold) {
                             topicState = "inMastery";

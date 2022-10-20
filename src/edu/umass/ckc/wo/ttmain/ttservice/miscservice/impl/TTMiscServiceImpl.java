@@ -80,6 +80,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 
 	private ResourceBundle rb = null;
 	private ResourceBundle rwrb = null;
+	private ResourceBundle rhrb = null;
 	private Locale ploc;
 	
     @Autowired
@@ -109,11 +110,12 @@ public class TTMiscServiceImpl implements TTMiscService {
     		try {
         		rb = ResourceBundle.getBundle("MathSpring",loc);
     			rwrb = ResourceBundle.getBundle("MSResearcherWorkbench",loc);
+    			rhrb = ResourceBundle.getBundle("MSResearcherHelp",loc);
     		}
     		catch (Exception e) {
     			logger.error(e.getMessage());	
     		}
-    		
+
     		String result = "";
     		switch (reportType) {
 			case "getCohortTeachersClasses":
@@ -366,6 +368,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 
     }
 
+    
     public String getTeacherLogins(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1747,7 +1750,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
-    	int intDuration = Integer.valueOf(splitter[1]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}    	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
 
     		
@@ -1969,6 +1974,74 @@ public class TTMiscServiceImpl implements TTMiscService {
     	return result;
     };
 
+    public String getCohortHelp(String helpTopic, String lang, String filter) throws TTCustomException {
+    	
+    	
+    	ArrayList<String> helpMsgs = new ArrayList<String>();
+    	String helpMsg = null;
+        JSONObject resultJson = new JSONObject();
+    	JSONArray resultArr = new JSONArray();
+    	int i=1;
+    	boolean done = false;
+    	
+    	do {
+    		String key = helpTopic + "_" + String.valueOf(i);
+    		try {
+    			helpMsg = rhrb.getString(key);
+    			helpMsgs.add(helpMsg);
+    			i++;
+    		}
+    		catch (Exception e) {
+    			done = true;
+    		}
+    	
+    	}
+    	while (!done);
+    	
+    	
+    	if (helpMsgs.size() > 0) {
+            for (int j = 0; j < helpMsgs.size(); j++) {
+                System.out.println(helpMsgs.get(j));
+    			resultJson = new JSONObject();
+    			String rawMsg = helpMsgs.get(j);
+    			String splitter[] = rawMsg.split("~");
+        		resultJson.put("label", splitter[0]);
+                resultJson.put("paragraph", splitter[1]);
+                resultArr.add(resultJson);       	            
+            }
+    	}
+    	else {
+    		return "No help found";
+    	}
+    	
+        return resultArr.toString();    
+    	
+    }
+/*
+    public String getCohortHelpold(Connection conn) throws SQLException {
+
+    	
+        JSONObject resultJson = new JSONObject();
+    	JSONArray resultArr = new JSONArray();
+            resultJson = new JSONObject();
+            resultJson.put("label", "About Cohort Slices");
+            resultJson.put("paragraph", "Cohort Slices are weekly totals");
+            resultArr.add(resultJson);       	            
+            resultJson = new JSONObject();
+            resultJson.put("label", "Updating Slices");
+            resultJson.put("paragraph", "Cohort Slices are updated by the study administrator at the end of each week");
+            resultArr.add(resultJson);      	            
+            resultJson = new JSONObject();
+            resultJson.put("label", "Selecting by week#");
+            resultJson.put("paragraph", "Use the filter selector to define the range of weeks to be displayed.");
+            resultArr.add(resultJson);
+            
+                        
+            return resultArr.toString();    	
+
+    }
+    
+ */   
     
     public String cohortAdmin(String cohortId, String command, String lang, String filter) throws TTCustomException {
     	
@@ -1981,6 +2054,12 @@ public class TTMiscServiceImpl implements TTMiscService {
     			break;
     		case "getCohortInfo":
     			result = getCohortInfo(conn, Integer.valueOf(cohortId),filter);
+    			break;
+    		case "getNewCohortId":
+    			result = getNewCohortId(conn, Integer.valueOf(cohortId),filter);
+    			break;
+    		case "addNewCohortInfo":
+    			result = addNewCohortInfo(conn, Integer.valueOf(cohortId),filter);
     			break;
     		case "updateCohortInfo":
     			result = updateCohortInfo(conn, Integer.valueOf(cohortId),filter);
@@ -2236,10 +2315,6 @@ public class TTMiscServiceImpl implements TTMiscService {
             if (stmt_del != null)
                 stmt_del.close();
         }    
-
-        if (result == 0) {
-        	return "SQL Insert error"; 
-        }
 
     	String[] splitter = filter.split("~");
     	
@@ -2628,11 +2703,7 @@ public class TTMiscServiceImpl implements TTMiscService {
                 stmt_del.close();
         }    
 
-        if (result == 0) {
-        	return "SQL Insert error"; 
-        }
-    	
-    	String[] splitter = filter.split("~");
+     	String[] splitter = filter.split("~");
     	
     	String startDate = splitter[0];
     	int intDuration = Integer.valueOf(splitter[1]);
@@ -2672,6 +2743,39 @@ public class TTMiscServiceImpl implements TTMiscService {
     	}
 
         return "Class Slices Updated Successfully"; 
+    }
+   
+    public String getNewCohortId(Connection conn, int cohortId, String filter) throws SQLException {
+	   	
+    	String result = "error";
+    	
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;    	
+	    	
+    	String q = "select researchcohortid from research_cohort order by researchcohortid desc limit 1;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+        	rs = stmt.executeQuery();
+            if (rs.next()) {
+            	int lastId = rs.getInt("researchcohortid");
+            	lastId = lastId + 1;
+                JSONObject cohortJson = new JSONObject();            	
+            	cohortJson.put("newCohortId", String.valueOf(lastId));
+            	result = cohortJson.toString();
+            }
+            stmt.close();
+        }
+        catch (Exception e) {
+        	result = "DB error";
+        	System.out.println(result);
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }    	
+    	return result;
+    	
+    	
     }
     
 
@@ -2735,6 +2839,122 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     	
     }
+    
+    public String addNewCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
+    	
+
+    	
+    	String[] splitter = filter.split("~");
+    	    	
+    	String result = "success";
+        PreparedStatement stmt = null;    	
+        Timestamp tsStartDate = null;
+        Timestamp tsEndDate = null; 
+        String teacherId = splitter[3];
+        String classId = splitter[4];
+    	ResultSet rs = null;        
+        
+        if (!(splitter[1].startsWith("202"))) {
+        	return "error - school year invalid";
+        }        
+        
+        String regex = "^(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])/[0-9]{4}$";
+
+        if ((!(splitter[2].matches(regex))) && (!splitter[2].equals("empty"))) {
+        	return "error - start date format invalid";
+        }        
+
+        
+        String q_val = "select * from teacher, class where teacher.id = ? and class.id = ? and class.teacherid = teacher.id";
+
+        try {        	
+        	stmt = conn.prepareStatement(q_val);
+            stmt.setInt(1, Integer.valueOf(teacherId));	  
+            stmt.setInt(2, Integer.valueOf(classId));
+        	rs = stmt.executeQuery();
+            if (!rs.next()) {
+            	result = "error - teacher or class not found";
+            }
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+        if (!result.equals("success")) {
+        	return result;
+        }
+        
+        
+    	String q = "insert into research_cohort (researchcohortid, name, schoolYear, startDate) values (?,?,?,?);";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);	            
+            stmt.setString(2, splitter[0]);	  
+            stmt.setString(3, splitter[1]);
+            if (splitter[2].equals("empty")) { 
+            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            }
+            else {            
+            	tsStartDate = convertStartDate(splitter[2]);
+            }
+        	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            stmt.setTimestamp(4, tsEndDate);
+           	
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+
+    	String q2 = "insert into teacher_map_cohorts (researchcohortid,teacherid,expectedStudentCount) values (?,?,?)";
+        try {        	
+        	stmt = conn.prepareStatement(q2);
+            stmt.setInt(1, cohortId);	            
+            stmt.setInt(2, Integer.valueOf(teacherId));	            
+            stmt.setInt(3, 0);	            
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+        
+    	String q3 = "insert into class_map_cohorts (researchcohortid,classid) values (?,?)";
+        try {        	
+        	stmt = conn.prepareStatement(q3);
+            stmt.setInt(1, cohortId);	            
+            stmt.setInt(2, Integer.valueOf(classId));	            
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+        
+
+        
+        return result;
+    	
+    }
+
+    
 
     public String updateCohortInfo(Connection conn, int cohortId, String filter) throws SQLException {
     	
@@ -2742,8 +2962,6 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	    	
     	String result = "success";
-    	boolean dateError = false;
-    	ResultSet rs = null;
         PreparedStatement stmt = null;    	
         Timestamp tsStartDate = null;
         Timestamp tsEndDate = null;
@@ -3174,6 +3392,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
     	if (splitter.length > 3) {
@@ -3250,6 +3471,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     	String[] splitter = filter.split("~");
     	
     	int startWeek = Integer.valueOf(splitter[0]);
+    	if (startWeek < 0) {
+    		startWeek = 0;
+    	}
     	int intDuration = Integer.valueOf(splitter[1]);
     	int weeksToReport = Integer.valueOf(splitter[2]);
     	if (splitter.length > 3) {

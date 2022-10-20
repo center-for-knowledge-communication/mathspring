@@ -78,7 +78,8 @@ public class TopicSummary {
     int SOF_SOF_sequence=0;
     int neglectful_count=0;
 
-
+    String effortsForGraph = "";
+    
     boolean fastResponse;
     boolean problemDifficult = false;
     boolean hasAvailableContent;
@@ -134,6 +135,7 @@ public class TopicSummary {
             analyzeHelpUsageBehavior();
             analyzeMonsterMasteryBehavior();
             analyzeNeglectfulBehavior();
+            this.effortsForGraph = getAllEffortsForGraph();
         }
     }
 
@@ -634,6 +636,65 @@ public class TopicSummary {
 
     }
 
+
+    String effortLabels[] = {"SOF","ATT","SHINT","SHELP", "GUESS","NOTR","SKIP","GIVEUP","NODATA"};
+    
+    
+    String getAllEffortsForGraph() throws Exception {
+
+        String result = "";
+
+        HashMap<String, String> efforts = new HashMap<String, String>();
+        for (int i=0; i<effortLabels.length;i++) {
+            efforts.put(effortLabels[i], "0");
+        }
+
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select effort from studentproblemhistory where studId=? and topicId=? and problemEndTime>0  and  mode='practice' order by ProblemBeginTime DESC";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, studId);
+            stmt.setInt(2, topicId);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String effort = rs.getString(1);
+                if ((!(effort == null)) && (!(effort.equals("unknown"))) && (!(effort.equals("NODATA")))) {
+                	try {                		
+                		int counter = Integer.valueOf(efforts.get(effort));
+                		counter = counter + 1;
+                		efforts.replace(effort, String.valueOf(counter));
+//                		System.out.println(effort + "=" + String.valueOf(counter));
+                	}
+                	catch (Exception e) {
+//                		System.out.println(e.getMessage() + "effort=" + effort);
+                	}
+                }
+            }
+            
+            // return comma deliited string
+            for (int i=0; i<effortLabels.length;i++) {
+            	if (i>0) {
+            		result = result + ",";
+            	}
+            	result = result + efforts.get(effortLabels[i]);
+            }
+//            System.out.println("Effort values: " + result);
+            return result;
+
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+
+    }
+
+
+    
     boolean checkIfProblematicLearningTrend(Connection conn) throws Exception {
 
         if (doneTooFewProblems(conn) == true && mastery < 0.3) {
@@ -685,6 +746,10 @@ public class TopicSummary {
         return SOF_SOF_sequence;
     }
 
+
+    public String getEffortsForGraph() {
+        return effortsForGraph;
+    }
 
     public int getNeglectful_count() {
         return neglectful_count;
