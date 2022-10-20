@@ -133,8 +133,7 @@ System.out.println("msHost = " + msHost + msContext);
     
 	<link href="https://cdn.datatables.net/fixedcolumns/3.3.0/css/fixedColumns.dataTables.min.css" rel="stylesheet"
           type="text/css">
-
-
+	<script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
 
     <style>
         .buttonCustomColor {
@@ -255,6 +254,8 @@ var effortMap;
 var perProblemObject;
 var emotionMap;
 var commentsMap;
+var emotionLevelOne;
+var emotionStudentName;
 var eachStudentData = [];
 
 var studentRosterTable;
@@ -794,298 +795,282 @@ function loadEffortMap (rows,flag) {
             $("#iconID" + rows).removeClass();
             $("#iconID" + rows).addClass('fa fa-times');
             var effortChartIdSelector = "#effortChart" + rows;
+            var effortPlotIdSelector = "containerChart" + rows;
             var containerChartSelector = "#containerChart" + rows;
-            var legendChart = "#legendChart" + rows;
             var effortValues = effortMap[rows];
             var effortData;
             
-            if (languageSet == 'es') {
-              effortData = {
-                labels: ["Tipo de comportamiento en problema"],
-                datasets: [{
-                    backgroundColor: "#8dd3c7",
-                    label: 'OMITIR: El estudiante saltó el problema (no hizo nada al respecto)',
-                    data: [effortValues[0]]
-                }, {
-                    backgroundColor: "#ffffb3",
-                    label: 'NOLEYO: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
-                    data: [effortValues[1]]
-                }, {
-                    backgroundColor: "#bebada",
-                    label: 'ABANDONO: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
-                    data: [effortValues[2]]
-                }, {
-                    backgroundColor: "#26f213",
-                    label: 'CORRECTO: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
-                    data: [effortValues[3]]
-                }, {
-                    backgroundColor: "#9beb94",
-                    label: 'AUTOCORRIGIO: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
-                    data: [effortValues[4]]
-                }, {
-                    backgroundColor: "#fb8072",
-                    label: 'ADIVINO: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
-                    data: [effortValues[5]]
-                }, {
-                    backgroundColor: "#80b1d3",
-                    label: 'CONAYUDA: El estudiante resolvió el problema correctamente después de ver PISTAS.',
-                    data: [effortValues[6]]
-                }, {
-                    backgroundColor: "#fdb462",
-                    label: 'SCONAYUDA: Consiguió el problema correcto, pero vio al menos un video.',
-                    data: [effortValues[7]]
-                }, {
-                    label: 'NOHAYDATOS: No se pudieron recopilar datos.',
-                    backgroundColor: "#d9d9d9",
-                    data: [effortValues[8]],
-                },]
-              };
-            }
-            else {
-                effortData = {
-                        labels: ["Type of behaviour in problem"],
-                        datasets: [{
-                            backgroundColor: "#8dd3c7",
-                            label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
-                            data: [effortValues[0]]
-                        }, {
-                            backgroundColor: "#ffffb3",
-                            label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
-                            data: [effortValues[1]]
-                        }, {
-                            backgroundColor: "#bebada",
-                            label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
-                            data: [effortValues[2]]
-                        }, {
-                            backgroundColor: "#26f213",
-                            label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
-                            data: [effortValues[3]]
-                        }, {
-                            backgroundColor: "#9beb94",
-                            label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
-                            data: [effortValues[4]]
-                        }, {
-                            backgroundColor: "#fb8072",
-                            label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
-                            data: [effortValues[5]]
-                        }, {
-                            backgroundColor: "#80b1d3",
-                            label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
-                            data: [effortValues[6]]
-                        }, {
-                            backgroundColor: "#fdb462",
-                            label: 'SHELP: Got the problem correct but saw atleast one video.',
-                            data: [effortValues[7]]
-                        }, {
-                            label: 'NO DATA: No data could be gathered.',
-                            backgroundColor: "#d9d9d9",
-                            data: [effortValues[8]],
-                        },]
-                      };            	
-            }
-            var emotionChart = new Chart($(effortChartIdSelector), {
-            type: 'horizontalBar',
-            data: effortData,
-            options: {
-                responsive: true,
-                legend: {
-                    display: false
-                }, legendCallback: function(chart) {
-                    var text = [];
-                    text.push('<table class="' + chart.id + '-legend">');
-                    for (var i = 0; i < chart.data.datasets.length; i++) {
-                        text.push('<tr><td><span style="background-color:' + chart.data.datasets[i].backgroundColor + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>');
-                        if (chart.data.datasets[i].label) {
-                            text.push('<td>'+ chart.data.datasets[i].label + '</td></tr>');
-                        }
-                    }
-                    text.push('</table>');
-                    return text.join('');
-                },
-                scales: {
-                    yAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: false,
-                            callback: function (value) {
-                                return value + "%"
-                            }
-                        },
-                        display: false
-                    }],
-                    xAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: false
-                        },
-                        display: false
-                    }]
-                }
-            }
-        });
-        $(legendChart).prepend(emotionChart.generateLegend());
+
+            effortData = {
+               labels: ["<%= rb.getString("type_of_behavior_in_problem")%>"],
+               datasets: [{
+                   backgroundColor: "#8dd3c7",
+                   label: '<%= rb.getString("effort_pie_label_skip")%>',
+                   data: [effortValues[0]]
+               }, {
+                   backgroundColor: "#ffffb3",
+                   label: '<%= rb.getString("effort_pie_label_notr")%>',
+                   data: [effortValues[1]]
+               }, {
+                   backgroundColor: "#bebada",
+                   label: '<%= rb.getString("effort_pie_label_giveup")%>',
+                   data: [effortValues[2]]
+               }, {
+                   backgroundColor: "#26f213",
+                   label: '<%= rb.getString("effort_pie_label_sof")%>',
+                   data: [effortValues[3]]
+               }, {
+                   backgroundColor: "#9beb94",
+                   label: '<%= rb.getString("effort_pie_label_att")%>',
+                   data: [effortValues[4]]
+               }, {
+                   backgroundColor: "#fb8072",
+                   label: '<%= rb.getString("effort_pie_label_guess")%>',
+                   data: [effortValues[5]]
+               }, {
+                   backgroundColor: "#80b1d3",
+                   label: '<%= rb.getString("effort_pie_label_shint")%>',
+                   data: [effortValues[6]]
+               }, {
+                   backgroundColor: "#fdb462",
+                   label: '<%= rb.getString("effort_pie_label_shelp")%>',
+                   data: [effortValues[7]]
+               }, {
+                   label: '<%= rb.getString("effort_pie_label_nodata")%>',
+                   backgroundColor: "#d9d9d9",
+                   data: [effortValues[8]],
+               },]
+             };            	
+            
+
+    		
+            var orderArr = [8,2,0,1,5,7,6,4,3];
+            var eff = [];
+            var lbl = [];
+            var colorArr = [];
+			for (j=8;j>=0;j = j - 1) {
+				var order = orderArr[j];
+	  			eff.push(Number(effortData.datasets[order].data[0]));
+	  			
+	  			var label = effortData.datasets[order].label;
+	  			var mylabel = label.substring(label.indexOf(":")+2);
+	  			lbl.push(mylabel);
+	  			
+	  			var color = effortData.datasets[order].backgroundColor;
+	  			color = color.replace("#","");
+	  			var aRgbHex = color.match(/.{1,2}/g);
+	  			console.log(aRgbHex); //["15", "02", "BE"]
+  			
+	  			var aRgb = [
+	  			    parseInt(aRgbHex[0], 16),
+	  			    parseInt(aRgbHex[1], 16),
+	  			    parseInt(aRgbHex[2], 16)
+	  			];
+	  			
+	  			var mycolor = "'rgb(" + parseInt(aRgbHex[0], 16) + "," + parseInt(aRgbHex[1], 16) + "," + parseInt(aRgbHex[2], 16) + ")'";
+
+	  			colorArr.push(mycolor);
+	  			
+  			
+  			}
+			
+			var data = [{
+				  values: eff,
+				  labels: lbl,
+				  sort: false,
+				  marker: {
+					    colors: colorArr
+				  },
+				  
+				  type: 'pie'
+				}];
+
+			
+			var layout = {
+					title: 'Effort Chart',
+					height: 400,
+					width: 800
+				};
+			Plotly.newPlot(effortPlotIdSelector, data, layout);
+
         $(containerChartSelector).show();
     } else if ($("#iconID" + rows).hasClass('fa fa-times')) {
         $("#iconID" + rows).removeClass();
         $("#iconID" + rows).addClass('fa fa-th');
         var containerChartSelector = "#containerChart" + rows;
-        var legendChart = "#legendChart" + rows;
         $(containerChartSelector).hide();
-        $(legendChart).empty();
     } 
   }else {
         $('#problemSnapshot').empty();
         var completeValues = perProblemObject[rows];
         var effortValues = completeValues['studentEffortsPerProblem'];
         var imageURL = problem_imageURL+rows+'.jpg';
-        var legendChart = "#lengendTable";
         $('#problemSnapshot').append('<span><strong><%= rb.getString("problem_id")%> :'+rows+'</strong></span>');
         $('#problemSnapshot').append('<img  style="max-width:600px; max-height:600px;" src="'+imageURL +'"/>');
+        var effortPlotIdSelector = 'studentEffortRecordedProblemCanvas';
                
         if(effortChartOnPopup) {
             effortChartOnPopup.destroy();
-            $(legendChart).empty();
         }
 
-        if (languageSet == 'es') {
-			effortData = {
-            labels: ["Tipo de comportamiento en problema"],
+
+        effortData = {
+            labels: ["<%= rb.getString("type_of_behavior_in_problem")%>"],
             datasets: [{
                 backgroundColor: "#8dd3c7",
-                label: 'SKIP: El estudiante saltó el problema (no hizo nada al respecto)',
+                label: '<%= rb.getString("effort_pie_label_skip")%>',
                 data: [effortValues[0]]
             }, {
                 backgroundColor: "#ffffb3",
-                label: 'NOTR: Ni siquiera LEYENDO el problema - El estudiante respondió demasiado rápido, en menos de 4 segundos',
+                label: '<%= rb.getString("effort_pie_label_notr")%>',
                 data: [effortValues[1]]
             }, {
                 backgroundColor: "#bebada",
-                label: 'GIVEUP: El estudiante comenzó a trabajar en el problema, pero luego AUMENTÓ y siguió adelante sin resolverlo correctamente.',
+                label: '<%= rb.getString("effort_pie_label_giveup")%>',
                 data: [effortValues[2]]
             }, {
                 backgroundColor: "#26f213",
-                label: 'SOF: El estudiante resolvió el problema correctamente en el PRIMER intento, sin ninguna ayuda.',
+                label: '<%= rb.getString("effort_pie_label_sof")%>',
                 data: [effortValues[3]]
             }, {
                 backgroundColor: "#9beb94",
-                label: 'ATT: El estudiante INTENTÓ una vez incorrectamente, pero se corrigió (contestó correctamente) en el segundo intento, no se solicitó ayuda.',
+                label: '<%= rb.getString("effort_pie_label_att")%>',
                 data: [effortValues[4]]
             }, {
                 backgroundColor: "#fb8072",
-                label: 'GUESS: El estudiante aparentemente, HABLADO, hizo clic en 3-5 respuestas hasta obtener la correcta, y no le pidió pistas / videos, etc.',
+                label: '<%= rb.getString("effort_pie_label_guess")%>',
                 data: [effortValues[5]]
             }, {
                 backgroundColor: "#80b1d3",
-                label: 'SHINT: El estudiante resolvió el problema correctamente después de ver PISTAS.',
+                label: '<%= rb.getString("effort_pie_label_shint")%>',
                 data: [effortValues[6]]
             }, {
                 backgroundColor: "#fdb462",
-                label: 'SHELP: Consiguió el problema correcto, pero vio al menos un video.',
+                label: '<%= rb.getString("effort_pie_label_shelp")%>',
                 data: [effortValues[7]]
             }, {
-                label: 'NO DATA: NO DATA: No se pudieron recopilar datos.',
+                label: '<%= rb.getString("effort_pie_label_nodata")%>',
                 backgroundColor: "#d9d9d9",
                 data: [effortValues[8]],
             },]
-        };
-        }
-        else {
-			effortData = {
-		            labels: ["Type of behaviour in problem"],
-		            datasets: [{
-                        backgroundColor: "#8dd3c7",
-                        label: 'SKIP: The student SKIPPED the problem (did not do anything on the problem)',
-                        data: [effortValues[0]]
-                    }, {
-                        backgroundColor: "#ffffb3",
-                        label: 'NOTR: NOT even READING the problem --The student answered too fast, in less than 4 seconds',
-                        data: [effortValues[1]]
-                    }, {
-                        backgroundColor: "#bebada",
-                        label: 'GIVEUP: The student started working on the problem, but then GAVE UP and moved on without solving it correctly.',
-                        data: [effortValues[2]]
-                    }, {
-                        backgroundColor: "#26f213",
-                        label: 'SOF: The student SOLVED the problem correctly on the FIRST attempt, without any help.',
-                        data: [effortValues[3]]
-                    }, {
-                        backgroundColor: "#9beb94",
-                        label: 'ATT: The student ATTEMPTED once incorrectly, but self-corrected (answered correctly) in the second attempt, no help.',
-                        data: [effortValues[4]]
-                    }, {
-                        backgroundColor: "#fb8072",
-                        label: 'GUESS: The student apparently GUESSED, clicked through 3-5 answers until getting the right one',
-                        data: [effortValues[5]]
-                    }, {
-                        backgroundColor: "#80b1d3",
-                        label: 'SHINT: Student SOLVED problem correctly after seeing HINTS.',
-                        data: [effortValues[6]]
-                    }, {
-                        backgroundColor: "#fdb462",
-                        label: 'SHELP: Got the problem correct but saw atleast one video.',
-                        data: [effortValues[7]]
-                    }, {
-                        label: 'NO DATA: No data could be gathered.',
-                        backgroundColor: "#d9d9d9",
-                        data: [effortValues[8]],
-		            },]
-		        };        	
-        }
-            effortChartOnPopup = new Chart($("#studentEffortRecordedProblemCanvas"), {
-            type: 'horizontalBar',
-            data: effortData,
-            options: {
-                responsive: true,
-                legend: {
-                    display: false
-                }, legendCallback: function(chart) {
-                    var text = [];
-                    text.push('<table class="' + chart.id + '-legend">');
-                    for (var i = 0; i < chart.data.datasets.length; i++) {
-                        text.push('<tr><td><span style="background-color:' + chart.data.datasets[i].backgroundColor + '">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>');
-                        if (chart.data.datasets[i].label) {
-                            text.push('<td>'+ chart.data.datasets[i].label + '</td></tr>');
-                        }
-                    }
-                    text.push('</table>');
-                    return text.join('');
-                },
-                scales: {
-                    yAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: false,
-                            callback: function (value) {
-                                return value + "%"
-                            }
-                        },
-                        display: false
-                    }],
-                    xAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: false
-                        },
-                        display: false
-                    }]
-                }
-            }
-        });
-        $(legendChart).prepend(effortChartOnPopup.generateLegend());
+         };            	
+  	
+        
+//        var orderArr = [3,4,6,7,5,1,0,2,8];
+        var orderArr = [8,2,0,1,5,7,6,4,3];
+        var eff = [];
+        var lbl = [];
+        var colorArr = [];
+		for (j=8;j>=0;j = j - 1) {
+			var order = orderArr[j];
+  			eff.push(Number(effortValues[order]));
+  			
+  			var label = effortData.datasets[order].label;
+  			var mylabel = label.substring(label.indexOf(":"));
+  			lbl.push(mylabel);
+  			
+  			var color = effortData.datasets[order].backgroundColor;
+  			color = color.replace("#","");
+  			var aRgbHex = color.match(/.{1,2}/g);
+  			console.log(aRgbHex); //["15", "02", "BE"]
+			
+  			var aRgb = [
+  			    parseInt(aRgbHex[0], 16),
+  			    parseInt(aRgbHex[1], 16),
+  			    parseInt(aRgbHex[2], 16)
+  			];
+  			
+  			var mycolor = "'rgb(" + parseInt(aRgbHex[0], 16) + "," + parseInt(aRgbHex[1], 16) + "," + parseInt(aRgbHex[2], 16) + ")'";
+
+  			colorArr.push(mycolor);
+ 						
+		}
+		
+		var data = [{
+			  values: eff,
+			  labels: lbl,
+			  sort: false,
+			  marker: {
+				    colors: colorArr
+			  },
+			  type: 'pie'
+			}];
+
+		
+		var layout = {
+				title: 'Effort Chart',
+				height: 380,
+				width: 880
+			};
+		Plotly.newPlot(effortPlotIdSelector, data, layout);
+
         $("#studentEffortRecordedProblem").modal('show');
     }
 
 }
 
-function loadEmotionMap (rows) {
+function loadEmotionMap (rows, studentName) {
     var studentEmotions = emotionMap[rows];
+    var studentComments = commentsMap[rows];
+    emotionStudentName = '';
+    for (var ctr=0; ctr < emotionLevelOne.length; ctr = ctr + 1) {
+    	var info = emotionLevelOne[ctr];
+    	if (info[0] == rows) {
+    		emotionStudentName = info[1];
+			break;
+    	}
+	}
+    
     var containerChartSelector = "#emotionContainerChart" + rows;
+    var emotionPlotIdSelector = "";
     if($("#emotioniconID" + rows).hasClass('fa fa-heart')) {
         $("#emotioniconID" + rows).removeClass();
         $("#emotioniconID" + rows).addClass('fa fa-times');
-        if (!jQuery.isEmptyObject(studentEmotions)) {
+        if(jQuery.isEmptyObject(studentEmotions)) {
+            var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
+            document.getElementById("emotionBlock1").innerHTML =  "";
+            document.getElementById("emotionBlock2").innerHTML =  "";
+            document.getElementById("chart1Canvas").innerHTML =  "";
+            document.getElementById("chart2Canvas").innerHTML =  "";
+    		document.getElementById("emotionChartsTitle").innerHTML = "<%= rb.getString("no_emotions_reported")%> " +  emotionStudentName;
+        }
+        else {
+        	
+    		document.getElementById("emotionChartsTitle").innerHTML = "<%= rb.getString("emotions_and_comment_for")%> " +  emotionStudentName;
+            var divBlockOne = "<div id='bloc1' style='margin: 1%; float: left;'>";
+            var divBlockTwo = "<div id='bloc2' style='margin: 1%; float: left;'>";
+
+            var blockCounter = 0;
             Object.keys(studentEmotions).forEach(function (key) {
-                var emotionChartCanvas = "#" + rows + key;
+                var eachEmotionComment = studentComments[key];
+                var commentsTable = "";
+                if (!jQuery.isEmptyObject(eachEmotionComment)) {
+                    commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr><%= rb.getString("comments")%></tr></thead><tbody>"
+                    var emotionComments = "";
+                    eachEmotionComment.forEach(function (comments) {
+                        if (comments != "")
+                            emotionComments += "<tr><td>" + comments + "</td></tr>";
+                    });
+                    emotionComments += "</tbody></table>"
+                    commentsTable += emotionComments;
+                }
+                
+                var canvasTags = "<div class='panel panel-default'>" + commentsTable + "</div></div>";
+
+                if (blockCounter == 0)
+                    divBlockOne += canvasTags;
+                if (blockCounter == 1)
+                    divBlockTwo += canvasTags;
+                blockCounter++;
+            });
+            divBlockOne += "</div>";
+            document.getElementById("emotionBlock1").innerHTML = divBlockOne;
+            divBlockTwo += "</div>";
+            document.getElementById("emotionBlock2").innerHTML = divBlockTwo;
+      	        	
+        	
+            var chartCounter = 1;
+            Object.keys(studentEmotions).forEach(function (key) {
                 var percentValues = jQuery.extend(true, [], studentEmotions[key]);
                 var keyValue = key;
                 percentValues[0] = Math.round(percentValues[0] / percentValues[5] * 100);
@@ -1104,63 +1089,62 @@ function loadEmotionMap (rows) {
                 } else if (keyValue == 'Interest') {
                     colorCodes = ['#D4FBD1', '#AAF7A3', '#7FF375', '#55EF47', '#2BEB1A'];
                 }
+                
+                
+                var emo = [];
+                var lbl = [];
+                var colorArr = [];
+        		for (j=4;j>=0;j = j - 1) {
+          			emo.push(percentValues[j]);
+          			
+          			var mylabel = barLabels[j];
+          			lbl.push(mylabel);
+          			
+          			var color = colorCodes[j];
+          			color = color.replace("#","");
+          			var aRgbHex = color.match(/.{1,2}/g);
+          			console.log(aRgbHex); //["15", "02", "BE"]
+        			
+          			var aRgb = [
+          			    parseInt(aRgbHex[0], 16),
+          			    parseInt(aRgbHex[1], 16),
+          			    parseInt(aRgbHex[2], 16)
+          			];
+          			
+          			var mycolor = "'rgb(" + parseInt(aRgbHex[0], 16) + "," + parseInt(aRgbHex[1], 16) + "," + parseInt(aRgbHex[2], 16) + ")'";
 
-                var emotionChart = new Chart($(emotionChartCanvas), {
-                    type: 'horizontalBar',
-                    data: {
-                        labels: [keyValue],
-                        datasets: [{
-                            backgroundColor: colorCodes[0],
-                            label: barLabels[0],
-                            data: [percentValues[0]]
-                        }, {
-                            backgroundColor: colorCodes[1],
-                            label: barLabels[1],
-                            data: [percentValues[1]]
-                        }, {
-                            backgroundColor: colorCodes[2],
-                            label: barLabels[2],
-                            data: [percentValues[2]]
-                        }, {
-                            backgroundColor: colorCodes[3],
-                            label: barLabels[3],
-                            data: [percentValues[3]]
-                        }, {
-                            backgroundColor: colorCodes[4],
-                            label: barLabels[4],
-                            data: [percentValues[4]]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            display: false
-                        },
-                        scales: {
-                            yAxes: [{
-                                stacked: true,
-                                ticks: {
-                                    beginAtZero: false,
-                                    callback: function(value) {
-                                        return value + "%"
-                                    }
-                                },
-                                display: false
-                            }],
-                            xAxes: [{
-                                stacked: true,
-                                ticks: {
-                                    beginAtZero: false
-                                },
-                                display: false
-                            }]
-                        }
-                    }
-                });
+          			colorArr.push(mycolor);
+         						
+        		}
+        		
+        		var data = [{
+        			  values: emo,
+        			  labels: lbl,
+        			  sort: false,
+        			  marker: {
+        				    colors: colorArr
+        			  },
+        			  type: 'pie'
+        			}];
 
+        		
+        		var layout = {
+        				title: key,
+        				height:280,
+        				width: 300
+        			};
+        		if (chartCounter == 1) {
+        			var mychart = Plotly.newPlot(chart1Canvas, data, layout);
+            	}
+	    		if (chartCounter == 2) {
+	    			var mychart = Plotly.newPlot(chart2Canvas, data, layout);
+	        	}
+                chartCounter = chartCounter + 1;
             });
         }
-        $(containerChartSelector).show();
+        $("#studentEmotionCharts").modal('show');
+        $("#emotioniconID" + rows).removeClass();
+        $("#emotioniconID" + rows).addClass('fa fa-heart');
     }else if($("#emotioniconID" + rows).hasClass('fa fa-times')){
         $("#emotioniconID" + rows).removeClass();
         $("#emotioniconID" + rows).addClass('fa fa-heart');
@@ -1543,8 +1527,7 @@ function registerAllEvents(){
                 'render': function ( data, type, row ) {
                     var effortChartId = "effortChart"+row[0];
                     var containerChart = "containerChart"+row[0];
-                    var legendChart = "legendChart"+row[0];
-                    var dataContent = "<div id="+containerChart+" style='width:900px;height:600px;display:none'><div class='panel panel-default'><div class='panel-heading'>"+headers['effchart']+"</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
+                    var dataContent = "<div id="+containerChart+" style='border: 1px solid #000000; width:800px;height:400px;display:none'></div></div>";
                     return "<i id='iconID"+row[0]+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row[0]+",true);'></i>"+dataContent;
                 }
             }, {
@@ -1560,38 +1543,8 @@ function registerAllEvents(){
                         var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
                         var containerChartSelector = "#emotionContainerChart" +row[0];
                          containerConvas += noEmotionReported;
-                    }else {
-                        var i = 0;
-                        var divBlockOne = "<div id='bloc1' style='margin: 1%; float: left;'>";
-                        var divBlockTwo = "<div id='bloc2' style='margin: 1%; float: left;'>";
-                        Object.keys(studentEmotions).forEach(function (key) {
-                            var eachEmotionComment = studentComments[key];
-                            var commentsTable = "";
-                            if (!jQuery.isEmptyObject(eachEmotionComment)) {
-                                commentsTable = "<table style='width:80%;' class='table table-striped table-bordered hover'><thead><tr><%= rb.getString("comments")%></tr></thead><tbody>"
-                                var emotionComments = "";
-                                eachEmotionComment.forEach(function (comments) {
-                                    if (comments != "")
-                                        emotionComments += "<tr><td>" + comments + "</td></tr>";
-                                });
-                                emotionComments += "</tbody></table>"
-                                commentsTable += emotionComments;
-                            }
-                            var canvasTags = "<div class='panel panel-default'><div class='panel-heading'>" + key + "</div><div class='panel-body'><canvas width='300' height='100' id='" + row[0] + key + "'></canvas>" + commentsTable+"</div></div>"
-
-                            if (i == 0 || i == 1)
-                                divBlockOne += canvasTags;
-                            if (i == 2 || i == 3)
-                                divBlockTwo += canvasTags;
-                            if (i == 3) {
-                                divBlockOne += "</div>";
-                                divBlockTwo += "</div>";
-                            }
-                            i++;
-                        });
-                        containerConvas = containerConvas + divBlockOne + divBlockTwo + "</div>"
                     }
-                    return "<i id='emotioniconID"+row[0]+"' style='cursor:pointer;' class='fa fa-heart' aria-hidden='true' onclick='loadEmotionMap("+row[0]+");'></i>"+containerConvas;
+                    return  "<i id='emotioniconID"+row[0]+"' style='cursor:pointer;' class='fa fa-heart' aria-hidden='true' onclick='loadEmotionMap("+row[0]+ ");'></i>";
                 }
             },
                 
@@ -1743,10 +1696,8 @@ function registerAllEvents(){
         var row = perStudentReport.row(tr);
         var rowID = row.data()[0];
         var containerChartSelector = "#containerChart" + rowID;
-        var legendChart = "#legendChart" + rowID;
         $(containerChartSelector).hide();
         $("#iconID" + rowID).show();
-        $(legendChart).empty();
 
         if (row.child.isShown()) {
             row.child.hide();
@@ -2668,10 +2619,9 @@ var completeDataChart;
                 $('#collapseThreeLoader').hide();
                 var jsonData = $.parseJSON(data);
                 effortMap = jsonData.effortChartValues;
-//                var junk = JSON.stringify(effortmap);
-//                alert("junk=" + junk);
                 emotionMap = jsonData.fullstudentEmotionsMap;
                 commentsMap = jsonData.fullstudentEmotionsComments;
+                emotionLevelOne = jsonData.levelOneData;
                 eachStudentData = jsonData.eachStudentDataValues;
                 perStudentReport.clear().draw();
                 perStudentReport.rows.add(jsonData.levelOneData).draw();
@@ -2962,8 +2912,6 @@ var completeDataChart;
                             'render': function ( data, type, row ) {
                                 var effortChartId = "effortChart"+row['problemId'];
                                 var containerChart = "containerChart"+row['problemId'];
-                                var legendChart = "legendChart"+row['problemId'];
-                                //var dataContent = "<div id="+containerChart+" style='width:900px;height:300px;display:none'><div class='panel panel-default'><div class='panel-heading'>Effort Chart</div><div class='panel-body'><canvas width='800' height='150' id="+effortChartId+"></canvas></div><div class='panel-body' id='"+legendChart+"'></div></div></div>";
                                 return "<i id='iconID"+row['problemId']+"' style='cursor:pointer;' class='fa fa-th' aria-hidden='true' onclick='loadEffortMap("+row['problemId']+",false);'></i>";
                             }
 
@@ -4098,19 +4046,43 @@ var completeDataChart;
 
 
 
-<!-- Modal For Mastery Trajecotory Report-->
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg" style="min-width:1100px">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title"><%= rb.getString("collective_student_effort") %></h4>
             </div>
-            <div class="modal-body" role="alert">
+            <div class="modal-body" style="min-width:900px">
                 <div id="problemSnapshot" ></div>
-                <canvas id="studentEffortRecordedProblemCanvas" width='900' height='150'></canvas>
-                <div id="lengendTable"></div>
+                <div id="studentEffortRecordedProblemCanvas" style="border: 1px solid #000000;width:900px; height:400px;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+
+<div id="studentEmotionCharts" class="modal" role="dialog" style="display: none;">
+    <div class="container modal-dialog modal-lg" style="min-width:900px;background-color: lightgray;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div id="emotionChartsTitle" class="modal-title"></div>
+            </div>
+            <div class="row">
+	            <div class="modal-body" style="min-width:900px">            	
+	                <div id="chart1Canvas"  class='col-md-6'; style="border: 2px solid #000000;min-width:300px; height:290px;"></div>                
+	                <div id="emotionBlock1" class='col-md-6';style="border: 2px solid #000000;min-width:400px; height:250px; overflow-x: scroll; overflow-y: scroll;""></div>
+	            </div>
+            </div>
+            <div class="row">
+	            <div class="modal-body" style="min-width:900px">            	
+	                <div id="chart2Canvas"  class='col-md-6'; style="border: 2px solid #000000;min-width:300px; height:290px;"></div>
+	                <div id="emotionBlock2" class='col-md-6';style="border: 2px solid #000000;min-width:400px; height:259px; overflow-x: scroll; overflow-y: scroll;"></div>
+	            </div>
             </div>
 
         </div>
