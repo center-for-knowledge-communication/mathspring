@@ -4592,12 +4592,6 @@ function showReport6() {
             	
             	}
  
-            	var rpt6MaxVal = 20;
-            	var rpt6Interval = 1;
-            	if (trendNumberOfUnits > 5 ) {
-            		rpt6MaxVal = trendNumberOfUnits * 25;
-            		rpt6Interval = rpt6MaxVal / 20;
-            	}
             	
         	  var p1_teacher0 = [];
         	  var p1_teacher1 = [];
@@ -4652,6 +4646,8 @@ function showReport6() {
         	  var p2_teachers = [p2_teacher0, p2_teacher1, p2_teacher2, p2_teacher3, p2_teacher4, p2_teacher5, p2_teacher6, p2_teacher7, p2_teacher8, p2_teacher9, p2_teacher10, p2_teacher11, p2_teacher12, p2_teacher13, p2_teacher14, p2_teacher15, p2_teacher16, p2_teacher17, p2_teacher18, p2_teacher19, p2_teacher20];
         	  var p2_teachersFound = [];
         	  
+        	  var maxProblemsSeen = 0;
+        	  
         	  for (var w=0; w < jsonWeekArr.length; w++ ) {
         		  
         	  	  var weekName = "Week" + (w+1);
@@ -4669,6 +4665,9 @@ function showReport6() {
      		  		  	    var index = rpt6getUsernameIndex(username);
      		  		  	    if (index >= 0) {
     				  			p1_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_seen]);
+    				  			if (jsonWeekArr[w][weekName][i].problems_seen > maxProblemsSeen) {
+    				  				maxProblemsSeen = jsonWeekArr[w][weekName][i].problems_seen;
+    				  			}
     				  			p2_teachers[index].push([week_date, jsonWeekArr[w][weekName][i].problems_solved]);
     						}
     						else {
@@ -4676,23 +4675,25 @@ function showReport6() {
     						}
     				  }
     			  }        		  
-        	  }
+        	}
+         	var rpt6MaxVal = maxProblemsSeen + 20;
+        	var rpt6Interval = rpt6MaxVal / 20;;
 
-        	  for (var t = 0; t<rpt6usernameXref.length; t++) {
-				  p1_teachersFound.push(p1_teachers[t]);
-				  p2_teachersFound.push(p2_teachers[t]);
-			  }
-			  var canvas_width = jsonWeekArr.length * 80;
-			  if (canvas_width > 1200) {
-				  canvas_width =  1200;
-			  }
-			  if (canvas_width < 600) {
-				  canvas_width = 600;
-			  }
-			  document.getElementById("chart6_canvas1").style.width = "" + canvas_width + "px";      	  			  
-			  document.getElementById("chart6_canvas2").style.width = "" + canvas_width + "px";      	  			  
+        	for (var t = 0; t<rpt6usernameXref.length; t++) {
+				p1_teachersFound.push(p1_teachers[t]);
+				p2_teachersFound.push(p2_teachers[t]);
+			}
+			var canvas_width = jsonWeekArr.length * 80;
+			if (canvas_width > 1200) {
+				canvas_width =  1200;
+			}
+			if (canvas_width < 600) {
+				canvas_width = 600;
+			}
+			document.getElementById("chart6_canvas1").style.width = "" + canvas_width + "px";      	  			  
+			document.getElementById("chart6_canvas2").style.width = "" + canvas_width + "px";      	  			  
         	  
-        	  p1_plot6 = $.jqplot('chart6_canvas1', p1_teachersFound, 
+        	p1_plot6 = $.jqplot('chart6_canvas1', p1_teachersFound, 
         	    { 
         	      title: '<%= rwrb.getString("weekly_problems_seen") %>', 
         	      // Set default options on all series, turn on smoothing.
