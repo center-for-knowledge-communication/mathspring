@@ -1026,12 +1026,12 @@ function loadEmotionMap (rows, studentName) {
     if($("#emotioniconID" + rows).hasClass('fa fa-heart')) {
         $("#emotioniconID" + rows).removeClass();
         $("#emotioniconID" + rows).addClass('fa fa-times');
+        document.getElementById("emotionBlock1").innerHTML =  "";
+        document.getElementById("emotionBlock2").innerHTML =  "";
+        document.getElementById("chart1Canvas").innerHTML =  "";
+        document.getElementById("chart2Canvas").innerHTML =  "";
         if(jQuery.isEmptyObject(studentEmotions)) {
             var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
-            document.getElementById("emotionBlock1").innerHTML =  "";
-            document.getElementById("emotionBlock2").innerHTML =  "";
-            document.getElementById("chart1Canvas").innerHTML =  "";
-            document.getElementById("chart2Canvas").innerHTML =  "";
     		document.getElementById("emotionChartsTitle").innerHTML = "<%= rb.getString("no_emotions_reported")%> " +  emotionStudentName;
         }
         else {
