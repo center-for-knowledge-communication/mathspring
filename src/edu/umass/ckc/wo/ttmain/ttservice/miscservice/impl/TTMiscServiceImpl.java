@@ -650,8 +650,12 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
     }
         
-    public String getTeacherProblemsStudentAverages(Connection conn, int cohortId) throws SQLException {
+    public String getTeacherProblemsStudentAverages(Connection conn, int cohortId, String filter) throws SQLException {
 
+    	
+    	String tpsaFilter[] = filter.split("~");
+    	String tpsaAnonymous = tpsaFilter[0];
+    	int tpsaTeacherId = Integer.valueOf(tpsaFilter[1]);
     	
     	String avg_problems_student =    "Problems per Active Student";
     	String avg_minutes_student =     "Actual Minutes per Student";
@@ -692,6 +696,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 
         		studentCount = getDistinctStudentsWhoSolvedProblems(conn, Integer.valueOf(rs.getString("teacherId")));
 
+        		int teacherId = rs.getInt("teacherId");
        			int sumProblemsSolved = rs.getInt("sumProblemsSolved");
        			studyProblemsSolved += sumProblemsSolved;
        			studyStudentCount += studentCount;
@@ -704,6 +709,22 @@ public class TTMiscServiceImpl implements TTMiscService {
        			}
 
        			String fullName = rs.getString("fullname");
+       			
+       			if (tpsaAnonymous.equals("showAll")) {
+       				;
+       			}
+       			else {
+       				if (tpsaAnonymous.equals("showSingleWithAnonymous")) {
+       					if (tpsaTeacherId != teacherId ) {
+       						teacherName = "XXXXXX";
+       						fullName ="XXXXXX";
+       					}
+       				}
+       				else {
+   						teacherName = "XXXXXX";
+   						fullName ="XXXXXX";
+       				}
+       			}
        			
        			int minutesToSolve =  rs.getInt("time_problems_solved");
    				minutesToSolve = minutesToSolve / 60000;
@@ -1915,7 +1936,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 				result = getTeacherProblems(conn, Integer.valueOf(cohortId));  
 				break;
     		case "teacherProblemsStudentAverages":
-				result = getTeacherProblemsStudentAverages(conn, Integer.valueOf(cohortId));  
+				result = getTeacherProblemsStudentAverages(conn, Integer.valueOf(cohortId), filter);  
 				break;
 
     		case "getStudentCensus":
