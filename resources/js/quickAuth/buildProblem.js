@@ -8,7 +8,7 @@
 // Frank 02-17-21 Added div for comment button
 // Boming 08-30-21 issue #421 circle answer before submit
 // Frank  12-26-21 Issue #567 Disable multiChoice buttons and hide submit box and button
-
+// Frank  11-10-22 Issue #705 Multiselect problems not working
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -131,7 +131,7 @@ m.build = function(activity, previewMode) {
                 hint.innerHTML = parameterizeText(formatted_text, problemParams);
             }
             else{
-                alert("text missing for hint: "+i);
+//                alert("text missing for hint: "+i);
             }
             // DM 1/23/18.  It looks like it might be possible to put images in {[]} in hoverText which means they should be located in problem_XXX/hint_YYY
             if(isNotEmpty(hints[i].hoverText)){
@@ -187,9 +187,13 @@ m.build = function(activity, previewMode) {
 
             	if (mode !== "demo" && mode !== "example") {
 					// add the submit answer button
-					var multiSubmitButton = buildMultiSubmit();
-					multi_answers.appendChild(multiSubmitButton);
-					problemUtils.addMultiChoiceSubmitListener(document);
+                    if(multiSelect) {
+                    }
+                    else {
+    					var multiSubmitButton = buildMultiSubmit();
+                    	multi_answers.appendChild(multiSubmitButton);
+						problemUtils.addMultiChoiceSubmitListener(document);
+                    }
             	}
 				
             }
@@ -312,9 +316,12 @@ function submitMultiSelectAnswer() {
     for(var i = 0; i < answerRows.length; ++i) {
         if(answerRows[i].style.display != "none") { //ignore rows for nonexistent answers
             var letter = answerRows[i].dataset.letter;
-            //if the answer is selected, append it to the string
-            if(document.getElementById(letter + "Checkbox").checked) {
-                selections += letter;
+            // Only single letter answers.  Don't include the 'submitButton' element
+            if (letter.length == 1) {
+	            //if the answer is selected, append it to the string
+	            if(document.getElementById(letter + "Checkbox").checked) {
+	                selections += letter;
+	            }
             }
         }
     }
