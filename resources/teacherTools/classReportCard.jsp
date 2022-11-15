@@ -270,6 +270,7 @@ var filterThree = "~~";
 var filterSeven = "~~";
 
 var filterEight = "~~";
+var topicNameMap = new Map([]);
 
 //Report5 Varribales
 var perStudentReport;
@@ -3383,7 +3384,31 @@ var completeDataChart;
             $("#report-wrapper").show();
             $("#report-wrapper2").show();
             $("#perStudentPerProblemSetReport").hide();
+            
+            
+            $.ajax({
+                type : "POST",
+                url : pgContext+"/tt/tt/getTeacherReports",
+                data : {
+                    classId: classID,
+                    teacherId: teacherID,
+                    reportType: 'getClassTopicNamesList',
+                    lang: loc,
+                    filter: filterEight
+                },
+                success : function(data) {        
+                	var topicData = $.parseJSON(data);
+                   	
 
+                    for (var i = 0; i < topicData.length; i++) {
+                    	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+                    }				            	
+                },
+    	        error : function(e) {
+    	            console.log(e);
+    	        }
+        	});
+            
                      
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
