@@ -3247,7 +3247,7 @@ function showReport_tcp() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#ff0066', '#66ccff'],
+                    seriesColors:['#009933', '#0033cc'],
             	    series:[
 //            	        {label:'<%= rwrb.getString("skipped") %>'},
             	        {label:'<%= rwrb.getString("solved") %>'},
@@ -3454,7 +3454,7 @@ function showReport_tp() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#ff0066', '#66ccff'],
+                    seriesColors:['#009933', '#0033cc'],
             	    series:[
 //            	        {label:'<%= rwrb.getString("skipped") %>'},
             	        {label:'<%= rwrb.getString("solved") %>'},
@@ -5823,7 +5823,7 @@ function updateAllCohortSlices() {
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:800px;"></div> 
+				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:1200px;"></div> 
 				            	<div id="tcp_table_panel" class="col-md-6" style="width:600px; height:800px;">
 				            	   <table align = "center"
             							id="tcp_table" border="1">
