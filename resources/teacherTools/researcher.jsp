@@ -99,10 +99,13 @@ catch (Exception e) {
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/jqplot2021/jquery.jqplot.css" />
 
 </head>
-<body>
 
 
 <style>
+
+.body {
+	background-color: #e4f0f5;
+}
 
 .li-disabled {
     pointer-events:none; 
@@ -193,6 +196,16 @@ th, td {
   padding: 4px;
 }
 
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+    background-color: #2ecc71;
+   color: white;
+   text-align: center;
+}
 </style>
 
 
@@ -5448,7 +5461,8 @@ function updateAllCohortSlices() {
 	
 	</script>
 
-
+<body>
+<div class="bootstrap fullscreen">
 <div class="container-fluid tab-content">
   <h2>Researcher Workbench</h2>
 
@@ -5477,10 +5491,6 @@ function updateAllCohortSlices() {
     <div id="Settings" class="container col-sm-12 tab-pane fade">
       	<h3><%= rwrb.getString("settings") %></h3>
         <p><%= rwrb.getString("settings_selection_msg1") %></p>
-		<br>
-		<label for="setname">other</label>
-	    <input type="text" class="form-control" id="setname" placeholder="Set Name" name="uname" required>
-		<br>
 		<div id="selections">
 			<div class="row">
 				<br>
@@ -5520,13 +5530,17 @@ function updateAllCohortSlices() {
 
 		</div>
 		<br>
+		<br>
+		<br>		
 		<div class="row">
 <!--		
 			<button type="recall" class="btn btn-primary col-sm-2 col-sm-offset-2">Recall Settings</button>
 			<button type="save" class="btn btn-primary col-sm-2 col-sm-offset-1">Save Settings</button>
 -->			
-			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-4" onclick="clearSettings()";">Clear Settings</button>
+			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-5" onclick="clearSettings()";">Clear Settings</button>
 		</div>
+		<br>
+		<br>		
 	</div>
 	
 	
@@ -6607,10 +6621,11 @@ function updateAllCohortSlices() {
 
 
 </div>
-
-
 </div>
-
+</div>
+    <footer class="footer">
+        &copy; <%= rb.getString("researcher_copyright")%>
+    </footer>
 
 <div id="showSessionProblemsModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg">
@@ -6854,6 +6869,7 @@ function updateAllCohortSlices() {
     	</div>
 	</div>
 </div>	
+
 
 
 </body>

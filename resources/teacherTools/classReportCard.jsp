@@ -2959,17 +2959,17 @@ var completeDataChart;
 				var traceMastery = {
 						  x: problems,
 						  y: mastery, 
-					  name: '<%= rb.getString("mastery")%>',
-							  type: 'scatter',
-							  mode: 'lines+markers',
-							  marker: {
-							    color: 'rgb(255, 102, 0)',
-							    size: 8
-							  },
-							  line: {
-							    color: 'rgb(255, 102, 0)',
-							    width: 2
-							  },        				
+							  name: '<%= rb.getString("mastery")%>',
+		     				  type: 'scatter',
+		 					  mode: 'lines+markers',
+		 					  marker: {
+		 					    color: 'rgb(255, 102, 0)',
+		 					    size: 8
+		 					  },
+		 					  line: {
+		 					    color: 'rgb(255, 102, 0)',
+		 					    width: 2
+		 					  },        				
 					          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
 				          text: topicname,
 				
@@ -3052,8 +3052,6 @@ var completeDataChart;
 			
 				var myPlot = document.getElementById('studentProblemHistoryReport');
 	
-                var myPlot = document.getElementById('studentProblemHistoryReport');
-           		
            		Plotly.newPlot('studentProblemHistoryReport', data, layout);     
            		
            		myPlot.on('plotly_click', function(data){
