@@ -4146,9 +4146,6 @@ var completeDataChart;
 	</div>
 </div>
 </div>
-    <footer class="footer">
-        &copy; <%= rb.getString("researcher_copyright")%>
-    </footer>
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
 
 <div id="calendarModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
