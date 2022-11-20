@@ -146,6 +146,18 @@ System.out.println("msHost = " + msHost + msContext);
             height: 20px; 
         } 
     </style>
+
+    <style> 
+	.footer {
+	   position: fixed;
+	   left: 0;
+	   bottom: 0;
+	   width: 100%;
+	    background-color: #2ecc71;
+	   color: white;
+	   text-align: center;
+	}	
+    </style>
     
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/jquery-2.2.2.min.js" />"></script>
   	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>		
@@ -712,6 +724,7 @@ function getStudentListEight() {
         success : function(response) {
         	console.log(response);
         	studentListEight = response;
+        	populateStudentSelectionListEight()
         },
         error : function(e) {
             console.log(e);
@@ -866,7 +879,44 @@ function getFilterThree() {
 	
 }
 
+var topicSelectionListEight = "";
+function populateTopicSelectionListEight() {
 
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+            classId: classID,
+            teacherId: teacherID,
+            reportType: 'getClassTopicNamesList',
+            lang: loc,
+            filter: filterEight
+        },
+        success : function(data) {        
+        	var topicData = $.parseJSON(data);
+           	
+
+            for (var i = 0; i < topicData.length; i++) {
+            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+            }
+
+            topicSelectionListEight = "<select name='topics' id='topicsEight' size='5' style='width:220px' >"; 	
+
+            for (var i = 0; i < topicData.length; i++) {
+        		topicSelectionListEight += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
+            }
+        	studentSelectionListEight += "</select>";
+        	document.getElementById("topicSelectionListEight").innerHTML=topicSelectionListEight; 
+
+            
+        },
+        error : function(e) {
+            console.log(e);
+        }
+	});
+
+	
+}
 
 var studentSelectionListEight = "";
 function populateStudentSelectionListEight() {
@@ -894,9 +944,6 @@ function addStudentEight2(item, index) {
 		studentSelectionListEight += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
 	}
 }
-
-
-
 
 function getFilterEight() {
 	
@@ -3045,6 +3092,9 @@ var completeDataChart;
                 });
 */                                          
 
+				var selectedTopicEight =  document.getElementById("topicsEight").value;
+
+
            		var problems = [];
            		var problemIds = [];
            		var hints = [];
@@ -3066,9 +3116,21 @@ var completeDataChart;
            		var prevTopic = 0;
            		
            		var maxYaxis = 1;          		
-                
+               
+           		var useThisOne = true;
+           		
                 $.each(outputStudentDataList, function (i, obj) {
-                	if (!(obj[8] === "NO DATA")) {                		
+                	useThisOne = true;
+               		var pTopic = obj[17];
+    				if ((selectedTopicEight.length > 0) && (!(pTopic == selectedTopicEight))) {
+    					useThisOne = false;
+    				}
+                	if (obj[8] === "NO DATA") {                		
+    					useThisOne = false;
+    				}
+    				
+					
+                	if (useThisOne) {                		
 	               		var p = "" + i + ": "+ obj[0];
 	               		var pHints = parseInt(obj[6]);
 	               		var pAttempts = parseInt(obj[7]);
@@ -3082,7 +3144,6 @@ var completeDataChart;
 	               		var pdifficulty = parseFloat(obj[15], 10);
 	               		pdifficulty = 10.0 * pdifficulty;
 	               		difficulty.push(pdifficulty);
-	               		var pTopic = obj[17];
 	               		topic.push(pTopic);
 	               		var ptopicname = topicNameMap.get(pTopic);
 	               		topicname.push(ptopicname);
@@ -3644,31 +3705,8 @@ var completeDataChart;
             $("#report-wrapper2").show();
             $("#perStudentPerProblemSetReport").hide();
 
+            populateTopicSelectionListEight();
             
-            $.ajax({
-                type : "POST",
-                url : pgContext+"/tt/tt/getTeacherReports",
-                data : {
-                    classId: classID,
-                    teacherId: teacherID,
-                    reportType: 'getClassTopicNamesList',
-                    lang: loc,
-                    filter: filterEight
-                },
-                success : function(data) {        
-                	var topicData = $.parseJSON(data);
-                   	
-
-                    for (var i = 0; i < topicData.length; i++) {
-                    	topicNameMap.set(topicData[i].topicId, topicData[i].name);
-                    }				            	
-                },
-    	        error : function(e) {
-    	            console.log(e);
-    	        }
-        	});
-            
-                     
         });
 
     </script>
@@ -3695,6 +3733,7 @@ var completeDataChart;
 </head>
 
 <body>
+<div class="bootstrap fullscreen">
 <div id="wrapper">
     <!-- Sidebar -->
     <nav class="navbar navbar-inverse navbar-fixed-top" id="topbar-wrapper" role="navigation">
@@ -3709,22 +3748,26 @@ var completeDataChart;
         </ul>
     </nav>
     <div id="page-content-wrapper">
-
-        <h1 class="page-header">
-            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
-        </h1>
-
-        <h2 class="page-header">
+    	<div class="row">
+			<div class="col-md-9">   
+		        <h2 class="page-header">
+		            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+		        </h2>
+			</div>
+			<div class="col-md-3">
+				<h2>
+					<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Close Report card</a>
+				</h2>  
+			</div> 
+		</div>
+        <h3 class="page-header">
             Teacher: <strong>${fn:toUpperCase(teacherName)}</strong>
-        </h2>
+        </h3>
 
         <div id="content-conatiner" class="container-fluid">
 
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
-                <div class="panel-group" id="accordion">
-                
-                
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -4071,43 +4114,41 @@ var completeDataChart;
 		                        		<div class="col-md-2 offset-md-1">                       
 						                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListEight();" ><%= rb.getString("choose_student") %></button>
 						                </div>
-		                        		<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-5">                       
+		                        		<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-3">                       
 											<select name='students' id='studentsEight' size='5' style='width:220px' >
 											</select>				                
 										</div>
+		                        		<div class="col-md-2 offset-md-1">                       
+						                	<button type="button" class="btn btn-primary" onclick="populateTopicSelectionListEight();" >Choose topic</button>
+						                </div>
+		                        		<div id="topicSelectionListEight" name="topicSelectionListEight" class="col-md-3">                       
+											<select name='topicss' id='topicsEight' size='5' style='width:220px' >
+											</select>				                
+										</div>
 		 							</div>  
+	                            </div>                            
 		
-								</div>
+		
 	                            <div class="panel-body report_filters hidden">
 	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
 	                            </div>
 	                            <div class="panel-body report_filters">                           
 									  <input id="showReportEightBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-	                            </div>                            
-	                            <div class="panel-body">
-                            </div>
-                            <div id="collapseEightLoader" class="loader" style="display: none" ></div>
-                            
-			            	<div id="studentProblemHistoryReport" style="overflow-x: scroll;overflow-y: scroll;"></div> 
-                            </div>
+								</div>
+                            <div id="collapseEightLoader" class="loader" style="display: none" >
+                           	</div>                            
+			            	<div id="studentProblemHistoryReport" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
                         </div>
 					</div>
-
-
              </div>
-
-            </div>
-           
         </div>
 	</div>
-	<div>
-		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Close Report card</a>
-	</div>
-
 </div>
-
-
-
+</div>
+    <footer class="footer">
+        &copy; <%= rb.getString("researcher_copyright")%>
+    </footer>
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
 
 <div id="calendarModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
