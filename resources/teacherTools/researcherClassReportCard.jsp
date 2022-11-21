@@ -278,6 +278,7 @@ var filterThree = "~~";
 var filterEight = "~~";
 var topicNameMap = new Map([]);
 
+
 var landingPageReport2;
 var filterLandingTwo = "~0";
 
@@ -882,6 +883,7 @@ function getFilterThree() {
 var topicSelectionListEight = "";
 function populateTopicSelectionListEight() {
 
+
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getTeacherReports",
@@ -907,7 +909,6 @@ function populateTopicSelectionListEight() {
             }
         	studentSelectionListEight += "</select>";
         	document.getElementById("topicSelectionListEight").innerHTML=topicSelectionListEight; 
-
             
         },
         error : function(e) {
@@ -3091,10 +3092,12 @@ var completeDataChart;
                         return new Date(b[10]).getTime() - new Date(a[10]).getTime();
                 });
 */                                          
-
 				var selectedTopicEight =  document.getElementById("topicsEight").value;
 
-
+				var rptEightTitle = '<%= rb.getString("student_problem_solving_history")%>';
+				if (selectedTopicEight.length > 0) {
+					rptEightTitle = rptEightTitle + " ( " + topicNameMap.get(selectedTopicEight) + " )";
+				}
            		var problems = [];
            		var problemIds = [];
            		var hints = [];
@@ -3350,6 +3353,8 @@ var completeDataChart;
            		data.push(traceProblems);
 //           		var data = [traceHints, traceAttempts, traceVideos, traceProblems];
 
+
+
            	    layout = {
            	    	 width:(maxWidth),
            	    	 height:500,          	         
@@ -3376,7 +3381,7 @@ var completeDataChart;
                  	    borderwidth: 1
                  	 },           	         
            	    	 hovermode:'x',
-           	         title:'<%= rb.getString("student_problem_solving_history")%>',
+           	         title:rptEightTitle ,
            	      	 displayModeBar: false,
 
            	      };   
@@ -3393,7 +3398,8 @@ var completeDataChart;
 			        $("#studentProblemHistoryPopup").modal('show');
            		});
 
-              $("#studentProblemHistoryReport").show();
+           		populateTopicSelectionListEight();
+           		$("#studentProblemHistoryReport").show();
                 
             },
             error : function(e) {
@@ -4083,6 +4089,12 @@ var completeDataChart;
                         </div>
                         <div id="collapseEight" class="panel-collapse collapse">
 	                            <div class="panel-body report_filters">                           
+									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <label class="report_filters">Track Mastery</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <label class="report_filters">Track Difficulty</label>
+									  &nbsp;|&nbsp;
 									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
 									  <label class="report_filters">Track Attempts</label>
 									  &nbsp;|&nbsp;
@@ -4091,12 +4103,6 @@ var completeDataChart;
 									  &nbsp;|&nbsp;
 									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight();">
 									  <label class="report_filters">Track Videos</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
-									  <label class="report_filters">Track Difficulty</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
-									  <label class="report_filters">Track Mastery</label>
 								</div>
 		                        <div class="panel-body report_filters">
 		                        	<div id="chooseDateRange" class="row">
@@ -4110,22 +4116,28 @@ var completeDataChart;
 		
 								</div>
 							     <div class="panel-body report_filters">
-		                        	<div id="chooseStudentsEight" class="row">
-		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListEight();" ><%= rb.getString("choose_student") %></button>
-						                </div>
-		                        		<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-3">                       
+	                        		<div class="row">
+	                        			<div class="col-md-2 offset-md-1">
+											<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
+	                        			</div>
+	                        			<div class="col-md-3">
+	                        			</div>
+	                        			<div class="col-md-3">
+											<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
+	                        			</div>
+	                        		</div>
+	                        		<div class="row">
+	                        			<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-2 offset-md-1"> 
 											<select name='students' id='studentsEight' size='5' style='width:220px' >
 											</select>				                
 										</div>
-		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="populateTopicSelectionListEight();" >Choose topic</button>
-						                </div>
+	                        			<div class="col-md-3">
+	                        			</div>	                        		
 		                        		<div id="topicSelectionListEight" name="topicSelectionListEight" class="col-md-3">                       
-											<select name='topicss' id='topicsEight' size='5' style='width:220px' >
+											<select name='topics' id='topicsEight' size='5' style='width:220px' >
 											</select>				                
 										</div>
-		 							</div>  
+									</div>
 	                            </div>                            
 		
 		
