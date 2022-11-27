@@ -73,24 +73,6 @@ m.build = function(activity, previewMode) {
         document.getElementById("Units").innerHTML = probUnits;
     }
 
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-	
-	var stepText = "Step";
-	var correctAnswerText = "Correct Answer:";
-	var feedback = 'Feedback';
-	var play_hint = "Play hint";
-	if (languageSet == "es") {
-		stepText = "Paso";
-		correctAnswerText = "Respuesta correcta";
-		feedback = "Comentario";
-		play_hint = "mostrar ayuda";
-	}
 
     var hint_labels = [];
     var hint_thumbs = document.getElementById("HintThumbs");
@@ -223,7 +205,7 @@ m.build = function(activity, previewMode) {
         problemContainer.style.float = "left";
         var play_hint_button = document.createElement("div");
         play_hint_button.className = "play-hint-button";
-        play_hint_button.innerHTML = "Play Hint";
+        play_hint_button.innerHTML = playhintText;
         var hint_label_index = 0;
         play_hint_button.onclick = function() {
             prob_playHint(hint_labels[hint_label_index]);
@@ -276,17 +258,7 @@ m.build = function(activity, previewMode) {
 }
 
 function buildMultiSubmit(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-	var submitText = 'Submit';
-	if (languageSet == "es") {
-		submitText = 'Enviar';
-	}
+
 	var answer_row = document.createElement("div");
     answer_row.className = "answer-row";
     answer_row.dataset.letter = "submitButton";
