@@ -58,6 +58,7 @@
 <!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
 <!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
 <!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
+<!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -425,56 +426,11 @@ var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS", 
 var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
 var live_series_colors = ['#0000c6'];
 
-var emsg_classLanguage   = 'Class language is mandatory field';
-var emsg_className       = 'Class name is mandatory field';
-var emsg_field_invalid   = 'Field must only include letters,numbers or . _ - characters';
-var emsg_classGrade      = 'Class grade is mandatory field';
-var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
-var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
-var emsg_town            = 'Town name is mandatory field';
-var emsg_schoolName      = 'School name is mandatory field';
-var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
-var emsg_schoolYear      = 'School year is a mandatory field';
-var emsg_gradeSection    = 'Section name is a mandatory field';
-var emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
-var emsg_maxProb         = 'Max Problems is a mandatory field';
-var emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
-var emsg_minProb         = 'Min Problems is a mandatory field';
-var emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
-var emsg_maxTime         = 'Max Time is a mandatory field';
-var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
-var emsg_minTime         = 'Min Time is a mandatory field';
-
-
 var languagePreference = window.navigator.language;
 var localeSplitter = languagePreference.split("-");
 var languageSet = localeSplitter[0];
 var countrySet = localeSplitter[1];
 var loc = languagePreference;    
-
-if (languageSet == "es") {
-	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
-	emsg_className       = 'El nombre de la clase es obligatorio';
-	emsg_field_invalid   = 'El nombre solo debe incluir letras, números o . _ - ';
-	emsg_classGrade      = 'El grado de la clase es obligatorio';
-	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
-	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
-	emsg_town            = 'El nombre de la ciudad es obligatorio';
-	emsg_schoolName      = 'El nombre de la escuela es obligatorio';
-	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
-	emsg_schoolYear      = 'El año escolar es obligatorio';
-	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
-	emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
-	emsg_maxProb         = 'Max Problems is a mandatory field';
-	emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
-	emsg_minProb         = 'Min Problems is a mandatory field';
-	emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
-	emsg_maxTime         = 'Max Time is a mandatory field';
-	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
-	emsg_minTime         = 'Min Time is a mandatory field';
-}
-
-
 function getFilterLandingOne() {
 	
 
@@ -1805,53 +1761,53 @@ function handleclickHandlers() {
             className: {
                 validators: {
                     notEmpty: {
-                        message: emsg_className
+                        message: '<%= rb.getString("emsg_className")%>'
                     },
 			        regexp: {
             			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-                        message: emsg_field_invalid
+                        message: '<%= rb.getString("emsg_field_invalid")%>'
         			}        
                 }
             },
             classGrade: {
                 validators: {
                     notEmpty: {
-                        message: emsg_classGrade
+                        message: '<%= rb.getString("emsg_classGrade")%>'
                     }
                 }
             },
             lowEndDiff: {
                 validators: {
                     notEmpty: {
-                        message: emsg_lowEndDiff
+                        message: '<%= rb.getString("emsg_lowEndDiff")%>'
                     }
                 }
             }, highEndDiff: {
                 validators: {
                     notEmpty: {
-                        message: emsg_highEndDiff
+                        message: '<%= rb.getString("emsg_highEndDiff")%>'
                     }
                 }
             }, town: {
                 validators: {
                     notEmpty: {
-                        message: emsg_town
+                        message: '<%= rb.getString("emsg_town")%>'
                     }
                 },
 		        regexp: {
         			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-                    message: emsg_field_invalid
+                    message: '<%= rb.getString("emsg_field_invalid")%>'
     			}        
                 
             }, schoolName: {
                 validators: {
                     notEmpty: {
-                        message: emsg_schoolName
+                        message: '<%= rb.getString("emsg_schoolName")%>'
                     }
                 },
 		        regexp: {
         			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-                    message: emsg_field_invalid
+                    message: '<%= rb.getString("emsg_field_invalid")%>'
     			}        
                 
             }, schoolYear: {
@@ -1860,21 +1816,21 @@ function handleclickHandlers() {
                     between: {
                         min: new Date().getFullYear(),
                         max: 2050,
-                        message: emsg_schoolYearRange
+                        message: '<%= rb.getString("emsg_schoolYearRange")%>'
                     },
 
                     notEmpty: {
-                        message: emsg_schoolYear
+                        message: '<%= rb.getString("emsg_schoolYear")%>'
                     }
                 }
             }, gradeSection: {
                 validators: {
                     notEmpty: {
-                        message: emsg_gradeSection
+                        message: '<%= rb.getString("emsg_gradeSection")%>'
                     },
 			        regexp: {
             			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-                        message: emsg_field_invalid
+                        message: '<%= rb.getString("emsg_field_invalid")%>'
         			}                            
                 }
             }, maxProb: {
@@ -1883,11 +1839,11 @@ function handleclickHandlers() {
                     between: {
                         min: 2,
                         max: 40,
-                        message: emsg_maxProbRange
+                        message: '<%= rb.getString("emsg_maxProbRange")%>'
                     },
 
                     notEmpty: {
-                        message: emsg_maxProb
+                        message: '<%= rb.getString("emsg_maxProbRange")%>'
                     }
                 }
             }, minProb: {
@@ -1896,11 +1852,11 @@ function handleclickHandlers() {
                     between: {
                         min: 2,
                         max: 40,
-                        message: emsg_minProbRange
+                        message: '<%= rb.getString("emsg_minProbRange")%>'
                     },
 
                     notEmpty: {
-                        message: emsg_minProb
+                        message: '<%= rb.getString("emsg_minProb")%>'
                     }
                 }
             }, maxTime: {
@@ -1909,11 +1865,11 @@ function handleclickHandlers() {
                     between: {
                         min: 0,
                         max: 30,
-                        message: emsg_maxTimeRange
+                        message: '<%= rb.getString("emsg_maxTimeRange")%>'
                     },
 
                     notEmpty: {
-                        message: emsg_maxTime
+                        message: '<%= rb.getString("emsg_maxTime")%>'
                     }
                 }
             }, minTime: {
@@ -1922,11 +1878,11 @@ function handleclickHandlers() {
                     between: {
                         min: 0,
                         max: 30,
-                        message: emsg_minTimeRange
+                        message: '<%= rb.getString("emsg_minTimeRange")%>'
                     },
 
                     notEmpty: {
-                        message: emsg_minTime
+                        message: '<%= rb.getString("emsg_minTime")%>'
                     }
                 }
             }
@@ -2158,24 +2114,14 @@ function handleclickHandlers() {
 
 function changeLandingPageHeaderAccordingToLanguage(){
 
-	if (languageSet == 'es') {
-		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Problemas resueltos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
-		return header;
-	}else{
-	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Problems solved','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
-	 	return header;
-	}
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	return header;
 }
 
 function changeLandingPageHeader2AccordingToLanguage(){
 
-	if (languageSet == 'es') {
-		var header = {'sid':  'Numero Identificador del alumno','sname': 'Nombre del  alumno','uname':  'Nombre de usuario','problems': 'Problemas resueltos','timeInMS': 'Tiempo resolviendo problemas (minutos)','latestLogin': 'Inicio de sesión más reciente'};
-		return header;
-	}else{
-	 	var header = {'sid':  'Student ID','sname': 'Student Name','uname':  'Username','problems': 'Problems solved','timeInMS': 'Time solving problems (minutes)','latestLogin': 'Most recent login'};
-	 	return header;
-	}
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	return header;
 }
 
 function dragElement(elmnt) {

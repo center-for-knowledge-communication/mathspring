@@ -9,6 +9,7 @@
 // Boming 08-30-21 issue #421 circle answer before submit
 // Frank  12-26-21 Issue #567 Disable multiChoice buttons and hide submit box and button
 // Frank  11-10-22 Issue #705 Multiselect problems not working
+// Frank  11-27-22 Multi-lingual changes
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -275,14 +276,21 @@ m.build = function(activity, previewMode) {
 }
 
 function buildMultiSubmit(){
+	var languagePreference = window.navigator.language;
+	var languageSet = "en";
+	if (languagePreference.includes("en")) {
+			languageSet = "en"
+		} else if (languagePreference.includes("es")) {
+			languageSet = "es"
+		}
+	var submitText = 'Submit';
+	if (languageSet == "es") {
+		submitText = 'Enviar';
+	}
 	var answer_row = document.createElement("div");
     answer_row.className = "answer-row";
     answer_row.dataset.letter = "submitButton";
-    var answer_button = 
-        `<div id="multiSubmitButton">
-            <input class="btn btn-success" type="submit" value="Submit" style="display: block;margin: auto;margin-left: 3px;">
-        </div>
-        `;
+    var answer_button =  `<div id="multiSubmitButton"><input class="btn btn-success" type="submit" value="` + submitText + `" style="display: block;margin: auto;margin-left: 3px;"></div>`;
     answer_row.innerHTML = answer_button + `<div id="Answer$" class="answer_text"></div>`;
     return answer_row;
 }

@@ -29,6 +29,7 @@
  *  Frank 10-09-21  	Issue #526 Improve form validation
  *  Frank   11-30-21    Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022  
  *  Frank	07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them
+ *  Frank 	11-27-22    Issue #714 - finish multi-lingual algorithms
  */
 
  System.out.println("teacherToolsMain starting");
@@ -43,6 +44,7 @@
 // 	logger.error(e.getMessage());	
  }
 
+ 
  
  Locale loc = request.getLocale(); 
  String lang = loc.getLanguage();
@@ -61,6 +63,16 @@ try {
 catch (Exception e) {
 //	logger.error(e.getMessage());	
 }
+
+ResourceBundle jc_rb = null;
+try {
+	jc_rb = ResourceBundle.getBundle("jchartML",loc);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
+
 %>
 
 <!DOCTYPE HTML>
@@ -241,49 +253,6 @@ catch (Exception e) {
     var countrySet = localeSplitter[1];
     var loc = languagePreference;    
 
-	var emsg_classLanguage   = 'Class language is mandatory field';
-	var emsg_className       = 'Class name is mandatory field';
-	var emsg_field_invalid   = 'This field must only include letters,numbers or . _ - characters';
-	var emsg_classGrade      = 'Class grade is mandatory field';
-	var emsg_lowEndDiff      = 'Grade level of problems - Lower is mandatory field';
-	var emsg_highEndDiff     = 'Grade level of problems - Higher is mandatory field';
-	var emsg_town            = 'Town name is mandatory field';
-	var emsg_schoolName      = 'School name is mandatory field';
-	var emsg_schoolYearRange = 'The academic year should not be greater than 2050 and less than current year';
-	var emsg_schoolYear      = 'School year is a mandatory field';
-	var emsg_gradeSection    = 'Section name is a mandatory field';
-	var emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
-	var emsg_maxProb         = 'Max Problems is a mandatory field';
-	var emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
-	var emsg_minProb         = 'Min Problems is a mandatory field';
-	var emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
-	var emsg_maxTime         = 'Max Time is a mandatory field';
-	var emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
-	var emsg_minTime         = 'Min Time is a mandatory field';
-	
-
-	if (languageSet == "es") {
-    	emsg_classLanguage   = 'El lenguaje de la clase es obligatorio';
-    	emsg_className       = 'El nombre de la clase es obligatorio';
-    	emsg_field_invalid   = 'El nombre de solo debe incluir letras, números o . _ - ';
-    	emsg_classGrade      = 'El grado de la clase es obligatorio';
-    	emsg_lowEndDiff      = 'El grado de problemas: bajo es obligatorio';
-    	emsg_highEndDiff     = 'El grado de problemas: mayor es obligatorio';
-    	emsg_town            = 'El nombre de la ciudad es obligatorio';
-    	emsg_schoolName      = 'El nombre de la escuela es obligatorio';
-    	emsg_schoolYearRange = 'El año académico no debe ser mayor que 2050 y menor que el año actual';
-    	emsg_schoolYear      = 'El año escolar es obligatorio';
-    	emsg_gradeSection    = 'El nombre de la sección es obligatorio';
-    	emsg_maxProbRange    = 'The Max Problems should not be greater than 40 and less than 2';
-    	emsg_maxProb         = 'Max Problems is a mandatory field';
-    	emsg_minProbRange    = 'The Min Problems should not be greater than 40 and less than 2';
-    	emsg_minProb         = 'Min Problems is a mandatory field';
-    	emsg_maxTimeRange    = 'The Max Time should not be greater than 30 and less than 0';
-    	emsg_maxTime         = 'Max Time is a mandatory field';
-    	emsg_minTimeRange    = 'The Min Time should not be greater than 30 and less than 0';
-    	emsg_minTime         = 'Min Time is a mandatory field';
-
-    }   
     	var perTeacherReport;
     	var eachTeacherData = [];    	
     	var eachTeacherListData = [];    	
@@ -555,58 +524,58 @@ catch (Exception e) {
                 	classLanguage: {
                         validators: {
                             notEmpty: {
-                                message: emsg_classLanguage
+                                message: '<%= rb.getString("emsg_classLanguage") %>'
                             }
                         }
                     },                    
                     className: {
                         validators: {
                             notEmpty: {
-                                message: emsg_className
+                                message: '<%= rb.getString("emsg_className") %>'
                             },
 	    			        regexp: {
     	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-        	                    message: emsg_field_invalid
+        	                    message: '<%= rb.getString("emsg_field_invalid") %>'
             				}        
                         }
                     },
                     classGrade: {
                         validators: {
                             notEmpty: {
-                                message: emsg_classGrade
+                                message: '<%= rb.getString("emsg_classGrade") %>'
                             }
                         }
                     },
                     lowEndDiff: {
                         validators: {
                             notEmpty: {
-                                message: emsg_lowEndDiff
+                                message: '<%= rb.getString("emsg_lowEndDiff") %>'
                             }
                         }
                     }, highEndDiff: {
                         validators: {
                             notEmpty: {
-                                message: emsg_highEndDiff
+                                message: '<%= rb.getString("emsg_highEndDiff") %>'
                             }
                         }
                     }, town: {
                         validators: {
                             notEmpty: {
-                                message: emsg_town
+                                message: '<%= rb.getString("emsg_town") %>'
                             },
 	    			        regexp: {
     	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-        	                    message: emsg_field_invalid
+        	                    message: '<%= rb.getString("emsg_field_invalid") %>'
             				}
                         }
                     }, schoolName: {
                         validators: {
                             notEmpty: {
-                                message: emsg_schoolName
+                                message: '<%= rb.getString("emsg_schoolName") %>'
                             },
 	    			        regexp: {
     	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-        	                    message: emsg_field_invalid
+        	                    message: '<%= rb.getString("emsg_field_invalid") %>'
             				}
                         }
                     }, schoolYear: {
@@ -615,21 +584,21 @@ catch (Exception e) {
                             between: {
                                 min: new Date().getFullYear(),
                                 max: 2050,
-                                message: emsg_schoolYearRange
+                                message: '<%= rb.getString("emsg_schoolYearRange") %>'
                             },
 
                             notEmpty: {
-                                message: emsg_schoolYear
+                                message: '<%= rb.getString("emsg_schoolYear") %>'
                             }
                         }
                     }, gradeSection: {
                         validators: {
                             notEmpty: {
-                                message: emsg_gradeSection
+                                message: '<%= rb.getString("emsg_gradeSection") %>'
                             },
 	    			        regexp: {
     	            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
-        	                    message: emsg_field_invalid
+        	                    message: '<%= rb.getString("emsg_field_invalid") %>'
             				}   
                         }
                     }, maxProb: {
@@ -638,11 +607,11 @@ catch (Exception e) {
                             between: {
                                 min: 2,
                                 max: 40,
-                                message: emsg_maxProbRange
+                                message: '<%= rb.getString("emsg_maxProbRange") %>'
                             },
 
                             notEmpty: {
-                                message: emsg_maxProb
+                                message: '<%= rb.getString("emsg_maxProb") %>'
                             }
                         }
                     }, minProb: {
@@ -651,11 +620,11 @@ catch (Exception e) {
                             between: {
                                 min: 2,
                                 max: 40,
-                                message: emsg_minProbRange
+                                message: '<%= rb.getString("emsg_minProbRange") %>'
                             },
 
                             notEmpty: {
-                                message: emsg_minProb
+                                message: '<%= rb.getString("emsg_minProb") %>'
                             }
                         }
 	                }, maxTime: {
@@ -664,11 +633,11 @@ catch (Exception e) {
 	                        between: {
 	                            min: 0,
 	                            max: 30,
-	                            message: emsg_maxTimeRange
+	                            message: '<%= rb.getString("emsg_maxTimeRange") %>'
 	                        },
 	
 	                        notEmpty: {
-	                            message: emsg_maxTime
+	                            message: '<%= rb.getString("emsg_maxTime") %>'
 	                        }
 	                    }
 	                }, minTime: {
@@ -677,11 +646,11 @@ catch (Exception e) {
 	                        between: {
 	                            min: 0,
 	                            max: 30,
-	                            message: emsg_minTimeRange
+	                            message: '<%= rb.getString("emsg_minTimeRange") %>'
 	                        },
 	
 	                        notEmpty: {
-	                            message: emsg_minTime
+	                            message: '<%= rb.getString("emsg_minTime") %>'
 	                        }
 	                    }
 	                }
@@ -836,20 +805,10 @@ catch (Exception e) {
 
 
 function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-		languageSet = "en"
-	} else if (languagePreference.includes("es")) {
-		languageSet = "es"
-	}
-	if (languageSet == 'es') {
-		var header = {'tstamp':  'Timestamp','tid':  'Numero Identificador del maestro','tname': 'Nombre del  meastro','uname':  'Nombre de usuario','action': 'Acción','classId': 'Código de clase',  'activityName': 'Actividad'};
-		return header;
-	}else{
-	 	var header = {'tstamp':  'Timestamp','tid':  'Teacher ID','tname': 'Teacher Name','uname':  'Username','action': 'Action','classId': 'Class Id', 'activityName': 'Activity'};
-	 	return header;
-	}
+
+		
+	var header = {'tstamp':  '<%= rb.getString("timestamp")%>','tid':  '<%= rb.getString("teacher_id")%>','tname': '<%= rb.getString("teacher_name")%>','uname':  '<%= rb.getString("username")%>','action': '<%= rb.getString("actions")%>','classId': '<%= rb.getString("class_id")%>',  'activityName': 'Actividad'};
+	return header;
 }
 
 
@@ -857,7 +816,6 @@ function registerAllEvents(){
 
 	var headers = changeTeacherActivitiesReportHeaderAccordingToLanguage();
 	
-    if (languageSet == 'es') {
         
         perTeacherReport  =  $('#perTeacherReport').DataTable({
             data: [],
@@ -873,33 +831,9 @@ function registerAllEvents(){
             ],
             "bPaginate": false,
             "bFilter": false,
+            <%=jc_rb.getString("language_text")%>
             "bLengthChange": false,
             rowReorder: false,                
-            "language": {
-                "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
-                "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
-                "sLoadingRecords": "Cargando...",
-                "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "Siguiente",
-                    "sPrevious": "Anterior"
-                },
-                "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                }
-            },
-
             "scrollX": true,
             "bSort" : false,
             "columnDefs": [
@@ -948,72 +882,6 @@ function registerAllEvents(){
             ]
         }    
         );
-    }
-    else {
-        perTeacherReport  =  $('#perTeacherReport').DataTable({
-            data: [],
-            destroy: true,
-            columns: [
-                { title: headers['tstamp'] },
-                { title: headers['tid'] },
-                { title: headers['tname']  },
-                { title: headers['uname']  },
-             	{ title: headers['action']  },
-                { title: headers['classId']  },
-             	{ title: headers['activityName']  },
-            ],
-            "bPaginate": false,
-            "bFilter": false,
-            "bLengthChange": false,
-            rowReorder: false,                
-            "scrollX": true,
-            "bSort" : false,
-            "columnDefs": [
-                {
-                    "width": "5%",
-                    "targets": [ 0 ],
-                    "visible": true
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 1 ],
-                    "visible": false
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 2 ],
-                    "visible": false
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 3 ],
-                    "visible": false
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 4 ],
-                    "visible": true
-
-                },
-                {
-                    "width": "5%",
-                    "targets": [ 5 ],
-                    "visible": true
-
-                },                   {
-                    "width": "5%",
-                    "targets": [ 6 ],
-                    "visible": true
-
-                }            	        	
-            ]
-        }    
-        );
-    }
 	
 	
     $('#teacherActivities').on('show.bs.collapse', function ()  {
