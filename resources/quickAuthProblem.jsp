@@ -37,10 +37,18 @@ String ctx = request.getContextPath();
 <!DOCTYPE html>
 <html>
     <head>
+
         <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css?ver=<%=versions.getString("css_version")%>"/>
         <script src="js/jquery-1.10.2.js"></script>
         <script>
         	var contextPath = "<%=ctx%>";
+        	var submitText =        "<%= rb.getString("submit") %>";
+        	var stepText =          "<%= rb.getString("step") %>";
+        	var correctAnswerText = "<%= rb.getString("correct_answer") %>";
+        	var feedback =          "<%= rb.getString("feedback") %>";
+        	var hintText =          "<%= rb.getString("hint") %>";
+        	var playhintText =      "<%= rb.getString("play_hint") %>";
+
         </script>
         <script src="js/quickAuth/format2json.js?ver=<%=versions.getString("js_version")%>"></script>
         <script src="js/quickAuth/formatBuilder.js?ver=<%=versions.getString("js_version")%>"></script>

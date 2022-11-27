@@ -359,23 +359,6 @@ m.getIdCorrespondingToHint = function(hintLabel){
 
 function getNextHint(hintLabel){
 
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-
-	var hintText = "";
-
-	 if (languageSet == "en") {
-		hintText = "Hint";
-	}
-	else {
-		hintText = "Ayuda";
-	}
-	
     var hintId = m.getIdCorrespondingToHint(hintLabel);
 
     if(hintId.match(/Hint\d+/)) {
