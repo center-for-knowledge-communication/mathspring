@@ -1,6 +1,9 @@
 /**
-
+                                  !!!!!ATTENTION!!!!!
+This file is OBSOLETE.  
+It's content has been moved inline into dashboard_new.jsp and modified in order to take advantage of JSP multi-lingual features.
  */
+
 var Chart = {
 
     /**
