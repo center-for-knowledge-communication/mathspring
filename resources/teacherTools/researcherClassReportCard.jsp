@@ -883,7 +883,10 @@ function getFilterThree() {
 var topicSelectionListEight = "";
 function populateTopicSelectionListEight() {
 
-
+	var topicFilter = "English";
+	if (languageSet == "es") {
+		topicFilter = "Spanish";
+	}
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getTeacherReports",
@@ -892,7 +895,7 @@ function populateTopicSelectionListEight() {
             teacherId: teacherID,
             reportType: 'getClassTopicNamesList',
             lang: loc,
-            filter: filterEight
+            filter: topicFilter
         },
         success : function(data) {        
         	var topicData = $.parseJSON(data);

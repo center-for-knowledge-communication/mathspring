@@ -730,14 +730,11 @@ public class TTReportServiceImpl implements TTReportService {
 
     	try {
 
-        	int id = Integer.valueOf(classId);
-        	
-        	String q = "select probGroupId,json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id=?)))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id=?)))) as summary,seqPos from classlessonplan,problemgroup_description_multi_language pgl where probGroupId=pgl.pg_pg_grp_id and classId=? order by seqPos;";
+        	String q = "select distinct(probGroupId),json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = ?))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = ?))) as summary,seqPos from classlessonplan,problemgroup_description_multi_language pgl where probGroupId=pgl.pg_pg_grp_id group by probGroupId order by probGroupId;";
 
             stmt = conn.prepareStatement(q);
-            stmt.setInt(1, id);
-            stmt.setInt(2, id);
-            stmt.setInt(3, id);
+            stmt.setString(1, filter);
+            stmt.setString(2, filter);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
