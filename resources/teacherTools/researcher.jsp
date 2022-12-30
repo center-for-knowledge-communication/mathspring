@@ -113,6 +113,7 @@ catch (Exception e) {
 }
 
 .li-enabled {
+    pointer-events:auto; 
     opacity:1.0;      
 }
 
@@ -766,8 +767,8 @@ function clearSettings() {
     $("#li-classroomTrends").addClass("li-disabled");
     $("#li-classroomDashboard").removeClass("li-enabled");
     $("#li-classroomDashboard").addClass("li-disabled");
-    $("#li-reportCard").removeClass("li-enabled");
-    $("#li-reportCard").addClass("li-disabled");
+    $("#reportCardLink").removeClass("li-enabled");
+    $("#reportCardLink").addClass("li-disabled");
    
 	
     showCohorts();
@@ -810,8 +811,8 @@ function gotoSettingsPane() {
     $("#li-classroomTrends").addClass("li-disabled");
     $("#li-classroomDashboard").removeClass("li-enabled");
     $("#li-classroomDashboard").addClass("li-disabled");
-    $("#li-reportCard").removeClass("li-enabled");
-    $("#li-reportCard").addClass("li-disabled");
+    $("#reportCardLink").removeClass("li-enabled");
+    $("#reportCardLink").addClass("li-disabled");
     
 	showCohorts();
 }
@@ -1006,8 +1007,8 @@ function handleTeacherSelect(event) {
     $("#li-classroomTrends").addClass("li-enabled");
     $("#li-classroomDashboard").removeClass("li-disabled");
     $("#li-classroomDashboard").addClass("li-enabled");
-    $("#li-reportCard").removeClass("li-disabled");
-    $("#li-reportCard").addClass("li-enabled");
+    $("#reportCardLink").removeClass("li-disabled");
+    $("#reportCardLink").addClass("li-enabled");
 
 	document.getElementById("liveDashboardProblemPane").style.visibility = 'hidden';
 	document.getElementById("liveDashboardEffortPane").style.visibility = 'hidden';
@@ -5472,8 +5473,8 @@ function updateAllCohortSlices() {
     <li><a data-toggle="tab" id="li-population" class="li-disabled"   href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
     <li><a data-toggle="tab" id="li-ttActivityReports" class="li-disabled"  href="#ttActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
-    <li><a data-toggle="tab" id="li-classroomDashboard" class="li-disabled"  class="li-disabled" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
-    <li onclick="launchReportCard();"><a data-toggle="tab"id="li-reportCard" class="li-disabled"   ><%= rwrb.getString("class_report_card") %></a></li>
+    <li><a data-toggle="tab" id="li-classroomDashboard"  href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
+	<li><a id="reportCardLink" onclick="launchReportCard();"><%= rwrb.getString("class_report_card") %></a></li>
     <li><a data-toggle="tab"  href="#MSViewerTools">MS Viewer Tools</a></li>
     <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
     <li><a data-toggle="tab"  href="#Help">Help</a></li>
@@ -6607,17 +6608,6 @@ function updateAllCohortSlices() {
 			  </div>
 			</div>
 	    </div>
-
-
-    <div id="classViews" class="col-md-12 hidden">
-			<div class="dropdown">
-			  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select View
-			  <span class="caret"></span></button>
-			  <ul class="dropdown-menu">
-			    <li onclick="launchReportCard();"><a id="reportCardLink"</a>Class Report Card</li>
-			  </ul>
-			</div>
-    </div>
 
 
 </div>
