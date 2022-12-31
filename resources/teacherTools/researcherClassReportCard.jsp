@@ -3335,13 +3335,13 @@ var completeDataChart;
 	               		var p = "" + i + ": "+ obj[0];
 	               		var pHints = parseInt(obj[6]);
 	               		var pAttempts = parseInt(obj[7]);
-	               		var pVideos = parseInt(obj[9]);
+	               		var pVideos = parseInt(obj[12]);
 						problems.push(p);
 	               		effColors.push(getEffortColorRGB(obj[8]));
 	               		effText.push(obj[8]);
 	               		hints.push(parseInt(obj[6], 10));
 	               		attempts.push(parseInt(obj[7], 10));
-	               		videos.push(parseInt(obj[9], 10));
+	               		videos.push(parseInt(obj[12], 10));
 	               		var pdifficulty = parseFloat(obj[15], 10);
 	               		pdifficulty = 10.0 * pdifficulty;
 	               		difficulty.push(pdifficulty);
@@ -3404,8 +3404,8 @@ var completeDataChart;
 	   						else {
 	   							minutesOnProblem.push(0.2);
 	   						}
-	   						effortOnProblem.push(0.5);
 	   					}
+   						effortOnProblem.push(0.5);
    					
                 	}
                 });
@@ -3649,10 +3649,18 @@ var completeDataChart;
 
               	      };   
            		
-                var myPlot2 = document.getElementById('');
+                var myPlot2 = document.getElementById('studentProblemAchievementReport');
            		
            		Plotly.newPlot('studentProblemAchievementReport', data2, layout2);     
           		
+           		myPlot2.on('plotly_click', function(data2){
+					var i = data2.points[0].pointIndex;
+					var myY = data2.points[0].fullData.y[i];
+					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+					document.getElementById('studentProblemHistorySnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+			        $("#studentProblemHistoryPopup").modal('show');
+           		});
+
            		populateTopicSelectionListEight();
            		$("#studentProblemAchievementReport").show();
 
@@ -3770,13 +3778,13 @@ var completeDataChart;
 	               		var p = "" + i + ": "+ obj[0];
 	               		var pHints = parseInt(obj[6]);
 	               		var pAttempts = parseInt(obj[7]);
-	               		var pVideos = parseInt(obj[9]);
+	               		var pVideos = parseInt(obj[12]);
 						problems.push(p);
 	               		effColors.push(getEffortColorRGB(obj[8]));
 	               		effText.push(obj[8]);
 	               		hints.push(parseInt(obj[6], 10));
 	               		attempts.push(parseInt(obj[7], 10));
-	               		videos.push(parseInt(obj[9], 10));
+	               		videos.push(parseInt(obj[12], 10));
 	               		var currDifficulty = parseFloat(obj[15], 10);
 	               		currDifficulty = 10.0 * currDifficulty;
 	               		difficulty.push(currDifficulty);
@@ -3860,9 +3868,9 @@ var completeDataChart;
 	   							minutesOnProblem.push(minutesToFirstAttempt);
 	   						}
 	   						else {
-	   							minutesOnProblem.push(0.2);
 	   						}
 	   					}
+						minutesOnProblem.push(0.2);
    					
                 	}
                 });
@@ -3953,7 +3961,7 @@ var completeDataChart;
 	  					  name: '<%= rb.getString("mastery")%>',
 						  yaxis: 'y4',
          				  type: 'scatter',
-     					  mode: 'markers',
+     					  mode: 'lines+markers',
      					  marker: {
      					    color: 'rgb(0, 153, 51)',
      					    size: 8
@@ -3975,7 +3983,9 @@ var completeDataChart;
        				  type: 'scatter',
    					  mode: 'markers',
        				  marker:{
-       				    color: achievementColors
+       				    color: achievementColors,
+       				 	symbol: 'diamond',
+       				 	size: 8
      				  },
   				
              	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
@@ -4094,8 +4104,8 @@ var completeDataChart;
 					var i = data.points[0].pointIndex;
 					var myY = data.points[0].fullData.y[i];
 					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
-					document.getElementById('studentProblemHistorySnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
-			        $("#studentProblemHistoryPopup").modal('show');
+					document.getElementById('studentProblemAchievementSnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+			        $("#studentProblemAchievementPopup").modal('show');
            		});
 
            		populateTopicSelectionListNine();
@@ -5586,6 +5596,22 @@ var completeDataChart;
     </div>
 </div>
 
+
+<div id="studentProblemAchievementPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg" >
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Student Problem Solving Achievement</h4>
+            </div>
+            <div class="modal-body" style="min-width:900px">
+                <div id="studentProblemAchievementSnapshot" ></div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 <div id="studentEmotionCharts" class="modal" role="dialog" style="display: none;">
