@@ -737,7 +737,7 @@ public class TTMiscServiceImpl implements TTMiscService {
         		if (expectedStudentCount == 0) {
         			expectedStudentCount = studentCount;
         		}
-        		studyExpectedStudentCount += expectedStudentCount;
+        		studyExpectedStudentCount += getDistinctStudentsOfTeacher(conn, cohortId, Integer.valueOf(rs.getString("teacherId")));;
        			resultJson.put("Actual # Students", expectedStudentCount);
        			resultJson.put("Active Students", studentCount);
        			int studentCountDiff = expectedStudentCount - studentCount;
@@ -2570,6 +2570,34 @@ public class TTMiscServiceImpl implements TTMiscService {
         }
 
     }
+
+    public int getDistinctStudentsOfTeacher(Connection conn, int cohortId, int teacherId) throws SQLException {
+    	int result = 0;
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select count(distinct studId) AS studs from teacher as tch, class as cls, student s, studentproblemhistory sh, class_map_cohorts as cmc, research_cohort as coh where coh.researchcohortid = ? and s.id=sh.studId and teacherId = ? and s.classId = cls.id and cls.id = cmc.classId and cmc.researchcohortid = coh.researchcohortid and cls.teacherId = teacherId and not s.trialUser > 0 and sh.mode != 'demo' ;";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, cohortId);
+            stmt.setInt(2, teacherId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getInt("studs");
+            }
+            stmt.close();
+            rs.close();
+            return result;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+    
+    
     
     public int getDistinctStudentsInClass(Connection conn, int cohortId, int teacherId) throws SQLException {
     	int result = 0;
