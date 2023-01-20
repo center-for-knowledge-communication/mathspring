@@ -8,7 +8,8 @@
 // Frank 02-17-21 Added div for comment button
 // Boming 08-30-21 issue #421 circle answer before submit
 // Frank  12-26-21 Issue #567 Disable multiChoice buttons and hide submit box and button
-
+// Frank  11-10-22 Issue #705 Multiselect problems not working
+// Frank  11-27-22 Multi-lingual changes
 var quickAuthBuildProblem = (function() {
 
     //The module we are exporting
@@ -72,24 +73,6 @@ m.build = function(activity, previewMode) {
         document.getElementById("Units").innerHTML = probUnits;
     }
 
-	var languagePreference = window.navigator.language;
-	var languageSet = "en";
-	if (languagePreference.includes("en")) {
-			languageSet = "en"
-		} else if (languagePreference.includes("es")) {
-			languageSet = "es"
-		}
-	
-	var stepText = "Step";
-	var correctAnswerText = "Correct Answer:";
-	var feedback = 'Feedback';
-	var play_hint = "Play hint";
-	if (languageSet == "es") {
-		stepText = "Paso";
-		correctAnswerText = "Respuesta correcta";
-		feedback = "Comentario";
-		play_hint = "mostrar ayuda";
-	}
 
     var hint_labels = [];
     var hint_thumbs = document.getElementById("HintThumbs");
@@ -131,7 +114,7 @@ m.build = function(activity, previewMode) {
                 hint.innerHTML = parameterizeText(formatted_text, problemParams);
             }
             else{
-                alert("text missing for hint: "+i);
+//                alert("text missing for hint: "+i);
             }
             // DM 1/23/18.  It looks like it might be possible to put images in {[]} in hoverText which means they should be located in problem_XXX/hint_YYY
             if(isNotEmpty(hints[i].hoverText)){
@@ -187,9 +170,13 @@ m.build = function(activity, previewMode) {
 
             	if (mode !== "demo" && mode !== "example") {
 					// add the submit answer button
-					var multiSubmitButton = buildMultiSubmit();
-					multi_answers.appendChild(multiSubmitButton);
-					problemUtils.addMultiChoiceSubmitListener(document);
+                    if(multiSelect) {
+                    }
+                    else {
+    					var multiSubmitButton = buildMultiSubmit();
+                    	multi_answers.appendChild(multiSubmitButton);
+						problemUtils.addMultiChoiceSubmitListener(document);
+                    }
             	}
 				
             }
@@ -218,7 +205,7 @@ m.build = function(activity, previewMode) {
         problemContainer.style.float = "left";
         var play_hint_button = document.createElement("div");
         play_hint_button.className = "play-hint-button";
-        play_hint_button.innerHTML = "Play Hint";
+        play_hint_button.innerHTML = playhintText;
         var hint_label_index = 0;
         play_hint_button.onclick = function() {
             prob_playHint(hint_labels[hint_label_index]);
@@ -271,14 +258,11 @@ m.build = function(activity, previewMode) {
 }
 
 function buildMultiSubmit(){
+
 	var answer_row = document.createElement("div");
     answer_row.className = "answer-row";
     answer_row.dataset.letter = "submitButton";
-    var answer_button = 
-        `<div id="multiSubmitButton">
-            <input class="btn btn-success" type="submit" value="Submit" style="display: block;margin: auto;margin-left: 3px;">
-        </div>
-        `;
+    var answer_button =  `<div id="multiSubmitButton"><input class="btn btn-success" type="submit" value="` + submitText + `" style="display: block;margin: auto;margin-left: 3px;"></div>`;
     answer_row.innerHTML = answer_button + `<div id="Answer$" class="answer_text"></div>`;
     return answer_row;
 }
@@ -312,9 +296,12 @@ function submitMultiSelectAnswer() {
     for(var i = 0; i < answerRows.length; ++i) {
         if(answerRows[i].style.display != "none") { //ignore rows for nonexistent answers
             var letter = answerRows[i].dataset.letter;
-            //if the answer is selected, append it to the string
-            if(document.getElementById(letter + "Checkbox").checked) {
-                selections += letter;
+            // Only single letter answers.  Don't include the 'submitButton' element
+            if (letter.length == 1) {
+	            //if the answer is selected, append it to the string
+	            if(document.getElementById(letter + "Checkbox").checked) {
+	                selections += letter;
+	            }
             }
         }
     }

@@ -99,10 +99,13 @@ catch (Exception e) {
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/jqplot2021/jquery.jqplot.css" />
 
 </head>
-<body>
 
 
 <style>
+
+.body {
+	background-color: #e4f0f5;
+}
 
 .li-disabled {
     pointer-events:none; 
@@ -110,6 +113,7 @@ catch (Exception e) {
 }
 
 .li-enabled {
+    pointer-events:auto; 
     opacity:1.0;      
 }
 
@@ -193,6 +197,16 @@ th, td {
   padding: 4px;
 }
 
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+    background-color: #2ecc71;
+   color: white;
+   text-align: center;
+}
 </style>
 
 
@@ -753,8 +767,8 @@ function clearSettings() {
     $("#li-classroomTrends").addClass("li-disabled");
     $("#li-classroomDashboard").removeClass("li-enabled");
     $("#li-classroomDashboard").addClass("li-disabled");
-    $("#li-reportCard").removeClass("li-enabled");
-    $("#li-reportCard").addClass("li-disabled");
+    $("#reportCardLink").removeClass("li-enabled");
+    $("#reportCardLink").addClass("li-disabled");
    
 	
     showCohorts();
@@ -797,8 +811,8 @@ function gotoSettingsPane() {
     $("#li-classroomTrends").addClass("li-disabled");
     $("#li-classroomDashboard").removeClass("li-enabled");
     $("#li-classroomDashboard").addClass("li-disabled");
-    $("#li-reportCard").removeClass("li-enabled");
-    $("#li-reportCard").addClass("li-disabled");
+    $("#reportCardLink").removeClass("li-enabled");
+    $("#reportCardLink").addClass("li-disabled");
     
 	showCohorts();
 }
@@ -993,8 +1007,8 @@ function handleTeacherSelect(event) {
     $("#li-classroomTrends").addClass("li-enabled");
     $("#li-classroomDashboard").removeClass("li-disabled");
     $("#li-classroomDashboard").addClass("li-enabled");
-    $("#li-reportCard").removeClass("li-disabled");
-    $("#li-reportCard").addClass("li-enabled");
+    $("#reportCardLink").removeClass("li-disabled");
+    $("#reportCardLink").addClass("li-enabled");
 
 	document.getElementById("liveDashboardProblemPane").style.visibility = 'hidden';
 	document.getElementById("liveDashboardEffortPane").style.visibility = 'hidden';
@@ -1440,7 +1454,7 @@ function showReport2b() {
                 // var ticks = ['Paul', 'John', 'George', 'Ringo'];
 
            		document.getElementById("chart2b_div").style.visibility = 'visible';
-
+         		           		
                 plot2b = $.jqplot('chart2b_canvas', [s1], {
             	    seriesDefaults:{
             	        renderer:$.jqplot.BarRenderer,
@@ -3247,7 +3261,7 @@ function showReport_tcp() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#ff0066', '#66ccff'],
+                    seriesColors:['#009933', '#0033cc'],
             	    series:[
 //            	        {label:'<%= rwrb.getString("skipped") %>'},
             	        {label:'<%= rwrb.getString("solved") %>'},
@@ -3454,7 +3468,7 @@ function showReport_tp() {
                             barDirection: 'horizontal'
                         }
                     },
-                    seriesColors:['#ff0066', '#66ccff'],
+                    seriesColors:['#009933', '#0033cc'],
             	    series:[
 //            	        {label:'<%= rwrb.getString("skipped") %>'},
             	        {label:'<%= rwrb.getString("solved") %>'},
@@ -3597,7 +3611,21 @@ function showTable_tpsa() {
 		alert('<%= rwrb.getString("must_select_cohort") %>');
 	}
 	
-		
+    const rbSnapshotPopulate = document.querySelectorAll('input[name="optRadioSnapshotPopulate"]');
+
+    for (const rbSnapshotp of rbSnapshotPopulate) {
+        if (rbSnapshotp.checked) {
+        	rptSnapshotPopulate = rbSnapshotp.value;
+            break;
+        }
+    }
+
+    var tpsa_filter = rptSnapshotPopulate;;
+    var teacherFilter = "";
+	if (!(currentTeacher.id === "0")) {
+		tpsa_filter += "~" + currentTeacher.id;
+	}
+    
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getCohortReport",
@@ -3605,7 +3633,7 @@ function showTable_tpsa() {
             cohortId: currentCohortId,
             reportType: 'teacherProblemsStudentAverages',
             lang: loc,
-            filter: ''
+            filter: tpsa_filter
         },
         success : function(data) {
         	if (data) {
@@ -3963,6 +3991,7 @@ var msTeacherColors = [ "#4bb2c5", "#EAA228", "#c5b47f", "#579575", "#839557", "
 //var msTeacherColors = ['#FF0000','#FFFF00','#0000FF','#999966','#008B8B','#FFA500','#4B0082','#008000','#ff99cc','#00ffcc','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
 
 var greyTeacherColors = ['#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966','#999966'];
+var blackTeacherColors = ['#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000'];
 
 var rpt5Colors = [];
 
@@ -3991,7 +4020,7 @@ function showReport5() {
 	
 	switch(rpt5Populate) {
 		case "showSingleWithAnonymous":
-			rpt5Colors = Array.from(greyTeacherColors);
+			rpt5Colors = Array.from(blackTeacherColors);
 			break;
 		case "showSingleOnly":
 			rpt5Colors = Array.from(msTeacherColors);		
@@ -4444,6 +4473,23 @@ function rpt6getUsernameDisplay(index) {
 	
 }
 
+function rpt6getLineWidth(index) {
+
+	if (rpt6Populate == "showSingleWithAnonymous") {
+		for (var i=0;i<8;i++) {		
+			if (rpt6usernameStrXref[index] === currentTeacher.username) {
+				return 3;
+			}
+		}
+		return(1);
+	}
+	else {
+		return 3;
+	}
+	
+}
+
+
 var rpt6Colors = [];
 
 function getrpt6Colors() {
@@ -4471,7 +4517,7 @@ function showReport6() {
 	
 	switch(rpt6Populate) {
 		case "showSingleWithAnonymous":
-			rpt6Colors = Array.from(greyTeacherColors);
+			rpt6Colors = Array.from(blackTeacherColors);
 			break;
 		case "showSingleOnly":
 			rpt6Colors = Array.from(msTeacherColors);		
@@ -4743,125 +4789,125 @@ function showReport6() {
         	          {
         	            // Change our line width and use a diamond shaped marker.
         	            label: rpt6getUsernameDisplay(0),
-        	            lineWidth:3, 
+        	            lineWidth:rpt6getLineWidth(0), 
         	            markerOptions: { style:'circle' }
         	          }, 
         	          {
         	            // Don't show a line, just show markers.
         	            // Make the markers 7 pixels with an 'x' style
         	            label: rpt6getUsernameDisplay(1),
-        	            lineWidth:3, 
+        	            lineWidth:rpt6getLineWidth(1), 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
         	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(2),
-        	            lineWidth:3, 
+        	            lineWidth:rpt6getLineWidth(2), 
         	            markerOptions: { style:"circle" }
         	          }, 
         	          {
         	            // Use a thicker, 5 pixel line and 10 pixel
         	            // filled square markers.
         	            label: rpt6getUsernameDisplay(3),
-        	            lineWidth:3, 
+        	            lineWidth:rpt6getLineWidth(3), 
         	            markerOptions: { style:"circle" }
         	          },
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(4),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(4), 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(5),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(5), 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(6),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(6), 
           	            markerOptions: { style:"circle" }
           	          }, 
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(7),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(7), 
           	            markerOptions: { style:"circle" }
           	          },
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(8),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(8), 
           	            markerOptions: { style:"circle" }
           	      	  },
         	          { 
           	            // Use (open) circlular markers.
         	            label: rpt6getUsernameDisplay(9),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(9), 
           	            markerOptions: { style:"circle" }
           	          },
         	          {
           	            // Change our line width and use a diamond shaped marker.
           	            label: rpt6getUsernameDisplay(10),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(10), 
           	            markerOptions: { style:'circle' }
           	          }, 
           	          {
           	            // Don't show a line, just show markers.
           	            // Make the markers 7 pixels with an 'x' style
           	            label: rpt6getUsernameDisplay(11),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(11), 
           	            markerOptions: { style:"circle" }
           	          },
           	          { 
           	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(12),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(12), 
           	            markerOptions: { style:"circle" }
           	          }, 
           	          {
           	            // Use a thicker, 5 pixel line and 10 pixel
           	            // filled square markers.
           	            label: rpt6getUsernameDisplay(13),
-          	            lineWidth:3, 
+          	            lineWidth:rpt6getLineWidth(13), 
           	            markerOptions: { style:"circle" }
           	          },
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(14),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(14), 
             	            markerOptions: { style:"circle" }
             	          }, 
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(15),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(15), 
             	            markerOptions: { style:"circle" }
             	          }, 
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(16),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(16), 
             	            markerOptions: { style:"circle" }
             	          }, 
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(17),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(17), 
             	            markerOptions: { style:"circle" }
             	          },
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(18),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(18), 
             	            markerOptions: { style:"circle" }
             	      	  },
           	          { 
             	            // Use (open) circlular markers.
           	            label: rpt6getUsernameDisplay(19),
-            	            lineWidth:3, 
+            	            lineWidth:rpt6getLineWidth(19), 
             	            markerOptions: { style:"circle" }
             	      }
         	          
@@ -4921,125 +4967,125 @@ function showReport6() {
               	          {
               	            // Change our line width and use a diamond shaped marker.
               	            label: rpt6getUsernameDisplay(0),
-              	            lineWidth:3, 
+              	            lineWidth: rpt6getLineWidth(0), 
               	            markerOptions: { style:'circle' }
               	          }, 
               	          {
               	            // Don't show a line, just show markers.
               	            // Make the markers 7 pixels with an 'x' style
               	            label: rpt6getUsernameDisplay(1),
-              	            lineWidth:3, 
+              	            lineWidth:rpt6getLineWidth(1), 
               	            markerOptions: { style:"circle" }
               	          },
               	          { 
               	            // Use (open) circlular markers.
               	            label: rpt6getUsernameDisplay(2),
-              	            lineWidth:3, 
+              	            lineWidth:rpt6getLineWidth(2), 
               	            markerOptions: { style:"circle" }
               	          }, 
               	          {
               	            // Use a thicker, 5 pixel line and 10 pixel
               	            // filled square markers.
               	            label: rpt6getUsernameDisplay(3),
-              	            lineWidth:3, 
+              	            lineWidth:rpt6getLineWidth(3), 
               	            markerOptions: { style:"circle" }
               	          },
               	          { 
                 	            // Use (open) circlular markers.
               	            label: rpt6getUsernameDisplay(4),
-                	            lineWidth:3, 
+                	            lineWidth:rpt6getLineWidth(4), 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
               	            label: rpt6getUsernameDisplay(5),
-                	            lineWidth:3, 
+                	            lineWidth:rpt6getLineWidth(5), 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
               	            label: rpt6getUsernameDisplay(6),
-                	            lineWidth:3, 
+                	            lineWidth:rpt6getLineWidth(6), 
                 	            markerOptions: { style:"circle" }
                 	          }, 
               	          { 
                 	            // Use (open) circlular markers.
               	            label: rpt6getUsernameDisplay(7),
-                	        lineWidth:3, 
+                	        lineWidth:rpt6getLineWidth(7), 
                 	        markerOptions: { style:"circle" }
                 	      },
                   	      { 
                     	        // Use (open) circlular markers.
                   	        label: rpt6getUsernameDisplay(8),
-                    	        lineWidth:3, 
+                    	        lineWidth:rpt6getLineWidth(8), 
                     	        markerOptions: { style:"circle" }
                     	  },
                   	      { 
                     	        // Use (open) circlular markers.
                   	        label: rpt6getUsernameDisplay(9),
-                    	    lineWidth:3, 
+                    	    lineWidth:rpt6getLineWidth(9), 
                     	    markerOptions: { style:"circle" }
                     	  },
               	          {
                	            // Change our line width and use a diamond shaped marker.
-               	            label: rpt6getUsernameDisplay(0),
-               	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(10),
+               	            lineWidth:rpt6getLineWidth(10), 
                	            markerOptions: { style:'circle' }
                	          }, 
                	          {
                	            // Don't show a line, just show markers.
                	            // Make the markers 7 pixels with an 'x' style
-               	            label: rpt6getUsernameDisplay(1),
-               	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(11),
+               	            lineWidth:rpt6getLineWidth(11), 
                	            markerOptions: { style:"circle" }
                	          },
                	          { 
                	            // Use (open) circlular markers.
-               	            label: rpt6getUsernameDisplay(2),
-               	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(12),
+               	            lineWidth:rpt6getLineWidth(12), 
                	            markerOptions: { style:"circle" }
                	          }, 
                	          {
                	            // Use a thicker, 5 pixel line and 10 pixel
                	            // filled square markers.
-               	            label: rpt6getUsernameDisplay(3),
-               	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(13),
+               	            lineWidth:rpt6getLineWidth(13), 
                	            markerOptions: { style:"circle" }
                	          },
                	          { 
                  	            // Use (open) circlular markers.
-               	            label: rpt6getUsernameDisplay(4),
-                 	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(14),
+                 	            lineWidth:rpt6getLineWidth(14), 
                  	            markerOptions: { style:"circle" }
                  	      }, 
                	          { 
                  	            // Use (open) circlular markers.
-               	            label: rpt6getUsernameDisplay(5),
-                 	            lineWidth:3, 
+               	            label: rpt6getUsernameDisplay(15),
+                 	            lineWidth:rpt6getLineWidth(15), 
                  	            markerOptions: { style:"circle" }
                  	      }, 
                	          { 
                  	            // Use (open) circlular markers.
-               	            	label: rpt6getUsernameDisplay(6),
-                 	            lineWidth:3, 
+               	            	label: rpt6getUsernameDisplay(16),
+                 	            lineWidth:rpt6getLineWidth(16), 
                  	            markerOptions: { style:"circle" }
                  	      }, 
                 	      { 
                   	           // Use (open) circlular markers.
-                	            label: rpt6getUsernameDisplay(7),
-                  	        	lineWidth:3, 
+                	            label: rpt6getUsernameDisplay(17),
+                  	        	lineWidth:rpt6getLineWidth(17), 
                   	        	markerOptions: { style:"circle" }
                   	      },
                     	      { 
                       	        // Use (open) circlular markers.
-                    	        label: rpt6getUsernameDisplay(8),
-                      	        lineWidth:3, 
+                    	        label: rpt6getUsernameDisplay(18),
+                      	        lineWidth:rpt6getLineWidth(18), 
                       	        markerOptions: { style:"circle" }
                       	  },
                     	  { 
                       	        // Use (open) circlular markers.
-                    	        label: rpt6getUsernameDisplay(9),
-                      	    	lineWidth:3, 
+                    	        label: rpt6getUsernameDisplay(19),
+                      	    	lineWidth:rpt6getLineWidth(19), 
                       	   		markerOptions: { style:"circle" }
                       	  }
               	          
@@ -5416,7 +5462,8 @@ function updateAllCohortSlices() {
 	
 	</script>
 
-
+<body>
+<div class="bootstrap fullscreen">
 <div class="container-fluid tab-content">
   <h2>Researcher Workbench</h2>
 
@@ -5426,8 +5473,8 @@ function updateAllCohortSlices() {
     <li><a data-toggle="tab" id="li-population" class="li-disabled"   href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
     <li><a data-toggle="tab" id="li-ttActivityReports" class="li-disabled"  href="#ttActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
-    <li><a data-toggle="tab" id="li-classroomDashboard" class="li-disabled"  class="li-disabled" href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
-    <li onclick="launchReportCard();"><a data-toggle="tab"id="li-reportCard" class="li-disabled"   ><%= rwrb.getString("class_report_card") %></a></li>
+    <li><a data-toggle="tab" id="li-classroomDashboard"  href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
+	<li><a id="reportCardLink" onclick="launchReportCard();"><%= rwrb.getString("class_report_card") %></a></li>
     <li><a data-toggle="tab"  href="#MSViewerTools">MS Viewer Tools</a></li>
     <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
     <li><a data-toggle="tab"  href="#Help">Help</a></li>
@@ -5445,10 +5492,6 @@ function updateAllCohortSlices() {
     <div id="Settings" class="container col-sm-12 tab-pane fade">
       	<h3><%= rwrb.getString("settings") %></h3>
         <p><%= rwrb.getString("settings_selection_msg1") %></p>
-		<br>
-		<label for="setname">other</label>
-	    <input type="text" class="form-control" id="setname" placeholder="Set Name" name="uname" required>
-		<br>
 		<div id="selections">
 			<div class="row">
 				<br>
@@ -5488,13 +5531,17 @@ function updateAllCohortSlices() {
 
 		</div>
 		<br>
+		<br>
+		<br>		
 		<div class="row">
 <!--		
 			<button type="recall" class="btn btn-primary col-sm-2 col-sm-offset-2">Recall Settings</button>
 			<button type="save" class="btn btn-primary col-sm-2 col-sm-offset-1">Save Settings</button>
 -->			
-			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-4" onclick="clearSettings()";">Clear Settings</button>
+			<button type="clear" class="btn btn-danger col-sm-2 col-sm-offset-5" onclick="clearSettings()";">Clear Settings</button>
 		</div>
+		<br>
+		<br>		
 	</div>
 	
 	
@@ -5791,7 +5838,7 @@ function updateAllCohortSlices() {
                             </div>
  
                             <div class="panel-body col-md-12">
-				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:800px;"></div> 
+				            	<div id="tcp_canvas" class="col-md-6" style="width:700px; height:1200px;"></div> 
 				            	<div id="tcp_table_panel" class="col-md-6" style="width:600px; height:800px;">
 				            	   <table align = "center"
             							id="tcp_table" border="1">
@@ -6091,6 +6138,13 @@ function updateAllCohortSlices() {
                         </div>
 
                         <div id="chartTPSA" class="panel-collapse collapse">  
+                           	<div class="row">      
+								<div class="form-group">
+									<label class="radio-inline"><input id="radioSnapshotShowAll"                  value="showAll"                 type="radio" name="optRadioSnapshotPopulate" checked><%= rwrb.getString("show_all") %></label>
+									<label class="radio-inline"><input id="radioSnapshotShowAnonymous"            value="showAnonymous"           type="radio" name="optRadioSnapshotPopulate">Anonymous</label>
+									<label class="radio-inline"><input id="radioSnapshotShowSingleWithAnonymous"  value="showSingleWithAnonymous" type="radio" name="optRadioSnapshotPopulate"><%= rwrb.getString("show_single_with_anon") %></label>
+								</div>
+							</div>
                             <div class="panel-body report_filters">                           
 								  <input id="showTableTPSABtn" class="btn btn-lg btn-primary" onclick="showTable_tpsa();" type="submit" value="<%= rwrb.getString("show_table") %>">
                             </div>
@@ -6556,22 +6610,12 @@ function updateAllCohortSlices() {
 	    </div>
 
 
-    <div id="classViews" class="col-md-12 hidden">
-			<div class="dropdown">
-			  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select View
-			  <span class="caret"></span></button>
-			  <ul class="dropdown-menu">
-			    <li onclick="launchReportCard();"><a id="reportCardLink"</a>Class Report Card</li>
-			  </ul>
-			</div>
-    </div>
-
-
 </div>
-
-
 </div>
-
+</div>
+    <footer class="footer">
+        &copy; <%= rb.getString("researcher_copyright")%>
+    </footer>
 
 <div id="showSessionProblemsModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg">
@@ -6815,6 +6859,7 @@ function updateAllCohortSlices() {
     	</div>
 	</div>
 </div>	
+
 
 
 </body>

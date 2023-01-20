@@ -440,6 +440,10 @@ public class TTReportServiceImpl implements TTReportService {
             		ClassLiveDashboard classLiveDashboard = generateLiveDashboard(classId, filter);
                     return classLiveDashboard.getProblemsSolved();       
 
+                case "getClassTopicNamesList":
+                    String topicNameList = getClassTopicNamesList(connection.getConnection(), classId, filter);
+                    return topicNameList ;
+                    
                 case "classLiveGarden":
 
                 	List<Topic> gardenTopics = null;;
@@ -717,6 +721,40 @@ public class TTReportServiceImpl implements TTReportService {
     	return surveyMap;
     	
     }
+
+    public String getClassTopicNamesList(Connection conn, String classId, String filter) {
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();            
+
+    	try {
+
+        	String q = "select distinct(probGroupId),json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = ?))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = ?))) as summary,seqPos from classlessonplan,problemgroup_description_multi_language pgl where probGroupId=pgl.pg_pg_grp_id group by probGroupId order by probGroupId;";
+
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1, filter);
+            stmt.setString(2, filter);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+            	JSONObject resultJson = new JSONObject();
+        		resultJson.put("name", rs.getString("summary"));
+        		resultJson.put("description", rs.getString("description"));
+        		int pgid = rs.getInt("probGroupId");
+        		resultJson.put("topicId", String.valueOf(pgid));
+            	resultArr.add(resultJson);
+            }
+            stmt.close();
+            rs.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        }
+        return resultArr.toString();
+
+    }    
+    
     
     private StudentDetails getStudentDetail(ResultSet mappedrow, Integer studentId, SurveyQuestionDetails sqd) throws SQLException {
     	
@@ -1075,6 +1113,8 @@ public class TTReportServiceImpl implements TTReportService {
                     studentRecordValues.add(mappedRow.getString("mastery"));
                     studentRecordValues.add(mappedRow.getString("topicId"));
                     studentRecordValues.add(mappedRow.getString("description"));
+                    studentRecordValues.add(mappedRow.getString("timeToSolve"));
+                    studentRecordValues.add(mappedRow.getString("timeToFirstAttempt"));
                     studentData.put(mappedRow.getString("id"), studentRecordValues);
 
                 }

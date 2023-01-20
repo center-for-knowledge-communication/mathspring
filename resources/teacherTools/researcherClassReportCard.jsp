@@ -146,8 +146,36 @@ System.out.println("msHost = " + msHost + msContext);
             height: 20px; 
         } 
     </style>
+
+    <style> 
+	.footer {
+	   position: fixed;
+	   left: 0;
+	   bottom: 0;
+	   width: 100%;
+	    background-color: #2ecc71;
+	   color: white;
+	   text-align: center;
+	}	
+    </style>
     
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/jquery-2.2.2.min.js" />"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>		
+
+	<link rel="stylesheet" type="text/css" hrf="../jquery.jqplot.min.css" />
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/jquery.jqplot.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.barRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.categoryAxisRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasTextRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisLabelRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.canvasAxisTickRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.dateAxisRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pieRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.enhancedPieLegendRenderer.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.highlighter.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/jqplot2021/plugins/jqplot.pointLabels.js" />"></script>
+
+
     <!-- js for bootstrap-->
     <script type="text/javascript" src="<c:url value="/js/bootstrap/js/bootstrap.min.js" />"></script>
     <script src="<c:url value="/js/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min.js"/>"></script>
@@ -213,6 +241,9 @@ System.out.println("msHost = " + msHost + msContext);
  */
  
 var studentList; 
+var studentListThree; 
+var studentListSix; 
+var studentListEight; 
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -243,6 +274,10 @@ var filterFour = "~~";
 
 //Report3 variables
 var filterThree = "~~";
+
+var filterEight = "~~";
+var topicNameMap = new Map([]);
+
 
 var landingPageReport2;
 var filterLandingTwo = "~0";
@@ -308,6 +343,73 @@ else {
           "NO DATA" : "No data could be gathered."
     }
 }
+
+//var effort_legend_labels = ["SOF",      "ATT",   "SHINT", "SHELP",     "GUESS",   "NOTR",  "SKIP", "GIVEUP",   "NODATA"];
+//var effort_series_colors = ['#26f213', '#9beb94','#80b1d3', '#fdb462', '#fb8072', '#ffffb3', '#8dd3c7', '#bebada',  '#d9d9d9'];
+
+function getEffortColorRGB(effortValue) {
+	
+	switch (effortValue) {
+		case ('SOF'): {
+			return 'rgba(38, 242, 19,1)';
+		}
+		case ('ATT'): {
+			return 'rgba(155, 235, 148,1)';
+		}
+		case ('SHINT'): {
+			return 'rgba(128, 177, 211,1)';
+		}
+		case ('SHELP'): {
+			return 'rgba(253, 180, 98,1)';
+		}
+		case ('GUESS'): {
+			return 'rgba(251, 128, 114,1)';
+		}
+		case ('NOTR'): {
+			return 'rgba(38, 242, 19,1)';
+		}
+		case ('SKIP'): {
+			return 'rgba(141, 211, 199,1)';
+		}
+		case ('GIVEUP'): {
+			return 'rgba(190, 186, 218,1)';
+		}
+		case ('NODATA'): {
+			return 'rgba(217, 217, 217,1)';
+		}
+		default: 
+			return 'rgba(217, 217, 217,1)';
+	}
+
+}
+
+
+function getAchievementColorRGB(achievementValue) {
+	
+	if (achievementValue > 0) {
+		return 'rgba(0, 102, 255,1)';		
+	}
+	else {
+		return 'rgba(255, 255, 255,1)';		
+	}
+
+}
+
+function getWeightValue(effortValue) {
+	
+	var weightValue = 0.1;
+	switch (effortValue) {
+		case ('SOF'): {
+			return weightValue;
+		}
+		case ('ATT'): {
+			return weightValue;
+		}
+		default: 
+			return 1;
+	}
+}
+
 
 function hideLegend() {
     $("#hideLegendBtn").hide();
@@ -630,6 +732,66 @@ function getFilterFour() {
 	}
 }
 
+function getFilterEight() {
+
+	var showNamesState = "N";
+	if (document.getElementById("showNamesEight").checked == true) {
+		showNamesState = "Y";
+	}
+	filterEight = "~" + "~" + showNamesState;		
+			
+}
+
+function getStudentListEight() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListEight = response;
+        	populateStudentSelectionListEight()
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+
+
+function getFilterNine() {
+
+	var showNamesState = "N";
+	if (document.getElementById("showNamesNine").checked == true) {
+		showNamesState = "Y";
+	}
+	filterNine = "~" + "~" + showNamesState;		
+			
+}
+
+function getStudentListNine() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListNine = response;
+        	populateStudentSelectionListNine()
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
 
 
 function getStudentListThree() {
@@ -776,6 +938,273 @@ function getFilterThree() {
 	
 }
 
+var topicSelectionListEight = "";
+function populateTopicSelectionListEight() {
+
+	var topicFilter = "English";
+	if (languageSet == "es") {
+		topicFilter = "Spanish";
+	}
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+            classId: classID,
+            teacherId: teacherID,
+            reportType: 'getClassTopicNamesList',
+            lang: loc,
+            filter: topicFilter
+        },
+        success : function(data) {        
+        	var topicData = $.parseJSON(data);
+           	
+
+            for (var i = 0; i < topicData.length; i++) {
+            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+            }
+
+            topicSelectionListEight = "<select name='topics' id='topicsEight' size='5' style='width:220px' >"; 	
+
+            for (var i = 0; i < topicData.length; i++) {
+        		topicSelectionListEight += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
+            }
+        	studentSelectionListEight += "</select>";
+        	document.getElementById("topicSelectionListEight").innerHTML=topicSelectionListEight; 
+            
+        },
+        error : function(e) {
+            console.log(e);
+        }
+	});
+
+	
+}
+
+var topicSelectionListNine = "";
+function populateTopicSelectionListNine() {
+
+	var topicFilter = "English";
+	if (languageSet == "es") {
+		topicFilter = "Spanish";
+	}
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+            classId: classID,
+            teacherId: teacherID,
+            reportType: 'getClassTopicNamesList',
+            lang: loc,
+            filter: topicFilter
+        },
+        success : function(data) {        
+        	var topicData = $.parseJSON(data);
+           	
+
+            for (var i = 0; i < topicData.length; i++) {
+            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+            }
+
+            topicSelectionListNine = "<select name='topics' id='topicsNine' size='5' style='width:220px' >"; 	
+
+            for (var i = 0; i < topicData.length; i++) {
+        		topicSelectionListNine += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
+            }
+        	studentSelectionListEight += "</select>";
+        	document.getElementById("topicSelectionListNine").innerHTML=topicSelectionListNine; 
+            
+        },
+        error : function(e) {
+            console.log(e);
+        }
+	});
+
+	
+}
+
+
+var studentSelectionListEight = "";
+function populateStudentSelectionListEight() {
+	
+	var studentsArrEight = studentListEight.split(",");	
+
+	studentSelectionListEight = "<select name='students' id='studentsEight' size='5' style='width:220px' >"; 	
+	studentsArrEight.forEach(addStudentEight1);
+	studentsArrEight.forEach(addStudentEight2);
+	studentSelectionListEight += "</select>";
+	document.getElementById("studentSelectionListEight").innerHTML=studentSelectionListEight; 
+
+}
+
+function addStudentEight1(item, index) {
+	var sArr = item.split("~");
+	if ((sArr[2].length + sArr[1].length) > 0) {
+		studentSelectionListEight += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
+	}
+}
+
+function addStudentEight2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionListEight += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+var studentSelectionListNine = "";
+function populateStudentSelectionListNine() {
+	
+	var studentsArrNine = studentListNine.split(",");	
+
+	studentSelectionListNine = "<select name='students' id='studentsNine' size='5' style='width:220px' >"; 	
+	studentsArrNine.forEach(addStudentNine1);
+	studentsArrNine.forEach(addStudentNine2);
+	studentSelectionListNine += "</select>";
+	document.getElementById("studentSelectionListNine").innerHTML=studentSelectionListNine; 
+
+}
+
+function addStudentNine1(item, index) {
+	var sArr = item.split("~");
+	if ((sArr[2].length + sArr[1].length) > 0) {
+		studentSelectionListNine += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
+	}
+}
+
+function addStudentNine2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionListNine += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+
+
+function getFilterEight() {
+	
+	//document.getElementById("daysFilterEight").value = "";
+		
+	var showNamesState = "N";
+	if (document.getElementById("showNamesEight").checked == true) {
+		showNamesState = "Y";
+	}
+
+	var selectedStudentEight =  document.getElementById("studentsEight").value;
+
+	filterEight = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
+
+	var d1 = parseInt(document.getElementById("selectDay_r8_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r8_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r8_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r8_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupEight').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r8_cal2").value + "/" +  document.getElementById("year_r8_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r8_cal1").value + "/" + document.getElementById("year_r8_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r8_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r8_cal2").value;
+			toDate = document.getElementById("selectDay_r8_cal1").value + "/" + m2 + "/" + document.getElementById("year_r8_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterEight").value = fromDate + " thru " + toDate;
+		filterEight = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+		
+	
+		if (selectedStudentEight.length > 0) {
+			filterEight += "~" + selectedStudentEight;	
+		}
+	}		
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterEight").value = "";
+			filterEight = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+
+			if (selectedStudentEight.length > 0) {
+				filterEight += "~" + selectedStudentEight;	
+			}
+		
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		}
+	}
+	
+}
+
+
+function getFilterNine() {
+	
+	//document.getElementById("daysFilterNine").value = "";
+		
+	var showNamesState = "N";
+	if (document.getElementById("showNamesNine").checked == true) {
+		showNamesState = "Y";
+	}
+
+	var selectedStudentNine =  document.getElementById("studentsNine").value;
+
+	filterNine = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
+
+	var d1 = parseInt(document.getElementById("selectDay_r8_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r8_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r8_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r8_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupEight').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r8_cal2").value + "/" +  document.getElementById("year_r8_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r8_cal1").value + "/" + document.getElementById("year_r8_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r8_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r8_cal2").value;
+			toDate = document.getElementById("selectDay_r8_cal1").value + "/" + m2 + "/" + document.getElementById("year_r8_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterEight").value = fromDate + " thru " + toDate;
+		filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+		
+	
+		if (selectedStudentNine.length > 0) {
+			filterNine += "~" + selectedStudentNine;	
+		}
+	}		
+	else {
+		if ((d1 + d2) == 0) {
+			document.getElementById("daysFilterEight").value = "";
+			filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+
+			if (selectedStudentNine.length > 0) {
+				filterNine += "~" + selectedStudentNine;	
+			}
+		
+		}
+		else {
+			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		}
+	}
+	
+}
 
 
 function nicknameOpen(problemName) {
@@ -1026,12 +1455,12 @@ function loadEmotionMap (rows, studentName) {
     if($("#emotioniconID" + rows).hasClass('fa fa-heart')) {
         $("#emotioniconID" + rows).removeClass();
         $("#emotioniconID" + rows).addClass('fa fa-times');
+        document.getElementById("emotionBlock1").innerHTML =  "";
+        document.getElementById("emotionBlock2").innerHTML =  "";
+        document.getElementById("chart1Canvas").innerHTML =  "";
+        document.getElementById("chart2Canvas").innerHTML =  "";
         if(jQuery.isEmptyObject(studentEmotions)) {
             var noEmotionReported = "<span><label><%= rb.getString("no_emotions_reported")%> </label></span>";
-            document.getElementById("emotionBlock1").innerHTML =  "";
-            document.getElementById("emotionBlock2").innerHTML =  "";
-            document.getElementById("chart1Canvas").innerHTML =  "";
-            document.getElementById("chart2Canvas").innerHTML =  "";
     		document.getElementById("emotionChartsTitle").innerHTML = "<%= rb.getString("no_emotions_reported")%> " +  emotionStudentName;
         }
         else {
@@ -2803,7 +3232,897 @@ var completeDataChart;
         });
 
     });
+ 
+
+	$('#showReportEightBtn').on('click', function ()  {    	
+
+  	   
+        getFilterEight();
         
+        var testFilterEight = filterEight.split("~");
+        if (testFilterEight.length < 4) {
+        	alert("You must select a student");
+        	return;
+        }
+        
+        $("#studentProblemHistoryReport").hide();
+        $("#studentProblemAchievementReport").hide();
+        $('#collapseEightLoader').show();
+
+            
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'perStudentReport',
+                lang: loc,
+                filter: filterEight
+            },
+            success : function(data) {
+                $('#collapseEightLoader').hide();
+                var jsonData = $.parseJSON(data);
+                effortMap = jsonData.effortChartValues;
+                emotionMap = jsonData.fullstudentEmotionsMap;
+                commentsMap = jsonData.fullstudentEmotionsComments;
+                emotionLevelOne = jsonData.levelOneData;
+                eachStudentData = jsonData.eachStudentDataValues;
+ 
+ 
+                var selectedStudentInfo = emotionLevelOne[0];
+                if (selectedStudentInfo == null) {
+                	alert("<%= rb.getString("no_student_activity_found")%>");
+                	return;
+                }
+                var selectedStudentId = selectedStudentInfo[0];
+           		
+                var studentDataList = eachStudentData[selectedStudentId];
+                var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
+/*
+                outputStudentDataList.sort(function(a,b) {
+                    if(a[10] == 'Problem was not completed')
+                        return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
+                    if( b[10] == 'Problem was not completed' )
+                        return new Date('1900-01-01 00:00:00.0').getTime() - new Date('1900-01-01 00:00:01.0').getTime();
+                    else
+                        return new Date(b[10]).getTime() - new Date(a[10]).getTime();
+                });
+*/                                          
+				var selectedTopicEight =  document.getElementById("topicsEight").value;
+
+				var rptEightTitle = '<%= rb.getString("student_problem_solving_history")%>';
+				if (selectedTopicEight.length > 0) {
+					rptEightTitle = rptEightTitle + " ( " + topicNameMap.get(selectedTopicEight) + " )";
+				}
+           		var problems = [];
+           		var problemIds = [];
+           		var hints = [];
+           		var attempts = [];
+           		var videos = [];
+           		var difficulty = [];
+           		var mastery = [];
+           		var topic = [];
+           		var topicname = [];
+           		var minutesOnProblem = [];
+           		var effortOnProblem = [];
+           		var maxMinutes = 0;
+           		var barWidth = [];
+           		//var myColors = ['rgba(38, 242, 19,1)', 'rgba(38, 242, 19,1)', 'rgba(141, 211, 199,1)', 'rgba(38, 242, 19,1)', 'rgba(190, 186, 218,1)','rgba(155, 235, 148,1)','rgba(141, 211, 199,1)'];
+           		var effColors = [];
+           		var effText = [];
+
+
+           		var prevMastery = 0.0;
+           		var prevTopic = 0;
+           		
+           		var maxYaxis = 1;          		
+               
+           		var useThisOne = true;
+           		
+                $.each(outputStudentDataList, function (i, obj) {
+                	useThisOne = true;
+               		var pTopic = obj[17];
+    				if ((selectedTopicEight.length > 0) && (!(pTopic == selectedTopicEight))) {
+    					useThisOne = false;
+    				}
+                	if (obj[8] === "NO DATA") {                		
+    					useThisOne = false;
+    				}
+    				
+					
+                	if (useThisOne) {                		
+	               		var p = "" + i + ": "+ obj[0];
+	               		var pHints = parseInt(obj[6]);
+	               		var pAttempts = parseInt(obj[7]);
+	               		var pVideos = parseInt(obj[12]);
+						problems.push(p);
+	               		effColors.push(getEffortColorRGB(obj[8]));
+	               		effText.push(obj[8]);
+	               		hints.push(parseInt(obj[6], 10));
+	               		attempts.push(parseInt(obj[7], 10));
+	               		videos.push(parseInt(obj[12], 10));
+	               		var pdifficulty = parseFloat(obj[15], 10);
+	               		pdifficulty = 10.0 * pdifficulty;
+	               		difficulty.push(pdifficulty);
+	               		topic.push(pTopic);
+	               		var ptopicname = topicNameMap.get(pTopic);
+	               		topicname.push(ptopicname);
+	               		var pmastery = parseFloat(obj[16], 10);
+	               		if ((pmastery == 0.0) && (pTopic == prevTopic) && (obj[10] === "Problem was not completed")) {
+	               			pmastery = prevMastery;
+	               		}
+	               		else {
+	               			pmastery = 10.0 * pmastery;
+	               		}
+	               		mastery.push(pmastery);
+	               		prevMastery = pmastery;
+	               		prevTopic = pTopic;
+	               		barWidth.push(1);
+	               		problemIds.push(obj[11]);
+	               		var isSolved = parseInt(obj[4], 10);
+		        		var timeToSolve = parseInt(obj[19], 10);
+		        		if (timeToSolve < 0) {
+		        			timeToSolve = 0;
+		        		}
+		        		var minutesToSolve = timeToSolve/60000;
+		        		if (minutesToSolve > 15) {
+		        			minutesToSolve = 15;
+		        		}
+		        		
+		        		var timeToFirstAttempt = parseInt(obj[20], 10);
+		        		if (timeToFirstAttempt < 0) {
+		        			timeToFirstAttempt = 0;
+		        		}
+						var minutesToFirstAttempt =  timeToFirstAttempt/60000;
+		        		if (minutesToFirstAttempt > 15) {
+		        			minutesToFirstAttempt = 15;
+		        		}
+											
+		        		if (minutesToSolve > maxYaxis) {
+		        			maxYaxis = minutesToSolve;
+		        		}
+	    			
+		        		if (pHints > maxYaxis) {
+		        			maxYaxis = pHints;
+		        		}
+		        		if (pAttempts > maxYaxis) {
+		        			maxYaxis = pAttempts;
+		        		}
+	
+		        		if (pVideos > maxYaxis) {
+		        			maxYaxis = pVideos;
+		        		}	        		
+	
+	   					if (isSolved > 0) {
+	                   		minutesOnProblem.push(minutesToSolve);    						
+	   					}
+	   					else {
+	   						if (minutesToFirstAttempt > 0) {	
+	   							minutesOnProblem.push(minutesToFirstAttempt);
+	   						}
+	   						else {
+	   							minutesOnProblem.push(0.2);
+	   						}
+	   					}
+   						effortOnProblem.push(0.5);
+   					
+                	}
+                });
+
+				maxYaxis1 = maxYaxis;
+        		if (maxYaxis1 > 15) {
+        			maxYaxis1 = 15;
+        		}
+        		
+        		if (maxYaxis1 < 10) {
+        			maxYaxis1 = 10;
+        		}
+
+        		
+				var maxWidth = 800;       
+				if (problems.length > 16) {
+					maxWidth = problems.length * 50;    		 
+				}
+                
+           		var traceHints = {
+             			  x: problems,
+         				  y: hints, 
+						  name: '<%= rb.getString("hints")%>',
+         				  type: 'scatter',
+       					  mode: 'lines+markers',
+       					  marker: {
+       					    color: 'rgb(219, 64, 82)',
+       					    size: 8
+       					  },
+       					  line: {
+       					    color: 'rgb(219, 64, 82)',
+       					    width: 1
+       					  }         				
+         		};
+
+           		var traceAttempts = {
+           			  x: problems,
+       				  y: attempts, 
+					  name: '<%= rb.getString("attempts")%>',
+       				  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(55, 128, 191)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(55, 128, 191)',
+   					    width: 1
+   					  }         				
+       				};
+
+           		var traceVideos = {
+             			  x: problems,
+         				  y: videos, 
+  					  name: '<%= rb.getString("videos")%>',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(153, 0, 153)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(153, 0, 153)',
+     					    width: 1
+     					  }         				
+         				};
+ 
+           		var traceDifficulty = {
+           			  x: problems,
+       				  y: difficulty, 
+					  name: '<%= rb.getString("difficulty")%>',
+       				  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(255, 255, 0)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(255, 255, 0)',
+   					    width: 2
+   					  }         				
+       				};
+           		
+           		var traceMastery = {
+             			  x: problems,
+         				  y: mastery, 
+  					  name: '<%= rb.getString("mastery")%>',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(255, 102, 0)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(255, 102, 0)',
+     					    width: 2
+     					  },        				
+               	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
+                          text: topicname,
+
+         				};
+           		
+/*          		
+           		var trace3 = {
+           				  x: [problems], 
+           				  y: [1, 1, 2, 3, 4, 3, 5],
+           				  name: 'Minutes',
+           				  marker:{
+           				    color: myColors
+           				  },
+           				  type: 'bar'
+           				};
+*/
+				var traceProblemMinutes = {
+					  x: problems,
+					  y: minutesOnProblem,
+					  name: '<%= rb.getString("minutes")%>',
+					  showlegend: false,
+					  mode: 'markers',
+					  marker:{
+					    color: effColors
+					  },
+					  type: 'bar',
+			          hovertemplate: '<%= rb.getString("minutes")%> %{y:.2f}<br><i><%= rb.getString("click_to_see_the_problem")%></i>',           			  
+			        text: effText,
+				};       
+
+				var traceProblemEffort = {
+						  x: problems,
+						  y: effortOnProblem,
+						  name: 'effort',
+						  showlegend: false,
+						  mode: 'markers',
+						  marker:{
+						    color: effColors
+						  },
+						  type: 'bar',
+					        hovertemplate: '<br><i><%= rb.getString("click_to_see_the_problem")%></i>',           			  
+				      text: effText,
+					};           		
+		
+           		var data1 = [];
+           		var data2 = [];
+                if (document.getElementById("trackHints").checked == true) {
+	           		data1.push(traceHints);
+                }
+                if (document.getElementById("trackAttempts").checked == true) {
+		           	data1.push(traceAttempts);
+                }
+                if (document.getElementById("trackVideos").checked == true) {
+    	       		data1.push(traceVideos);
+                }
+           		data1.push(traceProblemMinutes);
+                if (document.getElementById("trackDifficulty").checked == true) {
+    	       		data1.push(traceDifficulty);
+    	       		data2.push(traceDifficulty);
+                }
+                if (document.getElementById("trackMastery").checked == true) {
+    	       		data1.push(traceMastery);
+    	       		data2.push(traceMastery);
+                }
+           		//data2.push(traceProblemMinutes);
+           		data2.push(traceProblemEffort);
+
+
+
+           	    layout = {
+           	    	 width:(maxWidth),
+           	    	 height:300,          	         
+           	    	 xaxis: {
+               	       type: 'category',
+               	       title: '<%= rb.getString("problems")%>',
+               	     },
+          	         yaxis: {
+                 	   title: '<%= rb.getString("minutes")%>',
+                 	   dtick: 1,
+                   	   range: [0, maxYaxis1]
+                 	 },
+                 	 legend: {
+                 	    x: 0,
+                 	    y: 1,
+                 	    traceorder: 'normal',
+                 	    font: {
+                 	      family: 'sans-serif',
+                 	      size: 12,
+                 	      color: '#000'
+                 	    },
+                 	    bgcolor: '#E2E2E2',
+                 	    bordercolor: '#000000',
+                 	    borderwidth: 1
+                 	 },           	         
+           	    	 hovermode:'x',
+           	         title:rptEightTitle ,
+           	      	 displayModeBar: false,
+
+           	      };   
+           	    
+                var myPlot1 = document.getElementById('studentProblemHistoryReport');
+           		
+           		Plotly.newPlot('studentProblemHistoryReport', data1, layout);     
+           		
+           		myPlot1.on('plotly_click', function(data1){
+					var i = data1.points[0].pointIndex;
+					var myY = data1.points[0].fullData.y[i];
+					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+					document.getElementById('studentProblemHistorySnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+			        $("#studentProblemHistoryPopup").modal('show');
+           		});
+
+           		$("#studentProblemHistoryReport").show();
+
+           		
+           	    layout2 = {
+              	    	 width:(maxWidth),
+              	    	 height:600,          	         
+              	    	 xaxis: {
+                  	       type: 'category',
+                  	       title: '<%= rb.getString("problems")%>',
+                  	     },
+             	         yaxis: {
+                    	   title: '<%= rb.getString("mastery")%>',
+                    	   dtick: 0.2,
+                      	   range: [0, 9]
+                    	 },
+                    	 legend: {
+                    	    x: 0,
+                    	    y: 1,
+                    	    traceorder: 'normal',
+                    	    font: {
+                    	      family: 'sans-serif',
+                    	      size: 12,
+                    	      color: '#000'
+                    	    },
+                    	    bgcolor: '#E2E2E2',
+                    	    bordercolor: '#000000',
+                    	    borderwidth: 1
+                    	 },           	         
+              	    	 hovermode:'x',
+              	         title:'Achievement' ,
+              	      	 displayModeBar: false,
+
+              	      };   
+           		
+                var myPlot2 = document.getElementById('studentProblemAchievementReport');
+           		
+           		Plotly.newPlot('studentProblemAchievementReport', data2, layout2);     
+          		
+           		myPlot2.on('plotly_click', function(data2){
+					var i = data2.points[0].pointIndex;
+					var myY = data2.points[0].fullData.y[i];
+					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+					document.getElementById('studentProblemHistorySnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+			        $("#studentProblemHistoryPopup").modal('show');
+           		});
+
+           		populateTopicSelectionListEight();
+           		$("#studentProblemAchievementReport").show();
+
+            
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+        
+        
+
+
+    });
+
+	$('#showReportNineBtn').on('click', function ()  {    	
+
+	  	   
+        getFilterNine();
+        
+        var testFilterNine = filterNine.split("~");
+        if (testFilterNine.length < 4) {
+        	alert("You must select a student");
+        	return;
+        }
+        
+        $("#studentProblemAchievementReport").hide();
+        $('#collapseNineLoader').show();
+
+            
+        $.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classID,
+                teacherId: teacherID,
+                reportType: 'perStudentReport',
+                lang: loc,
+                filter: filterNine
+            },
+            success : function(data) {
+                $('#collapseNineLoader').hide();
+                var jsonData = $.parseJSON(data);
+                effortMap = jsonData.effortChartValues;
+                emotionMap = jsonData.fullstudentEmotionsMap;
+                commentsMap = jsonData.fullstudentEmotionsComments;
+                emotionLevelOne = jsonData.levelOneData;
+                eachStudentData = jsonData.eachStudentDataValues;
+ 
+ 
+                var selectedStudentInfo = emotionLevelOne[0];
+                if (selectedStudentInfo == null) {
+                	alert("<%= rb.getString("no_student_activity_found")%>");
+                	return;
+                }
+                var selectedStudentId = selectedStudentInfo[0];
+           		
+                var studentDataList = eachStudentData[selectedStudentId];
+                var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
+/*
+                outputStudentDataList.sort(function(a,b) {
+                    if(a[10] == 'Problem was not completed')
+                        return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
+                    if( b[10] == 'Problem was not completed' )
+                        return new Date('1900-01-01 00:00:00.0').getTime() - new Date('1900-01-01 00:00:01.0').getTime();
+                    else
+                        return new Date(b[10]).getTime() - new Date(a[10]).getTime();
+                });
+*/                                          
+				var selectedTopicNine =  document.getElementById("topicsNine").value;
+
+				var rptNineTitle = '<%= rb.getString("student_problem_solving_history")%>';
+				if (selectedTopicNine.length > 0) {
+					rptNineTitle = rptNineTitle + " ( " + topicNameMap.get(selectedTopicNine) + " )";
+				}
+           		var problems = [];
+           		var problemIds = [];
+           		var hints = [];
+           		var attempts = [];
+           		var videos = [];
+           		var difficulty = [];
+           		var mastery = [];
+           		var topic = [];
+           		var topicname = [];
+           		var minutesOnProblem = [];
+           		var maxMinutes = 0;
+           		var barWidth = [];
+           		//var myColors = ['rgba(38, 242, 19,1)', 'rgba(38, 242, 19,1)', 'rgba(141, 211, 199,1)', 'rgba(38, 242, 19,1)', 'rgba(190, 186, 218,1)','rgba(155, 235, 148,1)','rgba(141, 211, 199,1)'];
+           		var effColors = [];
+           		var effText = [];
+           		var achievementColors = [];
+           		var achievementValues = [];
+           		
+           		var prevMastery = 0.0;
+           		var prevTopic = 0;
+           		var prevDifficulty = -1;
+           		var prevEffort = "";
+           		
+           		var maxYaxis = 1;          		
+               
+           		var useThisOne = true;
+           		
+                $.each(outputStudentDataList, function (i, obj) {
+                	useThisOne = true;
+               		var pTopic = obj[17];
+    				if ((selectedTopicNine.length > 0) && (!(pTopic == selectedTopicNine))) {
+    					useThisOne = false;
+    				}
+                	if (obj[8] === "NO DATA") {                		
+    					useThisOne = false;
+    				}
+    				
+					
+                	if (useThisOne) {                		
+	               		var p = "" + i + ": "+ obj[0];
+	               		var pHints = parseInt(obj[6]);
+	               		var pAttempts = parseInt(obj[7]);
+	               		var pVideos = parseInt(obj[12]);
+						problems.push(p);
+	               		effColors.push(getEffortColorRGB(obj[8]));
+	               		effText.push(obj[8]);
+	               		hints.push(parseInt(obj[6], 10));
+	               		attempts.push(parseInt(obj[7], 10));
+	               		videos.push(parseInt(obj[12], 10));
+	               		var currDifficulty = parseFloat(obj[15], 10);
+	               		currDifficulty = 10.0 * currDifficulty;
+	               		difficulty.push(currDifficulty);
+	               		
+	               		
+	               		
+	               		var currAchievement = 0;
+	               		
+	               		if (prevDifficulty > 0) {
+	               			currAchievement = (currDifficulty + prevDifficulty ) /2;
+	               		}
+	               		else {
+	               			currAchievement = currDifficulty;
+	               		}
+	               		
+	               		achievementValues.push(currAchievement);
+	               		
+	               		if ((obj[8] == "SOF") || (obj[8] == "ATT")) {
+	               			prevDifficulty = currDifficulty
+		               		achievementColors.push(getAchievementColorRGB(currAchievement));
+	               		}
+	               		else {
+		               		achievementColors.push(getAchievementColorRGB(0));	               			
+	               		}
+	               		
+	               		
+	               		topic.push(pTopic);
+	               		var ptopicname = topicNameMap.get(pTopic);
+	               		topicname.push(ptopicname);
+	               		var pmastery = parseFloat(obj[16], 10);
+	               		if ((pmastery == 0.0) && (pTopic == prevTopic) && (obj[10] === "Problem was not completed")) {
+	               			pmastery = prevMastery;
+	               		}
+	               		else {
+	               			pmastery = 10.0 * pmastery;
+	               		}
+	               		mastery.push(pmastery);
+	               		prevMastery = pmastery;
+	               		prevTopic = pTopic;
+	               		barWidth.push(1);
+	               		problemIds.push(obj[11]);
+	               		var isSolved = parseInt(obj[4], 10);
+		        		var timeToSolve = parseInt(obj[19], 10);
+		        		if (timeToSolve < 0) {
+		        			timeToSolve = 0;
+		        		}
+		        		var minutesToSolve = timeToSolve/60000;
+		        		if (minutesToSolve > 15) {
+		        			minutesToSolve = 15;
+		        		}
+		        		
+		        		var timeToFirstAttempt = parseInt(obj[20], 10);
+		        		if (timeToFirstAttempt < 0) {
+		        			timeToFirstAttempt = 0;
+		        		}
+						var minutesToFirstAttempt =  timeToFirstAttempt/60000;
+		        		if (minutesToFirstAttempt > 15) {
+		        			minutesToFirstAttempt = 15;
+		        		}
+											
+		        		if (minutesToSolve > maxYaxis) {
+		        			maxYaxis = minutesToSolve;
+		        		}
+	    			
+		        		if (pHints > maxYaxis) {
+		        			maxYaxis = pHints;
+		        		}
+		        		if (pAttempts > maxYaxis) {
+		        			maxYaxis = pAttempts;
+		        		}
+	
+		        		if (pVideos > maxYaxis) {
+		        			maxYaxis = pVideos;
+		        		}	        		
+	
+	   					if (isSolved > 0) {
+	                   		minutesOnProblem.push(minutesToSolve);    						
+	   					}
+	   					else {
+	   						if (minutesToFirstAttempt > 0) {	
+	   							minutesOnProblem.push(minutesToFirstAttempt);
+	   						}
+	   						else {
+	   						}
+	   					}
+						minutesOnProblem.push(0.2);
+   					
+                	}
+                });
+
+				maxYaxis = maxYaxis;
+        		if (maxYaxis > 15) {
+        			maxYaxis = 15;
+        		}
+        		
+        		if (maxYaxis < 10) {
+        			maxYaxis = 10;
+        		}
+
+        		
+				var maxWidth = 800;       
+				if (problems.length > 16) {
+					maxWidth = problems.length * 50;    		 
+				}
+                
+           		var traceHints = {
+             			  x: problems,
+         				  y: hints, 
+						  name: '<%= rb.getString("hints")%>',
+         				  type: 'scatter',
+       					  mode: 'lines+markers',
+       					  marker: {
+       					    color: 'rgb(219, 64, 82)',
+       					    size: 8
+       					  },
+       					  line: {
+       					    color: 'rgb(219, 64, 82)',
+       					    width: 1
+       					  }         				
+         		};
+
+           		var traceAttempts = {
+           			  x: problems,
+       				  y: attempts, 
+					  name: '<%= rb.getString("attempts")%>',
+       				  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(55, 128, 191)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(55, 128, 191)',
+   					    width: 1
+   					  }         				
+       				};
+
+           		var traceVideos = {
+             			  x: problems,
+         				  y: videos, 
+  					  name: '<%= rb.getString("videos")%>',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(153, 0, 153)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(153, 0, 153)',
+     					    width: 1
+     					  }         				
+         				};
+ 
+           		var traceDifficulty = {
+           			  x: problems,
+       				  y: difficulty, 
+					  name: '<%= rb.getString("difficulty")%>',
+					  yaxis: 'y3',
+					  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(255, 102, 0)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(255, 102, 0)',
+   					    width: 2
+   					  }         				
+       				};
+           		
+           		var traceMastery = {
+             			  x: problems,
+         				  y: mastery, 
+	  					  name: '<%= rb.getString("mastery")%>',
+						  yaxis: 'y4',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(0, 153, 51)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(0, 153, 51)',
+     					    width: 2
+     					  },        				
+               	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
+                          text: topicname,
+
+         				};
+           		
+           		var traceAchievement = {
+           			  x: problems,
+       				  y: achievementValues, 
+	  					  name: 'Achievement',
+						  yaxis: 'y4',
+       				  type: 'scatter',
+   					  mode: 'markers',
+       				  marker:{
+       				    color: achievementColors,
+       				 	symbol: 'diamond',
+       				 	size: 8
+     				  },
+  				
+             	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
+                        text: topicname,
+
+       				};
+         		
+/*          		
+           		var trace3 = {
+           				  x: [problems], 
+           				  y: [1, 1, 2, 3, 4, 3, 5],
+           				  name: 'Minutes',
+           				  marker:{
+           				    color: myColors
+           				  },
+           				  type: 'bar'
+           				};
+*/
+           		var traceProblems = {
+           			  x: problems,
+           			  y: minutesOnProblem,
+       				  name: '<%= rb.getString("minutes")%>',
+       				  showlegend: false,
+       				  mode: 'markers',
+       				  marker:{
+         				    color: effColors
+       				  },
+           			  type: 'bar',
+           	          hovertemplate: '<%= rb.getString("minutes")%> %{y:.2f}<br><i><%= rb.getString("click_to_see_the_problem")%></i>',           			  
+                      text: effText,
+           			};           		
+           		
+ 		
+           		var data = [];
+                if (document.getElementById("trackHints").checked == true) {
+	           		data.push(traceHints);
+                }
+                if (document.getElementById("trackAttempts").checked == true) {
+		           	data.push(traceAttempts);
+                }
+                if (document.getElementById("trackVideos").checked == true) {
+    	       		data.push(traceVideos);
+                }
+                if (document.getElementById("trackDifficulty").checked == true) {
+    	       		data.push(traceDifficulty);
+                }
+                if (document.getElementById("trackMastery").checked == true) {
+    	       		data.push(traceMastery);
+                }
+//                if (document.getElementById("trackAchievement").checked == true) {
+    	       		data.push(traceAchievement);
+//                }
+           		data.push(traceProblems);
+//           		var data = [traceHints, traceAttempts, traceVideos, traceProblems];
+
+           	    layout = {
+           	    	 width:(maxWidth),
+           	    	 height:500,          	         
+           	    	 xaxis: {
+               	       type: 'category',
+               	       title: '<%= rb.getString("problems")%>',
+               	     },
+          	         yaxis: {
+                 	   title: '<%= rb.getString("minutes")%>',
+                 	   dtick: .5,
+                   	   range: [0, maxYaxis]
+                 	 },
+                 	 yaxis3: {
+             			    title: '<%= rb.getString("difficulty")%>',
+             			    titlefont: {color: '#ff6600'},
+             			    tickfont: {color: '#ff6600'},
+                       	    dtick: 0.1,
+                       	    range: [0, 10],
+             			    anchor: 'x',
+             			    overlaying: 'y',
+             			    side: 'right'
+             			    
+           			 },
+           		     yaxis4: {
+	           		    title: '<%= rb.getString("mastery")%>',
+	           		    titlefont: {color: '#009933'},
+	           		    tickfont: {color: '#009933'},
+                   	    dtick: 0.1,
+                   	    range: [0, 10],
+	           		    anchor: 'free',
+	           		    overlaying: 'y',
+	           		    side: 'right',
+	           		    position: 0.95,
+	           		    showline: false
+	           		 },
+           			 
+                 	 legend: {
+                 	    x: 0,
+                 	    y: 1,
+                 	    traceorder: 'normal',
+                 	    font: {
+                 	      family: 'sans-serif',
+                 	      size: 12,
+                 	      color: '#000'
+                 	    },
+                 	    bgcolor: '#E2E2E2',
+                 	    bordercolor: '#000000',
+                 	    borderwidth: 1
+                 	 },           	         
+           	    	 hovermode:'x',
+           	         title:rptNineTitle ,
+           	      	 displayModeBar: false,
+
+           	      };   
+           	    
+                var myPlot = document.getElementById('studentProblemAchievementReportNine');
+           		
+           		Plotly.newPlot('studentProblemAchievementReportNine', data, layout);     
+           		
+           		myPlot.on('plotly_click', function(data){
+					var i = data.points[0].pointIndex;
+					var myY = data.points[0].fullData.y[i];
+					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+					document.getElementById('studentProblemAchievementSnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+			        $("#studentProblemAchievementPopup").modal('show');
+           		});
+
+           		populateTopicSelectionListNine();
+           		$("#studentProblemAchievementReportNine").show();
+                
+            },
+            error : function(e) {
+                console.log(e);
+            }
+        });
+        
+        
+
+
+    });
+    
+    
     $('body').on('click', 'a.getStudentDetail', function () {
         $(this).children(':first').toggleClass('rotate-icon');
         var tr = $(this).closest('tr');
@@ -3090,6 +4409,12 @@ var completeDataChart;
             getStudentListSix();           
           	getFilterSix();
             
+            getStudentListEight();           
+          	getFilterEight();
+          	
+            getStudentListNine();           
+          	getFilterNine();
+          	
             $('#reorg_prob_sets_handler').css('background-color', '');
             $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
@@ -3098,7 +4423,9 @@ var completeDataChart;
             $("#report-wrapper2").show();
             $("#perStudentPerProblemSetReport").hide();
 
-                     
+            populateTopicSelectionListEight();
+            populateTopicSelectionListNine();
+            
         });
 
     </script>
@@ -3125,6 +4452,7 @@ var completeDataChart;
 </head>
 
 <body>
+<div class="bootstrap fullscreen">
 <div id="wrapper">
     <!-- Sidebar -->
     <nav class="navbar navbar-inverse navbar-fixed-top" id="topbar-wrapper" role="navigation">
@@ -3139,22 +4467,26 @@ var completeDataChart;
         </ul>
     </nav>
     <div id="page-content-wrapper">
-
-        <h1 class="page-header">
-            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
-        </h1>
-
-        <h2 class="page-header">
+    	<div class="row">
+			<div class="col-md-9">   
+		        <h2 class="page-header">
+		            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+		        </h2>
+			</div>
+			<div class="col-md-3">
+				<h2>
+					<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Close Report card</a>
+				</h2>  
+			</div> 
+		</div>
+        <h3 class="page-header">
             Teacher: <strong>${fn:toUpperCase(teacherName)}</strong>
-        </h2>
+        </h3>
 
         <div id="content-conatiner" class="container-fluid">
 
             <div id="report-wrapper" class="row" style="display:none;width: 100%;">
 
-                <div class="panel-group" id="accordion">
-                
-                
                 <div class="panel-group" id="accordion">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -3221,6 +4553,8 @@ var completeDataChart;
 					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListSix();" ><%= rb.getString("choose_student") %></button>
 					                </div>
 	                        		<div id="studentSelectionListSix" name="studentSelectionListSix" class="col-md-5">                       
+	                        			<select name='students' id='studentsSix' size='5' style='width:220px' >
+	                        			</select>                       
 					                </div>
 	 							</div>  
 	
@@ -3296,6 +4630,8 @@ var completeDataChart;
 					                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListThree();" ><%= rb.getString("choose_student") %></button>
 					                </div>
 	                        		<div id="studentSelectionListThree" name="studentSelectionListThree" class="col-md-5">                       
+	                        			<select name='students' id='studentsThree' size='5' style='width:220px' >
+	                        			</select>                       
 					                </div>
 	 							</div>  
 	
@@ -3316,6 +4652,7 @@ var completeDataChart;
 
                         </div>
                     </div>
+
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -3454,20 +4791,168 @@ var completeDataChart;
                         </div>
                     </div>
 
-             </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_eight" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseEight">
+									<%= rb.getString("student_gradebook_problem_solving_history") %>
+                                </a>
+                                <button id="eightButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseEight" class="panel-collapse collapse">
+	                            <div class="panel-body report_filters">                           
+									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <label class="report_filters">Track Mastery</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <label class="report_filters">Track Difficulty</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <label class="report_filters">Track Attempts</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackHints" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <label class="report_filters">Track Hints</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight();">
+									  <label class="report_filters">Track Videos</label>
+								</div>
+		                        <div class="panel-body report_filters">
+		                        	<div id="chooseDateRange" class="row">
+		                        		<div class="col-md-2 offset-md-1">                       
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r8_cal1();initCalendar_r8_cal2();$('#calendarModalPopupEight').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                </div>
+		                        		<div class="col-md-3">                       
+										    <input id="daysFilterEight" style="width:220px" type="text" name="" value="" >   
+						                </div>
+		 							</div>  
+		
+								</div>
+							     <div class="panel-body report_filters">
+	                        		<div class="row">
+	                        			<div class="col-md-2 offset-md-1">
+											<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
+	                        			</div>
+	                        			<div class="col-md-3">
+	                        			</div>
+	                        			<div class="col-md-3">
+											<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
+	                        			</div>
+	                        		</div>
+	                        		<div class="row">
+	                        			<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-2 offset-md-1"> 
+											<select name='students' id='studentsEight' size='5' style='width:220px' >
+											</select>				                
+										</div>
+	                        			<div class="col-md-3">
+	                        			</div>	                        		
+		                        		<div id="topicSelectionListEight" name="topicSelectionListEight" class="col-md-3">                       
+											<select name='topics' id='topicsEight' size='5' style='width:220px' >
+											</select>				                
+										</div>
+									</div>
+	                            </div>                            
+		
+		
+	                            <div class="panel-body report_filters hidden">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	                            </div>
+	                            <div class="panel-body report_filters">                           
+									  <input id="showReportEightBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								</div>
+                            <div id="collapseEightLoader" class="loader" style="display: none" >
+                           	</div>                            
+			            	<div id="studentProblemHistoryReport" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+			            	<div id="studentProblemAchievementReport" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+                        </div>
+					</div>
 
-            </div>
-           
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_nine" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
+									<%= rb.getString("student_gradebook_problem_solving_history") %>
+                                </a>
+                                <button id="nineButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseNine" class="panel-collapse collapse">
+	                            <div class="panel-body report_filters">                           
+									  <input id="trackMasteryNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
+									  <label class="report_filters">Track Mastery</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackDifficultyNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
+									  <label class="report_filters">Track Difficulty</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackAttemptsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();">
+									  <label class="report_filters">Track Attempts</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackHintsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();">
+									  <label class="report_filters">Track Hints</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackVideosNine" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterNine();">
+									  <label class="report_filters">Track Videos</label>
+								</div>
+		                        <div class="panel-body report_filters">
+		                        	<div id="chooseDateRange" class="row">
+		                        		<div class="col-md-2 offset-md-1">                       
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r8_cal1();initCalendar_r8_cal2();$('#calendarModalPopupEight').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                </div>
+		                        		<div class="col-md-3">                       
+										    <input id="daysFilterEight" style="width:220px" type="text" name="" value="" >   
+						                </div>
+		 							</div>  
+		
+								</div>
+							     <div class="panel-body report_filters">
+	                        		<div class="row">
+	                        			<div class="col-md-2 offset-md-1">
+											<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
+	                        			</div>
+	                        			<div class="col-md-3">
+	                        			</div>
+	                        			<div class="col-md-3">
+											<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
+	                        			</div>
+	                        		</div>
+	                        		<div class="row">
+	                        			<div id="studentSelectionListNine" name="studentSelectionListNine" class="col-md-2 offset-md-1"> 
+											<select name='students' id='studentsNine' size='5' style='width:220px' >
+											</select>				                
+										</div>
+	                        			<div class="col-md-3">
+	                        			</div>	                        		
+		                        		<div id="topicSelectionListNine" name="topicSelectionListNine" class="col-md-3">                       
+											<select name='topics' id='topicsNine' size='5' style='width:220px' >
+											</select>				                
+										</div>
+									</div>
+	                            </div>                            
+		
+		
+	                            <div class="panel-body report_filters hidden">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesNine" name="" value="Y"  onblur="getFilterNine();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	                            </div>
+	                            <div class="panel-body report_filters">                           
+									  <input id="showReportNineBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								</div>
+                            <div id="collapseNineLoader" class="loader" style="display: none" >
+                           	</div>                            
+			            	<div id="studentProblemHistoryReportNine" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+			            	<div id="studentProblemAchievementReportNine" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+                        </div>
+					</div>
+
+             </div>
         </div>
 	</div>
-	<div>
-		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain" class="btn btn-lg btn-primary" role="button">Close Report card</a>
-	</div>
-
 </div>
-
-
-
+</div>
 <div id = "statusMessage" class="spin-loader-message" align = "center" style="display: none;"></div>
 
 <div id="calendarModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
@@ -3973,76 +5458,107 @@ var completeDataChart;
 </div>	
 
 
-
-<div id="studentsModalPopupSix" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
-
-    <div class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body" role="dialog">
-			     <div class="wrapper-students col-sm-6">
-			      <div class="container-calendar">
-			          
-			          <div class="footer-container-calendar">
-			              <label for="studentsSix">Select Students: </label>
-						  <select name='students' id='studentsSix' size='5' multiple>;
-			              </select>
-     
-			          </div>
-			      </div>			      
-			    </div> 
-            </div>
-
-           <div class="modal-footer">
-
-          		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="alert('Hello');" ><%= rb.getString("submit") %></button>
-	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#studentsModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
-                </div> 
-         </div>
-    	</div>
-	</div>
-</div>	
-
-
-<div id="studentsModalPopupThree" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
-
-    <div class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body" role="dialog">
-			     <div class="wrapper-students col-sm-6">
-			      <div class="container-calendar">
-			          
-			          <div class="footer-container-calendar">
-			              <label for="studentsThree">Select Students: </label>
-						  <select name='students' id='studentsThree' size='5' multiple>;
-			              </select>
-     
-			          </div>
-			      </div>			      
-			    </div> 
-            </div>
-
-           <div class="modal-footer">
-
-          		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="alert('Hello');" ><%= rb.getString("submit") %></button>
-	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#studentsModalPopup').modal('hide');" ><%= rb.getString("cancel") %></button>
-                </div> 
-         </div>
-    	</div>
-	</div>
-</div>	
-
-
 <!-- Modal -->
+<div id="calendarModalPopupEight" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r8_cal1" name="selectDay_r8_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal1" onclick="previous_r8_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal1" onclick="next_r8_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal1" data-lang="en">
+			              <thead id="thead-month_r8_cal1"></thead>
+			              <tbody id="calendar-body_r8_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r8_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r8_cal1" onchange="jump_r8_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r8_cal1" onchange="jump_r8_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r8_cal2" name="selectDay_r8_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal2" onclick="previous_r8_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal2" onclick="next_r8_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal2" data-lang="en">
+			              <thead id="thead-month_r8_cal2"></thead>
+			              <tbody id="calendar-body_r8_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r8_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r8_cal2" onchange="jump_r8_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r8_cal2" onchange="jump_r8_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterEight();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupEight').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
 
 
 
@@ -4063,6 +5579,40 @@ var completeDataChart;
     </div>
 </div>
 <!-- Modal -->
+
+<div id="studentProblemHistoryPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg" >
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Student Problem Solving History</h4>
+            </div>
+            <div class="modal-body" style="min-width:900px">
+                <div id="studentProblemHistorySnapshot" ></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div id="studentProblemAchievementPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg" >
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Student Problem Solving Achievement</h4>
+            </div>
+            <div class="modal-body" style="min-width:900px">
+                <div id="studentProblemAchievementSnapshot" ></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <div id="studentEmotionCharts" class="modal" role="dialog" style="display: none;">
     <div class="container modal-dialog modal-lg" style="min-width:900px;background-color: lightgray;">
@@ -4220,6 +5770,8 @@ var completeDataChart;
     <script type="text/javascript" src="<c:url value="/js/calendar_r6_2.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r3_1.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r3_2.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r8_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r8_2.js" />"></script>
 </body>
 
 </html>

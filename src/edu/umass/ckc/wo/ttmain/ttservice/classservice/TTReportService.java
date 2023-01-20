@@ -14,6 +14,8 @@ import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import org.w3c.dom.Document;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,5 +72,9 @@ public interface TTReportService {
     public List<TeacherClassListEntry> generateTeacherClassList(String targetId);
     
     public ClassLiveDashboard generateLiveDashboard(String classId, String filter);
+    
+    public String getClassTopicNamesList(Connection conn, String classId, String filter);
+    
+    
     
 }
