@@ -1505,8 +1505,8 @@ $.extend({
     <form name="plantCommentForm">
         <textarea class="plantCommentBox" name="commentTextArea" id="plantCommentText"></textarea>
         <br/>
-        <button id="submitPlantCommentButton" type="button" class="thoughtbot">><%= rb.getString("submit") %></button>
-        <button id="cancelPlantCommentButton" type="button" class="clean-gray"<%= rb.getString("cancel") %></button>
+        <button id="submitPlantCommentButton" type="button" class="thoughtbot"><%= rb.getString("submit") %></button>
+        <button id="cancelPlantCommentButton" type="button" class="clean-gray"><%= rb.getString("cancel") %></button>
     </form>
 </div>
 

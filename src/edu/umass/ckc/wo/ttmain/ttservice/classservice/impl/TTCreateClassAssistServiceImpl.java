@@ -43,6 +43,7 @@ import java.util.Map;
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  * Frank	02--7-22	issue #600 removed code to adjustment maxTime after changing Topic selections
  * Frank	01-21-22	Issue #610 - compute numProblems for inactive topics
+ * Frank 	02-04-23    Issue #723 - handle class clustering
  */
 
 @Service
@@ -63,7 +64,9 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         List<User> students = DbClass.getClassStudentsByName(connection.getConnection(), Integer.valueOf(classId));
         String[] prepostIds = DbPrePost.getActivatedSurveyIdsForClass(connection.getConnection(), Integer.valueOf(classId));
         ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), Integer.valueOf(teacherId));
-        Map<Integer,String> activeSurveys = DbPrePost.getActiveSurveyList(connection.getConnection());
+        Map<Integer,String> activeSurveys = DbPrePost.getActiveSurveyList(connection.getConnection());       
+        classInfo.setClassesInCluster( DbClass.getStringClassesInCluster(connection.getConnection(), classId));
+        
         map.addAttribute("students",students );
         map.addAttribute("teacherName", teacherName);
         map.addAttribute("teacherId", teacherId);
@@ -72,6 +75,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         map.addAttribute("prepostIds",prepostIds[0]+"~~"+prepostIds[1] );
         map.addAttribute("webContentpath", Settings.webContentPath);
         map.addAttribute("classList", classes);
+        
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +87,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             // Make sure to check initial fields of create class are validated before proceeding ahead
             int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
             int newid = DbClass.insertClass(connection.getConnection(), createForm.getClassName(), createForm.getSchoolName(), createForm.getSchoolYear(), createForm.getTown(), createForm.getGradeSection(), tid,
-                    defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage());
+                    defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage(), createForm.getColor());
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newid);
                 ClassInfo info = DbClass.getClass(connection.getConnection(), newid);
@@ -132,7 +136,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
            
             if (update) {
                 DbClass.editClassConfig(connection.getConnection(),
-                		classId, createForm.getClassGrade(), createForm.getHighEndDiff(), createForm.getLowEndDiff());            	
+                		classId, createForm.getClassGrade(), createForm.getHighEndDiff(), createForm.getLowEndDiff(), createForm.getColor());            	
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
             }
             //ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
@@ -148,14 +152,29 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     
     @Override
     public Integer cloneExistingClass(Integer classId, CreateClassForm createForm) throws TTCustomException {
-        try {
-        int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection());
-        return newClassId;
+    	
+    	int result = 0;
+    	try {        	
+            ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
+            createForm.setClassGrade(ciPrev.getGrade());
+            
+    		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getColor());
+    		if (newClassId > 0) {
+	    		List<Integer> newClassIdList = new ArrayList<Integer>();
+	    		newClassIdList.add(newClassId);
+	    		continousContentApply(newClassIdList, classId, 0);    		
+	    		result = newClassId;
+    		}
+    		else {
+    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);    			
+    		}
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
             throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);
+
         }
+    	return result;
     }
 
     @Override
@@ -199,6 +218,19 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     public void createTestUsers(Integer classId, ClassInfo info, int userCount) throws TTCustomException {
         try {
             DbClass.createTestUsers(connection.getConnection(),info,classId.toString(),userCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+        }
+
+    }
+
+
+    @Override
+    public void addNewMasterClass(Integer classId) throws TTCustomException {
+        try {
+            DbClass.addNewMasterClass(connection.getConnection(),classId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -397,6 +429,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 		}
 		return "success";
 	}
+
 	
     @Override
     public String setClassActiveFlag(Integer teacherId, Integer classId, String activeFlag) {

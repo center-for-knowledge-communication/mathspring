@@ -30,7 +30,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
  * Frank	10-27-20	issue #149R2 teacher logging changes
  * Kartik	11-02-20	issue #292 test users to be created on class creation
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
- * Frank 	10-09-2021	issue #528 Research Tool 
+ * Frank 	10-09-2021	issue #528 Research Tool
+ * Frank 	02-04-23    Issue #723 - Added class clustering 
  */
 
 
@@ -51,7 +52,13 @@ public class TeacherToolsCreateClassController {
 
 		HttpSession session = request.getSession();
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
-		
+
+		if (classForm.getHasClusters().equals("Y") ) {
+			classForm.setHasClusters("1");
+		}
+		else { 
+			classForm.setHasClusters("0");
+		}
         //Basic Class Setup
         int newClassId = createClassAssistService.createNewClass(classForm, teacherId);
         //Set Default Pedagogy
@@ -68,6 +75,10 @@ public class TeacherToolsCreateClassController {
         createClassAssistService.createTestUsers(newClassId,newClassInfo, testUserCount);
         
         createClassAssistService.changeDefaultProblemSets(model, newClassId);
+        
+        if (classForm.getHasClusters().equals("1")) {
+        	createClassAssistService.addNewMasterClass(newClassId);
+        }
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), teacherLoginType);
         model.addAttribute("createClassForm", new CreateClassForm());
@@ -116,9 +127,20 @@ public class TeacherToolsCreateClassController {
     @RequestMapping(value = "/tt/ttCloneClass", method = RequestMethod.POST)
     public String cloneExistingClass(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
-        createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
-        return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), "Normal");
+    	
+    	
+    	
+        //Set Default Pedagogy
+        //ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(Integer.valueOf(classId) , classForm, "create");
+        int result = createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
 
+        if (result == 0) {
+        	return "*** clone error";
+        }
+        else {
+//        createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
+        	return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), "Normal");
+        }
     }
 
 

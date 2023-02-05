@@ -22,7 +22,7 @@ public interface TTProblemsViewService {
 
     public String resetPassWordForStudent(String studentId, String userName, String newPassWord) throws TTCustomException;
 
-    public String changeClassForStudent(String studentId, String newClassId) throws TTCustomException;
+    public String changeClassForStudent(String studentId, String newClassId, String lang) throws TTCustomException;
 
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException;
 

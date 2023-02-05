@@ -24,6 +24,7 @@ import javax.servlet.RequestDispatcher;
  * Frank	10-07-20  Issue #261 change problem header
  * Kartik 04-22-21 Issue #390 Added session clock functionality
  * Frank	06-26-21	Added support for gaze detection
+ * Frank 	02-04-23    Issue #723 - set isTesteUser
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)
@@ -127,11 +128,14 @@ public class TutorPage {
         info.getRequest().setAttribute("gazeDetectionOn", smgr.getGazeDetectionOn());
         info.getRequest().setAttribute("gazeParamsJSON", smgr.getGazeParamsJSON());
 
-        if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId()))
+        if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId())) {
             info.getRequest().setAttribute("showAnswer", true);
-        else
+            info.getRequest().setAttribute("isTestUser","1");
+        }
+        else {
             info.getRequest().setAttribute("showAnswer", false);
-
+            info.getRequest().setAttribute("isTestUser","0");
+        }
         if (DbUser.isShowTestControls(smgr.getConnection(), smgr.getStudentId()))
             info.getRequest().setAttribute("showProblemSelector", true);
         else

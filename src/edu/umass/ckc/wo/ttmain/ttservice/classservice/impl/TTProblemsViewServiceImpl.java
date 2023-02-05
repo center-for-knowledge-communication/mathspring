@@ -49,6 +49,7 @@ import edu.umass.ckc.wo.smgr.User;
  * Frank    05-20-21  	Issue #473 crop lname and fix username update bug
  * Frank 	10-09-2021	issue #523 username prefix validation 
  * Frank	05-11-2022 	issue #632 add sorted standards to view
+ * Frank 	02-04-23    Issue #723 - handle class clustering
  */
 @Service
 public class TTProblemsViewServiceImpl implements TTProblemsViewService {
@@ -206,7 +207,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     }
     
     @Override
-    public String changeClassForStudent(String studentId, String newClassId) throws TTCustomException {
+    public String changeClassForStudent(String studentId, String newClassId, String lang) throws TTCustomException {
 		String msg = "***";
         try {
         	Map<String, Object> updateParams = new HashMap<String, Object>();
@@ -225,7 +226,8 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         	return msg;
 
         }
-    }
+    }   
+
     @Override
     public String editStudentInfo(EditStudentInfoForm editStudentInfoForm, String lang) throws TTCustomException {
     	
@@ -379,8 +381,12 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	
     	String result = "";
   		List<User> theList = null;
+  		
+  		
         try {
-        	theList = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId.trim()));
+      		
+
+      		theList = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId.trim()));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

@@ -28,6 +28,8 @@ public interface TTCreateClassAssistService {
 
     public void createTestUsers(Integer classId, ClassInfo info, int userCount) throws TTCustomException;
     
+    public void addNewMasterClass(Integer classId) throws TTCustomException;
+    
     public void changeDefaultProblemSets(ModelMap map,Integer classId) throws TTCustomException;
 
     public boolean reOrderProblemSets(Integer classId, List<Integer> problemSetsToReorder,Map<Integer,Integer> sequenceNosToBeAdded) throws TTCustomException;

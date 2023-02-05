@@ -59,7 +59,8 @@ import javax.servlet.http.HttpSession;
  * Frank 	04-01-21  	Issue #418 getStudentList()
  * Frank 	05-17-21  	Issue #471 Pass teacherLoginType value in map to classReportCard
  * Frank    05-20-21  	Issue #473 fix username update bug
- * Frank   10-09-2021	issue #528 Research Tool 
+ * Frank   10-09-2021	issue #528 Research Tool
+ * Frank 	02-04-23    Issue #723 - Added class clustering 
  */
 
 @Controller
@@ -368,9 +369,9 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/changeStudentClass", method = RequestMethod.POST)
     public @ResponseBody
-    String changeStudentClass(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "newClassId") String newClassId ) throws TTCustomException {
+    String changeStudentClass(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "newClassId") String newClassId,  @RequestParam("lang") String lang ) throws TTCustomException {
     	System.out.println("changeStudentClass");
-    	return pvService.changeClassForStudent(studentId,newClassId);
+    	return pvService.changeClassForStudent(studentId,newClassId, lang);
     }
     
     

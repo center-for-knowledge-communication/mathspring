@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
  * Frank	09-13-20 	issue #242
  * Frank    09-15-20    issue #242 fix test for valid email address 
  * Frank	10-29-21	issue #526 validate user entry fields
+ * Frank 	02-04-23    Issue #723 - Added class clusters
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -193,8 +194,15 @@ public class UserRegistrationHandler {
     		ClassInfo ci = DbClass.getClass(conn, intClassId);	
     		if (ci == null)
     			return "Class id " + strClassId + " " + "was not found." + rb.getString("unsure_of_classcode_instructions");
-    		else 
-    			return "";
+    		else {
+    			if (ci.getIsCluster() == 1) {
+        			return rb.getString("class_id") + " " + strClassId + " " + rb.getString("is_not_an_available_class") + "  " + rb.getString("unsure_of_classcode_instructions");    				
+    			}
+    			else {
+        			return "";
+    				
+    			}
+    		}
     	}
     	catch (NumberFormatException ex) {
     		System.out.println(ex.getMessage());

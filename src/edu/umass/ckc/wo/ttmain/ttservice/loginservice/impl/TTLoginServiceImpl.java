@@ -67,7 +67,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank    11-28-20	issue #318 Sort Student - getClassStudentsByName(...)
  * Frank	02-14-21	issue #383R1 added logFeedback method
  * Frank	08-03-21	Issue 150 pass along the list of class name/id pairs
- * Frank    10-09-2021	issue #528 Research Tool 
+ * Frank    10-09-2021	issue #528 Research Tool
+ * Frank 	02-04-23    Issue #723 - handle class clustering 
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -104,13 +105,13 @@ public class TTLoginServiceImpl implements TTLoginService {
                 Settings.loginMap = DbPedagogy.buildAllLoginSequences(connection.getConnection());
                 Settings.pedagogyGroups = DbPedagogy.buildAllPedagogies(connection.getConnection(), null);
             }
-            ClassInfo[] classes = DbClass.getClasses(connection.getConnection(), teacherId);
+            ClassInfo[] classes = DbClass.getClassesForHomePage(connection.getConnection(), teacherId);
             List<ClassInfo> classInfoList = new  ArrayList<>(Arrays.asList(classes));
 //            Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> ((c.getSchoolYear() == Year.now().getValue()) && (c.getIsActive() > 0))));                                           
             Map<Boolean, List<ClassInfo>> groups = classInfoList.stream().collect(Collectors.partitioningBy(c -> (c.getIsActive() > 0)));                                           
             List<ClassInfo> classInfoListLatest = groups.get(true);
             List<ClassInfo> classInfoListArchived = groups.get(false);
-            Collections.reverse(classInfoListLatest);
+            //Collections.reverse(classInfoListLatest);
             Classes classbean = new Classes(classInfoListLatest.toArray(new ClassInfo[classInfoListLatest.size()]));
             Classes classbeanArchived = new Classes(classInfoListArchived.toArray(new ClassInfo[classInfoListArchived.size()]));
             //String teacherName = DbTeacher.getTeacherName(connection.getConnection(), teacherId);
@@ -122,7 +123,7 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("teacherId", Integer.toString(teacherId));
             model.addAttribute("createClassForm", new CreateClassForm());
             model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
-           
+
             JSONArray classNameIdArray = new JSONArray();
 	        try {
 	            if (classInfoListLatest.size() > 0) {
@@ -147,6 +148,42 @@ public class TTLoginServiceImpl implements TTLoginService {
             
            	String classNameIdArrayStr = classNameIdArray.toString();
 
+            
+            
+            JSONArray resultArr = new JSONArray();
+	        try {
+	            if (classInfoListLatest.size() > 0) {
+	            	classInfoListLatest.stream().forEach(element ->
+	                {
+
+	                    JSONArray homePageClassArray = new JSONArray();
+	                    homePageClassArray.add(element.getName());                   
+	                    homePageClassArray.add(element.getClassid());                   
+	                    homePageClassArray.add(element.getIsCluster());                   
+	                    homePageClassArray.add(element.getHasClusters());                   
+	                    homePageClassArray.add(element.getSchoolYear());                   
+	                    homePageClassArray.add(element.getColor());                   
+	                    homePageClassArray.add(element.getIsActive());                   
+	                    homePageClassArray.add(classInfoListLatest.size());     
+	                    
+	                    resultArr.add(homePageClassArray);
+	                });
+	            }
+	            else {
+                    JSONArray homePageClassArray = new JSONArray();
+                    JSONObject nameIdJson = new JSONObject();
+                    nameIdJson.put("name", "dummyClass");
+                    nameIdJson.put("Id", 0);
+                    classNameIdArray.add(nameIdJson);                   	            	
+	       			resultArr.add(classNameIdArray);
+	            }
+	        } catch (JSONException e1) {
+	                // TODO Auto-generated catch block
+	              e1.printStackTrace();
+	        }
+            
+           	String homePageClassArrayStr = resultArr.toString();
+
             if (classes.length > 0) {
                 int classId = classInfoList.get(0).getClassid();
                 ClassInfo classInfo = DbClass.getClass(connection.getConnection(), classId);
@@ -158,9 +195,10 @@ public class TTLoginServiceImpl implements TTLoginService {
                 model.addAttribute("noClass", false);
                 model.addAttribute("classList", classes);
                 model.addAttribute("classNameIdArrayStr", classNameIdArrayStr);
+                model.addAttribute("homePageClassArrayStr", homePageClassArrayStr);
                 return "teacherTools/teacherToolsMain";
             } else {
-                model.addAttribute("classNameIdArrayStr", classNameIdArrayStr);
+                model.addAttribute("homePageClassArrayStr", homePageClassArrayStr);
                 model.addAttribute("noClass", true);
                 return "teacherTools/teacherToolsMain";
             }

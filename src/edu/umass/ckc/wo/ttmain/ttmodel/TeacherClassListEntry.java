@@ -2,7 +2,8 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
 
 
 /**
- * Frank 	02-26-20	Issue #45 & #21 
+ * Frank 	02-26-20	Issue #45 & #21
+* Frank 	02-04-23    Issue #723 - handle class clusters 
  */
 public class TeacherClassListEntry {
 
@@ -10,6 +11,9 @@ public class TeacherClassListEntry {
     private String teacherName;
     private String classId;
     private String className;
+    private String hasClusters;
+    private String isCluster;
+    private String color;
     
     public String getTeacherId() {
         return teacherId;
@@ -42,4 +46,28 @@ public class TeacherClassListEntry {
     public void setClassId(String classId) {
         this.classId = classId;
     }
+
+    public String getClassHasClusters() {
+        return hasClusters;
+    }
+
+    public void setClassHasClusters(String hasClusters) {
+        this.hasClusters = hasClusters;
+    }
+    public String getClassIsCluster() {
+        return isCluster;
+    }
+
+    public void setClassIsCluster(String isCluster) {
+        this.isCluster = isCluster;
+    }
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+
 }

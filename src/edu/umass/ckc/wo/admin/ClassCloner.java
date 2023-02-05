@@ -16,6 +16,8 @@ import java.sql.Connection;
  * Date: 9/7/11
  * Time: 9:24 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ *  Frank 	02-04-23    Issue #723 - handle class clustering
  */
 public class ClassCloner {
 
@@ -28,23 +30,24 @@ public class ClassCloner {
      * @param newClassSection   The section of the new class
      * @return
      */
-    public static int cloneClass (Connection conn, int classId, String newClassName, String newClassSection) throws Exception {
-        if (newClassName.trim().equals("") || newClassSection.trim().equals(""))
+    public static int cloneClass (Connection conn, int classId, String newClassName, String newClassSection, String color) throws Exception {
+        if (newClassName.trim().equals(""))
             return -1;
         ClassInfo info = DbClass.getClass(conn,classId);
         int newClassId= DbClass.insertClass(conn,newClassName,info.getSchool(), Integer.toString(info.getSchoolYear()),
                         info.getTown(),newClassSection, Integer.toString(info.getTeachid()),
-                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade(),info.getClassLanguageCode());
+                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade(),info.getClassLanguageCode(),color);
          DbClass.removeConfig(conn,newClassId);
         if (newClassId != -1) {
             // clone the lesson plan (if there is one)
-            DbTopics.cloneLessonPlan(conn,classId,newClassId);
+            //DbTopics.cloneLessonPlan(conn,classId,newClassId);
             // clone the class config
             DbClass.cloneConfig(conn,classId,newClassId);
             // clone class pedagogies
             DbClassPedagogies.clonePedagogies(conn,classId,newClassId);
             // clone class omitted problems
-            DbTopics.cloneOmittedProblems(conn,classId,newClassId);
+            //DbTopics.cloneOmittedProblems(conn,classId,newClassId);
+            DbClass.addNewClassCluster(conn,classId,newClassId);
         }
         return newClassId;
     }
@@ -54,7 +57,7 @@ public class ClassCloner {
         try {
             Connection conn = DbUtil.getAConnection("cadmium.cs.umass.edu");
             int id = DbUser.getStudent(conn,"whole_1","whole");
-            ClassCloner.cloneClass(conn,415,"Clone of Class 415","section 2");
+            ClassCloner.cloneClass(conn,415,"Clone of Class 415","section 2", "green");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

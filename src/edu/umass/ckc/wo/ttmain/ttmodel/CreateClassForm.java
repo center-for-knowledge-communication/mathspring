@@ -5,6 +5,7 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
  * 
  * Frank	02-16-2020	Issue #48 add hypen and useClass for pwd
  * Frank	10-30-20	Issue #293 added 4 fields to class config form handling
+ * Frank 	02-04-23    Issue #723 - handle class clusters
  */
 
 public class CreateClassForm {
@@ -27,6 +28,9 @@ public class CreateClassForm {
     private String minProb;
     private String maxTime;
     private String minTime;
+    private String hasClusters;
+    private String isCluster;
+    private String color;
     
     
 
@@ -242,4 +246,27 @@ public class CreateClassForm {
         this.minTime = minTime;
     }
 
+    public String getHasClusters() {
+        return hasClusters;
+    }
+
+    public void setHasClusters(String hasClusters) {
+        this.hasClusters =hasClusters;
+    }
+    
+    public String getIsCluster() {
+        return isCluster;
+    }
+
+    public void setIsCluster(String isCluster) {
+        this.isCluster = isCluster;
+    }
+    
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 }
