@@ -30,6 +30,8 @@ import java.io.IOException;
  * Written by: David Marshall
  * Date: Jan 23, 2008
  * Time: 2:18:57 PM
+ * 
+ *  Frank 	02-04-23    Issue #723 - Added class color
  */
 public class AlterClassHandler {
     private int teacherId;
@@ -123,7 +125,7 @@ public class AlterClassHandler {
         // creating a clone of an existing class
         else if (e instanceof AdminAlterClassCloneSubmitInfoEvent) {
             AdminAlterClassCloneSubmitInfoEvent e2 = (AdminAlterClassCloneSubmitInfoEvent) e;
-            int classId = ClassCloner.cloneClass(conn,e2.getClassId(),e2.getClassName(),e2.getSection());
+            int classId = ClassCloner.cloneClass(conn,e2.getClassId(),e2.getClassName(),e2.getSection(),"green");
             if (classId < 0) {
                 classId = e2.getClassId();
                 ClassInfo classInfo = DbClass.getClass(conn,classId);

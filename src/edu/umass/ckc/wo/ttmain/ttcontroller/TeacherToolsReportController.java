@@ -39,7 +39,7 @@ import javax.servlet.http.HttpSession;
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank	11-23-20	Issue #148R3 add lastXdays filter to perCluster Report
  * Frank	05-11-21	Issue #463 add report filters
-
+ * Frank 	02-04-23    Issue #723 - Added class clustering
  */
 @Controller
 public class TeacherToolsReportController {
@@ -209,11 +209,11 @@ public class TeacherToolsReportController {
 	    		System.out.println("TeacherLogger error " + e.getMessage());
 	    	}
 		}
-        Map<String, List<String[]>> perStdentReport =  reportService.generateEmotionsReportForDownload(teacherId,classId, filter);
+        Map<String, List<String[]>> perStudentReport =  reportService.generateEmotionsReportForDownload(teacherId,classId, filter);
         map.addAttribute("classId", classId);
         map.addAttribute("teacherId", teacherId);
         map.addAttribute("reportType", "perStudentEmotion");
-        map.addAttribute("dataForEmotionReport",perStdentReport);
+        map.addAttribute("dataForEmotionReport",perStudentReport);
         return new ModelAndView("teachersReport", map);
 
     }
