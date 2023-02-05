@@ -28,7 +28,7 @@ public class AffectStudentModel extends BaseStudentModel {
     public static final String CONFIANZA = "Confianza";
     public static final String CONFIDENT = "Confidence";
     public static final String FRUSTRATED = "Frustration";
-    public static final String FRUSTACION = "Frustración";
+    public static final String FRUSTACION = "Frustration";
     public static final String INTERESTED = "Interest";
     public static final String HARDWORK = "Hardworking";
 
