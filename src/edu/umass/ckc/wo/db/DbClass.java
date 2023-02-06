@@ -635,10 +635,10 @@ public class DbClass {
         PreparedStatement stmt=null;
         try {
             List<ClassInfo> result = new ArrayList<ClassInfo>();
-            String q2 = "select * from class, classconfig where teacherid=? and class.id = classconfig.classId order by class.ID asc;";
-            //String q = "select * from class, classconfig where teacherid=? and class.id = classconfig.classId and class.isactive = 1 order by class.ID asc, classconfig.hasClusters asc, classconfig.isCluster asc;";
             String q = "select class_map_clusters.clusterId from class, classconfig, class_map_clusters where teacherid=? and class_map_clusters.clusterId = classconfig.classId and class.isactive = 1 and class_map_clusters.classId = class.id order by class_map_clusters.classid asc, class_map_clusters.clusterId asc;";
+            String q2 = "select * from class as c, classconfig as cc where teacherid=? and c.ID = cc.classId and cc.isCluster = 0 and cc.hasClusters = 0 order by c.ID asc;";
 
+            // First get the cluster classes
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,teacherId);
             rs = stmt.executeQuery();
@@ -648,18 +648,17 @@ public class DbClass {
                 if (ci != null)
                     result.add(ci);
             }
-            if (result.size() == 0) {
-                stmt = conn.prepareStatement(q2);
-                stmt.setInt(1,teacherId);
-                rs = stmt.executeQuery();
-                while (rs.next()) {
-                    int classId= rs.getInt(1);
-                    ClassInfo ci = getClass(conn,classId);
-                    if (ci != null)
-                        result.add(ci);
-                }
-            	
-            }
+            
+            // Then get the rest of the non-cluster classes
+            stmt = conn.prepareStatement(q2);
+            stmt.setInt(1,teacherId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                int classId= rs.getInt(1);
+                ClassInfo ci = getClass(conn,classId);
+                if (ci != null)
+                    result.add(ci);
+            }            	
             
             return result.toArray(new ClassInfo[result.size()]);
         }

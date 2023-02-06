@@ -3809,7 +3809,7 @@ var completeDataChart;
                         </div>
                     </div>
 
-                    <div class="panel panel-default">
+                    <div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_seven" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven">
