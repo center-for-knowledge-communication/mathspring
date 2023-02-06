@@ -58,7 +58,7 @@
 <!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
 <!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
 <!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
-<!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms
+<!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms -->
   
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -72,7 +72,7 @@
 <%@ page import="java.sql.Connection"%>
 <%@ page import="edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger"%>
 
-<% 
+<%
 
 ResourceBundle versions = null; 
 try {
@@ -354,7 +354,12 @@ System.out.println("msHost = " + msHost + msContext);
  * Frank	12-02-20	Issue #322 added currentSelection to classReportCard URL 
  */
  
- 
+ var isCluster = 0;
+ var hasClusters = 0;
+ var classColor = "";
+ var titleClassName = "";
+ var moveStudentId = "";     	       
+
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -387,7 +392,7 @@ var studentData;
 var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
-var filterLandingOne = "~7";
+var filterLandingOne = "7";
 var filterLandingTwo = "~0";
 
 var activeProblemSet;
@@ -444,17 +449,19 @@ function getFilterLandingOne() {
 	else {
 		daysLandingOne = "" + nDays;
 	}
-	filterLandingOne = daysLandingOne;
+	filterLandingOne = daysLandingOne + '~' + classesInCluster;
 }
 
 function getFilterLandingTwo() {
-	
-	
+		
 	var d1 = parseInt(document.getElementById("selectDay_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay").value);
 
 	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
 	var m2 =  parseInt(document.getElementById("month").value) + 1;
+
+	document.getElementById("year_cal2").value = "2023";
+	document.getElementById("year").value = "2023";
 	
 	if ((d1 > 0) && (d2 > 0)) {
 		$('#calendarModalPopup').modal('hide');
@@ -508,17 +515,27 @@ function getFilterLandingTwo() {
 	}
 
 }
-var teacherClassSelections = "";
+
+function moveToDestination(id, isCluster) {
+	
+	var splitter = id.split(',');
+	if(splitter[1] == "0") {
+		moveThisStudent(splitter[0]);
+	}
+	else {
+		moveThisStudent(splitter[0]);
+	}
+}
 
 function moveThisStudent(id) {
 
-	var newClassId = document.getElementById('moveBtn').value;
+	var newClassId = id;
     $('#student_info_out').find('.loader').show();
 	$.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/changeStudentClass",
         data : {
-        	studentId:id,
+        	studentId: moveStudentId,
         	newClassId: newClassId,
             lang: loc
         },
@@ -534,45 +551,13 @@ function moveThisStudent(id) {
                 $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_class_changed")%>");
                 $('#successMsgModelPopup').modal('show');
             }
+            $("#clusterList").hide();
 	    },
 	    error : function(e) {
 	        console.log(e);
 	    }
     });
 }
-
-
-
-function selectTeacherClass(myClassId) {
-
-
-
-	var txtClassId = "" + myClassId;
-	for (var i=0; i < classChoices.length; i++) {	
-		var splitter = classChoices[i].split(',');
-		if (splitter[2] === txtClassId) {
-			document.getElementById('moveBtn').value = splitter[2];			
-			document.getElementById('moveBtn').innerHTML = '<%= rb.getString("move_this_student_to")%>: ' + splitter[1];
-			break;
-		}
-	}
-	
-	$("#moveBtn").show();
-}
-
-var classChoices = [];
-
-function addToTeacherList(item, index) {
-    
-	var titem = "" + item;
-	var tlist = titem.split(",");
-
-	if (tlist[2] != classID) {
-		classChoices.push(titem);	
-		teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
-	}
-}
-
 
 function logTeacherEvent(action,activityName) {
 
@@ -647,8 +632,46 @@ function userPrefixLookup() {
 
 }
 
+function startClusterLoader() {
+	
+    $('#createClusterLoader').show();
+
+}
 
 
+function cloneCurrentClass() {
+	
+//	CreateClassForm createForm = null;
+	
+	$('#clone_class_out').find('.loader').show();
+	$.ajax({
+	    type: "POST",
+	    url: pgContext + "/tt/ttCloneClass",
+	    data: {
+	        classId: classId
+	    },
+	    success: function (data) {
+	        $('#clone_class_out').find('.loader').hide();
+
+            if (response.includes("***")) {
+                $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                $('#errorMsgModelPopup').modal('show');
+            }else{
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("createdClassCluster","");
+                }
+                $("#successMsgModelPopup").find("[class*='modal-body']").html("Created Class Cluster");
+                $('#successMsgModelPopup').modal('show');
+            }
+	    
+	    }
+	    ,
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+	});
+}
 
 function verifyProbMinMax() {
 
@@ -781,6 +804,7 @@ var liveDashboardTotal = 0;
 
 function liveDashboardPopulate() {
 	
+	var liveDashboardFilter = "ProblemsSolved" + "~" + classesInCluster;
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getTeacherReports",
@@ -789,7 +813,7 @@ function liveDashboardPopulate() {
             teacherId: teacherID,
             reportType: 'classLiveDashboard',
             lang: loc,
-            filter: "ProblemsSolved"
+            filter: liveDashboardFilter
 
         },
         success : function(data) {
@@ -1279,9 +1303,9 @@ function problemDetails(data, response) {
     	}
     });
 
-    var selector = "#"+JSONData["problemLevelId"]+"_handler";
+    var saveselector = "#"+JSONData["problemLevelId"]+"_full_save_handler";
 
-    $(document.body).on('click', selector ,function(){
+    $(document.body).on('click', saveselector ,function(){
         var rows = $("#"+JSONData["problemLevelId"]).dataTable(
             { "bPaginate": false,
                 <%=jc_rb.getString("language_text")%>
@@ -1326,7 +1350,121 @@ function problemDetails(data, response) {
 
     });	
 
+    var closeSelector = "#"+JSONData["problemLevelId"]+"_full_close_handler";
+
+    $(document.body).on('click', closeSelector ,function(){
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
+        $(location).attr('href', newlocation);
+                
+
+    });	
+
+
+    
+    var selectallSelector = "#"+JSONData["problemLevelId"]+"_full_selectall_handler";    
+    
+    $(document.body).on('click', selectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var problemIds = [""];
+        
+	    $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+  
+    
+    var deselectallSelector = "#"+JSONData["problemLevelId"]+"_full_deselectall_handler";    
+    
+    $(document.body).on('click', deselectallSelector ,function(){
+        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
+            { "bPaginate": false,
+                <%=jc_rb.getString("language_text")%>
+                "bFilter": false,
+                "bLengthChange": false,
+                rowReorder: false,
+                "bSort": false
+
+                
+            }).fnGetNodes();
+
+        var j=0;
+        var rowsArray = [];
+        var problemIds = [""];
+
+        var i = 0;
+       
+        $("input:checkbox:not(:checked)", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+
+        $("input:checkbox:checked", rows).each(function(){
+            rowsArray[i] = $(this).closest('tr');
+            i++;
+        });
+        
+        for(j=0; j < rowsArray.length; j++)
+            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
+
+        
+        $('#problem_set_content').find('.loader').show();
+	    $.ajax({
+            type : "POST",
+            url :pgContext+"/tt/tt/saveChangesForProblemSet",
+            data : {
+                problemIds: problemIds,
+                classid: classID,
+                problemsetId: JSONData["problemLevelId"]
+            },
+            success : function(response) {
+        	    $('#problem_set_content').find('.loader').hide();
+                if (response.includes("***")) {
+                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                    $('#errorMsgModelPopup').modal('show');
+                }else{
+                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
+                    $('#successMsgModelPopupForProblemSets').modal('show');
+                }
+            }
+        });
+
+    });	
+    
+    
+       
+    
 var save_selections = "<%= rb.getString("save_selections")%>";
+var close_selections = "<%= rb.getString("close_cancel")%>";
+var activate_save_all = "<%= rb.getString("activate_save_all")%>";
+var deactivate_save_all = "<%= rb.getString("deactivate_save_all")%>";
 var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
 var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
 var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
@@ -1336,7 +1474,13 @@ var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoom
     " <div class='panel-body full_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
     " <div class='panel-body full_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
     "<div class='panel-body full_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body full_detail_table_bg'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
+    "<div class='panel-body full_detail_table_bg'>"+
+    "<button id="+JSONData["problemLevelId"]+'_full_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_full_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_full_deselectall_handler'+"  class='btn btn-primary btn-lg hidden' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_full_close_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+close_selections+"</button>&nbsp;&nbsp;"+
+    "</div>"+
+    "</div>";
 
     return higherlevelDetail + problemLevelDetails(JSONData,problems);
 
@@ -1579,6 +1723,17 @@ function standardsProblemDetails(data, response, state) {
 
     });	
 
+    var closeSelector = "#"+JSONData["problemLevelId"]+"_close_handler";
+
+    $(document.body).on('click', closeSelector ,function(){
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
+        $(location).attr('href', newlocation);
+                
+
+    });	
+
+
+    
     var selectallSelector = "#"+JSONData["problemLevelId"]+"_selectall_handler";    
     
     $(document.body).on('click', selectallSelector ,function(){
@@ -1678,6 +1833,7 @@ function standardsProblemDetails(data, response, state) {
     
     
 	var save_selections = "<%= rb.getString("save_selections")%>";
+	var close_selections = "<%= rb.getString("close_cancel")%>";
 	var activate_save_all = "<%= rb.getString("activate_save_all")%>";
 	var deactivate_save_all = "<%= rb.getString("deactivate_save_all")%>";
 	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
@@ -1692,7 +1848,8 @@ function standardsProblemDetails(data, response, state) {
     "<div class='panel-body standards_detail_table_bg'>"+
     "<button id="+JSONData["problemLevelId"]+'_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
     "<button id="+JSONData["problemLevelId"]+'_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
-    "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg hidden' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
+    "<button id="+JSONData["problemLevelId"]+'_close_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+close_selections+"</button>&nbsp;&nbsp;"+
     "</div>"+
     "</div>";
 
@@ -1707,6 +1864,7 @@ function standardsProblemLevelDetails(JSONData,problems, selectedStd){
     $.each(problems, function (i, obj) {
     	var foundStandard = false;
         var html = "";
+        
         var flash = "";
         var checkBox = "";
         var flashWindow = "'" + JSONData["uri"]+"?questionNum="+obj.problemNo + "'" + attri ;
@@ -1885,7 +2043,15 @@ function handleclickHandlers() {
                         message: '<%= rb.getString("emsg_minTime")%>'
                     }
                 }
+            },
+            color: {
+                validators: {
+                    notEmpty: {
+                        message: '<%= rb.getString("emsg_class_color") %>'
+                    }
+                }
             }
+            
         }
     }).on('success.form.bv', function (e) {
         $("#edit_class_form").data('bootstrapValidator').resetForm();
@@ -1896,11 +2062,43 @@ function handleclickHandlers() {
         })
     });
 	
+
+    $("#clone_class_form").bootstrapValidator({
+        // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            className: {
+                validators: {
+                    notEmpty: {
+                        message: '<%= rb.getString("emsg_className")%>'
+                    },
+			        regexp: {
+            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
+                        message: '<%= rb.getString("emsg_field_invalid")%>'
+        			}        
+                }
+            }
+        }
+    }).on('success.form.bv', function (e) {
+        $("#clone_class_form").data('bootstrapValidator').resetForm();
+        e.preventDefault();
+        var $form = $(e.target);
+        var bv = $form.data('bootstrapValidator');
+        $.post($form.attr('action'), $form.serialize(), function (result) {        	
+        })
+    });
+	
+    
     $("#classHomePage").click(function () {
         $('#reorg_prob_sets_handler').css('color', '#ffffff');
         $("#content-conatiner").children().hide();
-        
-        $("#splash_page").show();
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
+        }
     });
     
     $("#reorg_prob_sets_handler").click(function () {
@@ -1977,10 +2175,31 @@ function handleclickHandlers() {
     $("#cancelClassProfileBtn").click(function () {
         $('#reorg_prob_sets_handler').css('color', '#ffffff');
         $("#content-conatiner").children().hide();
-        $("#splash_page").show();
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
+        }
+    });
+
+    $("#clone_class_handler").click(function () {
+    	$('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        
+        $("#clone_class_out").show();
+    });
+    
+    $("#cancelCloneClassBtn").click(function () {
+        $('#reorg_prob_sets_handler').css('color', '#ffffff');
+        $("#content-conatiner").children().hide();
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
+        }
     });
 
 
+    
+    
     $('#activateProbSetTable input[type="checkbox"]').click(function () {
         if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
             $('#deactivateProblemSets').prop('disabled', false);
@@ -2114,13 +2333,13 @@ function handleclickHandlers() {
 
 function changeLandingPageHeaderAccordingToLanguage(){
 
-	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("most_recent_login")%>'};
 	return header;
 }
 
 function changeLandingPageHeader2AccordingToLanguage(){
 
-	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("most_recent_login")%>'};
 	return header;
 }
 
@@ -2994,8 +3213,14 @@ function registerAllEvents(){
         var sessionID = "0";
         var prePostIds = '${prepostIds}'.split("~~");		
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
+        var classesInCluster = "";
         $(document).ready(function () {
 
+        	classesInCluster = '${classInfo.classesInCluster}'; 
+			hasClusters = parseInt('${classInfo.hasClusters}');
+			isCluster = parseInt('${classInfo.isCluster}');
+			classColor = '${classInfo.color}';
+			className = '${classInfo.name}';
         	var classGrade = parseInt('${classInfo.grade}');
         	var simpleLowDiff = '${classInfo.simpleLowDiff}';
         	simpleLowDiff = simpleLowDiff.replace('below',"");
@@ -3014,12 +3239,33 @@ function registerAllEvents(){
             registerAllEvents();
             handleclickHandlers();
 
+            if (isCluster == 1) {
+            	document.getElementById("li_classHomePage").style.display = 'none';
+            	document.getElementById("li_classReportCard").style.display = 'none';
+            	document.getElementById("li_manage_roster").style.display = 'none';
+            	document.getElementById("li_manage_class").style.display = 'none';
+            	document.getElementById("li_live_garden").style.display = 'none';
+            	document.getElementById("li_live_dashboard").style.display = 'none';
+            	document.getElementById("li_teacher_feedback").style.display = 'none';
+            	document.getElementById("li_clone_class").style.display = 'none';
+            	document.getElementById("li_apply_content").style.display = 'none';
+            }
+
+            
             $("#content-conatiner").children().hide();
 
             if (currentSelection == "classHomePage") {
+            	var titleClassname = "";
+                if (isCluster == 0) {                        
+	            	titleClassname = 'home-title-' + '${classInfo.color}';
+            	}
+                else {
+                	titleClassname = 'home-title-' + '${classInfo.color}' + '-cluster';                	
+                }
             	$("#splash_page").show();            
         	    $('#landing-report-loader').show();
             	$("#classLandingReportOne").collapse('show');
+            	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_class") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
                     $('#reorg_prob_sets_handler').click();
@@ -3112,42 +3358,53 @@ function registerAllEvents(){
     
     <script id="editStudentInformation">
 
+    var teacherClusterSelections = "";
+    var teacherClassSelections = "";
+    var classChoices = [];
+    var clusterChoices = [];
+
+    function selectTeacherCluster(myClassId) {
+
+    	var txtClassId = "" + myClassId;
+    	for (var i=0; i < clusterChoices.length; i++) {	
+    		var splitter = clusterChoices[i].split(',');
+    		if (splitter[1] === txtClassId) {
+    			moveToDestination(splitter[1] + ',' + splitter[3]);
+    			break;
+    		}
+    	}
+    }
+
+
+
+    function addToTeacherClassList(item, index) {
+        
+    	var titem = "" + item;
+    	var tlist = titem.split(",");
+
+    	if ((tlist[1] != classID) && (tlist[3] == 0))  {
+    		clusterChoices.push(titem);	
+    		teacherClusterSelections = teacherClusterSelections +  "<li id='Class" + tlist[1]  + "' class='dropdown-content' value='" + tlist[1] + "' onclick='selectTeacherCluster(" + tlist[1] + ");'>" + tlist[0] + "</li>";
+    	}
+    }
+
+    function addToTeacherClusterList(item, index) {
+        
+    	var titem = "" + item;
+    	var tlist = titem.split(",");
+
+    	if (tlist[1] != classID) {
+    		clusterChoices.push(titem);	
+    		teacherClusterSelections = teacherClusterSelections +  "<li id='Class" + tlist[1]  + "' class='dropdown-content' value='" + tlist[1] + "' onclick='selectTeacherCluster(" + tlist[1] + ");'>" + tlist[0] + "</li>";
+    	}
+    }
+
+
     function editStudentInformation(id,fname,lname,uname,context){
 
-    	
-        $.ajax({
-            type : "POST",
-            url : pgContext+"/tt/tt/getTeacherReports",
-            data : {
-            	classId: classID,
-                teacherId: teacherID,
-                reportType: 'teacherClassList',
-                lang: loc,
-                filter: "~"
 
-            },
-            success : function(data) {
-            	    if (data) {
-            	    	teacherClassSelections = "";
-            	    	$("#moveBtn").hide();
-            	    	var msg = "" + data;
-                       	var jsonData = $.parseJSON(data);
-       	                eachTeacherListData = jsonData.levelOneData;
-       	                eachTeacherListData.forEach(addToTeacherList);		           	             	
-       	             	document.getElementById("teacherList").innerHTML = "<ul>" + teacherClassSelections + "</ul>";
-                  	}
-                  	else {
-                  		alert("response data is null");
-                  	}
-            },
-            error : function(e) {
-            	alert("error");
-                console.log(e);
-            }
-        });
-	
     	
-    var tr = context.closest('tr')
+    var tr = context.closest('tr');
     var row = $('#student_roster').DataTable().row( tr );
 
 
@@ -3188,16 +3445,68 @@ function registerAllEvents(){
             '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary"> <%= rb.getString("reset_password") %></button></div></form></div>';
 
 
-        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass"><%= rb.getString("new_class") %></label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
-            
-        var tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
-            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="changeClass'+id+'">'+formHtmlChangeClass+'</div> </div> </div>';
 
+
+        var moveTabHeading = '';
+        var tabPanel = "";
+		    moveStudentId = id;     	       
+ 	       	moveTabHeading = '<%= rb.getString("move_the_student") %>';
+            var formHtmlAssignToCluster = '<div class="panel-body"><form id="AssignToCluster'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="select_a_destination"><%= rb.getString("select_a_destination") %></label></div><div id="clusterList"></div><div class="input-group"><button id="moveClusterBtn" role="button" onclick="moveToDestination('+id+')" type="button" class="btn btn-primary"><%= rb.getString("submit") %></button></div></form></div>';  
+            tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
+            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
+            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> ' +
+         	'<li><a href="#assignCluster'+id+'" role="tab" data-toggle="tab">' + moveTabHeading + '</a> </li> </ul>'+
+         	'<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="assignCluster'+id+'">'+formHtmlAssignToCluster+'</div> </div> </div>';
+ 
         row.child(tabPanel).show();
-      }
+
+        var clusterListFilter = "";
+       	if (hasClusters == 1) {
+       		clusterListFilter = "clusterList";
+       	}
+   		else {
+       		clusterListFilter = "classList";
+		}
+       		
+            $.ajax({
+                type : "POST",
+                url : pgContext+"/tt/tt/getTeacherReports",
+                data : {
+                	classId: classID,
+                    teacherId: teacherID,
+                    reportType: 'classClusterList',
+                    lang: loc,
+                    filter: clusterListFilter
+
+                },
+                success : function(data) {
+                	    if (data) {
+                	    	clusterChoices = [];
+                	    	teacherClusterSelections = "";
+                	    	$("#moveClusterBtn").hide();
+                	    	var msg = "" + data;
+                           	var jsonData = $.parseJSON(data);
+           	                eachTeacherListData = jsonData.levelOneData;
+           	                if (clusterListFilter ==  "clusterList") {
+           	                	eachTeacherListData.forEach(addToTeacherClusterList);
+           	                }
+           	                else {
+           	                	eachTeacherListData.forEach(addToTeacherClassList);           	                	
+           	                }
+           	             	document.getElementById("clusterList").innerHTML = "<ul>" + teacherClusterSelections + "</ul>";
+           	             	$("#clusterList").show();
+                      	}
+                      	else {
+                      		alert("response data is null");
+                      	}
+                },
+                error : function(e) {
+                	alert("error");
+                    console.log(e);
+                }
+            });
+    
+    	}
     }
     </script>
     
@@ -3262,37 +3571,39 @@ function registerAllEvents(){
                 <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i
                         class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
-            <li>
+            <li id="li_classHomePage">
                 <a id="classHomePage" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("class_home") %></a>
             </li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+            <li id="li_classReportCard"><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+		
 
-            <li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
+           	<li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
 
-            <li><a id="manage_roster_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_class_roster") %></a></li>
+            <li id="li_manage_roster"><a id="manage_roster_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_class_roster") %></a></li>
 
-            <li><a id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
+            <li id="li_manage_student_info"><a id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
 
-            <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
-
+                <li id="li_manage_class"><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
+		
              <li id="resetSurveySettings"><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
-             <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
+             <li id="li_apply_content"><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
-             <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
+             <li id="li_live_dashboard"><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
-             <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
-            <li>
-                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
-            </li>
-        </ul>
+             <li id="li_live_garden"><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
+             
+             <li id="li_teacher_feedback"> <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a></li>
+             
+            <li id="li_clone_class" ><a id="clone_class_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("create_class_cluster") %></a></li>
+		</ul>
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
 
-        <h1 id="classManagerHeader" class="home-page-header">
-            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong> 
+        <h1 id="classManagerHeader" class="home-page-header" >
+        	<div id="titleLine"></div>
         </h1>
         <div id="classGrades" style="font-size:16px;" class="home-page-header2">
         </div>
@@ -3797,6 +4108,84 @@ function registerAllEvents(){
             </div>
 
 
+            <div id="clone_class_out" style="display:none;width: 100%;">
+
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("clone_class") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                <div class="loader" style="display: none" ></div>               
+                        <div class="panel-body" id="cloneClassProfile">
+				            <springForm:form id="clone_class_form" method="post"
+				                             action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
+				                             modelAttribute="createClassForm">
+				                <div class="row">
+				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
+				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
+				                    
+				                    <input type="hidden" name="town" id="town" value="${classInfo.town}">
+				                    <input type="hidden" name="school" id="school" value="${classInfo.school}">
+				                    <input type="hidden" name="schoolYear" id="schoolYear" value="${classInfo.schoolYear}">
+				                    <input type="hidden" name="section" id="section" value="${classInfo.section}">
+
+				                    <input type="hidden" name="lowEndDiff" id="lowEndDiff" value="${classInfo.simpleLowDiff}">
+				                    <input type="hidden" name="highEndDiff" id="highEndDiff" value="${classInfo.simpleHighDiff}">
+				                    <input type="hidden" name="maxProb" id="maxProb" value="${classInfo.maxProb}">
+				                    <input type="hidden" name="minProb" id="minProb" value="${classInfo.minProb}">
+				                    <input type="hidden" name="maxTime" id="maxTime" value="${classInfo.maxTime}">
+				                    <input type="hidden" name="minTime" id="minTime" value="${classInfo.minTime}">
+				                    <input type="hidden" name="color"   id="color"   value="${classInfo.color}">
+
+				                    
+			                        <div class="panel panel-default">
+					                    <div id="create_class_out" class="col-md-4 col-sm-4">
+				                            <div class="panel-heading">
+				                                <%= rb.getString("identification_settings") %>
+				                            </div>
+				                             <div class="panel-body">
+				                                <div class="form-group">
+				                                    <label for="className"><%= rb.getString("class_name") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-blackboard"></i></span>
+				                                        <springForm:input path="className" id="className" name="className"
+				                                                          class="form-control" type="text" onblur="startClusterLoader()" value="${classInfo.name}"/>
+				                                    </div>
+				                                </div>
+					                        </div>
+					                    </div>
+					                   		                        
+				                    </div>
+				                </div>
+				                <div class="row">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-4 col-sm-4">
+				                            <button id="cloneClassBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                            <button id="cancelCloneClassBtn" class="btn btn-danger btn-lg" aria-disabled="true"><%= rb.getString("cancel") %></button>
+				                        </div>
+				                </div>
+				            </springForm:form>
+				            <div id="createClusterLoader" class="loader" style="display: none" ></div>               
+				            <div class="col-lg-12">
+				                <h1 class="page-header">
+				                    <small><%= rb.getString("setup_cluster_instructions") %></small>
+				                </h1>
+				            </div>
+				            <div id="no-refresh-msg">
+				            	<div class="row">
+				                 <h1 class="tt-paused-logins-message">
+									<%= rb.getString("do_not_reload_page") %>                 
+								</h1>
+				                 </div>
+				            </div>
+                </div>            
+                        
+            </div>
+
+
 
 
 
@@ -3871,6 +4260,22 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.section}"/>
 				                                    </div>
 				                                </div>
+				                                <div class="form-group">
+				                                    <label for="classGrade"><%= rb.getString("color_scheme") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="color" class="form-control" id="classColor"
+				                                                           name="color">
+				                                            <springForm:option value=""><%= rb.getString("select_color_scheme") %></springForm:option>
+				                                            <springForm:option class="panel-green" value="green"><%= rb.getString("green") %> </springForm:option>
+				                                            <springForm:option class="panel-blue" value="blue"><%= rb.getString("blue") %> </springForm:option>
+				                                            <springForm:option class="panel-red" value="red"><%= rb.getString("red") %> </springForm:option>
+				                                            <springForm:option class="panel-violet" value="violet"><%= rb.getString("violet") %> </springForm:option>
+				                                            <springForm:option class="panel-yellow" value="orange"><%= rb.getString("yellow") %> </springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
 					                        	</div>
 					                    	</div>
 					                   
@@ -3921,7 +4326,7 @@ function registerAllEvents(){
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-education"></i></span>
 				                                        <springForm:select path="highEndDiff" class="form-control" id="highEndDiff"
-				                                                           name="highEndDiff">
+				                                                           name="highEndDiff" value="${classInfo.simpleHighDiff}">
 				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
 				                                            <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
 				                                            <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
@@ -4241,6 +4646,7 @@ function registerAllEvents(){
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -4280,6 +4686,7 @@ function registerAllEvents(){
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
 			              </select>       
 			          </div>			 
 			        </div>
