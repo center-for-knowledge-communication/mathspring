@@ -723,7 +723,7 @@ public class DbClass {
         PreparedStatement s = null;
         try {
             String q = "select c.id,teacher,school,schoolYear,name,town,section,propgroupid,pretestPoolId, pool.description, " +
-                    "logType,teacherId, c.flashClient, c.isActive, c.hasClusters, c.isCluster from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
+                    "logType,teacherId, c.flashClient, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
             if (rs.next()) {
@@ -742,7 +742,9 @@ public class DbClass {
                 String cl = rs.getString(13);
                 int isActive = rs.getInt(14);
                 int gazeDetectionOn = 0;
-                ClassInfo c = null;
+
+                ClassInfo c = new ClassInfo(sch, yr, name, town, sec, id, teacherId, teacherName, propgroupid, pretestPoolId,
+                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn,0,0,"green");
                 return c;
             }
         } finally {

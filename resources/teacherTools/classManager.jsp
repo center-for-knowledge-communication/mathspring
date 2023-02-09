@@ -59,7 +59,6 @@
 <!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
 <!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
 <!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms -->
-  
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -4113,7 +4112,7 @@ function registerAllEvents(){
                 <div class="row">
 	                <div class="col-md-10">
 	                    <h3 class="tt-page-header">
-	                        <small><%= rb.getString("clone_class") %></small>
+	                        <small><%= rb.getString("create_class_cluster") %></small>
 	                    </h3>
 	                </div>
                 </div>
@@ -4148,7 +4147,7 @@ function registerAllEvents(){
 				                            </div>
 				                             <div class="panel-body">
 				                                <div class="form-group">
-				                                    <label for="className"><%= rb.getString("class_name") %></label>
+				                                    <label for="className"><%= rb.getString("cluster_name") %></label>
 				                                    <div class="input-group">
 				                                    <span class="input-group-addon"><i
 				                                            class="glyphicon glyphicon-blackboard"></i></span>
