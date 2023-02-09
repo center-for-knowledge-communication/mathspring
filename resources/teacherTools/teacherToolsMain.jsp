@@ -298,11 +298,19 @@ catch (Exception e) {
 			var myHTML = "";
 			var nbrOfClasses = homePageClassArr[0][7];
 			var nbrOfClusters = 0;
+
+			for (let index = 0; index < nbrOfClasses; index++) {
+				nbrOfClusters += homePageClassArr[index][2];
+			}			
 			
 			myHTML  = '<div class="loader" style="display: none" ></div>';               
-			myHTML += '<div class="row"><div class="col-lg-12"><h1 class="page-header">';
+			myHTML += '<div class="row"><div class="col-lg-6"><h1 class="page-header">';
 			if (nbrOfClasses > 0) {
 				myHTML += '<small><%= rb.getString("existing_classes") %></small>';
+				if (nbrOfClusters > 0) {
+					myHTML += '   |   ';
+					myHTML += '<small><%= rb.getString("clusters") %></small>';
+				}
 			}
 			else {
 				myHTML += '<small><%= rb.getString("no_pre-existing_classes") %></small>';
@@ -312,9 +320,6 @@ catch (Exception e) {
 			var needsEndOfRowDiv = true;
 			
 			if (nbrOfClasses > 0) {
-				for (let index = 0; index < nbrOfClasses; index++) {
-					nbrOfClusters += homePageClassArr[index][2];
-				}
 				
 				
 				
@@ -350,7 +355,7 @@ catch (Exception e) {
 					    myHTML += '<img src="../../images/classroom.png" height="64" width="64">';
 				    }
 				    else {
-					    myHTML += '<img src="../../images/cluster.png" height="48" width="48">';
+					    myHTML += '<img src="../../images/cluster.png" height="36" width="48">';
 				    }
 				    
 				    myHTML += '</div>';
