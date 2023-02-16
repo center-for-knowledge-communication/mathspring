@@ -1,7 +1,15 @@
-function generate_year_range(start, end) {
+function generate_year_range() {
+  let currenYearStr =  new Date().getFullYear();
+  
+  var currentYear = Number(currenYearStr);
   var years = "";
-  for (var year = start; year <= end; year++) {
-      years += "<option value='" + year + "'>" + year + "</option>";
+  for (var year = currentYear - 3; year <= currentYear; year++) {
+	  if (year == currentYear)  { 
+		  years += "<option value='" + year + "' checked>" + year + "</option>";
+	  }
+	  else {
+		  years += "<option value='" + year + "'>" + year + "</option>";
+	  }
   }
   return years;
 }
@@ -13,13 +21,7 @@ var currentYear = today.getFullYear();
 var selectYear = document.getElementById("year");
 var selectMonth = document.getElementById("month");
 
-
-var createYear = generate_year_range(2020, 2022);
-/** or
-* createYear = generate_year_range( 1970, currentYear );
-*/
-
-document.getElementById("year").innerHTML = createYear;
+document.getElementById("year").innerHTML = generate_year_range();
 
 var calendar = document.getElementById("calendar");
 var lang = calendar.getAttribute('data-lang');

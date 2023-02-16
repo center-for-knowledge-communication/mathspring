@@ -125,7 +125,7 @@ public class AlterClassHandler {
         // creating a clone of an existing class
         else if (e instanceof AdminAlterClassCloneSubmitInfoEvent) {
             AdminAlterClassCloneSubmitInfoEvent e2 = (AdminAlterClassCloneSubmitInfoEvent) e;
-            int classId = ClassCloner.cloneClass(conn,e2.getClassId(),e2.getClassName(),e2.getSection(),"green");
+            int classId = ClassCloner.cloneClass(conn,e2.getClassId(),e2.getClassName(),e2.getSection(),"en:English","green");
             if (classId < 0) {
                 classId = e2.getClassId();
                 ClassInfo classInfo = DbClass.getClass(conn,classId);
