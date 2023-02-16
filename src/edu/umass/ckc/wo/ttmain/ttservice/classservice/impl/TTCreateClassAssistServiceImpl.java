@@ -158,11 +158,16 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
             createForm.setClassGrade(ciPrev.getGrade());
             
-    		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getColor());
+    		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getClassLanguage(),createForm.getColor());
     		if (newClassId > 0) {
-	    		List<Integer> newClassIdList = new ArrayList<Integer>();
-	    		newClassIdList.add(newClassId);
-	    		continousContentApply(newClassIdList, classId, 0);    		
+    			if (ciPrev.getClassLanguageCode().equals(createForm.getClassLanguage())) {
+    				List<Integer> newClassIdList = new ArrayList<Integer>();
+    				newClassIdList.add(newClassId);
+    				continousContentApply(newClassIdList, classId, 0);
+    			}
+    			else {
+                    DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newClassId);
+    			}
 	    		result = newClassId;
     		}
     		else {

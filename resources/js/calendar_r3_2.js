@@ -1,11 +1,18 @@
-function generate_year_range(start, end) {
-  var years_r3_cal2 = "";
-  for (var year = start; year <= end; year++) {
-      years_r3_cal2 += "<option value='" + year + "'>" + year + "</option>";
+function generate_year_range() {
+  let currenYearStr =  new Date().getFullYear();
+  
+  var currentYear = Number(currenYearStr);
+  var years = "";
+  for (var year = currentYear - 3; year <= currentYear; year++) {
+	  if (year == currentYear)  { 
+		  years += "<option value='" + year + "' checked>" + year + "</option>";
+	  }
+	  else {
+		  years += "<option value='" + year + "'>" + year + "</option>";
+	  }
   }
-  return years_r3_cal2;
+  return years;
 }
-
 var today = new Date();
 document.getElementById("selectDay_r3_cal2").value = "0";
 var currentMonth_r3_cal2 = today.getMonth();
@@ -13,13 +20,7 @@ var currentYear_r3_cal2 = today.getFullYear();
 var selectYear_r3_cal2 = document.getElementById("year_r3_cal2");
 var selectMonth_r3_cal2 = document.getElementById("month_r3_cal2");
 
-
-var createYear_r3_cal2 = generate_year_range(2020, 2022);
-/** or
-* createYear = generate_year_range( 1970, currentYear );
-*/
-
-document.getElementById("year_r3_cal2").innerHTML = createYear_r3_cal2;
+document.getElementById("year_r3_cal2").innerHTML = generate_year_range();
 
 var calendar_r3_cal2 = document.getElementById("calendar_r3_cal2");
 var lang_r3_cal2 = calendar_r3_cal2.getAttribute('data-lang');

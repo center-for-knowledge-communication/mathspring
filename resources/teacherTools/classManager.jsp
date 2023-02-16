@@ -481,7 +481,7 @@ function getFilterLandingTwo() {
 			toDate = temp;
 		}
 		document.getElementById("daysFilterLanding2").value = fromDate + " thru " + toDate;
-		filterLandingTwo = "~" + fromDate + "thru" + toDate;
+		filterLandingTwo = "~" + fromDate + "thru" + toDate + '~' + classesInCluster;
 	    $('#landing-report-loader').show();
 	    $.ajax({
             type : "POST",
@@ -2059,10 +2059,9 @@ function handleclickHandlers() {
         var bv = $form.data('bootstrapValidator');
         $.post($form.attr('action'), $form.serialize(), function (result) {        	
         })
-    });
-	
+    });	
 
-    $("#clone_class_form").bootstrapValidator({
+    $("#cluster_class_form").bootstrapValidator({
         // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -2080,10 +2079,18 @@ function handleclickHandlers() {
                         message: '<%= rb.getString("emsg_field_invalid")%>'
         			}        
                 }
-            }
+            },
+	    	classLanguage: {
+	            validators: {
+	                notEmpty: {
+	                    message: '<%= rb.getString("emsg_classLanguage") %>'
+	                }
+	            }
+	        }
+        
         }
     }).on('success.form.bv', function (e) {
-        $("#clone_class_form").data('bootstrapValidator').resetForm();
+        $("#cluster_class_form").data('bootstrapValidator').resetForm();
         e.preventDefault();
         var $form = $(e.target);
         var bv = $form.data('bootstrapValidator');
@@ -3257,14 +3264,15 @@ function registerAllEvents(){
             	var titleClassname = "";
                 if (isCluster == 0) {                        
 	            	titleClassname = 'home-title-' + '${classInfo.color}';
+	            	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_class") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
             	}
                 else {
+                	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_cluster") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
                 	titleClassname = 'home-title-' + '${classInfo.color}' + '-cluster';                	
                 }
             	$("#splash_page").show();            
         	    $('#landing-report-loader').show();
             	$("#classLandingReportOne").collapse('show');
-            	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_class") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
             }
             else if (currentSelection == "reorg_prob_sets_handler") {
                     $('#reorg_prob_sets_handler').click();
@@ -4118,21 +4126,22 @@ function registerAllEvents(){
                 </div>
                 <div class="loader" style="display: none" ></div>               
                         <div class="panel-body" id="cloneClassProfile">
-				            <springForm:form id="clone_class_form" method="post"
+				            <springForm:form id="cluster_class_form" method="post"
 				                             action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
 				                             modelAttribute="createClassForm">
 				                <div class="row">
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
-				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
 				                    
 				                    <input type="hidden" name="town" id="town" value="${classInfo.town}">
 				                    <input type="hidden" name="school" id="school" value="${classInfo.school}">
 				                    <input type="hidden" name="schoolYear" id="schoolYear" value="${classInfo.schoolYear}">
 				                    <input type="hidden" name="section" id="section" value="${classInfo.section}">
-
+				                    
+				                    <input type="hidden" name="classGrade" id="classGrade" value="${classInfo.grade}">
 				                    <input type="hidden" name="lowEndDiff" id="lowEndDiff" value="${classInfo.simpleLowDiff}">
 				                    <input type="hidden" name="highEndDiff" id="highEndDiff" value="${classInfo.simpleHighDiff}">
+				                    
 				                    <input type="hidden" name="maxProb" id="maxProb" value="${classInfo.maxProb}">
 				                    <input type="hidden" name="minProb" id="minProb" value="${classInfo.minProb}">
 				                    <input type="hidden" name="maxTime" id="maxTime" value="${classInfo.maxTime}">
@@ -4141,7 +4150,7 @@ function registerAllEvents(){
 
 				                    
 			                        <div class="panel panel-default">
-					                    <div id="create_class_out" class="col-md-4 col-sm-4">
+					                    <div id="clone_class_out" class="col-md-4 col-sm-4">
 				                            <div class="panel-heading">
 				                                <%= rb.getString("identification_settings") %>
 				                            </div>
@@ -4155,11 +4164,28 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" onblur="startClusterLoader()" value="${classInfo.name}"/>
 				                                    </div>
 				                                </div>
+				                                
+				                               <div class="form-group">
+				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
+				                                                           name="classLanguage" value="${classInfo.classLanguageCode}>">
+				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
+				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                                
+				                                
 					                        </div>
 					                    </div>
 					                   		                        
 				                    </div>
 				                </div>
+				                
 				                <div class="row">
 				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-4 col-sm-4">
 				                            <button id="cloneClassBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
@@ -4260,7 +4286,7 @@ function registerAllEvents(){
 				                                    </div>
 				                                </div>
 				                                <div class="form-group">
-				                                    <label for="classGrade"><%= rb.getString("color_scheme") %></label>
+				                                    <label for="color"><%= rb.getString("color_scheme") %></label>
 				                                    <div class="input-group">
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-education"></i></span>

@@ -1435,7 +1435,7 @@ public class TTReportServiceImpl implements TTReportService {
     	
     	String filters[] = filter.split("~");
     	if (filters.length > 0) {    		
-    		String dateFilters[] = filters[0].split("thru");
+    		String dateFilters[] = filters[1].split("thru");
     		tsFromDate = convertFromDate(dateFilters[0].trim());
     		tsToDate = convertToDate(dateFilters[1].trim());
     	}
