@@ -1472,10 +1472,10 @@ function handleclickHandlers() {
         $("#reset_survey_setting_out").show();
     });
 
-    $("#manage_topics").click(function () {
-        var newlocation = '/ms/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=classManageTopics';
-        $(location).attr('href', newlocation);
-    });
+//    $("#manage_topics").click(function () {
+//        var newlocation = '/ms/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=classManageTopics';
+//        $(location).attr('href', newlocation);
+//    });
 
     $("#addMoreStudentsToClass").click(function () {
         $("#addMoreStudents").show();
