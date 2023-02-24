@@ -646,7 +646,7 @@ public class TTReportServiceImpl implements TTReportService {
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
                     }
                     else {
-                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login=");
+                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login");
                     	return "{\"status\": \"success\", \"message\" : \"" + successMsg + "\"}";                    	
                     }
         	}

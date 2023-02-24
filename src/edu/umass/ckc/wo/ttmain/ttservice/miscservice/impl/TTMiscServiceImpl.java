@@ -1315,14 +1315,23 @@ public class TTMiscServiceImpl implements TTMiscService {
     	JSONArray resultArr = new JSONArray();
     	
     	int adjacentRows = 3;
+
+    	String type = "date";
+    	String sort = "desc";
+
+    	String splitter[] = filter.split("~");
+    	if (splitter.length > 0)
+			type = splitter[0];
+    	if (splitter.length > 1)
+			sort = splitter[1];
     	
     	String fromDate = "2020-09-01 00:00:00";
 
-    	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by stu.classId, evt.sessNum DESC, sph.problemBeginTime DESC;";
-    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.problemId, evt.sessNum DESC, sph.problemBeginTime DESC;";
+    	String q_date =    "select evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.sessNum " + splitter[1] + ", sph.problemBeginTime asc";
+    	String q_class =   "select stu.classId as classId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by stu.classId desc, evt.sessNum " + splitter[1] + ", sph.problemBeginTime asc";
+    	String q_problem = "select evt.problemId as probId, evt.studId as sid, evt.sessNum as sessId, evt.id as evtid, evt.problemId as probId, evt.userInput as comment, evt.time as timestamp, evt.curTopicId, sph.isProbBroken as probStatus from eventlog as evt  INNER JOIN studentproblemhistory as sph ON evt.probHistoryID = sph.ID INNER JOIN student as stu ON evt.studId=stu.id and action = 'ReportError' and sph.isProbBroken < 3 and time > ? order by evt.problemId, evt.sessNum " + splitter[1] + ", sph.problemBeginTime asc";
     	
-    	if (filter.equals("date")) {
+    	if (splitter[0].equals("date")) {
         
 	         try {
 	        	
@@ -1364,7 +1373,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        }
     	}
 
-    	if (filter.equals("classId")) {
+    	if (splitter[0].equals("classId")) {
             
 	         try {
 	        	
@@ -1408,7 +1417,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 	        }
     	}
     	
-    	if (filter.equals("problemId")) {
+    	if (splitter[0].equals("problemId")) {
             
 	         try {
 	        	
