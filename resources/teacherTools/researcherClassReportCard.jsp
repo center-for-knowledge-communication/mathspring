@@ -3574,7 +3574,7 @@ var completeDataChart;
 
            	    layout = {
            	    	 width:(maxWidth),
-           	    	 height:300,          	         
+           	    	 height:500,          	         
            	    	 xaxis: {
                	       type: 'category',
                	       title: '<%= rb.getString("problems")%>',
@@ -3620,7 +3620,7 @@ var completeDataChart;
            		
            	    layout2 = {
               	    	 width:(maxWidth),
-              	    	 height:600,          	         
+              	    	 height:660,          	         
               	    	 xaxis: {
                   	       type: 'category',
                   	       title: '<%= rb.getString("problems")%>',
@@ -3628,7 +3628,7 @@ var completeDataChart;
              	         yaxis: {
                     	   title: '<%= rb.getString("mastery")%>',
                     	   dtick: 0.2,
-                      	   range: [0, 9]
+                      	   range: [0, 10]
                     	 },
                     	 legend: {
                     	    x: 0,
@@ -3942,7 +3942,7 @@ var completeDataChart;
            			  x: problems,
        				  y: difficulty, 
 					  name: '<%= rb.getString("difficulty")%>',
-					  yaxis: 'y3',
+					  yaxis: 'y',
 					  type: 'scatter',
    					  mode: 'lines+markers',
    					  marker: {
@@ -3959,7 +3959,7 @@ var completeDataChart;
              			  x: problems,
          				  y: mastery, 
 	  					  name: '<%= rb.getString("mastery")%>',
-						  yaxis: 'y4',
+						  yaxis: 'y',
          				  type: 'scatter',
      					  mode: 'lines+markers',
      					  marker: {
@@ -3979,7 +3979,7 @@ var completeDataChart;
            			  x: problems,
        				  y: achievementValues, 
 	  					  name: 'Achievement',
-						  yaxis: 'y4',
+						  yaxis: 'y',
        				  type: 'scatter',
    					  mode: 'markers',
        				  marker:{
@@ -4020,62 +4020,39 @@ var completeDataChart;
            		
  		
            		var data = [];
-                if (document.getElementById("trackHints").checked == true) {
+                if (document.getElementById("trackHintsNine").checked == true) {
 	           		data.push(traceHints);
                 }
-                if (document.getElementById("trackAttempts").checked == true) {
+                if (document.getElementById("trackAttemptsNine").checked == true) {
 		           	data.push(traceAttempts);
                 }
-                if (document.getElementById("trackVideos").checked == true) {
+                if (document.getElementById("trackVideosNine").checked == true) {
     	       		data.push(traceVideos);
                 }
-                if (document.getElementById("trackDifficulty").checked == true) {
+                if (document.getElementById("trackDifficultyNine").checked == true) {
     	       		data.push(traceDifficulty);
                 }
-                if (document.getElementById("trackMastery").checked == true) {
+                if (document.getElementById("trackMasteryNine").checked == true) {
     	       		data.push(traceMastery);
                 }
-//                if (document.getElementById("trackAchievement").checked == true) {
+                if (document.getElementById("trackAchievementNine").checked == true) {
     	       		data.push(traceAchievement);
-//                }
+                }
            		data.push(traceProblems);
 //           		var data = [traceHints, traceAttempts, traceVideos, traceProblems];
 
            	    layout = {
            	    	 width:(maxWidth),
-           	    	 height:500,          	         
+           	    	 height:800,          	         
            	    	 xaxis: {
                	       type: 'category',
                	       title: '<%= rb.getString("problems")%>',
                	     },
           	         yaxis: {
-                 	   title: '<%= rb.getString("minutes")%>',
-                 	   dtick: .5,
+                 	   title: '<%= rb.getString("difficulty")%> / <%= rb.getString("mastery")%>',
+                 	   dtick: .25,
                    	   range: [0, maxYaxis]
                  	 },
-                 	 yaxis3: {
-             			    title: '<%= rb.getString("difficulty")%>',
-             			    titlefont: {color: '#ff6600'},
-             			    tickfont: {color: '#ff6600'},
-                       	    dtick: 0.1,
-                       	    range: [0, 10],
-             			    anchor: 'x',
-             			    overlaying: 'y',
-             			    side: 'right'
-             			    
-           			 },
-           		     yaxis4: {
-	           		    title: '<%= rb.getString("mastery")%>',
-	           		    titlefont: {color: '#009933'},
-	           		    tickfont: {color: '#009933'},
-                   	    dtick: 0.1,
-                   	    range: [0, 10],
-	           		    anchor: 'free',
-	           		    overlaying: 'y',
-	           		    side: 'right',
-	           		    position: 0.95,
-	           		    showline: false
-	           		 },
            			 
                  	 legend: {
                  	    x: 0,
@@ -4096,7 +4073,7 @@ var completeDataChart;
 
            	      };   
            	    
-                var myPlot = document.getElementById('studentProblemAchievementReportNine');
+                var myPlot = document.getElementById('');
            		
            		Plotly.newPlot('studentProblemAchievementReportNine', data, layout);     
            		
@@ -4880,12 +4857,15 @@ var completeDataChart;
                             </h4>
                         </div>
                         <div id="collapseNine" class="panel-collapse collapse">
-	                            <div class="panel-body report_filters">                           
+	                            <div class="panel-body report_filters hidden">                           
 									  <input id="trackMasteryNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
 									  <label class="report_filters">Track Mastery</label>
 									  &nbsp;|&nbsp;
 									  <input id="trackDifficultyNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
 									  <label class="report_filters">Track Difficulty</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackAchievementNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
+									  <label class="report_filters">Track Achievement</label>
 									  &nbsp;|&nbsp;
 									  <input id="trackAttemptsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();">
 									  <label class="report_filters">Track Attempts</label>
@@ -4899,10 +4879,10 @@ var completeDataChart;
 		                        <div class="panel-body report_filters">
 		                        	<div id="chooseDateRange" class="row">
 		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r8_cal1();initCalendar_r8_cal2();$('#calendarModalPopupEight').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r9_cal1();initCalendar_r9_cal2();$('#calendarModalPopupEight').modal('show');" ><%= rb.getString("choose_date_range") %></button>
 						                </div>
 		                        		<div class="col-md-3">                       
-										    <input id="daysFilterEight" style="width:220px" type="text" name="" value="" >   
+										    <input id="daysFilterNine" style="width:220px" type="text" name="" value="" >   
 						                </div>
 		 							</div>  
 		
@@ -4941,8 +4921,6 @@ var completeDataChart;
 								</div>
                             <div id="collapseNineLoader" class="loader" style="display: none" >
                            	</div>                            
-			            	<div id="studentProblemHistoryReportNine" style="overflow-x: scroll;overflow-y: scroll;">
-			            	</div> 
 			            	<div id="studentProblemAchievementReportNine" style="overflow-x: scroll;overflow-y: scroll;">
 			            	</div> 
                         </div>
@@ -5559,7 +5537,105 @@ var completeDataChart;
 	</div>
 </div>	
 
+<div id="calendarModalPopupNine" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r9_cal1" name="selectDay_r9_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r9_cal1" onclick="previous_r9_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r9_cal1" onclick="next_r9_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r9_cal1" data-lang="en">
+			              <thead id="thead-month_r9_cal1"></thead>
+			              <tbody id="calendar-body_r9_cal1"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r9_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r9_cal1" onchange="jump_r9_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r9_cal1" onchange="jump_r9_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r9_cal2" name="selectDay_r9_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r9_cal2" onclick="previous_r9_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r9_cal2" onclick="next_r9_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r9_cal2" data-lang="en">
+			              <thead id="thead-month_r9_cal2"></thead>
+			              <tbody id="calendar-body_r9_cal2"></tbody>
+			          </table>
+			          
+			          <div class="footer-container-calendar">
+			              <label for="month_r9_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r9_cal2" onchange="jump_r9_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r9_cal2" onchange="jump_r9_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
 
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterEight();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupEight').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
 
 
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
@@ -5772,6 +5848,9 @@ var completeDataChart;
     <script type="text/javascript" src="<c:url value="/js/calendar_r3_2.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r8_1.js" />"></script>
     <script type="text/javascript" src="<c:url value="/js/calendar_r8_2.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r9_1.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/js/calendar_r9_2.js" />"></script>
+    
 </body>
 
 </html>
