@@ -167,6 +167,8 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     			}
     			else {
                     DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newClassId);
+                    ClassInfo info = DbClass.getClass(connection.getConnection(), newClassId);
+                    info.setSimpleConfigDefaults();
     			}
 	    		result = newClassId;
     		}
@@ -439,8 +441,12 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     @Override
     public String setClassActiveFlag(Integer teacherId, Integer classId, String activeFlag) {
         try {
+        	ClassInfo ci = DbClass.getClass(connection.getConnection(),classId);
         	if (activeFlag.equals("-1")) {
-        		DbClass.deleteClass(connection.getConnection(), classId);
+        		if ((ci.getHasClusters() == 0) && (ci.getIsCluster() == 0)) {
+        			DbClass.deleteClass(connection.getConnection(), classId);
+        		}
+        		return "error -Can't delete cluster class";
         	}
         	else {
                 DbClass.setIsActiveFlag(connection.getConnection(), classId, activeFlag);

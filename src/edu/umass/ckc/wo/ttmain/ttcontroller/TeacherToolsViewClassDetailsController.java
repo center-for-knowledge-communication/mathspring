@@ -164,7 +164,7 @@ public class TeacherToolsViewClassDetailsController {
     	}
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
-   		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+   		//ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
     	map.addAttribute("createClassForm", new CreateClassForm());
         map.addAttribute("teacherId", String.valueOf(sTeacherId));
         session.setAttribute("classId",classId);
