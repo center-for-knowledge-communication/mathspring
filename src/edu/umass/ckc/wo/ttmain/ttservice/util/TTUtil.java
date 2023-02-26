@@ -245,6 +245,14 @@ public class TTUtil {
 
 	public List<Topic> updateTopicNameAndDescription(List<Topic> activeproblemSet, Integer classId,
 			Connection connection, NamedParameterJdbcTemplate namedParameterJdbcTemplate, boolean isActiveProblemSet) {
+
+		try {
+			cc = DbClass.getClass(connection, classId);
+		}
+		catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
 		MapSqlParameterSource sqlSurce = new MapSqlParameterSource();
 		sqlSurce.addValue("classId", classId);
 		List<Topic> activeList = new ArrayList<>();
@@ -263,19 +271,31 @@ public class TTUtil {
 			                // We get the set of CCStandards for this topic from the ProblemMgr
 			                Set<CCStandard> stds = ProblemMgr.getTopicStandards(tp.getId());
 			                tp.setCcStandards(stds);
-							activeList.add(tp);
+
+			                try {
+			                	cc = DbClass.getClass(connection, classId);
+			                	if (hasStandardWithinBounds(tp.getCcStandards().iterator(),cc.getGrade(),cc.getSimpleLowDiff(),cc.getSimpleHighDiff())) {
+			                		activeList.add(tp);
+			                		System.out.println("Added to active list " + tp.getName());
+			                	}
+			                	else {
+			                		System.out.println("Topic not within standards. Not added " + tp.getName());
+			                	}
+			                }
+			                catch (Exception tpe) {
+			                	System.out.println(tpe.getMessage());
+			                }							
+			                
+			                
+			                
 						}
 						return activeList;
 					});
 			return activeListTopics;
 
 		} else {
-			try {
-				cc = DbClass.getClass(connection, classId);
-			}
-			catch(Exception e) {
-				System.out.println(e.getMessage());
-			}
+
+			
 			List<Integer> activeProblemSetIds = activeproblemSet.stream().map(x -> x.getId())
 					.collect(Collectors.toList());
 			List<Topic> inactiveTopicList = new ArrayList<>();
@@ -296,7 +316,7 @@ public class TTUtil {
 			                try {
 			                	if (hasStandardWithinBounds(tp.getCcStandards().iterator(),cc.getGrade(),cc.getSimpleLowDiff(),cc.getSimpleHighDiff())) {
 			                		inactiveTopicList.add(tp);
-			                		System.out.println("Added " + tp.getName());
+			                		System.out.println("Added to inactive list  " + tp.getName());
 			                	}
 			                	else {
 			                		System.out.println("Topic not within standards. Not added " + tp.getName());
