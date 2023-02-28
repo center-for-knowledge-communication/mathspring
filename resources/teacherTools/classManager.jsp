@@ -2004,7 +2004,6 @@ function registerAllEvents(){
             	gradesLevelsUsedInThisClass = gradesLevelsUsedInThisClass + gradeLevel + ".";
             } 
             var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
-   			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
    		
         	generate_year_range(2021,2023);
             registerAllEvents();
@@ -2050,6 +2049,7 @@ function registerAllEvents(){
 	                	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_cluster") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
 	                	titleClassname = 'home-title-' + '${classInfo.color}' + '-cluster';                	
 	                }
+	       			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
 	            	$("#splash_page").show();            
 	        	    $('#landing-report-loader').show();
 	            	$("#classLandingReportOne").collapse('show');

@@ -278,8 +278,6 @@ catch (Exception e) {
         
         $(document).ready(function () {
         	$('#wrapper').toggleClass('toggled');
-            $("#report-wrapper").show();
-            $("#report-wrapper2").show();
             $("#teacher-activities-wrapper").hide();
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
@@ -418,6 +416,9 @@ catch (Exception e) {
             	$("#pause-status").hide();
             registerAllEvents();
             handleclickHandlers();
+            $("#report-wrapper").show();
+            $("#report-wrapper2").show();
+
         });
 
         function createMessageClassList() {
