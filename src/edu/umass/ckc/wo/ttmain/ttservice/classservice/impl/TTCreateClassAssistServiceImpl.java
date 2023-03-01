@@ -154,8 +154,14 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     public Integer cloneExistingClass(Integer classId, CreateClassForm createForm) throws TTCustomException {
     	
     	int result = 0;
-    	try {        	
-            ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
+    	try {
+    		 
+    		boolean inUse = DbClass.isClassNameInUse(connection.getConnection(), createForm.getClassName());
+    		if (inUse) {
+    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);    			
+    		}
+    		
+    		ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
             createForm.setClassGrade(ciPrev.getGrade());
             
     		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getClassLanguage(),createForm.getColor());

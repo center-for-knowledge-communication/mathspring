@@ -2056,7 +2056,35 @@ public class DbClass {
                 rs.close();
         }
     }
-    
+
+    public static final boolean isClassNameInUse(Connection conn, String newName) {
+    	boolean result = true;
+    	
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+        	String q = "select name from class where name = ?";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,newName);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+               	result = true;
+            }
+            else {
+            	result = false;
+            }
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        catch(SQLException e) {
+        	System.out.println(e.getMessage());
+        }
+
+    	
+    	return result;
+    }
 }
 
     

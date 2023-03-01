@@ -366,7 +366,12 @@ catch (Exception e) {
 					    var toYear = t_schoolYear;
 					    var fromYear = toYear-1;
 					    myHTML += '<div class="pull-right">&nbsp;&nbsp;' + labelYear  + ':' + fromYear + '-' + toYear + '</div>';
-					    labelClassCode = '<%= rb.getString("class_code") %>';
+						if (t_hasClusters) {
+					    	labelClassCode = '<%= rb.getString("master_code") %>';
+						}
+						else {
+					    	labelClassCode = '<%= rb.getString("class_code") %>';							
+						}
 				    }
 				    else {
 				    	labelClassCode = '<%= rb.getString("cluster_code") %>';
