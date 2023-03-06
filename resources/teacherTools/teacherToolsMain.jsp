@@ -809,6 +809,14 @@ catch (Exception e) {
                                 message: '<%= rb.getString("emsg_class_color") %>'
                             }
                         }
+                    },
+                    hasClusters: {
+                        validators: {
+                            notEmpty: {
+    	            			regexp: ^[YNyn]{1}$,
+                                message: '<%= rb.getString("must_answer_clusters_question") %>'
+                            }
+                        }
                     }
 
                 }
@@ -1694,7 +1702,7 @@ function registerAllEvents(){
                                    	<label for="hasClusters"><%= rb.getString("does_this_class_use_clusters") %></label>
                                     <div class="input-group">
                                     	<springForm:input path="hasClusters" id="hasClusters" name="hasClusters"
-                                    	class="form-control" type="text" value="N"/>
+                                    	class="form-control" type="text" value=""/>
                                     </div>
                                 </div>
                             </div>

@@ -2020,7 +2020,9 @@ function registerAllEvents(){
             	document.getElementById("li_clone_class").style.display = 'none';
             	document.getElementById("li_apply_content").style.display = 'none';
             }
-
+            if (hasClusters == 0) {
+            	document.getElementById("li_clone_class").style.display = 'none';
+            }
             
             $("#content-conatiner").children().hide();
 
