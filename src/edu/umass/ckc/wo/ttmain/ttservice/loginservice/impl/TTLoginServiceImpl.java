@@ -174,8 +174,8 @@ public class TTLoginServiceImpl implements TTLoginService {
                     JSONObject nameIdJson = new JSONObject();
                     nameIdJson.put("name", "dummyClass");
                     nameIdJson.put("Id", 0);
-                    classNameIdArray.add(nameIdJson);                   	            	
-	       			resultArr.add(classNameIdArray);
+                    homePageClassArray.add(nameIdJson);                   	            	
+	       			resultArr.add(homePageClassArray);
 	            }
 	        } catch (JSONException e1) {
 	                // TODO Auto-generated catch block
@@ -198,6 +198,7 @@ public class TTLoginServiceImpl implements TTLoginService {
                 model.addAttribute("homePageClassArrayStr", homePageClassArrayStr);
                 return "teacherTools/teacherToolsMain";
             } else {
+                model.addAttribute("classNameIdArrayStr", classNameIdArrayStr);
                 model.addAttribute("homePageClassArrayStr", homePageClassArrayStr);
                 model.addAttribute("noClass", true);
                 return "teacherTools/teacherToolsMain";
