@@ -813,9 +813,13 @@ catch (Exception e) {
                     hasClusters: {
                         validators: {
                             notEmpty: {
-    	            			regexp: ^[YNyn]{1}$,
                                 message: '<%= rb.getString("must_answer_clusters_question") %>'
-                            }
+                            },
+	    			        regexp: {
+    	            			regexp: /[YNSyns]/,
+                                message: '<%= rb.getString("must_answer_clusters_question") %>'
+            				}   
+                            
                         }
                     }
 
