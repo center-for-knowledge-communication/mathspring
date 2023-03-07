@@ -31,6 +31,7 @@
  *  Frank	07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them
  *  Frank 	11-27-22    Issue #714 - finish multi-lingual algorithms
  *  Frank 	02-04-23    Issue #723 - Added class clustering
+ *  Frank 	02-04-23    Issue #723 - Added create class validation on cluster y/n
  */
 
  System.out.println("teacherToolsMain starting");
