@@ -136,7 +136,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
            
             if (update) {
                 DbClass.editClassConfig(connection.getConnection(),
-                		classId, createForm.getClassGrade(), createForm.getHighEndDiff(), createForm.getLowEndDiff(), createForm.getColor());            	
+                		classId, createForm.getHighEndDiff(), createForm.getLowEndDiff(), createForm.getColor());            	
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), classId);
             }
             //ClassInfo info = DbClass.getClass(connection.getConnection(), classId);

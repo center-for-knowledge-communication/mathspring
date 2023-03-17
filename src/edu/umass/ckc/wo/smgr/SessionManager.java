@@ -358,7 +358,7 @@ public class SessionManager {
         ClassInfo cl = DbClass.getClass(connection, this.classId);
         
         this.gazeDetectionOn = cl.getGazeDetectionOn();
-        this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId);
+        this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId, 0);
 
 
         language = cl.getClassLanguageCode();

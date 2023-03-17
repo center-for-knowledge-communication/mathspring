@@ -645,6 +645,25 @@ public class Problem implements Activity {
         return questType.name();
     }
 
+    public void setQuestType (String strQuestType) {
+    	if (strQuestType.equals("shortAnswer"))
+    		this.questType = QuestType.shortAnswer;
+    	if (strQuestType.equals("longAnswer"))
+    		this.questType = QuestType.longAnswer;
+    	if (strQuestType.equals("multiChoice"))
+    		this.questType = QuestType.multiChoice;
+    	if (strQuestType.equals("multiSelect"))
+    		this.questType = QuestType.multiSelect;
+    }
+
+    public String getProblemFormat() {
+        return problemFormat;
+    }
+
+    public void setProblemFormat(String format) {
+        this.problemFormat = format;
+    }
+
     public String getImageURL() {
         return imageURL;
     }
@@ -659,6 +678,10 @@ public class Problem implements Activity {
 
     public int getAudioFileId() {
         return audioFileId;
+    }
+    
+    public void setAudioFileId(int id) {
+        this.audioFileId = id;
     }
     
     public void updateHintListForDemoProblems(Hint answerHint) {

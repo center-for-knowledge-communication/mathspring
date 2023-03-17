@@ -248,7 +248,8 @@ function loadIframe (iframeId, url) {
 
 
 function nextProb(globals,isSessionBegin=false) {
-    toggleSolveDialogue(false);
+
+	toggleSolveDialogue(false);
     if (!globals.showMPP)
         hideMPP()
     if (globals.trace)
@@ -268,7 +269,7 @@ function nextProb(globals,isSessionBegin=false) {
             processNextProblemResult) ;
     // Normal Processing
     else
-        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin}, processNextProblemResult);    	
+        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, langIndex: globals.probLangIndex}, processNextProblemResult);    	
 }
 
 // This function can only be called if the button is showing
@@ -811,7 +812,9 @@ function checkError (responseText) {
 
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $("#next_prob_spinner").show();
-	$("#nextProb").addClass("disable_a_href");
+   	$("#nextProb").addClass("disable_a_href");
+   	$("#nextProb1").addClass("disable_a_href");    	
+    
     checkError(responseText);
     // empty out the flashContainer div of any swfobjects and clear the iframe of any problems
     $(FLASH_CONTAINER_OUTERID).html('<div id="' +FLASH_CONTAINER_INNER+ '"></div>');
@@ -993,7 +996,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     }
     
 	 $("#next_prob_spinner").hide();
+	 
 	 $("#nextProb").removeClass("disable_a_href");
+	 $("#nextProb1").removeClass("disable_a_href");		 
 }
 
 function newBrowserWindow (url,w, h) {
@@ -1265,6 +1270,15 @@ function clickHandling () {
     $("#nextProb").click(function () {
     	$("#next_prob_spinner").show();
         if (!isWaiting()) {
+        	globals.probLangIndex = 0;
+            nextProb(globals)
+        }
+        $("#next_prob_spinner").hide();
+    });
+    $("#nextProb1").click(function () {
+    	$("#next_prob_spinner").show();
+        if (!isWaiting()) {
+        	globals.probLangIndex = 1;
             nextProb(globals)
         }
         $("#next_prob_spinner").hide();

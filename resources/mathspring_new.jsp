@@ -24,21 +24,45 @@ catch (Exception e) {
 }
 
 Locale loc = request.getLocale(); 
+Locale loc1 = request.getLocale(); 
+Locale loc2 = request.getLocale();
+
 String lang = loc.getLanguage();
 String country = loc.getCountry();
 
 System.out.println("locale set to:" + lang + "-" + country );	
 
-if (!lang.equals("es")) {
-	loc = new Locale("en","US");	
-}			
+if (lang.equals("en")) {
+	loc1 = new Locale("en","US");	
+	loc2 = new Locale("es","US");	
+}
+else {
+	loc1 = new Locale("es","US");	
+	loc2 = new Locale("en","US");		
+}
 		
 ResourceBundle rb = null;
+
+ResourceBundle rb1 = null;
 try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
+	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
 }
 catch (Exception e) {
 //	logger.error(e.getMessage());
+}
+ResourceBundle rb2 = null;
+try {
+	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
+if (lang.equals("en")) {
+	rb = rb1;
+}
+else {
+	rb = rb2;	
 }
 %>
 
@@ -141,6 +165,9 @@ else
 	var what_are_your_goals = "<%= rb.getString("what_are_your_goals") %>";
 	var lets_see_our_progress = "<%= rb.getString("lets_see_our_progress") %>";
 	var waiting_for_partner = "<%= rb.getString("waiting_for_partner") %>";
+	var initializing_camera = "<%= rb.getString("initializing_camera") %>";
+	var wait_for_camera = "<%= rb.getString("wait_for_camera") %>";
+	var camera_initialized = "<%= rb.getString("camera_initialized") %>";	
 </script>
 
 
@@ -187,6 +214,7 @@ else
             gazeParamsJSON: ${gazeParamsJSON},
             gazeWanderingUI: "",
             probType : '${probType}',
+            probLangIndex : 0,
             exampleProbType : null,
             probId : ${probId},
             probMode: '${probMode}',
@@ -394,7 +422,13 @@ label {
 						class="fa fa-plus" aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
-				</a> <a href="#" class="huytran-sitenav__button" id="hint"> <span
+				</a> 
+				<a href="#" class="huytran-sitenav__button huytran-sitenav__button--first"
+					id="nextProb1"> <span class="huytran-sitenav__icon"> <i
+						class="fa fa-plus" aria-hidden="true"></i>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb2.getString("next_problem") %></span>
+				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
+				</a>				<a href="#" class="huytran-sitenav__button" id="hint"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o"
 						aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><span

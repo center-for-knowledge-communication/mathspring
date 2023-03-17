@@ -143,11 +143,18 @@ public class LoginSequence {
     public void clearInterventionState() throws SQLException {
         List<InterventionSelectorSpec> specs = interventionGroup.getInterventionsSpecs();
         for (InterventionSelectorSpec s: specs) {
-//            if (s.getRunFreq().equals(InterventionSelectorSpec.ONCE_PER_SESSION)) {
-                LoginInterventionSelector lis = (LoginInterventionSelector) s.getSelector();
-                lis.clearState();
-//            }
-
+        	String isName = s.getClassName();
+        	if (isName == null)
+        		isName = "";
+            if (isName.equals("edu.umass.ckc.login.interv.StudentPedagogy")) {
+            	System.out.println("isName = " + "edu.umass.ckc.login.interv.StudentPedagogy");
+            }
+            else {
+	        	if (s.getRunFreq().equals(InterventionSelectorSpec.ONCE_PER_SESSION)) {
+	                LoginInterventionSelector lis = (LoginInterventionSelector) s.getSelector();
+	                lis.clearState();
+	             }
+            }
         }
 
     }
