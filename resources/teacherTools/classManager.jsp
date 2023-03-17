@@ -60,6 +60,7 @@
 <!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
 <!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms -->
 <!-- Frank 02-20-23     Issue #723 - Split off Problem set (topic) management code to classManageTopics.jsp -->
+<!-- Frank 02-20-23     Issue #725 - took color and school year off the edit form -->
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -1328,19 +1329,6 @@ function handleclickHandlers() {
                     message: '<%= rb.getString("emsg_field_invalid")%>'
     			}        
                 
-            }, schoolYear: {
-                validators: {
-
-                    between: {
-                        min: new Date().getFullYear(),
-                        max: 2050,
-                        message: '<%= rb.getString("emsg_schoolYearRange")%>'
-                    },
-
-                    notEmpty: {
-                        message: '<%= rb.getString("emsg_schoolYear")%>'
-                    }
-                }
             }, gradeSection: {
                 validators: {
                     notEmpty: {
@@ -1401,13 +1389,6 @@ function handleclickHandlers() {
 
                     notEmpty: {
                         message: '<%= rb.getString("emsg_minTime")%>'
-                    }
-                }
-            },
-            color: {
-                validators: {
-                    notEmpty: {
-                        message: '<%= rb.getString("emsg_class_color") %>'
                     }
                 }
             }
@@ -2818,6 +2799,8 @@ function registerAllEvents(){
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
 				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
+				                    <input type="hidden" name="schoolYear" id="schoolYear" value="${classInfo.schoolYear}">
+				                    <input type="hidden" name="color"   id="color"   value="${classInfo.color}">
 			                        <div class="panel panel-default">
 					                    <div id="create_class_out" class="col-md-4 col-sm-4">
 				                            <div class="panel-heading">
@@ -2851,20 +2834,7 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.school}"/>
 				                                    </div>
 				                                </div>
-				                               <div class="form-group">
-				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
-				                                    <div class="input-group">
-				                                        <span class="input-group-addon"><i
-				                                                class="glyphicon glyphicon-hourglass"></i></span>
-				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
-				                                                           name="schoolYear" value="${classInfo.schoolYear}">
-				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-				                                            <springForm:option value="2021">2020/2021</springForm:option>
-				                                            <springForm:option value="2022">2021/2022</springForm:option>
-				                                            <springForm:option value="2023">2022/2023</springForm:option>
-				                                        </springForm:select>
-				                                    </div>
-				                                </div>
+
 				                                <div class="form-group">
 				                                    <label for="gradeSection"><%= rb.getString("section") %></label>
 				                                    <div class="input-group">
@@ -2874,22 +2844,7 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.section}"/>
 				                                    </div>
 				                                </div>
-				                                <div class="form-group">
-				                                    <label for="color"><%= rb.getString("color_scheme") %></label>
-				                                    <div class="input-group">
-				                                        <span class="input-group-addon"><i
-				                                                class="glyphicon glyphicon-education"></i></span>
-				                                        <springForm:select path="color" class="form-control" id="classColor"
-				                                                           name="color">
-				                                            <springForm:option value=""><%= rb.getString("select_color_scheme") %></springForm:option>
-				                                            <springForm:option class="panel-green" value="green"><%= rb.getString("green") %> </springForm:option>
-				                                            <springForm:option class="panel-blue" value="blue"><%= rb.getString("blue") %> </springForm:option>
-				                                            <springForm:option class="panel-red" value="red"><%= rb.getString("red") %> </springForm:option>
-				                                            <springForm:option class="panel-violet" value="violet"><%= rb.getString("violet") %> </springForm:option>
-				                                            <springForm:option class="panel-yellow" value="orange"><%= rb.getString("yellow") %> </springForm:option>
-				                                        </springForm:select>
-				                                    </div>
-				                                </div>
+
 					                        	</div>
 					                    	</div>
 					                   

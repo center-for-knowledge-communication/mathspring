@@ -681,6 +681,18 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         // typically it takes 125 ms to finish the above call
         ProblemResponse r=null;
         if (curProb != null) {
+        	if ((e != null) && (e.getLangIndex() > 0)) {
+        		int altProbId = ProblemMgr.getProblemPair(curProb.getId());
+        		//int altProbId = ProblemMgr.getProblemPair(2042);
+        		if (altProbId > 0 ) {
+	        		Problem altProb = ProblemMgr.getProblem(altProbId);
+	        		curProb.setNickname(altProb.getNickname());
+	        		curProb.setStatementHTML(altProb.getStatementHTML());
+	        		curProb.setProblemFormat(altProb.getProblemFormat());
+	        		curProb.setQuestType(altProb.getQuestType());
+	        		curProb.setAudioFileId(altProb.getAudioFileId());
+        		}
+        	}
             curProb.setMode(Problem.PRACTICE);
 
             problemGiven(curProb); // inform pedagogical move listeners that a problem is given.

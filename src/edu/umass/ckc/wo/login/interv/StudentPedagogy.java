@@ -7,6 +7,8 @@ package edu.umass.ckc.wo.login.interv;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +33,12 @@ public class StudentPedagogy extends LoginInterventionSelector {
 	
     public Intervention selectIntervention (SessionEvent e) throws Exception {
         long shownTime = this.interventionState.getTimeOfLastIntervention();
-        if ( shownTime > 0)
+    	java.util.Date date = new java.util.Date(); 
+    	long lnow  = date.getTime();
+    	long waitTime = 60000;
+        if ((shownTime > 0) && ( shownTime < (lnow + waitTime))) {
             return null;
+        }
         else {
             super.selectIntervention(e);
         	String studentPedagogyUrl = JSP_NEW;

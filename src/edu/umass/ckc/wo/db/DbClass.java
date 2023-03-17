@@ -89,7 +89,7 @@ public class DbClass {
                 boolean showPreSurvey = true;
                 String getPreSurvey = rs.getString(23);
                 String getClassLanguage = rs.getString(24);
-
+                String altClassLanguage = "es";
                 int maxProb = 40;
                 if (rs.getObject(25) != null && !rs.wasNull()) {
                 	maxProb = rs.getInt(25);
@@ -118,8 +118,12 @@ public class DbClass {
                 //int minProb = rs.getInt(26);
                 //int maxTime = rs.getInt(27);
                 //int minTime = rs.getInt(28);
+                
+                
+                // creation of altClassLanguage concept for multi-lingual study in March 2023
                 if("English".equals(getClassLanguage)) {
                 	getClassLanguage = "en:"+getClassLanguage;
+                	altClassLanguage = "es:Spanish";
                 } else {
                 	String getQueryCode = "select language_code from ms_language where language_name = ?";
                 	s2 = conn.prepareStatement(getQueryCode);
@@ -127,6 +131,7 @@ public class DbClass {
                     rs2 = s2.executeQuery();
                      if (rs2.next()) {
                     	 getClassLanguage = rs2.getString("language_code")+":"+getClassLanguage;
+                    	 altClassLanguage = "en:English";
                      }
                 }
                 
@@ -150,6 +155,7 @@ public class DbClass {
                 ci.setShowPostSurvey(showPostSurvey);
                 ci.setShowPreSurvey(showPreSurvey);
                 ci.setClassLanguageCode(getClassLanguage);
+                ci.setAltClassLanguageCode(altClassLanguage);
                 ci.setMaxProb(String.valueOf(maxProb));
                 ci.setMinProb(String.valueOf(minProb));
                 if (maxTime > 0) {
@@ -435,16 +441,16 @@ public class DbClass {
 		}
 }
 
-    public static int editClassConfig(Connection conn, int classId, String classGrade, String highEndDiff, String lowEndDiff,String color) throws Exception {
+    public static int editClassConfig(Connection conn, int classId, String highEndDiff, String lowEndDiff,String color) throws Exception {
 		PreparedStatement s = null;
 		try {
-			String q = "update classconfig set simpleHighDiff=?, simpleLowDiff=? " +
+			String q = "update classconfig set simpleHighDiff=?, simpleLowDiff=?, color=? " +
 			"where classId=?";
 			s = conn.prepareStatement(q);
 			s.setString(1, highEndDiff);
 			s.setString(2, lowEndDiff);
-			s.setInt(3, classId);
-			s.setString(4, color);
+			s.setString(3, color);
+			s.setInt(4, classId);
 			return s.executeUpdate();
 		} finally {
 			if (s != null)
@@ -539,7 +545,14 @@ public class DbClass {
             newid = s.getGeneratedKeys();
             newid.next();
             int classId = newid.getInt(1);
-            insertClassConfig(conn, classId, color);
+            String altClassLanguageCode = "";
+            if("English".equals(languageDescription)) {
+            	altClassLanguageCode = "es:Spanish";
+            } else {
+               	 altClassLanguageCode = "en:English";
+            }
+            
+            insertClassConfig(conn, classId, color, altClassLanguageCode);
             return newid.getInt(1);
         } catch (SQLException e) {
             System.out.println(e.getErrorCode());
@@ -558,15 +571,16 @@ public class DbClass {
 
  
 
-	public static void insertClassConfig(Connection conn, int classId, String color) throws SQLException {
+	public static void insertClassConfig(Connection conn, int classId, String color, String altLanguage) throws SQLException {
         PreparedStatement stmt = null;
         try {
             // relying on the default values defined in DB for the fields pretest,posttest,mfr,
             // spatialR,tutoring,
-            String q = "insert into ClassConfig (classId, color) values (?,?)";
+            String q = "insert into ClassConfig (classId, color) values (?,?,?)";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classId);
             stmt.setString(2, color);
+            stmt.setString(3, altLanguage);
             stmt.execute();
         } catch (SQLException e) {
             if (e.getErrorCode() == Settings.duplicateRowError || e.getErrorCode() == Settings.keyConstraintViolation)

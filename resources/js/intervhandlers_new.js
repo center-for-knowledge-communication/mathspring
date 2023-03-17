@@ -32,8 +32,12 @@ function highlightNextProbButton() {
     $nextProbBtn.addClass('hint-green animated tada');
     setTimeout(function() {
         $nextProbBtn.removeClass('hint-green animated tada');
+        var $nextProbBtn1 = $('#nextProb1');
+        $nextProbBtn1.addClass('hint-green animated tada');
+        setTimeout(function() {
+            $nextProbBtn1.removeClass('hint-green animated tada');
+        }, 4000);
     }, 4000);
-
 
     
 }

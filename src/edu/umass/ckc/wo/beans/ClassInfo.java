@@ -47,6 +47,7 @@ public class ClassInfo {
     private int isCluster;
     private String color;
     private String classesInCluster;
+    private String altClassLanguageCode;
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
@@ -75,6 +76,7 @@ public class ClassInfo {
         this.isCluster= isCluster;
         this.color=color;
         this.classesInCluster = classesInCluster;
+        this.altClassLanguageCode = altClassLanguageCode;
     }
 
     
@@ -270,6 +272,10 @@ public class ClassInfo {
 		this.classLanguageCode = classLanguageCode;
 	}
 
+	public void setAltClassLanguageCode(String altLanguageCode) {
+		this.altClassLanguageCode = altLanguageCode;
+	}
+	
 	public boolean isDefaultClass() {
 		return isDefaultClass;
 	}
