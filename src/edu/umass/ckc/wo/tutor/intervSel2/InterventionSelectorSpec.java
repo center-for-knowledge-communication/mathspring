@@ -65,6 +65,9 @@ public class InterventionSelectorSpec implements Comparable<InterventionSelector
         else if (checkValidFreq(freq))
             this.runFreq = freq.toLowerCase();
         else throw new UserException("runFrequency is not a valid value:" + freq);
+        if (this.className.equals("edu.umass.ckc.wo.login.interv.StudentPedagogy")) {
+        	this.runFreq=ALWAYS;
+        }
         this.configXML = intervSel.getChild("config");
     }
 

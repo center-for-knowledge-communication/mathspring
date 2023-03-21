@@ -691,6 +691,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	        		curProb.setProblemFormat(altProb.getProblemFormat());
 	        		curProb.setQuestType(altProb.getQuestType());
 	        		curProb.setAudioFileId(altProb.getAudioFileId());
+	        		curProb.setAnswer(altProb.getAnswer());
+	        		curProb.setAnswers(altProb.getAnswers());
+	        		curProb.setAnswersViewList ();
+	        		curProb.getAnswersViewList ();
         		}
         	}
             curProb.setMode(Problem.PRACTICE);

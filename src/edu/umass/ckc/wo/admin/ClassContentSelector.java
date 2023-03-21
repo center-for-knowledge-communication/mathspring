@@ -96,19 +96,34 @@ public class ClassContentSelector {
         DbClassPedagogies.removeClassPedagogies(conn, classId);
 
         if (simpleCollab.equals("none")) {
-            if (simpleLC.equals("none"))
+            if (simpleLC.equals("none")) {
                 p = getPedagogyByName("No Learning Companion");
-            else if (simpleLC.equals("male"))
+            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            }
+            else if (simpleLC.equals("male")) {
                 p = getPedagogyByName("Jake Learning Companion");
-            else if (simpleLC.equals("female"))
+            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            }
+            else if (simpleLC.equals("female")) {
                 p = getPedagogyByName("Jane Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            }
             // if they want both, given them Jane semi and Jake full empathy
             else if (simpleLC.equals("both")) {
                 p = getPedagogyByName("Jane Learning Companion");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
                 p = getPedagogyByName("Jake Learning Companion");
             }
-            DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            else if (simpleLC.equals("multi-lingual")) {
+                p = getPedagogyByName("Jane Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+                p = getPedagogyByName("Jake Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+                p = getPedagogyByName("Lucas Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+                p = getPedagogyByName("Isabel Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            }
         }
         else {
             if (simpleLC.equals("none"))

@@ -33,11 +33,19 @@ public class StudentPedagogy extends LoginInterventionSelector {
 	
     public Intervention selectIntervention (SessionEvent e) throws Exception {
         long shownTime = this.interventionState.getTimeOfLastIntervention();
+
+        /*        
     	java.util.Date date = new java.util.Date(); 
     	long lnow  = date.getTime();
     	long waitTime = 60000;
-        if ((shownTime > 0) && ( shownTime < (lnow + waitTime))) {
+    	if ((shownTime > 0) && ( shownTime < (lnow + waitTime))) {
+       	if (shownTime == 0) {
+    		this.interventionState.setTimeOfLastIntervention(0);
             return null;
+        }
+*/
+        if (shownTime > 0) {
+        	return null;
         }
         else {
             super.selectIntervention(e);
