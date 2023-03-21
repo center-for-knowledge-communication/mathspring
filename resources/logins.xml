@@ -22,6 +22,9 @@
             <interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.StudentName">
                 <config></config>
             </interventionSelector>
+           <interventionSelector onEvent="Login" weight="1" runFreq="always" class="edu.umass.ckc.wo.login.interv.StudentPedagogy">
+                <config></config>
+            </interventionSelector>
 
             <!-- Shows a pre-survey (in a separate browser window/tab) on first login only.   -->
             <!--<interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.PreSurvey">-->
@@ -79,7 +82,10 @@
             <interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.StudentName">
                 <config></config>
             </interventionSelector>
-
+           <interventionSelector onEvent="Login" weight="1" runFreq="always" class="edu.umass.ckc.wo.login.interv.StudentPedagogy">
+                <config></config>
+            </interventionSelector>
+ 
             <!-- Shows a pre-survey (in a separate browser window/tab) on first login only.   -->
             <!--<interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.PreSurvey">-->
                 <!--<config>-->
@@ -131,6 +137,9 @@
                 <config>
 
                 </config>
+            </interventionSelector>
+           <interventionSelector onEvent="Login" weight="1" runFreq="always" class="edu.umass.ckc.wo.login.interv.StudentPedagogy">
+                <config></config>
             </interventionSelector>
 
             <!--<interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.PreSurvey">-->

@@ -409,6 +409,10 @@ public class Problem implements Activity {
         return answer;
     }
 
+    public void setAnswer(String ans) {
+        answer = ans;
+    }
+
     public String getMode () {
         return mode;
     }
