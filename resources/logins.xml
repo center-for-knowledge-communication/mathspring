@@ -178,8 +178,12 @@
 
                 </config>
             </interventionSelector>
+           <interventionSelector onEvent="Login" weight="1" runFreq="always" class="edu.umass.ckc.wo.login.interv.StudentPedagogy">
+                <config></config>
+            </interventionSelector>
 
-            <!--<interventionSelector onEvent="Login" weight="1" runFreq="once" class="edu.umass.ckc.wo.login.interv.PreSurvey">-->
+
+            <!--<interventionSelector onEvent="Login" weight="3" runFreq="once" class="edu.umass.ckc.wo.login.interv.PreSurvey">-->
                 <!--<config>-->
                     <!--<url>-->
                         <!--<![CDATA[https://docs.google.com/forms/d/1ailDyQ9tChd9Abh6TEUsCoyALYJSLi8mWoIiHzMZcpA/viewform?entry.1324523958=<uname>&entry.1477109510=<uid>&usp=send_form]]>-->
