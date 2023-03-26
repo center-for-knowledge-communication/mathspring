@@ -115,13 +115,13 @@ public class ClassContentSelector {
                 p = getPedagogyByName("Jake Learning Companion");
             }
             else if (simpleLC.equals("multi-lingual")) {
-                p = getPedagogyByName("Jane Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Jake Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
                 p = getPedagogyByName("Lucas Learning Companion");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
                 p = getPedagogyByName("Isabel Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+                p = getPedagogyByName("Jane Learning Companion");
+                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+                p = getPedagogyByName("Jake Learning Companion");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
             }
         }

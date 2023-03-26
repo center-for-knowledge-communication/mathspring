@@ -13,7 +13,7 @@ function flashProblemAnswerChosen (choice) {
     debugAlert("flashProblemAnswerChosen CALLED! with: " + choice);
     if (!sysGlobals.exampleWindowActive  || (globals.probMode != MODE_DEMO && globals.probMode != MODE_EXAMPLE && !isWaiting())) {
         incrementTimers(globals);
-        servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime}, processFlashProblemAnswerChosenResult);
+        servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime, langIndex: globals.probLangIndex}, processFlashProblemAnswerChosenResult);
     }
 }
 
@@ -34,7 +34,7 @@ function tutorhut_shortAnswerSubmitted (sym, answer) {
     transients.sym = sym;
     if (!isWaiting() && globals.probMode != MODE_DEMO) {
         incrementTimers(globals);
-        servletGetWait("Attempt", {userInput: answer, probElapsedTime: globals.probElapsedTime}, processShortAnswerResult);
+        servletGetWait("Attempt", {userInput: answer, probElapsedTime: globals.probElapsedTime, langIndex: globals.probLangIndex}, processShortAnswerResult);
 
     }
 }
@@ -72,7 +72,7 @@ tutorhut_answerChosen = function (selectedButton, choice) {
         if (transients.answersChosenSoFar.indexOf(choice) < 0) {
             transients.answersChosenSoFar[transients.answersChosenSoFar.length] = choice; // adds an element to the end of the list
             incrementTimers(globals);
-            servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime}, processAnswerChosenResult);
+            servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime, langIndex: globals.probLangIndex}, processAnswerChosenResult);
         }
     }
 };

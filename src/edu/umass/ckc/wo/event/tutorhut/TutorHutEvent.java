@@ -75,8 +75,12 @@ public abstract class TutorHutEvent extends SessionEvent {
         return clickTime;
     }
 
-    public long getLangIndex() {
+    public int getLangIndex() {
         return langIndex;
+    }
+
+    public void setLangIndex(int langIndex) {
+        this.langIndex = langIndex;
     }
 
 }

@@ -678,7 +678,15 @@ public class StudentState extends State implements TutorEventHandler {
         problemState.getPojo().setPossibleShortAnswersList(possibleShortAnswers);
     }
 
+    public int getLangIndex() {
+        return problemState.getPojo().getLangIndex();
+    }
 
+    public void setLangIndex(int langIndex) throws SQLException {
+        problemState.getPojo().setLangIndex(langIndex);
+    }
+
+    
     /* end of problem state methods */
 
 
@@ -1323,4 +1331,5 @@ public class StudentState extends State implements TutorEventHandler {
     public void setCurProblemIndexInLesson(int curProblemIndexInLesson) {
         lessonState.setCurProblemIndex(curProblemIndexInLesson);
     }
+
 }

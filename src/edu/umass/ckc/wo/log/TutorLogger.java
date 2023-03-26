@@ -93,6 +93,12 @@ public class TutorLogger {
                 smgr.getStudentState().getCurProblem(), hintStep, hintId, emotion, activityName, -1, null, curTopicId, clickTimeMs);
     }
 
+    public int insertLogEntryAttempt(String action, String userInput, boolean isCorrect, long elapsedTime,
+            long probElapsed, String hintStep, int hintId, String emotion, String activityName, int curTopicId, long clickTimeMs, int langIndex) throws Exception {
+
+    		return insertLogEntryWorkerLang(smgr.getStudentId(), smgr.getSessionNum(), action, userInput, isCorrect, elapsedTime, probElapsed,
+    				smgr.getStudentState().getCurProblem(), hintStep, hintId, emotion, activityName, -1, null, curTopicId, clickTimeMs, langIndex);
+}    
     public int insertLogEntry(String action, int probId, String userInput, boolean isCorrect, long elapsedTime,
                               long probElapsed, String hintStep, int hintId, String emotion, String activityName, int curTopicId, long clickTimeMs) throws Exception {
 
@@ -100,6 +106,15 @@ public class TutorLogger {
                 probId, hintStep, hintId, emotion, activityName, -1, null, curTopicId, clickTimeMs);
     }
 
+    public int insertLogEntryNextProb(String action, int probId, String userInput, boolean isCorrect, long elapsedTime,
+            long probElapsed, String hintStep, int hintId, String emotion, String activityName, int curTopicId, long clickTimeMs, int langIndex) throws Exception {
+
+    	return insertLogEntryWorkerLang(smgr.getStudentId(), smgr.getSessionNum(), action, userInput, isCorrect, elapsedTime, probElapsed,
+    			probId, hintStep, hintId, emotion, activityName, -1, null, curTopicId, clickTimeMs, langIndex);
+    }
+
+
+    
     public int insertLogEntry(String action, int probId, String userInput, boolean isCorrect, long elapsedTime,
                               long probElapsed, String hintStep, int hintId, String emotion, String activityName,
                               int auxId, String auxTable, int curTopicId, long clickTimeMs) throws Exception {
@@ -226,6 +241,81 @@ public class TutorLogger {
         }
     }
 
+
+
+    public int insertLogEntryWorkerLang(int studId, int sessNum, String action, String userInput, boolean isCorrect, long elapsedTime,
+                                    long probElapsed, int probId, String hintStep, int hintId, String emotion, String activityName,
+                                    int auxId, String auxTable, int curTopicId, long clickTimeMs, int langIndex) throws SQLException {
+        int studProbHistId = getStudentProblemHistoryEntry(sessNum);
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            if (probId < 1)
+                probId = getDummyProbId();
+            String q = "insert into " + EventLog + " (studId, sessNum, action, userInput, isCorrect, elapsedTime, probElapsed, problemId, hintStep, " +
+                    "hintid, emotion, activityName, auxId, auxTable,time,curTopicId, clickTime, probhistoryid,langIndex) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            ps = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, studId);
+            ps.setInt(2, sessNum);
+            ps.setString(3, action);
+
+            if (userInput == null)
+                ps.setNull(4,Types.VARCHAR);
+            else ps.setString(4,userInput.substring(0,Math.min(userInput.length(),1500))); // column can only store 1500 chars
+            ps.setBoolean(5,isCorrect);
+            ps.setLong(6,elapsedTime);
+            ps.setLong(7,probElapsed);
+            ps.setInt(8,probId);
+            if (hintStep == null)
+                ps.setNull(9,Types.VARCHAR);
+            else ps.setString(9,hintStep);
+            if (hintId == -1)
+                ps.setNull(10,Types.INTEGER);
+            else ps.setInt(10,hintId);
+            if (emotion == null)
+                ps.setNull(11, Types.VARCHAR);
+            else ps.setString(11,emotion);
+            if (activityName == null)
+                ps.setNull(12,Types.VARCHAR);
+            else ps.setString(12,activityName);
+            if (auxId == -1)
+                ps.setNull(13, Types.INTEGER);
+            else ps.setInt(13,auxId);
+            if (auxTable == null)
+                ps.setNull(14,Types.VARCHAR);
+            else ps.setString(14,auxTable);
+            ps.setTimestamp(15,new Timestamp(System.currentTimeMillis()));
+            if (curTopicId > 0)
+                ps.setInt(16,curTopicId);
+            else ps.setNull(16,Types.INTEGER);
+            ps.setTimestamp(17, clickTimeMs > 0 ? new Timestamp(clickTimeMs) : new Timestamp(System.currentTimeMillis()));
+            ps.setInt(18,studProbHistId);
+            if (langIndex == -1)
+                ps.setNull(19, Types.INTEGER);
+            else ps.setInt(19,langIndex);
+            ps.executeUpdate();
+            rs = ps.getGeneratedKeys();
+            rs.next();
+            int newId = rs.getInt(1);
+            return newId;
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    
+    
+    
     // Log My Progress Page entries
     public void logMPP (NavigationEvent e) throws Exception {
         insertLogEntry(RequestActions.MPP,null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),e.getProbElapsedTime(),null,-1,null,"mpp", getTopic(), e.getClickTime());
@@ -303,8 +393,8 @@ public class TutorLogger {
 
     public void logNextProblem(NextProblemEvent e, String lcClip, String mode) throws Exception {
 
-        insertLogEntry(RequestActions.NEXT_PROBLEM,smgr.getStudentState().getCurProblem(), null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),e.getProbElapsedTime(),
-                null,-1,lcClip,mode, smgr.getStudentState().getCurTopic(), e.getClickTime());
+        insertLogEntryNextProb(RequestActions.NEXT_PROBLEM,smgr.getStudentState().getCurProblem(), null,smgr.getStudentState().isProblemSolved(),e.getElapsedTime(),e.getProbElapsedTime(),
+                null,-1,lcClip,mode, smgr.getStudentState().getCurTopic(), e.getClickTime(),e.getLangIndex());
     }
 
     public void logNextProblemIntervention (NextProblemEvent e, InterventionResponse r) throws Exception {
@@ -313,13 +403,14 @@ public class TutorLogger {
     }
 
     public void logAttempt(AttemptEvent e, AttemptResponse r) throws Exception {
+    	int intLangIndex = e.getLangIndex();
         String curHint = smgr.getStudentState().getCurHint();
         // Bug 327:  Ivon complains that wrong attempts are graded as incorrect after the problem has been solved.  So now attempts
         // are marked as isCorrect=true once the problem is solved.
         // Bug 328:  Ivon complains that attempts should not have a hintStep logged.  Wants NULL.
         boolean isProbSolved = smgr.getStudentState().isProblemSolved() || r.isCorrect();
-        insertLogEntry(RequestActions.ATTEMPT,e.getUserInput(),isProbSolved,e.getElapsedTime(),e.getProbElapsedTime(),
-                null ,-1,r.getCharacterControl(),null, getTopic(), e.getClickTime());
+        insertLogEntryAttempt(RequestActions.ATTEMPT,e.getUserInput(),isProbSolved,e.getElapsedTime(),e.getProbElapsedTime(),
+                null ,-1,r.getCharacterControl(),null, getTopic(), e.getClickTime(), e.getLangIndex());
     }
 
 
@@ -329,7 +420,7 @@ public class TutorLogger {
     }
 
     public void logBeginProblem(BeginProblemEvent e, Response r) throws Exception {
-        insertLogEntry(RequestActions.BEGIN_PROBLEM,e.getProbId(),null,false,e.getElapsedTime(),0,null,-1,r.getCharacterControl(),e.getMode(), getTopic(), e.getClickTime());
+        insertLogEntryNextProb(RequestActions.BEGIN_PROBLEM,e.getProbId(),null,false,e.getElapsedTime(),0,null,-1,r.getCharacterControl(),e.getMode(), getTopic(), e.getClickTime(), e.getLangIndex());
     }
 
     public void logResumeProblem(ResumeProblemEvent e, Response r) throws Exception {
