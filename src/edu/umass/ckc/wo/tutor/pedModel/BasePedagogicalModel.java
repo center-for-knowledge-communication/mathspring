@@ -679,9 +679,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
      public ProblemResponse getNextProblem(NextProblemEvent e) throws Exception {
         Problem curProb = problemSelector.selectProblem(smgr, e, lastProblemScore);
         // typically it takes 125 ms to finish the above call
+        StudentState state = smgr.getStudentState();
         ProblemResponse r=null;
         if (curProb != null) {
-        	if ((e != null) && (e.getLangIndex() > 0)) {
+        	if ((e != null) && (state.getLangIndex() > 0)) {
         		int altProbId = ProblemMgr.getProblemPair(curProb.getId());
         		//int altProbId = ProblemMgr.getProblemPair(2042);
         		if (altProbId > 0 ) {
@@ -695,6 +696,9 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	        		curProb.setAnswers(altProb.getAnswers());
 	        		curProb.setAnswersViewList ();
 	        		curProb.getAnswersViewList ();
+        		}
+        		else {
+        			state.setLangIndex(-1);
         		}
         	}
             curProb.setMode(Problem.PRACTICE);
@@ -747,6 +751,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         long t = System.currentTimeMillis();
         Response r=null;
         StudentState state = smgr.getStudentState();
+        
         Problem curProb=null;
         // First grade the last practice problem which sets the lastProblemScore property of this class (used by subsequent code)
         this.lastProblemScore = gradeLastProblem();

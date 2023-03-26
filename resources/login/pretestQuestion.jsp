@@ -169,8 +169,9 @@ catch (Exception e) {
 
 <%--@elvariable id="question" type="edu.umass.ckc.wo.content.PrePostProblemDefn"--%>
 
+
 <c:if test="${message != null}">
-    <b>${message}</b> <br><br>
+   <br><br><br>
 </c:if>
 
 

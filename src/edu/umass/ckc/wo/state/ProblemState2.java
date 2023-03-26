@@ -66,13 +66,15 @@ public class ProblemState2 extends State {
     private static final String POSSIBLE_SHORT_ANSWERS = "possibleShortAnswers";
     private static final String PROBLEM_TYPE = "problemType";
 
+    private static final String LANG_INDEX = "langIndex";
+
     static final String  TABLE_NAME= "studentproblemstate";
     public static final String[] TABLE_COLS  = new String[] { CUR_HINT, CUR_HINT_ID, PROB_ELAPSED_TIME, PROB_START_TIME, HINT_START_TIME, ATTEMPT_START_TIME,
             CUR_PROB_NUM_ATTEMPTS, CUR_PROB_AVG_TIME_BETWEEN_ATTEMPTS, CUR_PROB_NUM_MISTAKES, CUR_PROB_NUM_HINTS_GIVEN, CUR_PROB_NUM_HELPAIDS_GIVEN,
             CUR_PROB_MAX_HINTS, PROBLEM_SOLVED, TIME_TO_SOLVE, TIME_TO_FIRST_EVENT, TIME_TO_FIRST_HINT, TIME_TO_SECOND_HINT, TIME_TO_THIRD_HINT, TIME_TO_FIRST_ATTEMPT, TIME_TO_SECOND_ATTEMPT, TIME_TO_THIRD_ATTEMPT,
             TIME_IN_HINTS_BEFORE_CORRECT,
             NUM_HINTS_BEFORE_CORRECT, NUM_HELPAIDS_BEFORE_CORRECT, FIRST_EVENT, LAST_EVENT, STRATEGIC_HINT_SHOWN, PROB_IDLE_TIME, VIDEO_SHOWN,
-            TEXT_READER_USED, SOLUTION_HINT_GIVEN, CUR_INTERVENTION, INTERVENTION_START_TIME, PROB_EXAMPLES_SHOWN, PROBLEM_BINDING, PROBLEM_ANSWER,POSSIBLE_SHORT_ANSWERS,PROBLEM_TYPE};
+            TEXT_READER_USED, SOLUTION_HINT_GIVEN, CUR_INTERVENTION, INTERVENTION_START_TIME, PROB_EXAMPLES_SHOWN, PROBLEM_BINDING, PROBLEM_ANSWER,POSSIBLE_SHORT_ANSWERS,PROBLEM_TYPE, LANG_INDEX};
          // N.B.  If you add a new field above,  make sure clearState deletes its value
 
 
@@ -122,7 +124,7 @@ public class ProblemState2 extends State {
     private String possibleShortAnswers;   // comma separated as coming out of db
     private List<String> possibleShortAnswersList;    // parsed version of below
     private String problemType;  // HTML, Flash, or some other.
-
+    private int langIndex;
 
 
 //    public ProblemState2(Connection conn) throws SQLException {
@@ -678,5 +680,12 @@ public class ProblemState2 extends State {
         this.problemType = problemType;
     }
 
+    public void setLangIndex(int langIndex) throws SQLException {
+        this.langIndex = langIndex;
+    }
+
+    public int getLangIndex() {
+        return langIndex;
+    }
 
 }

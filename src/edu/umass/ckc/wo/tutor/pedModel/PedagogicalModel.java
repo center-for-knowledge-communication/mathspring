@@ -160,6 +160,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
 
         if (e instanceof AttemptEvent) {
+        	state.setLangIndex(e.getLangIndex());
             r = processAttempt((AttemptEvent) e);
             studentModel.save();
             return r;
@@ -176,7 +177,10 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
                 r = processChallengeModeNextProblemRequest(ee);
             else if (ee.getMode().equalsIgnoreCase(REVIEW_MODE) || state.isInReviewMode())
                 r = processReviewModeNextProblemRequest(ee);
-            else r = processNextProblemRequest((NextProblemEvent) e);
+            else {
+            	state.setLangIndex(e.getLangIndex());
+            	r = processNextProblemRequest((NextProblemEvent) e);
+            }
             studentModel.save();
             System.out.println("Time to process NextProblem event " + (System.currentTimeMillis() - t));
             return r;
@@ -224,8 +228,10 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         else if (e instanceof BeginProblemEvent) {
             long t = System.currentTimeMillis();
             r = processBeginProblemEvent((BeginProblemEvent) e);
+            e.setLangIndex(state.getLangIndex());
             studentModel.save();
             System.out.println("Time to process BeginProblem event " + (System.currentTimeMillis() - t));
+            System.out.println("langIndex in BeginProblem event " + String.valueOf(state.getLangIndex()));
 
             return r;
         }

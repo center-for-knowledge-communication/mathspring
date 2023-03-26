@@ -68,8 +68,8 @@ public class StudentName extends LoginInterventionSelector {
         String lini = params.getString(LoginParams.LINI);
         if ((fname.length() > 0) && (lini.length() > 2)) {
         	lini = lini.substring(0, 2);
-        	DbUser.setUserNames(servletInfo.getConn(), smgr.getStudentId(), fname, lini);
         }
+    	DbUser.setUserNames(servletInfo.getConn(), smgr.getStudentId(), fname, lini);
         return null;
     }
 
