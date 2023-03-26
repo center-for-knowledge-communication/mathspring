@@ -576,7 +576,7 @@ public class DbClass {
         try {
             // relying on the default values defined in DB for the fields pretest,posttest,mfr,
             // spatialR,tutoring,
-            String q = "insert into ClassConfig (classId, color) values (?,?,?)";
+            String q = "insert into ClassConfig (classId, color, altLanguage) values (?,?,?)";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classId);
             stmt.setString(2, color);
