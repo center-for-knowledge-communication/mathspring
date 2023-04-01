@@ -1083,15 +1083,18 @@ function showLearningCompanion (json) {
     }
     else return;
 
+    
     if (file != globals.learningCompanionClip) {
         globals.learningCompanionClip = file;
-        url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;
-        console.log("Attempting to show LC animation: " + url);
-        httpHead(url, successfulLCResult, failureLCResult);
-
-//            newBrowserWindow(sysGlobals.problemContentPath + "/LearningCompanion/" + files, 260,600);
-
-
+        
+        if (file.indexOf("Isabel") >= 0) {
+        	url = "https://dev.mathspring.org:8443/MSContent/LearningCompanion" + file;
+            httpHead(url, successfulLCResult, failureLCResult);
+        }
+        else {
+            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
+            httpHead(url, successfulLCResult, failureLCResult);
+        }
     }
 }
 
