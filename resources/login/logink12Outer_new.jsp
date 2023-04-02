@@ -72,15 +72,6 @@ catch (Exception e) {
 </head>
 <body>
 
-<div class="nav">
-    <div class="nav__logo">
-        <img src="img/mstile-150x150.png" alt="" class="nav__logo-image">
-        <span class="nav__logo-text">
-            <span class="nav__logo-text--green-letter">M</span>ATH<span class="nav__logo-text--green-letter">S</span>PRING
-        </span>
-    </div>
-</div>
-
 <div class="additional-form">
     <div class="additional-form__wrapper">
         <h1 class="additional-form__header"><%= rb.getString("thank_you_for_using_ms")%></h1>
