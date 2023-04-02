@@ -1083,19 +1083,24 @@ function showLearningCompanion (json) {
     }
     else return;
 
-    
-    if (file != globals.learningCompanionClip) {
-        globals.learningCompanionClip = file;
-        
-        if (file.indexOf("Isabel") >= 0) {
-        	url = "https://dev.mathspring.org:8443/MSContent/LearningCompanion/" + file;
-            httpHead(url, successfulLCResult, failureLCResult);
-        }
-        else {
-            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
-            httpHead(url, successfulLCResult, failureLCResult);
-        }
+    try {
+	    if (file != globals.learningCompanionClip) {
+	        globals.learningCompanionClip = file;
+	        
+	        if (file.indexOf("Isabel") >= 0) {
+	        	url = "https://dev.mathspring.org:8443/MSContent/LearningCompanion/" + file;
+	            httpHead(url, successfulLCResult, failureLCResult);
+	        }
+	        else {
+	            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
+	            httpHead(url, successfulLCResult, failureLCResult);
+	        }
+	    }
     }
+	catch(err) {
+    	console.log(err.message + url);
+        $(LEARNING_COMPANION_WINDOW_ID).attr("src","")
+	}    
 }
 
 // when the lc dialog is closed we need remove the src of the iframe because
