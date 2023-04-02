@@ -39,7 +39,7 @@ catch (Exception e) {
          <h4><%= rb.getString("want_to_work_with")%></h4>
 		<c:forEach items="${lcprofile}" var="lcompanion" varStatus="loop">
 			<c:if test="${(loop.index == 0 || loop.index%3  == 0)}">
-				<c:set var="terminator" value="${loop.index + 3}"/>
+				<c:set var="terminator" value="${loop.index + 4}"/>
 			<div class="row">	
 			</c:if>
 			<div class="col-md-3">			    
