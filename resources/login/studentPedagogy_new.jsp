@@ -2,6 +2,7 @@
   Author: kartik
   
   Frank 08-03-21 Issues 150 AND 487 class message and worksheet location 
+  Frank 04-05-23 added lang
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.Locale"%>
@@ -44,11 +45,11 @@ catch (Exception e) {
 			</c:if>
 			<div class="col-md-3">			    
        			<label class="radio-inline">
-          			<input type="radio" name="optLC" id="LC${loop.index}" value="${lcompanion.key}" required ${lcompanion.value[2]}>
+          			<input type="radio" name="optLC" id="LC${loop.index}" value="${lcompanion.key}" required ${lcompanion.value[3]}>
           			<c:if test="${lcompanion.value[1] != 'NoLC'}">
           				<img src="${url}/${lcompanion.value[1]}/character.png" width="120px" height="150px">
           			</c:if>
-          			<span style="display:block; text-align: center;">${lcompanion.value[1]}</span>
+          			<span style="display:block; text-align: center;">${lcompanion.value[1]}${lcompanion.value[2]}</span>
          		</label>
        		</div>
 		    <c:if test="${loop.index == terminator}">

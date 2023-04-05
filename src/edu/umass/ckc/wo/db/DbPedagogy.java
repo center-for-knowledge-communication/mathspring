@@ -40,6 +40,7 @@ import edu.umass.ckc.wo.xml.JDOMUtils;
  * 
  * Frank	08-03-21	Issue 150 and 487 - Remember LCProfile selection on login page
  * Frank	08-03-21	Issue 150 and 487 - Remove "No Companion" option from LCGetProfiles()
+ * Frank	04-05023	Issue 725 add lang text to lcprofile
  */
 public class DbPedagogy {
 
@@ -420,7 +421,11 @@ public class DbPedagogy {
             	else {
             		checked = " ";           		
             	}
-            	LCprofiles.put(pedId, new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3), checked)));
+            	String lang = "";
+            	if ((rs.getString(3).equals("Lucas")) || (rs.getString(3).equals("Isabel"))){
+            		lang = " (esp)";
+            	}
+            	LCprofiles.put(pedId, new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3),  lang, checked)));
             }
         } finally {
             if (stmt != null)
