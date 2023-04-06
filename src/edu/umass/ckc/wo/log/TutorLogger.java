@@ -602,7 +602,8 @@ public class TutorLogger {
     }
     
 	public void logChoosePedagogy(String userInput) throws Exception {
+		String LCName = smgr.getLearningCompanion().getCharactersName();
 		insertLogEntryWorker(smgr.getStudentId(), smgr.getSessionId(), RequestActions.CHOOSE_PEDAGOGY, userInput, false, 0, 0, -1, null, -1,
-				null, null, -1, null, 0, 0);
+				null, LCName, -1, null, 0, 0);
 	}
 }

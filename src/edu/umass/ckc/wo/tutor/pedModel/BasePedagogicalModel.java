@@ -696,6 +696,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	        		curProb.setAnswers(altProb.getAnswers());
 	        		curProb.setAnswersViewList ();
 	        		curProb.getAnswersViewList ();
+	        		curProb.setHints(altProb.getHints());
+	        		curProb.setNumHints(altProb.getNumHints());
         		}
         		else {
         			state.setLangIndex(-1);
