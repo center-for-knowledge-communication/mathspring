@@ -682,7 +682,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         StudentState state = smgr.getStudentState();
         ProblemResponse r=null;
         if (curProb != null) {
-        	if ((e != null) && (state.getLangIndex() > 0)) {
+        	if (state.getLangIndex() > 0) {
         		int altProbId = ProblemMgr.getProblemPair(curProb.getId());
         		//int altProbId = ProblemMgr.getProblemPair(2042);
         		if (altProbId > 0 ) {
@@ -698,9 +698,6 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	        		curProb.getAnswersViewList ();
 	        		curProb.setHints(altProb.getHints());
 	        		curProb.setNumHints(altProb.getNumHints());
-        		}
-        		else {
-        			state.setLangIndex(-1);
         		}
         	}
             curProb.setMode(Problem.PRACTICE);

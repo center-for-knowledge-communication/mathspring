@@ -1086,7 +1086,7 @@ function showLearningCompanion (json) {
     try {
 	    if (file != globals.learningCompanionClip) {
 	        globals.learningCompanionClip = file;
-	        
+	        console.log("LC=" + file);
 	        if (file.indexOf("Isabel") >= 0) {
 	        	url = "https://dev.mathspring.org:8443/MSContent/LearningCompanion/" + file;
 	            httpHead(url, successfulLCResult, failureLCResult);
