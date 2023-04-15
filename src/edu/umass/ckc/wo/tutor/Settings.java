@@ -59,6 +59,7 @@ public class Settings {
   public static String dbhost = "localhost";
   public static boolean isDevelopmentEnv = false; // read from web.xml to determine if html5 comes from tomcat or apache
   public static String webContentPath = "should be URI of path to mathspring under apache webroot";  // has trailing slash: root of apache content read from web.xml as context param webContentPath
+  public static String webContentPath2 = "should be URI of path to mathspring under apache webroot";  // has trailing slash: root of apache content read from web.xml as context param webContentPath
   public static String html5Probs = "partial path to the html5 root folder under webContentPath"; // has trailing slash: location of html5 problems under webContentPath read as context param from web.xml as html5Probs
   public static String html5ProblemURI = "URI to html5 problem root dir"; // concat of above two
     // "cadmium.cs.umass.edu";

@@ -297,6 +297,7 @@ public class Problem implements Activity {
         if (isQuickAuth()) {
             jo.element("statementHTML", statementHTML);
             jo.element("probContentPath", Settings.webContentPath);
+            jo.element("webContentPath2", Settings.webContentPath2);
             jo.element("probDir",this.getProblemDir()); // DM 1/23/18 Added probDir so we can have problem_XXX for dir
             jo.element("questionAudio", questionAudio);  // DM 1/23/18 e.g. {[file.mp3]}
             jo.element("questionImage", imageURL); // DM 1/23/18 this will be Either a URL or {[myimage.jpg]}

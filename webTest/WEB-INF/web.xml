@@ -35,6 +35,17 @@
 		<!-- connect to the msadmin content -->
 		<param-value>https://s3.amazonaws.com/ec2-54-225-52-217.compute-1.amazonaws.com/mscontent/</param-value>
 	</context-param>
+
+	<context-param>
+		<param-name>webContentPath2</param-name>
+		<!-- <param-value>http://tutor.mathspring.org/mathspring/mscontent/</param-value> -->
+		
+		<!-- <param-value>http://msadmin-prod/mscontent/</param-value> -->
+
+		<!-- <param-value>http://rose.cs.umass.edu/mathspring/mscontent/</param-value> -->
+		<param-value>https://dev.mathspring.org:8443/MSContent/</param-value>
+	</context-param>
+	
   <context-param>
     <param-name>probplayerPath</param-name>
     <param-value>Problems/probplayer.swf</param-value>

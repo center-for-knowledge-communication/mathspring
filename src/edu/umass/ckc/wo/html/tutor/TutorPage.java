@@ -100,6 +100,7 @@ public class TutorPage {
 //        info.getRequest().setAttribute("problemContentPath", Settings.isDevelopmentEnv ?  Settings.devWebContentPath : Settings.problemContentPath);
         info.getRequest().setAttribute("problemContentPath", Settings.problemContentPath);
         info.getRequest().setAttribute("webContentPath",  Settings.webContentPath);
+        info.getRequest().setAttribute("webContentPath2",  Settings.webContentPath2);
         info.getRequest().setAttribute("elapsedTime",0);
         info.getRequest().setAttribute("lastProbId",-1);
         info.getRequest().setAttribute("topicId",-1);

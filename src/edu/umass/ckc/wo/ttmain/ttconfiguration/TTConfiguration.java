@@ -38,6 +38,7 @@ public class TTConfiguration implements ServletContextAware {
             JndiTemplate jndiTemplate = new JndiTemplate();
             String dataSourceLookup = this.servletContext.getInitParameter("wodb.datasource");
             Settings.webContentPath = this.servletContext.getInitParameter("webContentPath");
+            Settings.webContentPath2 = this.servletContext.getInitParameter("webContentPath2");
             DataSource ds = (DataSource) jndiTemplate.lookup("java:comp/env/" + dataSourceLookup);
             return ds.getConnection();
         } catch (Exception e) {
