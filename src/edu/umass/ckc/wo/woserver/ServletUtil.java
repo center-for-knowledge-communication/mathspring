@@ -83,6 +83,7 @@ public class ServletUtil {
         Settings.port = servletContext.getInitParameter(Names.SERVLET_PORT);
         Settings.isDevelopmentEnv = Boolean.parseBoolean(servletContext.getInitParameter(Names.IS_DEVELOPMENT_ENVIRONMENT)); // boolean saying if we are using Tomcat for HTML5
         Settings.webContentPath =servletContext.getInitParameter(Names.WEB_CONTENT_PATH); // root of apache web content for mathspring
+        Settings.webContentPath2 =servletContext.getInitParameter(Names.WEB_CONTENT_PATH2); // root of apache web content for mathspring
 
         String probPlayerPath =  servletContext.getInitParameter(Names.PROB_PLAYER_PATH);
         String probPreviewerPath =  servletContext.getInitParameter(Names.PROB_PREVIEWER_PATH);

@@ -256,6 +256,7 @@ else
             problemContentDomain : '${problemContentDomain}',
             problemContentPath : '${problemContentPath}',
             webContentPath : '${webContentPath}',
+            webContentPath2 : '${webContentPath2}',
             <%--servletContextPath : '${pageContext.request.contextPath}',--%>
             servletName : '${servletName}',
             probplayerPath : '${probplayerPath}',
@@ -969,8 +970,8 @@ label {
 		<p id="instructionsP">${instructions}</p>
 		<div class="empty"></div>
 	</div>
-	<%-- This div contains information about the current problem (its topic and standard)--%>
-	<%--<div id="problemTopicAndStandards" style="display: none;">Topic:<br/>Standards:</div>--%>
+	<%-- This div contains information about the current problem --%>
+	<div id="problemId" style="display: block;">Problem Id: ${probId}</div>
 	<%-- Only shown to test users--%>
 	<div id="varBindings" style="display: none;"></div>
 
