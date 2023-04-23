@@ -678,6 +678,8 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
      */
      public ProblemResponse getNextProblem(NextProblemEvent e) throws Exception {
         Problem curProb = problemSelector.selectProblem(smgr, e, lastProblemScore);
+        ProblemMgr.reloadProblem(smgr.getConnection(),curProb.getId());
+        curProb  = ProblemMgr.getProblem(curProb.getId());
         // typically it takes 125 ms to finish the above call
         StudentState state = smgr.getStudentState();
         ProblemResponse r=null;
@@ -686,7 +688,9 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         		int altProbId = ProblemMgr.getProblemPair(curProb.getId());
         		//int altProbId = ProblemMgr.getProblemPair(2042);
         		if (altProbId > 0 ) {
+        			
 	        		Problem altProb = ProblemMgr.getProblem(altProbId);
+
 	        		curProb.setNickname(altProb.getNickname());
 	        		curProb.setStatementHTML(altProb.getStatementHTML());
 	        		curProb.setProblemFormat(altProb.getProblemFormat());
@@ -698,6 +702,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 	        		curProb.getAnswersViewList ();
 	        		curProb.setHints(altProb.getHints());
 	        		curProb.setNumHints(altProb.getNumHints());
+		            
         		}
         	}
             curProb.setMode(Problem.PRACTICE);
@@ -782,7 +787,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         }
 
         if (r != null && r instanceof ProblemResponse) {
-             curProb = ((ProblemResponse) r).getProblem();
+            curProb = ((ProblemResponse) r).getProblem();
         }
         if (learningCompanion != null )
             learningCompanion.processNextProblemRequest(smgr,e,r);
