@@ -990,8 +990,12 @@ public class TTReportServiceImpl implements TTReportService {
                     documentXmlEmotion.add(parseXmlFromString("<interventionInput class='AskEmotionIS'><emotion name='NoEmotionReported' level='-1'><![CDATA[]]></emotion></interventionInput>"));
                 } else {
 
-                    for (String strEmo : studentEmotions)
-                        documentXmlEmotion.add(parseXmlFromString(strEmo));
+                    	if (strEmo.startsWith("<") && strEmo.endsWith(">")) {
+                    		documentXmlEmotion.add(parseXmlFromString(strEmo));
+                    	}
+                    	else {
+                    		logger.error("Invalid strEmo: " + strEmo);
+                    	}
                 }
             } catch (TTCustomException e) {
                 logger.error(e.getErrorMessage());
