@@ -69,7 +69,8 @@ import edu.umass.ckc.wo.ttmain.ttservice.util.SendEM;
  * Frank	08-03-21	Issue 150 pass along the list of class name/id pairs
  * Frank    10-09-2021	issue #528 Research Tool
  * Frank 	02-04-23    Issue #723 - handle class clustering 
- * Frank 	02-04-23    Issue #723 - fix class clustering 
+ * Frank 	02-04-23    Issue #723 - fix class clustering
+ * Frank	05-13-23	Issue #763 make LCs selectable by class 
  */
 @Service
 public class TTLoginServiceImpl implements TTLoginService {
@@ -125,6 +126,11 @@ public class TTLoginServiceImpl implements TTLoginService {
             model.addAttribute("createClassForm", new CreateClassForm());
             model.addAttribute("teacherPauseStudentUse", Integer.toString(teacher.getPauseStudentUse()));
 
+            String lcProfileStr = populateLCProfile();
+            model.addAttribute("lcProfileStr", lcProfileStr);
+                        
+            
+            
             JSONArray classNameIdArray = new JSONArray();
 	        try {
 	            if (classInfoListLatest.size() > 0) {
@@ -211,6 +217,16 @@ public class TTLoginServiceImpl implements TTLoginService {
         }
     }
 
+    @Override
+    public String populateLCProfile() throws TTCustomException {
+    	try {
+    		String lcprofile = DbPedagogy.getSelectableLCprofiles(connection.getConnection());
+        	return lcprofile;
+    	}
+    	catch (Exception e) {
+    		return null;
+    	}
+    }	
     @Override
     public int resetPassword(String uname, String email) {
         try {

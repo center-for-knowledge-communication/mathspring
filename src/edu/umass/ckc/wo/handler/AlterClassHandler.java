@@ -32,6 +32,7 @@ import java.io.IOException;
  * Time: 2:18:57 PM
  * 
  *  Frank 	02-04-23    Issue #723 - Added class color
+ *  Frank 05-13-23		Issue #763 make LCs selectable by class
  */
 public class AlterClassHandler {
     private int teacherId;
@@ -418,7 +419,7 @@ public class AlterClassHandler {
                 DbClass.setSimpleConfig(conn, classId, ee.getLc(), ee.getCollab(), ee.getDiffRate(), ee.getLowDiff(), ee.getHighDiff());
                 ClassInfo info = DbClass.getClass(conn, classId);
                 // Contains settings which allows us to select content for this class
-                new ClassContentSelector(conn).selectContent(info);
+                new ClassContentSelector(conn).selectContent(info,"both","");
                 editClassList(conn,e.getClassId(),e.getTeacherId(),req,resp);
             }
             // not part of a create-class sequence so just show the simple config page again.
@@ -435,7 +436,7 @@ public class AlterClassHandler {
                     // we run the content selector (a slow process).
                     if (oldLowDiff == null || oldHighDiff == null ||
                             !oldHighDiff.equals(ee.getHighDiff()) || !oldLowDiff.equals(ee.getLowDiff()))
-                        new ClassContentSelector(conn).selectContent(info);
+                        new ClassContentSelector(conn).selectContent(info, "both","");
                     message = "Your edits have been successully stored and content has been adjusted." ;
                 }
                 else message = "You need to set a grade for this class. Go to class information page to set this.";

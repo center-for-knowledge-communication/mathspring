@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * Frank	08-08-20	issue #51 don't show active topics which have ZERO problems 
  * Kartik   09-20-20    issue #232 setting only one topic to be activated on class creation
  * Frank	08-10-21    issue #491 change default LCs to 1 & 2 (i.e. Jane Learning Companion and Jake Learning Companion) 
- * 
+ * Frank	05-13-23 	issue #763 make lCs selectable by class
  */
 public class ClassContentSelector {
 
@@ -44,14 +44,14 @@ public class ClassContentSelector {
     // Run an algorithm which selects topics and problems for the class depending on settings in the event
     // Make sure to save the settings in the db so that re-visits to the simple class config page can show the
     // current settings.
-    public void selectContent(ClassInfo ci) throws SQLException {
+    public void selectContent(ClassInfo ci, String lc, String selectedLCs) throws SQLException {
         String grade = ci.getGrade();
         String lowDiff = ci.getSimpleLowDiff();
         String highDiff = ci.getSimpleHighDiff();
         // remove topics and problems that don't fit the grade and difficulty levels
         removeTopicsAndProblems(ci.getClassid(),grade,lowDiff,highDiff);
         // set the class pedagogies based on collab and learning companions selections in the event
-        setClassPedagogies(ci.getClassid(), ci.getSimpleLC(), ci.getSimpleCollab());
+        setClassPedagogies(ci.getClassid(), ci.getSimpleLC(), ci.getSimpleCollab(), selectedLCs);
         // set the problem selectors difficulty rate based on the event
         setProblemDiffRate(ci.getClassid(), ci.getSimpleDiffRate(),ci.isDefaultClass());
     }
@@ -91,7 +91,7 @@ public class ClassContentSelector {
      * @param simpleLC  Values are: none, male, female, both
      * @param simpleCollab Values are: none, some, alot
      */
-    private void setClassPedagogies(int classId, String simpleLC, String simpleCollab) throws SQLException {
+    private void setClassPedagogies(int classId, String simpleLC, String simpleCollab, String selectedLCs) throws SQLException {
         Pedagogy p=null;
         DbClassPedagogies.removeClassPedagogies(conn, classId);
 
@@ -124,6 +124,13 @@ public class ClassContentSelector {
                 p = getPedagogyByName("Jake Learning Companion");
                 DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
             }
+            else if (simpleLC.equals("selectable")) {
+            	String[] id = selectedLCs.split("~"); 
+            	for(int i=0;i < id.length; i++) {
+            		DbClassPedagogies.setClassPedagogy(conn, classId, id[i]);
+            	}	
+            }
+            
         }
         else {
             if (simpleLC.equals("none"))

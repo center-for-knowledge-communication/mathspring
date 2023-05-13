@@ -44,6 +44,7 @@ import java.util.Map;
  * Frank	02--7-22	issue #600 removed code to adjustment maxTime after changing Topic selections
  * Frank	01-21-22	Issue #610 - compute numProblems for inactive topics
  * Frank 	02-04-23    Issue #723 - handle class clustering
+ * Frank	05-13-23	Issue #763 make LCs selectable by class
  */
 
 @Service
@@ -91,7 +92,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newid);
                 ClassInfo info = DbClass.getClass(connection.getConnection(), newid);
-                info.setSimpleConfigDefaults();
+                info.setSimpleConfigDefaults("selectable");
             } else {
                 throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
             }
@@ -174,7 +175,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     			else {
                     DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newClassId);
                     ClassInfo info = DbClass.getClass(connection.getConnection(), newClassId);
-                    info.setSimpleConfigDefaults();
+                    info.setSimpleConfigDefaults(ciPrev.getSimpleLC());
     			}
 	    		result = newClassId;
     		}
@@ -199,7 +200,8 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     		DbClass.setAdvancedConfig(connection.getConnection(), classId, createForm.getMaxProb(), createForm.getMinProb(), createForm.getMaxTime(), createForm.getMinTime());
         	ClassInfo info = DbClass.getClass(connection.getConnection(), classId);
             info.setDefaultClass(true);
-            new ClassContentSelector(connection.getConnection()).selectContent(info);
+            String selectedLCs = getSelectedLCs(createForm);
+            new ClassContentSelector(connection.getConnection()).selectContent(info,"selectable", selectedLCs);
             return info;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -465,4 +467,62 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     }
 
 
+    private String getSelectedLCs(CreateClassForm createForm) {
+    	
+    	String result = "";
+    	
+    	String t = createForm.getLC1();
+    	
+    	if ((createForm.getLC1()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC1();
+    	}
+    	    	
+    	if ((createForm.getLC2()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC2();
+    	}
+    	    	
+    	if ((createForm.getLC3()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC3();
+    	}
+    	    	
+    	if ((createForm.getLC4()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC4();
+    	}
+    	    	
+    	if ((createForm.getLC5()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC5();
+    	}
+    	    	
+    	if ((createForm.getLC6()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC6();
+    	}
+    	    	
+    	if ((createForm.getLC7()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC7();
+    	}
+    	    	
+    	if ((createForm.getLC8()).length() > 0) {
+    		if (result.length() > 0) 
+    			result += "~";    			
+    		result = result +  createForm.getLC8();
+    	}
+    	    	
+    	return result;
+    	
+    }
+    
 }

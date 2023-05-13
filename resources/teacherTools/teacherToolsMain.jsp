@@ -32,6 +32,7 @@
  *  Frank 	11-27-22    Issue #714 - finish multi-lingual algorithms
  *  Frank 	02-04-23    Issue #723 - Added class clustering
  *  Frank 	02-04-23    Issue #723 - Added create class validation on cluster y/n
+ *  Frank	05-13-23	Issue #763 - make LCs selectable by class
  */
 
  System.out.println("teacherToolsMain starting");
@@ -275,7 +276,8 @@ catch (Exception e) {
 		var t_name = "";
 		var t_classid = "";
 		var t_schoolYear = "";
-        
+		
+		var lcProfileArr = null;
         
         $(document).ready(function () {
         	$('#wrapper').toggleClass('toggled');
@@ -294,6 +296,8 @@ catch (Exception e) {
 				}
 	              
 	            homePageClassArr = ${homePageClassArrayStr};
+	            lcProfileArr = ${lcProfileStr};
+
 	            teacherId =  ${teacherId};
 				var myHTML = "";
 				var nbrOfClasses = homePageClassArr[0][7];
@@ -416,7 +420,51 @@ catch (Exception e) {
 				}
 	            
 				document.getElementById('report-wrapper').innerHTML = myHTML;
-		       	
+
+//			    <input type="checkbox" id="myCheckbox1" />
+//			        <label for="myCheckbox1"><img src="http://townandcountryremovals.com/wp-content/uploads/2013/10/firefox-logo-200x200.png" /></label>
+				
+				
+				//var lcProfileArr = JSON.parse(lcProfileStr);
+                                        
+				var fullLCDiv = '<br><div class="row">';
+				var itemsinrow = 4;
+				var itemcount = 0;
+
+//				fullLCDiv += '<select path="LCOpts" class="form-control" id="LCDivs" name="LCDivs" multiple="true">';
+
+				for (let index = 0; index < lcProfileArr.length; index++) {
+					if (itemcount == itemsinrow) {
+						fullLCDiv += "</div>";
+						fullLCDiv += '<br><div class="row">';
+						itemcount = 0;
+					}
+					  
+					itemcount = itemcount + 1;
+					myLCDiv = '<div class="col-md-2" style="border:black; border-width:2px; border-style:solid;outline-style: solid;outline-color: white;outline-width: 3px;">';			    
+					var id = 'LC' + (index + 1);
+					var lcname = lcProfileArr[index].lcname;
+					var lcshortname = lcProfileArr[index].lcshortname;
+					var lang = lcProfileArr[index].lang;
+					var url = lcProfileArr[index].url;
+
+
+//					myLCDiv += 'option  id="' + id + '" + value="' + lcProfileArr[index].id + '"></option>';                                            
+
+					myLCDiv += '<input type="checkbox" name="' + id + '" id="' + id + '" value="' + lcProfileArr[index].id + '" />';
+					myLCDiv += '<label for=' + id + '>';			
+					myLCDiv += '<img src="' + url +  lcshortname + '/character.png" width="120px" height="150px" />';
+					myLCDiv += '<span style="display:block; text-align: center;">' + lcshortname + lang + '</span>';		
+					myLCDiv += "</label>";
+					myLCDiv += "</div>";
+					console.log(myLCDiv);
+					fullLCDiv += myLCDiv;
+				}			
+				
+//				fullLCDiv += "</select>";
+				fullLCDiv += "</div>";
+				
+				document.getElementById('learning_companions').innerHTML = fullLCDiv;
             }
             else {
 				myHTML  = '<div class="loader" style="display: none" ></div>';               
@@ -428,7 +476,8 @@ catch (Exception e) {
 	          	var x = document.getElementById("li_class_message_handler");
         		x.style.display = "none";
             }
-
+		
+            
             var pause = ${teacherPauseStudentUse};
             if (pause == "1")
             	$("#pause-status").show();            
@@ -1649,6 +1698,7 @@ function registerAllEvents(){
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div id="add_students_out" class="col-md-12 col-sm-12">
                         <div id="add_students_out_panel_default" class="panel panel-default">
@@ -1691,10 +1741,10 @@ function registerAllEvents(){
                     </div>
                 </div>
                 <div class="row">
-                    <div id="has_clusters_out" class="col-md-12 col-sm-12">
-                           <div class="panel-heading">
-                             <%= rb.getString("part_three_class_clustering") %>
-                           </div>
+                    <div id="has_clusters_out" class="panel panel-default">
+                        <div class="panel-heading">
+                           <%= rb.getString("part_three_class_clustering") %>
+                        </div>
 
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -1714,6 +1764,20 @@ function registerAllEvents(){
                         </div>
                     </div>
                 </div>                
+                <div class="row">
+                    <div id="learning_companions-section" class="panel panel-default">
+                        <div class="panel-heading">
+                           <%= rb.getString("part_four_learning_companions") %>part_four_learning_companions
+                        </div>
+                        <div class="panel-body">
+                            <span class="input-group label label-warning"><%= rb.getString("what_are_learning_companions") %></span>
+                            <label><%= rb.getString("learning_companion_definition") %></label>
+                        </div>
+	                    <div id="learning_companions" class="container">
+
+						</div>
+                    </div>
+                </div>
                 <div style="text-align:center;">
                     <button role="button" type="submit" class="btn btn-primary btn-lg" ><%= rb.getString("create_class") %></button>
                 </div>

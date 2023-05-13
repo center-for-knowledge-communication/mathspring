@@ -7,6 +7,7 @@ import edu.umass.ckc.wo.woreports.Report;
  * Frank	10-31-20	issue #293 added advanced settings
  * Frank	06-26-21	Added gaze_detection_on handling
  *  Frank 	02-04-23    Issue #723 - handle class clustering
+ *  Frank	05-13-23	issue #763 - make LCs selectable by class
  */
 
 public class ClassInfo {
@@ -240,10 +241,10 @@ public class ClassInfo {
         this.simpleHighDiff = simpleHighDiff;
     }
 
-    public void setSimpleConfigDefaults() {
+    public void setSimpleConfigDefaults(String lc) {
         this.simpleCollab="none";
         this.simpleDiffRate="normal";
-        this.simpleLC = "both";
+        this.simpleLC = lc;
         this.simpleLowDiff="below2";
         this.simpleHighDiff="above1";
     }

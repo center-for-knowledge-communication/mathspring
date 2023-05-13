@@ -3237,7 +3237,10 @@ var completeDataChart;
 	$('#showReportEightBtn').on('click', function ()  {    	
 
   	   
-        getFilterEight();
+        var showProblemNames = true;
+        var forPaper = false;
+        
+		getFilterEight();
         
         var testFilterEight = filterEight.split("~");
         if (testFilterEight.length < 4) {
@@ -3293,7 +3296,12 @@ var completeDataChart;
 
 				var rptEightTitle = '<%= rb.getString("student_problem_solving_history")%>';
 				if (selectedTopicEight.length > 0) {
-					rptEightTitle = rptEightTitle + " ( " + topicNameMap.get(selectedTopicEight) + " )";
+					if (forPaper == true) {
+						rptEightTitle = rptEightTitle;						
+					}
+					else {
+						rptEightTitle = rptEightTitle + " ( Topic = " + topicNameMap.get(selectedTopicEight) + " )";
+					}
 				}
            		var problems = [];
            		var problemIds = [];
@@ -3333,6 +3341,9 @@ var completeDataChart;
 					
                 	if (useThisOne) {                		
 	               		var p = "" + i + ": "+ obj[0];
+	               		if (forPaper == true) {
+	               			p = "" + i;
+	               		}
 	               		var pHints = parseInt(obj[6]);
 	               		var pAttempts = parseInt(obj[7]);
 	               		var pVideos = parseInt(obj[12]);
@@ -3420,10 +3431,10 @@ var completeDataChart;
         		}
 
         		
-				var maxWidth = 800;       
-				if (problems.length > 16) {
-					maxWidth = problems.length * 50;    		 
-				}
+				var maxWidth = 1200;       
+//				if (problems.length > 10) {
+//					maxWidth = problems.length * 50;    		 
+//				}
                 
            		var traceHints = {
              			  x: problems,
@@ -3480,11 +3491,11 @@ var completeDataChart;
        				  type: 'scatter',
    					  mode: 'lines+markers',
    					  marker: {
-   					    color: 'rgb(255, 255, 0)',
+   					    color: 'rgb(0, 0, 0)',
    					    size: 8
    					  },
    					  line: {
-   					    color: 'rgb(255, 255, 0)',
+   					    color: 'rgb(0, 0, 0)',
    					    width: 2
    					  }         				
        				};
@@ -3574,13 +3585,23 @@ var completeDataChart;
 
            	    layout = {
            	    	 width:(maxWidth),
-           	    	 height:500,          	         
+           	    	 height:660,          	         
            	    	 xaxis: {
                	       type: 'category',
-               	       title: '<%= rb.getString("problems")%>',
+               	       title: 'PROBLEMS',
+                	    font: {
+                   	      family: 'sans-serif',
+                   	      size: 20,
+                   	      color: '#000'
+                   	    }
                	     },
           	         yaxis: {
-                 	   title: '<%= rb.getString("minutes")%>',
+                 	   title: 'BAR = MINUTES;  LINES = VALUES',
+                	    font: {
+                   	      family: 'sans-serif',
+                   	      size: 16,
+                   	      color: '#000'
+                   	    },
                  	   dtick: 1,
                    	   range: [0, maxYaxis1]
                  	 },
@@ -3590,7 +3611,7 @@ var completeDataChart;
                  	    traceorder: 'normal',
                  	    font: {
                  	      family: 'sans-serif',
-                 	      size: 12,
+                 	      size: 18,
                  	      color: '#000'
                  	    },
                  	    bgcolor: '#E2E2E2',
@@ -3620,7 +3641,7 @@ var completeDataChart;
            		
            	    layout2 = {
               	    	 width:(maxWidth),
-              	    	 height:660,          	         
+              	    	 height:800,          	         
               	    	 xaxis: {
                   	       type: 'category',
                   	       title: '<%= rb.getString("problems")%>',
@@ -3636,7 +3657,7 @@ var completeDataChart;
                     	    traceorder: 'normal',
                     	    font: {
                     	      family: 'sans-serif',
-                    	      size: 12,
+                    	      size: 16,
                     	      color: '#000'
                     	    },
                     	    bgcolor: '#E2E2E2',
@@ -3946,11 +3967,11 @@ var completeDataChart;
 					  type: 'scatter',
    					  mode: 'lines+markers',
    					  marker: {
-   					    color: 'rgb(255, 102, 0)',
+   					    color: 'rgb(0, 0, 0)',
    					    size: 8
    					  },
    					  line: {
-   					    color: 'rgb(255, 102, 0)',
+   					    color: 'rgb(0, 0, 0)',
    					    width: 2
    					  }         				
        				};
@@ -4060,7 +4081,7 @@ var completeDataChart;
                  	    traceorder: 'normal',
                  	    font: {
                  	      family: 'sans-serif',
-                 	      size: 12,
+                 	      size: 16,
                  	      color: '#000'
                  	    },
                  	    bgcolor: '#E2E2E2',

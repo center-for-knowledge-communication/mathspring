@@ -1,2 +1,303 @@
 # enter queries here
+
+#class clusters
+CREATE TABLE `class_map_clusters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `classId` int(11) DEFAULT NULL,
+  `clusterId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=170 DEFAULT CHARSET=latin1;
+
+
+
+# ML study
+
+ALTER TABLE classconfig ADD altLanguage  char(45) NOT NULL DEFAULT 'es' AFTER color; 
+
+ALTER TABLE studentproblemstate ADD langIndex  int(11) NOT NULL DEFAULT 0 AFTER problemtype;
+ALTER TABLE studentproblemhistory ADD langIndex  int(11) NOT NULL DEFAULT 0 AFTER isProbBroken;
+ALTER TABLE eventlog ADD langIndex  int(11) NOT NULL DEFAULT 0 AFTER tempSavedTime;
+
+DROP TABLE `BaseProblemJoin`;
+CREATE TABLE `BaseProblemJoin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `problemID` int(11) DEFAULT NULL,
+  `baseProblemID` int(11) DEFAULT NULL,
+  `relationshipType` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1841, 2326, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1845, 1620, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1853, 1793, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1876, 1873, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1914, 1570, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1916, 2128, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1917, 1805, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1918, 1776, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1934, 1952, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1935, 1951, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1936, 1950, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1942, 1570, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1955, 1804, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1979, 1794, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1984, 1676, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1986, 1677, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1987, 1684, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1988, 1372, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1994, 1678, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (1998, 1802, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2000, 1085, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2006, 1686, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2007, 1688, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2008, 1800, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2009, 1801, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2010, 1687, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2011, 1685, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2014, 2110, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2015, 2111, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2016, 2112, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2017, 2113, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2020, 2115, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2021, 2116, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2025, 1702, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2026, 1704, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2027, 1367, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2040, 1706, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2042, 1388, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2043, 1552, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2044, 2342, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2049, 2059, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2050, 2060, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2051, 2148, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2052, 2149, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2053, 2150, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2054, 2151, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2055, 2152, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2056, 2153, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2057, 2154, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2058, 2155, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2068, 2063, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2069, 2067, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2070, 2156, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2071, 2157, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2072, 2158, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2073, 2159, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2074, 2160, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2075, 2161, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2076, 2162, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2077, 2163, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2078, 2167, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2080, 2164, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2081, 2165, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2082, 2166, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2084, 1703, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2085, 1791, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2086, 1791, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2087, 1775, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2088, 1774, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2089, 1698, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2093, 1710, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2094, 1711, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2096, 1778, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2098, 1581, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2109, 2196, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2120, 1710, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2122, 2121, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2123, 1711, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2124, 1712, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2125, 1713, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2126, 1714, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2129, 1715, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2133, 1724, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2143, 1629, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2144, 1665, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2145, 1666, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2147, 1672, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2168, 1673, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2169, 1674, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2171, 2202, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2172, 1374, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2173, 1375, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2174, 2328, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2175, 2203, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2176, 2204, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2177, 1793, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2178, 2220, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2179, 1791, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2180, 1775, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2181, 2199, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2182, 1374, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2183, 1720, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2184, 1600, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2185, 1721, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2186, 1769, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2187, 1831, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2201, 1834, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2205, 1708, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2207, 2276, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2209, 2197, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2213, 1873, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2216, 1807, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2217, 2278, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2218, 2279, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2219, 2280, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2224, 1570, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2227, 2128, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2231, 1633, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2233, 1628, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2234, 1943, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2235, 1834, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2243, 2604, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2244, 2605, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2245, 2606, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2246, 2263, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2248, 2701, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2249, 2701, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2250, 2555, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2251, 2556, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2252, 2570, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2253, 2571, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2254, 2604, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2255, 2605, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2260, 2338, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2269, 2267, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2270, 2588, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2332, 1921, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2336, 1920, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2340, 1718, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2839, 1905, 'EnglishBaseForSpanishProb'); 
+INSERT INTO BaseProblemJoin (problemID, baseProblemID, relationshipType) VALUES (2840, 1905, 'EnglishBaseForSpanishProb'); 
+
+
+
+# New Learning Companion
+INSERT INTO `localwayangoutpostdb`.`pedagogy`
+(`id`,
+`isBasic`,
+`active`,
+`definition`,
+`login`,
+`lesson`,
+`name`,
+`simpleConfigName`,
+`shortName`)
+VALUES
+( 66, 1, 1, '<pedagogy default="true">   <comment>Fully empathic Isabel Learning Companion</comment>   
+ <pedagogicalModelClass>BasePedagogicalModel</pedagogicalModelClass>   <studentModelClass>AffectStudentModel</studentModelClass>   
+ <problemSelectorClass>BaseProblemSelector</problemSelectorClass>   
+ <reviewModeProblemSelectorClass>ReviewModeProblemSelector</reviewModeProblemSelectorClass>   
+ <challengeModeProblemSelectorClass>ChallengeModeProblemSelector</challengeModeProblemSelectorClass>   
+ 
+ <controlParameters>     <!-- number of sessions that determines when solved problems and demos can be given again-->     
+ <problemReuseIntervalSessions>6</problemReuseIntervalSessions>     <problemReuseIntervalDays>10</problemReuseIntervalDays>     <!--valid values for the below: true, false.   If true and a MPP nextProblemIntervention selector is present, then MPP is off until the intervention selector             turns it on.   If false, intervention selector has no effect - it is always off-->     <displayMyProgressPage>true</displayMyProgressPage>   </controlParameters>   
+ 
+ <hintSelectorClass>PercentageHintSelector</hintSelectorClass>   
+ <package>pedModel2</package>   
+ 
+ <interventions>
+ <interventionSelector onEvent="NextProblem" weight="1" class="AskEmotionIS">       
+ <config>         
+ <inputType>radio</inputType>         
+ <numVals>5</numVals>         
+ <!-- Will interrupt to ask every 5 min or every 8 problems whichever comes first.  Omit one of these parameters for it not to be considered-->         
+ <interruptIntervalMin>5</interruptIntervalMin>        
+ <interruptIntervalProblems>8</interruptIntervalProblems>         
+ 
+ <emotion name="Frustration">           
+ <label val="1">Para nada Frustrado/a</label>           
+ <label val="2">Apenas Frustrado/a</label>           
+ <label val="3">Un poco Frustrado/a</label>           
+ <label val="4">Bastante Frustrado/a</label>           
+ <label val="5">Muy Frustrado/a</label>         
+ </emotion>         
+ 
+ <emotion name="Confidence">           
+ <label val="1">No tengo confianza para nada</label>           
+ <label val="2">Apenas un poquito de confianza</label>           
+ <label val="3">Un poco de Confianza</label>           
+ <label val="4">Bastante Confianza</label>           
+ <label val="5">Tengo mucha Confianza</label>         
+ </emotion>         
+ <askWhy>true</askWhy>       
+ </config>   
+ </interventionSelector>          
+ 
+ <interventionSelector onEvent="Attempt" weight="1" class="HighlightHintButtonIS">       
+ <config>         
+ <threshold>1</threshold>       
+ </config>     
+ </interventionSelector>    
+ </interventions>  
+ 
+ <learningCompanionClass>IsabelEmpathicLC</learningCompanionClass> 
+ </pedagogy>','IndivWithFNameAndTests','TopicWithIntroAndDemo ','Isabel Full Empathy','Isabel Learning Companion','Isabel');
+
+
+
+# selectable Learning Companions
+alter table pedagogy ADD selectable int(11) DEFAULT '0';
+alter table classpedagogies ADD selectable int(11) DEFAULT '0';
+
+update pedagogy set selectable = 1 where id = 66;
+update pedagogy set selectable = 1 where id = 65;
+update pedagogy set selectable = 1 where id = 2;
+update pedagogy set selectable = 1 where id = 1;
+ 
+update classpedagogies set selectable = 1 where classId = ???? and pedagogyId = 66;
+update classpedagogies set selectable = 1 where classId = ???? and pedagogyId = 65;
+update classpedagogies set selectable = 1 where classId = ???? and pedagogyId = 2;
+update classpedagogies set selectable = 1 where classId = ???? and pedagogyId = 1;
+  
+update pedagogy set login = "EmbeddedSurveyLogin" where id = 65;
+update pedagogy set login = "EmbeddedSurveyLogin" where id = 66; 
+
+insert into intervention_selector (name,className,type,onEvent,generic_is_id) values ('StudentPedagogy','edu.umass.ckc.wo.login.interv.StudentPedagogy','login',"Login",5);
+update intervention_selector set strategy_id = 34 where id = 317;
+
+select * from loginbehavior where name="EmbeddedSurveyLogin";
+
+update loginbehavior set definition='<login name="SurveyLogin">
+         <controlParameters>
+ 
+         </controlParameters>
+ 
+         <interventions>
+ 
+ 
+             <interventionSelector onEvent="Login" weight="3" runFreq="once" class="edu.umass.ckc.wo.login.interv.StudentName">
+                 <config>
+ 
+                 </config>
+             </interventionSelector>
+			 
+			 <interventionSelector onEvent="Login" weight="4" runFreq="always" class="edu.umass.ckc.wo.login.interv.StudentPedagogy">
+                    <config>
+    
+                    </config>
+                </interventionSelector>
+ 
+ <interventionSelector onEvent="Login" weight="1" runFreq="oncepersession" class="edu.umass.ckc.wo.login.interv.Pretest">
+                 <config>
+                           <terminationTest>completeAllProblems</terminationTest>
+  <startMessage><![CDATA[Before using the software, please TELL US WHAT YOU THINK.<br>Please be very sincere in your responses.  We are really interested in knowing how you feel about mathematics.  NOBODY other than the UMass research team will know your responses.]]></startMessage>
+                 </config>
+             </interventionSelector>
+ 
+    <interventionSelector onEvent="Login" weight="2" runFreq="oncepersession" class="edu.umass.ckc.wo.login.interv.Posttest">
+                 <config>
+                           <terminationTest>completeAllProblems</terminationTest>
+  <startMessage><![CDATA[Now that you have used the software, please TELL US WHAT YOU THINK.<br>Please be very sincere in your responses.  We are really interested in knowing what you thought of this experience.  NOBODY other than the UMass research team will know your responses.]]></startMessage>
+                 </config>
+             </interventionSelector>
+ 
+         </interventions>
+     </login>' where name = "EmbeddedSurveyLogin";
+ 
 end
+
+#fix - topic name too long
+update problemgroup_description_multi_language set pg_language_name = '{"en": "Measurement and Conversions", "es": "Midiendo con el sistema métrico"}' where pg_description_language_id = 58;
+

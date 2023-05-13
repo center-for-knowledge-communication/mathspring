@@ -101,6 +101,7 @@ import java.text.SimpleDateFormat;
   * Frank	08-20-21	Issue 578 handled anonymous report option
   * Frank	04-16-22	Issue# 634R2 use full topic list not activeTopics
  * Frank 	02-04-23    Issue #723 - handle class clustering
+ * Frank 	05-13-23	Add validation to sutydent comment input processing
  */
 
 
@@ -1021,8 +1022,14 @@ public class TTReportServiceImpl implements TTReportService {
                     documentXmlEmotion.add(parseXmlFromString("<interventionInput class='AskEmotionIS'><emotion name='NoEmotionReported' level='-1'><![CDATA[]]></emotion></interventionInput>"));
                 } else {
 
-                    for (String strEmo : studentEmotions)
-                        documentXmlEmotion.add(parseXmlFromString(strEmo));
+                    for (String strEmo : studentEmotions) {
+                    	if (strEmo.startsWith("<") && strEmo.endsWith(">")) {
+                    		documentXmlEmotion.add(parseXmlFromString(strEmo));
+                    	}
+                    	else {
+                    		logger.error("Invalid strEmo: " + strEmo);
+                    	}
+                    }
                 }
             } catch (TTCustomException e) {
                 logger.error(e.getErrorMessage());
