@@ -52,6 +52,7 @@ import net.sf.json.JSONObject;
  * To change this template use File | Settings | File Templates.
  * Frank	06-26-2021	added support for gaze detection
  * Frank	07-03-21	added logging to evemtLog and updating gazewanderingevents with reciprocal links
+ * Frank	05-13-23	temporary fix for multi-lingual study
  */
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 

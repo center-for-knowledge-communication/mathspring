@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.ttmain.ttservice.loginservice;
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
 import org.springframework.ui.ModelMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,4 +23,6 @@ public interface TTLoginService{
     public int sendHelpMessage(String subject, String email,String helpmsg) throws TTCustomException;
 
     public int logFeedback(String messageType, int teacherId, String objectId, String priority, String msg) throws TTCustomException;
+    
+    public String populateLCProfile() throws TTCustomException;
 }

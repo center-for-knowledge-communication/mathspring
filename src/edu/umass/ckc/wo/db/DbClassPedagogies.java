@@ -20,6 +20,8 @@ import java.util.Arrays;
  * Written by: David Marshall
  * Date: Jan 22, 2008
  * Time: 11:12:59 AM
+ * 
+ * Frank	05-13-23	issue #763 make LCs selectable
  */
 public class DbClassPedagogies {
 
@@ -32,7 +34,7 @@ public class DbClassPedagogies {
      */
     public static void setClassPedagogy(Connection conn, int classid, String pedagogyId) throws SQLException {
         try {
-            String q = "insert into classpedagogies values (?,?)";
+            String q = "insert into classpedagogies (classId, pedagogyId, selectable) values (?,?,1)";
             PreparedStatement s = conn.prepareStatement(q);
             s.setInt(1,classid);
             s.setInt(2,Integer.parseInt(pedagogyId));

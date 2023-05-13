@@ -30,6 +30,9 @@ import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.probSel.LessonModelParameters;
 import edu.umass.ckc.wo.xml.JDOMUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,6 +44,7 @@ import edu.umass.ckc.wo.xml.JDOMUtils;
  * Frank	08-03-21	Issue 150 and 487 - Remember LCProfile selection on login page
  * Frank	08-03-21	Issue 150 and 487 - Remove "No Companion" option from LCGetProfiles()
  * Frank	04-05023	Issue 725 add lang text to lcprofile
+ * Frank	05-13-23	Issue #763 - make LCs selectable by class
  */
 public class DbPedagogy {
 
@@ -434,6 +438,46 @@ public class DbPedagogy {
                 rs.close();
         }
 		return LCprofiles;
+    }
+
+    public static String getSelectableLCprofiles(Connection conn) throws SQLException {
+        JSONArray resultArr = new JSONArray();
+        String lcProfileStr = "";
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select p.id, p.name, p.shortName from pedagogy p where p.selectable = 1"; 
+            stmt = conn.prepareStatement(q);
+            rs = stmt.executeQuery();
+            while (rs.next()) {           	
+                JSONArray lcArray = new JSONArray();
+            	int id = rs.getInt(1);
+            	String lang = "(eng)";
+            	String url = Settings.webContentPath + "LearningCompanion/";
+            	if ((rs.getString(3).equals("Lucas")) || (rs.getString(3).equals("Isabel"))){
+            		lang = " (esp)";
+                	url = Settings.webContentPath2 + "LearningCompanion/";
+            	}
+            	JSONObject resultJson = new JSONObject();
+            	resultJson.put("id", String.valueOf(id));                       		
+            	resultJson.put("lcname", rs.getString(2));                       		
+            	resultJson.put("lcshortname", rs.getString(3));                       		
+            	resultJson.put("lang", lang);                 
+            	resultJson.put("url",url);
+                resultArr.add(resultJson);
+            }
+            lcProfileStr = resultArr.toString();
+	               
+	    } catch (JSONException e1) {
+	                // TODO Auto-generated catch block
+	              e1.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+		return lcProfileStr;
     }
 
     public static void main(String[] args) {

@@ -32,6 +32,7 @@ import edu.umass.ckc.wo.ttmain.ttservice.loggerservice.TTLoggerService;
  * Frank	11-12-20    issue #276 suppress logging if logged in as Master
  * Frank 	10-09-2021	issue #528 Research Tool
  * Frank 	02-04-23    Issue #723 - Added class clustering 
+ * Frank	05-13-23	Issue #763 make LCs selectable by class
  */
 
 
@@ -82,7 +83,7 @@ public class TeacherToolsCreateClassController {
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), teacherLoginType);
         model.addAttribute("createClassForm", new CreateClassForm());
-
+        
     	int intTeacherId = Integer.valueOf(teacherId);
     	String strNewClassId = String.valueOf(newClassId);
 
