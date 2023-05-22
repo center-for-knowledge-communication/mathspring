@@ -8,8 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -406,7 +408,10 @@ public class DbPedagogy {
     }
 
     public static Map<Integer, List<String>> getLCprofiles(Connection conn, int classId, int currStudentPedId) throws SQLException {
+    	
 		Map<Integer, List<String>> LCprofiles = new HashMap<Integer, List<String>>();
+
+    	List<String> LCprofilesArr = new ArrayList<>();
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
@@ -429,7 +434,8 @@ public class DbPedagogy {
             	if ((rs.getString(3).equals("Lucas")) || (rs.getString(3).equals("Isabel"))){
             		lang = " (esp)";
             	}
-            	LCprofiles.put(pedId, new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3),  lang, checked)));
+            	String LCdef = pedId + "~" + rs.getString(2) + "~" + rs.getString(3) + "~" + lang + "~" + checked ;
+            	LCprofilesArr.add(LCdef);
             }
         } finally {
             if (stmt != null)
@@ -437,12 +443,25 @@ public class DbPedagogy {
             if (rs != null)
                 rs.close();
         }
+        Collections.shuffle(LCprofilesArr);
+        
+        ListIterator <String> lit = LCprofilesArr.listIterator();
+        
+        while (lit.hasNext()) {
+        	String element = lit.next();
+        	String sp[] = element.split("~");
+        
+        	int pedid = Integer.valueOf(sp[0]);
+        	LCprofiles.put(pedid, new ArrayList<String>(Arrays.asList(sp[1], sp[2], sp[3], sp[4])));
+        }
+
 		return LCprofiles;
     }
 
     public static String getSelectableLCprofiles(Connection conn) throws SQLException {
         JSONArray resultArr = new JSONArray();
         String lcProfileStr = "";
+        int rowCount = 0;
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
@@ -450,13 +469,15 @@ public class DbPedagogy {
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {           	
-                JSONArray lcArray = new JSONArray();
             	int id = rs.getInt(1);
             	String lang = "(eng)";
             	String url = Settings.webContentPath + "LearningCompanion/";
-            	if ((rs.getString(3).equals("Lucas")) || (rs.getString(3).equals("Isabel"))){
+            	if ((rs.getString(3).equals("Isabel"))){
             		lang = " (esp)";
                 	url = Settings.webContentPath2 + "LearningCompanion/";
+            	}
+            	if (rs.getString(3).equals("Lucas")){
+            		lang = " (esp)";
             	}
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", String.valueOf(id));                       		
@@ -466,6 +487,7 @@ public class DbPedagogy {
             	resultJson.put("url",url);
                 resultArr.add(resultJson);
             }
+            Collections.shuffle(resultArr);
             lcProfileStr = resultArr.toString();
 	               
 	    } catch (JSONException e1) {
