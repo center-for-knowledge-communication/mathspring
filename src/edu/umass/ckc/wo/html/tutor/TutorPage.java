@@ -25,6 +25,7 @@ import javax.servlet.RequestDispatcher;
  * Kartik 04-22-21 Issue #390 Added session clock functionality
  * Frank	06-26-21	Added support for gaze detection
  * Frank 	02-04-23    Issue #723 - set isTesteUser
+ * Frank	05-23-23	Issue #763 - exception case for new Learning Companions at a different url
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)
@@ -177,14 +178,20 @@ public class TutorPage {
         info.getRequest().setAttribute("resource", resource);
         info.getRequest().setAttribute("answer", answer);
         appendLogMsg("answer",answer);
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv) {
 
 //                info.getRequest().setAttribute("learningCompanionMovie",  Settings.devWebContentPath + "/LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
-            } else
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-
+            } else {
+            	if (smgr.getLearningCompanion().equals("Isabel")) {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+            	}
+            	else {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+            	}
+            }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
 
         info.getRequest().setAttribute("probType", lastProbType==null ? "" : lastProbType);
@@ -264,13 +271,19 @@ public class TutorPage {
         info.getRequest().setAttribute("probType", "intervention"); // This is how we tell the client its getting an intervention in the activityJSON
         info.getRequest().setAttribute("activityJSON", intervResponse.getJSON().toString());
         appendLogMsg("activity",intervResponse.getJSON().toString());
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv) {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath +  "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             }
             else {
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
+            	if (smgr.getLearningCompanion().equals("Isabel")) {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+            	}
+            	else {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+            	}
             }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
 
         info.getRequest().setAttribute("lastProbType", lastProbType==null ? "" : lastProbType);
@@ -330,12 +343,19 @@ public class TutorPage {
         info.getRequest().setAttribute("probType", problem.getType());
         info.getRequest().setAttribute("activityJSON", response.getJSON().toString());
         appendLogMsg("activity",response.getJSON().toString());
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv)
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath  + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-            else
+            else {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-
+		    	if (smgr.getLearningCompanion().equals("Isabel")) {
+		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+		    	}
+		    	else {
+		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+		    	}
+            }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
         info.getRequest().setAttribute("lastProbType", lastProbType==null ? "" : lastProbType);
 
