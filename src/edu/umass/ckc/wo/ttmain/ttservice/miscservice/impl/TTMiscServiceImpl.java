@@ -3012,12 +3012,12 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.setString(2, splitter[0]);	  
             stmt.setString(3, splitter[1]);
             if (splitter[2].equals("empty")) { 
-            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00.0");
             }
             else {            
             	tsStartDate = convertStartDate(splitter[2]);
             }
-        	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00");
+        	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00.0");
             stmt.setTimestamp(4, tsEndDate);
            	
             int status = stmt.executeUpdate();		
@@ -3106,14 +3106,14 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt.setString(1, splitter[0]);	            
             stmt.setString(2, splitter[1]);
             if (splitter[2].equals("empty")) { 
-            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            	tsStartDate = Timestamp.valueOf("2000-01-01 00:00:00.0");
             }
             else {            
             	tsStartDate = convertStartDate(splitter[2]);
             }
             stmt.setTimestamp(3, tsStartDate);            
             if (splitter[3].equals("empty")) { 
-            	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00");
+            	tsEndDate = Timestamp.valueOf("2000-01-01 00:00:00.0");
             }
             else {
             	tsEndDate = convertEndDate(splitter[3]);
