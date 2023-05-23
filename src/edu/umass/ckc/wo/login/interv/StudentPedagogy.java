@@ -35,16 +35,6 @@ public class StudentPedagogy extends LoginInterventionSelector {
     public Intervention selectIntervention (SessionEvent e) throws Exception {
         long shownTime = this.interventionState.getTimeOfLastIntervention();
 
-        /*        
-    	java.util.Date date = new java.util.Date(); 
-    	long lnow  = date.getTime();
-    	long waitTime = 60000;
-    	if ((shownTime > 0) && ( shownTime < (lnow + waitTime))) {
-       	if (shownTime == 0) {
-    		this.interventionState.setTimeOfLastIntervention(0);
-            return null;
-        }
-*/
         if (shownTime > 0) {
         	return null;
         }
@@ -54,7 +44,6 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	int classId = smgr.getClassID();
         	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
         	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
-
 /*        	
         	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
         	if (gazeDetectionOn > 0) {
@@ -82,9 +71,6 @@ public class StudentPedagogy extends LoginInterventionSelector {
 	            }
         	}
         	
-            //String messageFromTeacher = "Let's try reading the first hint on each problem. The textarea tag defines a multi-line text input control.  The element is often used in a form, to collect user inputs like comments or reviews.";
-        	//studentPedagogyUrl = studentPedagogyUrl + "&messageFromTeacher=" + messageFromTeacher;
-
         	LoginIntervention li = new LoginIntervention(studentPedagogyUrl);
             li.setUrl(Settings.webContentPath + "LearningCompanion");
             li.setUrl2(Settings.webContentPath2 + "LearningCompanion");
