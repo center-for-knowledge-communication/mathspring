@@ -27,7 +27,7 @@ public class ClassInfo {
     private int statusReportPeriodDays;
     private int studentEmailPeriodDays;
     private int studentEmailIntervalDays;
-    private String flashClient;
+    private String experiment;
     private String grade;
     private String simpleLC;
     private String simpleDiffRate;
@@ -53,7 +53,7 @@ public class ClassInfo {
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
                      int logType, int emailStatusInterval, int statusReportPeriodDays, int studentEmailIntervalDays,
-                     int studentReportPeriodDays, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color) {
+                     int studentReportPeriodDays, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color, String experiment) {
         this.school = school;
         this.schoolYear = schoolYear;
         this.name = name;
@@ -78,23 +78,24 @@ public class ClassInfo {
         this.color=color;
         this.classesInCluster = classesInCluster;
         this.altClassLanguageCode = altClassLanguageCode;
+        this.experiment = experiment;
     }
 
     
      
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color ) {
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color, String experiment ) {
         this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive, gazeDetectionOn, hasClusters, isCluster, color);
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive, gazeDetectionOn, hasClusters, isCluster, color, experiment);
     }
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, String flashClient, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color) {
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, String experiment, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color) {
     	this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive, gazeDetectionOn, hasClusters, isCluster, color);
-        this.flashClient = flashClient;
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive, gazeDetectionOn, hasClusters, isCluster, color, experiment);
+        this.experiment = experiment;
     }
 
     public String getSchool() {
@@ -185,12 +186,12 @@ public class ClassInfo {
         this.studentEmailIntervalDays = studentEmailIntervalDays;
     }
 
-    public String getFlashClient() {
-        return flashClient;
+    public String getExperiment() {
+        return experiment;
     }
 
-    public void setFlashClient(String flashClient) {
-        this.flashClient = flashClient;
+    public void setExperiment(String experiment) {
+        this.experiment = experiment;
     }
 
     public String getGrade() {
@@ -365,5 +366,8 @@ public class ClassInfo {
     public void setClassesInCluster(String classesInCluster) {
         this.classesInCluster = classesInCluster;
     }
+
+
     
+
 }

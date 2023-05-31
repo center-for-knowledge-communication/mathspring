@@ -1,17 +1,17 @@
 package edu.umass.ckc.wo.rest;
 
-import edu.umass.ckc.wo.assistments.CoopUser;
+//import edu.umass.ckc.wo.assistments.CoopUser;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.CCContentMgr;
 import edu.umass.ckc.wo.content.LessonMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbAdmin;
-import edu.umass.ckc.wo.db.DbCoopUsers;
+//import edu.umass.ckc.wo.db.DbCoopUsers;
 import edu.umass.ckc.wo.db.DbPedagogy;
 import edu.umass.ckc.wo.db.DbUser;
 import edu.umass.ckc.wo.handler.UserRegistrationHandler;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
-import edu.umass.ckc.wo.servletController.MariHandler;
+//import edu.umass.ckc.wo.servletController.MariHandler;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.probSel.BaseExampleSelector;
 import edu.umass.ckc.wo.tutor.vid.BaseVideoSelector;
@@ -123,16 +123,17 @@ public class MathContentService {
         int n = ProblemMgr.getStandardNumProblems(conn,ccstd);
         jsonObject.put("ccss", ccstd);
         jsonObject.put("numProbs", n);
-        CoopUser u = DbCoopUsers.getUser(conn,userid);
-        if (u == null) {
+//        CoopUser u = DbCoopUsers.getUser(conn,userid);
+//        if (u == null) {
             jsonObject.put("numProbs", 0);
-        }
+/*  
+    }
         else {
             int studId = u.getStudId();
             List<Integer> probIds = MariHandler.getStdProblemsForStudent(conn,studId,ccstd);
             jsonObject.put("numProbs", probIds.size());
         }
-
+*/
         String result = jsonObject.toString();
         return Response.status(200).entity(result).build();
     }

@@ -72,14 +72,12 @@ public class TutorPage {
 
 
         // Path to the Flash client is given by web.xml param for WoTutorServlet
-        String flashClientPath = Settings.flashClientPath + smgr.getClient() ;
         info.getRequest().setAttribute("instructions",null);
         info.getRequest().setAttribute("studId",smgr.getStudentId());
         appendLogMsg("studId",Integer.toString(smgr.getStudentId()));
         info.getRequest().setAttribute("userName", smgr.getUserName());
         info.getRequest().setAttribute("studentFirstName", smgr.getStudentModel().getStudentFirstName());
         info.getRequest().setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
-        info.getRequest().setAttribute("flashClientPath",flashClientPath);
         info.getRequest().setAttribute("formalityServlet",Settings.formalityServletURI);
         LearningCompanion lc = smgr.getLearningCompanion();
         String character = "", strategy = "";
@@ -129,6 +127,7 @@ public class TutorPage {
         info.getRequest().setAttribute("timeInSession", smgr.getTimeInSession());
         info.getRequest().setAttribute("gazeDetectionOn", smgr.getGazeDetectionOn());
         info.getRequest().setAttribute("gazeParamsJSON", smgr.getGazeParamsJSON());
+        info.getRequest().setAttribute("experiment", smgr.getExperiment());
 
         if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId())) {
             info.getRequest().setAttribute("showAnswer", true);
@@ -348,7 +347,7 @@ public class TutorPage {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath  + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             else {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-		    	if (smgr.getLearningCompanion().equals("Isabel")) {
+		    	if (smgr.getLearningCompanion().getCharactersName().equals("Isabel")) {
 		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
 		    	}
 		    	else {

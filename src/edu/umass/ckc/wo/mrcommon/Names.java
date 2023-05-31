@@ -64,7 +64,6 @@ public class Names {
     public static String FORMALITY_SERVLET_URI = "formalityServletURI";
     public static String ERROR_SMTP_SERVER = "error.smtpserver";
     public static String EMAIL_LOG_FILENAME = "emailLogFilename";
-    public static String FLASH_CLIENT_PATH = "flashClientPath";
     public static String WEB_CONTENT_PATH = "webContentPath";  // context param in web.xml
     public static String WEB_CONTENT_PATH2 = "webContentPath2";  // context param in web.xml
     public static String DEV_WEB_CONTENT_PATH = "devWebContentPath";  // context param in web.xml

@@ -93,7 +93,6 @@ public class ServletUtil {
                 servletContext.getContextPath(),Settings.webContentPath, probPlayerPath);
         Settings.probPreviewerPath = getURIForEnvironment(Settings.isDevelopmentEnv,Settings.host,Settings.port,
                 servletContext.getContextPath(),Settings.webContentPath, probPreviewerPath);
-        Settings.flashClientPath = Settings.webContentPath + servletContext.getInitParameter(Names.FLASH_CLIENT_PATH); // relative to the above
         String useHybrid= servletContext.getInitParameter(Names.USE_HYBRID_TUTOR);
         if (useHybrid != null)
             Settings.useHybridTutor = Boolean.parseBoolean(useHybrid);

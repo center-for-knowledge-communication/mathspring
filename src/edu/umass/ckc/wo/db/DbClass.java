@@ -55,10 +55,10 @@ public class DbClass {
 
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language," +
                     "maxNumberProbsToShowPerTopic,minNumberProbsToShowPerTopic,maxTimeInTopic,minTimeInTopic," +
-                    "isActive, f.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
+                    "isActive, f.gaze_detection_on, f.hasClusters, f.isCluster, f.color, c.experiment from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -78,7 +78,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -143,7 +143,7 @@ public class DbClass {
                 int isCluster = rs.getInt(32);
                 String color = rs.getString(33);
                 
-                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval, statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
+                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval, statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,experiment,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
                 		
                 
                 
@@ -189,7 +189,7 @@ public class DbClass {
         try {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive,c.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
                     " where f.classid=c.id order by " + ( orderByTeacher ? "c.teacher" : "c.id");
             s = conn.prepareStatement(q);
@@ -209,7 +209,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -224,7 +224,7 @@ public class DbClass {
                 int isCluster = rs.getInt(27);
                 String color = rs.getString(28);
                 
-                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval,statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,flashClient,grade,isActive,gazeDetectionOn,hasClusters,isCluster,color);
+                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval,statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,experiment,grade,isActive,gazeDetectionOn,hasClusters,isCluster,color);
                                 
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
@@ -250,7 +250,7 @@ public class DbClass {
         try {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive, c.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
                     " where f.classid=c.id and c.createTimeStamp > date_add(now(), interval -2 year) order by c.id desc";
             s = conn.prepareStatement(q);
@@ -270,7 +270,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -288,7 +288,7 @@ public class DbClass {
                 
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
+                        studentEmailPeriodDays,experiment,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
                 
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
@@ -334,6 +334,60 @@ public class DbClass {
                 rs.close();
         }
 
+    }
+
+    /**
+     * Given a name of a propgroup (typically "default") this will return the id
+     *
+     * @param conn
+     * @param name
+     * @return
+     * @throws SQLException
+     */
+    public static String getPropGroupByClassId(Connection conn, int classId) throws SQLException {
+
+    	String studyName = "";
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            String q = "select name from propgroup where id=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, classId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                studyName = rs.getString(1);
+            } 
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+        return studyName;
+    }
+    
+    public static void updatePropGroupInClass(Connection conn, int classId, String studyName) throws SQLException {
+
+        int defaultPropGroup = 1;
+
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        if (studyName.equals("ML_Study")) {
+        	defaultPropGroup = 99;
+        }
+
+        try {
+            String q = "update class set propGroupId = ? where id = ?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, defaultPropGroup);
+            ps.setInt(2, classId);
+            ps.executeUpdate();
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
     }
 
     public static String getTeacherName(Connection conn, int teacherID) throws SQLException {
@@ -551,7 +605,6 @@ public class DbClass {
             } else {
                	 altClassLanguageCode = "en:English";
             }
-            
             insertClassConfig(conn, classId, color, altClassLanguageCode);
             return newid.getInt(1);
         } catch (SQLException e) {
@@ -572,9 +625,12 @@ public class DbClass {
  
 
 	public static void insertClassConfig(Connection conn, int classId, String color, String altLanguage) throws SQLException {
-        PreparedStatement stmt = null;
+ 
+		
+		PreparedStatement stmt = null;
         try {
-            // relying on the default values defined in DB for the fields pretest,posttest,mfr,
+
+        	// relying on the default values defined in DB for the fields pretest,posttest,mfr,
             // spatialR,tutoring,
             String q = "insert into ClassConfig (classId, color, altLanguage) values (?,?,?)";
             stmt = conn.prepareStatement(q);
@@ -737,7 +793,7 @@ public class DbClass {
         PreparedStatement s = null;
         try {
             String q = "select c.id,teacher,school,schoolYear,name,town,section,propgroupid,pretestPoolId, pool.description, " +
-                    "logType,teacherId, c.flashClient, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
+                    "logType,teacherId, c.experiment, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
             if (rs.next()) {
@@ -753,12 +809,12 @@ public class DbClass {
                 String pretestPoolDescr = rs.getString(10);
                 int logType = rs.getInt(11);
                 int teacherId = rs.getInt(12);
-                String cl = rs.getString(13);
+                String experiment = rs.getString(13);
                 int isActive = rs.getInt(14);
                 int gazeDetectionOn = 0;
 
                 ClassInfo c = new ClassInfo(sch, yr, name, town, sec, id, teacherId, teacherName, propgroupid, pretestPoolId,
-                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn,0,0,"green");
+                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn,0,0,"green",experiment);
                 return c;
             }
         } finally {

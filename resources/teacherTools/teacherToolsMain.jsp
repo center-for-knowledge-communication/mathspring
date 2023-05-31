@@ -421,17 +421,9 @@ catch (Exception e) {
 	            
 				document.getElementById('report-wrapper').innerHTML = myHTML;
 
-//			    <input type="checkbox" id="myCheckbox1" />
-//			        <label for="myCheckbox1"><img src="http://townandcountryremovals.com/wp-content/uploads/2013/10/firefox-logo-200x200.png" /></label>
-				
-				
-				//var lcProfileArr = JSON.parse(lcProfileStr);
-                                        
 				var fullLCDiv = '<br><div class="row">';
 				var itemsinrow = 4;
 				var itemcount = 0;
-
-//				fullLCDiv += '<select path="LCOpts" class="form-control" id="LCDivs" name="LCDivs" multiple="true">';
 
 				for (let index = 0; index < lcProfileArr.length; index++) {
 					if (itemcount == itemsinrow) {
@@ -460,8 +452,6 @@ catch (Exception e) {
 					console.log(myLCDiv);
 					fullLCDiv += myLCDiv;
 				}			
-				
-//				fullLCDiv += "</select>";
 				fullLCDiv += "</div>";
 				
 				document.getElementById('learning_companions').innerHTML = fullLCDiv;
@@ -1767,11 +1757,13 @@ function registerAllEvents(){
                 <div class="row">
                     <div id="learning_companions-section" class="panel panel-default">
                         <div class="panel-heading">
-                           <%= rb.getString("part_four_learning_companions") %>part_four_learning_companions
+                           <%= rb.getString("part_four_learning_companions") %>
                         </div>
                         <div class="panel-body">
                             <span class="input-group label label-warning"><%= rb.getString("what_are_learning_companions") %></span>
                             <label><%= rb.getString("learning_companion_definition") %></label>
+	                        <br><br>
+                        	<label><%= rb.getString("learning_companion_prompt") %></label>
                         </div>
 	                    <div id="learning_companions" class="container">
 

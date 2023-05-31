@@ -51,7 +51,8 @@ public class Pedagogy implements Comparable {
     private boolean lcFromDb;
     private List<LCRuleset> learningCompanionRuleSets;
     private String learningCompanionCharacter;
-
+    private String lcsource;
+    private String lang;
 
     public Pedagogy() {
         this.learningCompanionRuleSets = new ArrayList<LCRuleset>();
@@ -386,4 +387,22 @@ public class Pedagogy implements Comparable {
     public void setLearningCompanionCharacter(String learningCompanionCharacter) {
         this.learningCompanionCharacter = learningCompanionCharacter;
     }
+
+    public void setLCsource(String lcsource) {
+        this.lcsource = lcsource;
+    }
+
+    public String getLCsource() {
+        return this.lcsource;
+    }
+
+    public void setLange(String lang) {
+        this.lang = lang;
+    }
+
+    public String getLang() {
+        return this.lang;
+    }
+    
+
 }

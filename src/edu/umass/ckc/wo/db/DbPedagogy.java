@@ -125,7 +125,7 @@ public class DbPedagogy {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
-            String q = "select id,isBasic,definition,login,lesson,name,simpleConfigName from pedagogy where active=1";
+            String q = "select id,isBasic,definition,login,lesson,name,simpleConfigName,lcsource from pedagogy where active=1";
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {
@@ -135,7 +135,8 @@ public class DbPedagogy {
                 String login = rs.getString(4);
                 String lesson = rs.getString(5);
                 String name = rs.getString(6);
-                String simpleConfigName = rs.getString(6);
+                String simpleConfigName = rs.getString(7);
+                String lcsource = rs.getString(8);
                 PedagogyParser pp = new PedagogyParser();
                 Pedagogy ped = pp.parsePed(xml); // Fully instantiated pedagogy based on XML only
                 // now replace the fields from the db into the pedagogy
@@ -148,6 +149,7 @@ public class DbPedagogy {
                 ped.setLogin(login);
                 ped.setLesson(lesson);
                 ped.setName(name);
+                ped.setLCsource(lcsource);
                 // only basic pedagogies should have a simpleConfig name (used in the teacher tools TEACHER view of pedagogies)
                 if (isBasic)
                     ped.setSimpleConfigName(simpleConfigName);
@@ -415,7 +417,7 @@ public class DbPedagogy {
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select cp.pedagogyId, p.name, p.shortName from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+        	String q = "select cp.pedagogyId, p.name, p.shortName, p.lcsource, p.lang from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
 //        			"UNION\r\n" + 
 //        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
             stmt = conn.prepareStatement(q);
@@ -430,11 +432,8 @@ public class DbPedagogy {
             	else {
             		checked = " ";           		
             	}
-            	String lang = "";
-            	if ((rs.getString(3).equals("Lucas")) || (rs.getString(3).equals("Isabel"))){
-            		lang = " (esp)";
-            	}
-            	String LCdef = pedId + "~" + rs.getString(2) + "~" + rs.getString(3) + "~" + lang + "~" + checked ;
+            	String lang = " (" + rs.getString(5) + ")";
+            	String LCdef = pedId + "~" + rs.getString(2) + "~" + rs.getString(3) + "~" + lang + "~" + checked +  "~"  + rs.getString(4);
             	LCprofilesArr.add(LCdef);
             }
         } finally {
@@ -465,20 +464,16 @@ public class DbPedagogy {
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select p.id, p.name, p.shortName from pedagogy p where p.selectable = 1"; 
+        	String q = "select p.id, p.name, p.shortName, p.lcsource, p.lang from pedagogy p where p.selectable = 1"; 
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {           	
             	int id = rs.getInt(1);
-            	String lang = "(eng)";
             	String url = Settings.webContentPath + "LearningCompanion/";
-            	if ((rs.getString(3).equals("Isabel"))){
-            		lang = " (esp)";
+            	if ((rs.getString(4).equals("webContentPath2"))){
                 	url = Settings.webContentPath2 + "LearningCompanion/";
             	}
-            	if (rs.getString(3).equals("Lucas")){
-            		lang = " (esp)";
-            	}
+           		String lang = " (" + rs.getString(5) + ")";
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", String.valueOf(id));                       		
             	resultJson.put("lcname", rs.getString(2));                       		
