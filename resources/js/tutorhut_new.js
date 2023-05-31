@@ -15,16 +15,11 @@ var sysGlobals;
 var transients;
 
 //var EXTERNAL = 'External';
-//var FLASH = 'flash';
 //var HTML5 = 'html5';
 //var FORMALITY = '4Mality';
 var MODE_DEMO = "demo";
 var MODE_EXAMPLE = "example";
 var MODE_PRACTICE = "practice";
-var FLASH_CONTAINER_OUTER = "flashContainer1";
-var FLASH_CONTAINER_INNER = "flashContainer2";
-var FLASH_CONTAINER_OUTERID = "#"+FLASH_CONTAINER_OUTER;
-var FLASH_CONTAINER_INNERID = "#"+FLASH_CONTAINER_INNER;
 var PROBLEM_CONTAINER = "frameContainer";
 var PROBLEM_CONTAINERID = "#"+PROBLEM_CONTAINER;
 var PROBLEM_WINDOW = "problemWindow";
@@ -37,8 +32,6 @@ var EXAMPLE_CONTAINER_DIV = "exampleContainer";
 var EXAMPLE_CONTAINER_DIV_ID = "#"+EXAMPLE_CONTAINER_DIV;
 var EXAMPLE_FRAME = "exampleFrame";
 var EXAMPLE_FRAMEID = "#"+EXAMPLE_FRAME;
-var FLASH_PROB_PLAYER = "flashprobplayer"; // the id we put on the swfobject tags in the main window
-var EXAMPLE_FLASH_PROB_PLAYER = "xflashprobplayer"; // the id we put on the swfobject tags in the example dialog
 var UTIL_DIALOG = "utilDialog";
 var INTERVENTION_DIALOG = "interventionDialog";
 var INTERVENTION_DIALOG_CONTENT = "interventionDialogContent";
@@ -51,8 +44,6 @@ var NO_MORE_REVIEW_PROBLEMS = "noMoreReviewProblems";
 var NO_MORE_CHALLENGE_PROBLEMS = "noMoreChallengeProblems";
 var INPUT_RESPONSE_FORM = "inputResponseForm";
 
-var FLASH_PROB_TYPE = "flash";
-var SWF_TYPE = "swf";
 var HTML_PROB_TYPE = "html5";
 var EXTERNAL_PROB_TYPE = "EexternalActivity";
 var TOPIC_INTRO_PROB_TYPE = "TopicIntro";
@@ -65,16 +56,10 @@ const LCDIALOG_WIDTH = 300;
 const LCDIALOG_HEIGHT = 700;
 var DELAY = 700, clicks = 0, timer = null; //Variables required for determining the difference between single and double clicks
 
-function isFlashProblem() {
-    return globals.probType === FLASH_PROB_TYPE;
-}
 function isHTML5Problem() {
     return globals.probType === HTML_PROB_TYPE;
 }
 
-function isFlashExample() {
-    return globals.exampleProbType === FLASH_PROB_TYPE;
-}
 function isHTML5Example() {
     return globals.exampleProbType === HTML_PROB_TYPE;
 }
@@ -332,14 +317,11 @@ function myprogress() {
 function callReadProb() {
     debugAlert("In  callReadProb");
    	try {
-	    if (isFlashProblem() || isHTML5Problem())   {
+	    if (isHTML5Problem())   {
 	        incrementTimers(globals);
 	        servletGet("ReadProblem", {probElapsedTime: globals.probElapsedTime});
-	    }
-	    if (isHTML5Problem())
 	        document.getElementById(PROBLEM_WINDOW).contentWindow.prob_readProblem();
-	    else if (isFlashProblem())
-	        document.getElementById(FLASH_PROB_PLAYER).readProblem();
+	    }
    	}
 	catch(err) {
     	console.log(err.message);
@@ -348,7 +330,7 @@ function callReadProb() {
 
 // fields the click on the hint button.
 function requestHint(globals) {
-    if (isFlashProblem() || isHTML5Problem()) {
+    if (isHTML5Problem()) {
         incrementTimers(globals);
         servletGetWait("Hint", {probElapsedTime: globals.probElapsedTime}, processRequestHintResult);
     }
@@ -356,7 +338,7 @@ function requestHint(globals) {
 
 // fields the click on the solve problem button
 function requestSolution(globals) {
-    if (isFlashProblem() || isHTML5Problem())
+    if (isHTML5Problem())
     {
         incrementTimers(globals);
         servletGet("ShowSolveProblem", {probElapsedTime: globals.probElapsedTime}, processRequestSolutionResult);
@@ -364,14 +346,14 @@ function requestSolution(globals) {
 }
 
 function showExample (globals) {
-    if (isFlashProblem() || isHTML5Problem()) {
+    if (isHTML5Problem()) {
         updateTimers();
         servletGet("ShowExample",{probElapsedTime: globals.probElapsedTime},processShowExample);
     }
 }
 
 function showVideo (globals) {
-    if (isFlashProblem() || isHTML5Problem()) {
+    if (isHTML5Problem()) {
         updateTimers();
         servletGet("ShowVideo",{probElapsedTime: globals.probElapsedTime },processShowVideo);
     }
@@ -450,9 +432,8 @@ function processShowExample (responseText, textStatus, XMLHttpRequest) {
 
     globals.exampleProbType = activity.activityType;
     // solution is an array of hints.   Each hint has a label that we want to pull out and put in globals.example_hint_sequence
-    if (isFlashExample())
-        showFlashProblem(resource,ans,solution,EXAMPLE_FRAME, MODE_EXAMPLE) ;
-    else if (form === 'quickAuth')
+
+    if (form === 'quickAuth')
         showQuickAuthProblem(pid,solution,resource,mode,activity.questType);
     else showHTMLProblem(pid,solution,resource,MODE_EXAMPLE);
 
@@ -604,51 +585,6 @@ function playBeep() {
 
 
 
-function showFlashProblem (resource,ans,solution, containerElement, mode) {
-    // examples are requested by user during a practice problem so we don't want to mess up timers and properties
-    globals.probMode = mode;
-    if (mode != MODE_EXAMPLE) {
-        hideHTMLProblem(true);
-        globals.probElapsedTime = 0;
-        globals.lastProbId = globals.probId;
-        globals.lastProbType = FLASH_PROB_TYPE;
-    }
-    var isExample = (mode === MODE_DEMO || mode===MODE_EXAMPLE);
-    if (typeof(isExample)==='undefined') {
-        isExample = false;
-    }
-    if (isExample)
-        openExampleDialog(solution);
-    var questionNum = resource.substring(resource.indexOf("_") + 1, resource.length);
-    var flashvars = {
-//        hostURL: sysGlobals.isDevEnv ? 'mathspring/' : sysGlobals.webContentPath,
-        hostURL: sysGlobals.webContentPath,
-        correctAnswer: ans,
-        readAloud: false,
-        isExample: isExample
-
-    }
-    var params = {
-        wmode: "transparent",
-        allowscriptaccess: "always"
-    }
-    var attributes = {
-        id:  isExample ? EXAMPLE_FLASH_PROB_PLAYER : FLASH_PROB_PLAYER ,
-        name: isExample ? EXAMPLE_FLASH_PROB_PLAYER : FLASH_PROB_PLAYER
-    }
-    debugAlert("its a flash problem:" + resource + " The number is:" + questionNum);
-    // send an END for the first xAct
-    debugAlert("Calling servlet with EndExternalActivity");
-
-    swfobject.embedSWF(sysGlobals.probplayerPath + "?questionNum=" + questionNum, containerElement,
-        "600", "475", "8", "#FFFFFF", flashvars, params, attributes);
-
-    // We only request the solution for a problem in the main screen (problems return for ShowExample come to us with a solution)
-    //else // plays the first hint of the example
-    //    example_playHint(globals.exampleCurHint);
-
-
-}
 
 function showQuickAuthProblem (pid, solution, resource, mode, questType) {
     hideHTMLProblem(false);
@@ -733,9 +669,6 @@ function showHTMLProblem (pid, solution, resource, mode) {
         var dir = resource.split(".")[0];
         loadIframe(PROBLEM_WINDOWID, sysGlobals.problemContentPath + "/html5Probs/" + dir + "/" + resource);
 
-
-//        The commented out lines below make the HTML problem have a white background,  but we cannot figure out how
-        // to make FLash problems have a white background so we have abandoned this
 //        $(PROBLEM_WINDOWID).load(function () {
 //            var content = $(PROBLEM_WINDOWID).contents();
 //            var body = content.find('body');
@@ -813,11 +746,11 @@ function checkError (responseText) {
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $("#next_prob_spinner").show();
    	$("#nextProb").addClass("disable_a_href");
-   	$("#nextProb1").addClass("disable_a_href");    	
-    
+   	if (globals.experiment == "multi-lingual") {
+   		$("#nextProb1").addClass("disable_a_href");    	
+   	    $("#next_prob_spinner1").show();
+	}
     checkError(responseText);
-    // empty out the flashContainer div of any swfobjects and clear the iframe of any problems
-    $(FLASH_CONTAINER_OUTERID).html('<div id="' +FLASH_CONTAINER_INNER+ '"></div>');
     $(PROBLEM_WINDOWID).attr("src","");
     // Replaceing the example div for the same reason as the above.
     $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="650" height="650" src="" frameborder="no" scrolling="no"></iframe>');
@@ -933,29 +866,6 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
             globals.topicId = activity.topicId;
             globals.probId = pid;
         }
-        else if (isFlashProblem()) {
-            // send EndEvent for previous problem
-            sendEndEvent(globals);
-//            showProblemInfo(pid,resource);
-            var ans = activity.answer;
-            var solution = activity.solution;
-            var container;
-            if (mode == MODE_DEMO)  {
-                container = EXAMPLE_FRAME;
-                globals.exampleProbType = activityType;
-            }
-            else {
-                container =FLASH_CONTAINER_INNER;
-            }
-            playBeep();
-            sendBeginEvent(globals,pid,mode,processBeginProblemResult) ;
-            showFlashProblem(resource,ans,solution,container,mode);
-            if (activity.intervention != null) {
-                processNextProblemIntervention(activity.intervention);
-            }
-            globals.topicId = activity.topicId;
-            globals.probId = pid;
-        }
         // DM 6/11/15 topic intros are now interventions
 
 //        else if (activityType === TOPIC_INTRO_PROB_TYPE) {
@@ -972,7 +882,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 //        }
         // We got XML that we don't understand so it must be an intervention.   We call Flash and pass it the XML
         else {
-            globals.lastProbType = FLASH_PROB_TYPE;
+            globals.lastProbType = HTML_PROB_TYPE;
             debugAlert('Unknown return result: ' + activity);
             globals.topicId = activity.topicId;
             globals.probId = pid;
@@ -998,7 +908,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 	 $("#next_prob_spinner").hide();
 	 
 	 $("#nextProb").removeClass("disable_a_href");
-	 $("#nextProb1").removeClass("disable_a_href");		 
+	   	if (globals.experiment == "multi-lingual") {
+	   		$("#nextProb1").removeClass("disable_a_href");
+	   	}
 }
 
 function newBrowserWindow (url,w, h) {
@@ -1284,12 +1196,14 @@ function clickHandling () {
         $("#next_prob_spinner").hide();
     });
     $("#nextProb1").click(function () {
-    	$("#next_prob_spinner").show();
-        if (!isWaiting()) {
-        	globals.probLangIndex = 1;
-            nextProb(globals)
-        }
-        $("#next_prob_spinner").hide();
+       	if (globals.experiment == "multi-lingual") {
+	    	$("#next_prob_spinner1").show();
+	        if (!isWaiting()) {
+	        	globals.probLangIndex = 1;
+	            nextProb(globals)
+	        }
+	        $("#next_prob_spinner1").hide();
+	    }
     });
     $("#read").click(function () {
         callReadProb()
@@ -1480,48 +1394,6 @@ function clickHandling () {
     });
 }
 
-
-
-// This is called only when entering the tutor with specific problem (either from MPP or TeachTopic event from Assistments)
-function showFlashProblemAtStart () {
-    var activity = globals.activityJSON;
-    var mode = activity.mode;
-    var activityType = activity.activityType;
-    var resource = activity.resource;
-    var pid = activity.id;
-    var topicName = activity.topicName;
-    var standards = activity.standards;
-    var type = activity.type;
-    var ans = activity.answer;
-    var solution = activity.solution;
-    setGlobalProblemInfo(activity);
-    var isExample =  (mode == MODE_DEMO || mode == MODE_EXAMPLE);
-    var container;
-    if (isExample) {
-        globals.exampleProbType = activityType;
-        container = EXAMPLE_FRAME;
-    }
-    else {
-        container = FLASH_CONTAINER_INNER;
-    }
-    // THe resumeProblem flag is on if a previous problem was unsolved and the user is returning to it
-    if (globals.resumeProblem) {
-        globals.resumeProblem = false;
-        sendResumeProblemEvent(globals);
-    }
-    // end the last problem
-    else {
-        if (globals.lastProbId != -1)
-            sendEndEvent(globals);
-        playBeep();
-        sendBeginEvent(globals,pid,mode,processBeginProblemResult) ;
-    }
-    showProblemInfo(pid,resource,topicName,standards);
-    if (globals.showAnswer)
-        showAnswer(ans);
-    showFlashProblem(resource,ans,solution,container, mode);
-}
-
 function showHTMLProblemAtStart () {
     var activity = globals.activityJSON;
     var mode = activity.mode;
@@ -1617,9 +1489,6 @@ function tutorhut_main(g, sysG, trans, learningCompanionMovieClip) {
     if (globals.isBeginningOfSession) {
         console.log("next problem " + globals.isBeginningOfSession)
         nextProb(globals, globals.isBeginningOfSession);
-    }
-    else if (globals.activityJSON != null && (globals.probType === FLASH_PROB_TYPE || globals.probType === SWF_TYPE)) {
-        showFlashProblemAtStart();
     }
     else if (globals.activityJSON != null && globals.probType === HTML_PROB_TYPE) {
         showHTMLProblemAtStart();

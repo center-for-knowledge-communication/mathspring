@@ -83,14 +83,10 @@ public class MyProgressHandler {
             int problemsDone= ee.getProblemsDone();
             int totalProblems= ee.getTotalProblems();
 
-            String flashClientPath = Settings.flashClientPath  + smgr.getClient();
-
-           String  backToVillageURL= Settings.flashClientPath + smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
-
             String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
-            request.setAttribute("clientPath", flashClientPath);
+            request.setAttribute("clientPath", null);
             request.setAttribute("learningCompanion", learningCompanion);
-            request.setAttribute("backToVillageURL", backToVillageURL);
+            request.setAttribute("backToVillageURL", null);
 
 
             TopicDetails td= new TopicDetails(smgr, topicId);
@@ -146,7 +142,7 @@ public class MyProgressHandler {
         //request.setAttribute("problemHistory", smgr.getStudentModel().getProblemHistory());
         //List<TopicSummary> summaries = TopicSummary.getTopicSummaries(smgr.getConnection(),smgr.getStudentId(),smgr.getClassID(),smgr.getClassMasteryThreshold());
         List<TopicSummary> summaries = TopicSummary.getTopicSummaries(smgr);
-        String  backToVillageURL= Settings.flashClientPath + smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
+        String  backToVillageURL= null;
         //String  backToVillageURL= smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
         String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
         // in the hybrid system problemId and topicId are passed as params with NavigationEvent when to the MPP
@@ -178,7 +174,7 @@ public class MyProgressHandler {
         //request.setAttribute("problemHistory", smgr.getStudentModel().getProblemHistory());
         //List<TopicSummary> summaries = TopicSummary.getTopicSummaries(smgr.getConnection(),smgr.getStudentId(),smgr.getClassID(),smgr.getClassMasteryThreshold());
         List<TopicSummary> summaries = TopicSummary.getTopicSummaries(smgr);
-        String  backToVillageURL= Settings.flashClientPath + smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
+        String  backToVillageURL= null ;
         //String  backToVillageURL= smgr.getClient() + "?sessnum=" + smgr.getSessionNum() ;
         String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
         // in the hybrid system problemId and topicId are passed as params with NavigationEvent when to the MPP

@@ -268,7 +268,7 @@ public class MyProgressPage implements View  {
   private String msg_;
 
   private String getBackToVillageURL() {
-      return Settings.flashClientPath + this.client + ".swf?sessnum=" + sessionId ;
+      return null;
   }
 
 

@@ -1,8 +1,5 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
-import edu.umass.ckc.wo.assistments.AssistmentsHandler;
-import edu.umass.ckc.wo.assistments.CoopUser;
-import edu.umass.ckc.wo.db.DbCoopUsers;
 import edu.umass.ckc.wo.event.tutorhut.EndProblemEvent;
 import edu.umass.ckc.wo.log.TutorLogger;
 import edu.umass.ckc.wo.smgr.SessionManager;
@@ -75,14 +72,6 @@ public class DynamicPedagogicalModel extends CollabPedagogicalModel {
         }
         r.setEffort(this.studentModel.getEffort());
         new TutorLogger(smgr).logEndProblem(e, r);
-        if (Settings.usingAssistments)
-        {
-            CoopUser assu = DbCoopUsers.getUserFromWayangStudId(smgr.getConnection(), smgr.getStudentId());
-            if (assu != null) {
-                smgr.setAssistmentsUser(true);
-                AssistmentsHandler.logToAssistmentsProblemEnd(smgr, (EndProblemEvent) e);
-            }
-        }
 
         if (learningCompanion != null )
             learningCompanion.processUncategorizedEvent(e,r);

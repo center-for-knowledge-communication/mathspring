@@ -8,7 +8,6 @@ import edu.umass.ckc.wo.lc.InferenceEngine;
 import edu.umass.ckc.wo.lc.LCAction;
 import edu.umass.ckc.wo.lc.LCRule;
 import edu.umass.ckc.wo.lc.LCRuleset;
-import edu.umass.ckc.wo.servletController.MariHandler;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.TransactionLogger;

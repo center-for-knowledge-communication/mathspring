@@ -213,7 +213,8 @@ else
             gazeDetectionOn: ${gazeDetectionOn},
             gazeParamsJSON: ${gazeParamsJSON},
             gazeWanderingUI: "",
-            probType : '${probType}',
+            probType: '${probType}',
+            experiment : '${experiment}',
             probLangIndex : 0,
             exampleProbType : null,
             probId : ${probId},
@@ -389,8 +390,6 @@ label {
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="650" height="650"
 		title="<%= rb.getString("watch_and_listen_instructions")%>">
-		<%-- This iframe gets replaced by swfobject.embed.   It replaces it with the Flash object/embed tags for showing a problem OR an the html
-     of an HTML5 problem (perhaps in an iframe if we must)--%>
 		<iframe id="exampleFrame" name="iframe2" width="650" height="650"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
@@ -508,9 +507,6 @@ label {
 					<iframe id="problemWindow" class="probWindow" name="iframe1"
 						width="650" height="650" src="${activityURL}" frameborder="no"
 						scrolling="no"> </iframe>
-					<div id="flashContainer1">
-						<div id="flashContainer2"></div>
-					</div>
 					<div class="huytran-practice__info">
 						<p id="pid">${probId}</p>
 						<h2>&nbsp</h2>
@@ -922,8 +918,15 @@ label {
 	    	document.getElementById("gazeMonitor6").innerHTML = "";
 	    }
 	    else {
-	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
+    		document.getElementById("monitorBox").style.visibility = "hidden";
 	    }
+		if (globals.experiment == "multi-lingual") {
+			// Show 'Proxima problema' button
+		    document.getElementById("nextProb1").style.display = "block";
+		}
+		else {
+		    document.getElementById("nextProb1").style.display = "none";			
+		}
     });
     
     $(document).ready(function() {

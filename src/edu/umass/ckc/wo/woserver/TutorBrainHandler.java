@@ -4,7 +4,6 @@ package edu.umass.ckc.wo.woserver;
 import edu.umass.ckc.servlet.servbase.ServletEvent;
 import edu.umass.ckc.servlet.servbase.UserException;
 import edu.umass.ckc.servlet.servbase.View;
-import edu.umass.ckc.wo.assistments.AssistmentsHandler;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.content.ProblemBinding;
@@ -118,11 +117,7 @@ public class TutorBrainHandler {
     // All servlet requests handled through this method
     public boolean handleRequest() throws Throwable {
         ServletEvent e = eventFactory.buildEvent(servletInfo.params, "tutorhut");
-        if (e instanceof TeachTopicEvent)
-            return new AssistmentsHandler(servletInfo).teachTopic((TeachTopicEvent) e);
-        else if (e instanceof GetProblemDataEvent)
-            return new AssistmentsHandler(servletInfo).getProblemData((GetProblemDataEvent) e);
-        else if (e instanceof GetEventLogDataEvent){
+        if (e instanceof GetEventLogDataEvent){
 
             SessionManager sessionManager = new SessionManager(servletInfo.getConn(),((SessionEvent) e).getSessionId(), servletInfo.getHostPath(), servletInfo.getContextPath()).buildExistingSession(servletInfo.getParams());
             if(!servletInfo.getParams().getString("type").equals("publishNote")) {
@@ -401,12 +396,4 @@ public class TutorBrainHandler {
     }
 
 
-
-    public String getTopicStartAnchor(String client, int sessId,String lc, int topic ) {
-        String url = Settings.flashClientPath + client;
-
-        String args = "?sessnum="+sessId+"&learningHutChoice=true&elapsedTime=0&mode=teachStandard" + ((lc !=null) ? ("&learningCompanion="+lc) : "") +"&topicId="+topic; //"&problemIdString='+problemId;
-        System.out.println("URL TO call flash is " + (url+args));
-        return "<a href=\"" +(url+args)+ "\">here</a>";
-    }
 }

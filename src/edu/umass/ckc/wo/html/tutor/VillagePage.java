@@ -20,14 +20,7 @@ public class VillagePage {
     }
 
     public String getPage (String flashClient) {
-        String name="";
-        if (lc != null)
-            name=lc.getCharactersName();
-        String x = "<META HTTP-EQUIV=\"Refresh\" Content=\"0; URL=http://cadmium.cs.umass.edu/wayang2/flash/client/" +flashClient+ ".swf?sessnum="
-                    +sessNum+ "&learningHutChoice=false&learningCompanion=" +name+ "\"/>";
-        String y = "<META HTTP-EQUIV=\"Refresh\" Content=\"0; URL=http://localhost/wayang/flash/client/" + flashClient + ".swf?sessnum="
-                    +sessNum+ "&learningHutChoice=false&learningCompanion=" +name+ "\"/>";
-            return y;
+        return null;
     }
 
 }
