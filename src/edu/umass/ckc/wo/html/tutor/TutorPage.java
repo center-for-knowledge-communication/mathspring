@@ -183,7 +183,7 @@ public class TutorPage {
 //                info.getRequest().setAttribute("learningCompanionMovie",  Settings.devWebContentPath + "/LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
             } else {
-            	if (smgr.getLearningCompanion().equals("Isabel")) {
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
             		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             	}
             	else {
@@ -275,7 +275,7 @@ public class TutorPage {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath +  "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             }
             else {
-            	if (smgr.getLearningCompanion().equals("Isabel")) {
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
             		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             	}
             	else {
@@ -346,8 +346,7 @@ public class TutorPage {
             if (Settings.isDevelopmentEnv)
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath  + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             else {
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-		    	if (smgr.getLearningCompanion().getCharactersName().equals("Isabel")) {
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
 		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
 		    	}
 		    	else {
