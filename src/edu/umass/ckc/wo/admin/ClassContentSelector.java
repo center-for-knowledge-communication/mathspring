@@ -93,60 +93,63 @@ public class ClassContentSelector {
      */
     private void setClassPedagogies(int classId, String simpleLC, String simpleCollab, String selectedLCs) throws SQLException {
         Pedagogy p=null;
-        DbClassPedagogies.removeClassPedagogies(conn, classId);
-
-        if (simpleCollab.equals("none")) {
-            if (simpleLC.equals("none")) {
-                p = getPedagogyByName("No Learning Companion");
-            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-            }
-            else if (simpleLC.equals("male")) {
-                p = getPedagogyByName("Jake Learning Companion");
-            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-            }
-            else if (simpleLC.equals("female")) {
-                p = getPedagogyByName("Jane Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-            }
-            // if they want both, given them Jane semi and Jake full empathy
-            else if (simpleLC.equals("both")) {
-                p = getPedagogyByName("Jane Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Jake Learning Companion");
-            }
-            else if (simpleLC.equals("multi-lingual")) {
-                p = getPedagogyByName("Lucas Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Isabel Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Jane Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Jake Learning Companion");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-            }
-            else if (simpleLC.equals("selectable")) {
-            	String[] id = selectedLCs.split("~"); 
-            	for(int i=0;i < id.length; i++) {
-            		DbClassPedagogies.setClassPedagogy(conn, classId, id[i]);
-            	}	
-            }
-            
-        }
-        else {
-            if (simpleLC.equals("none"))
-                p = getPedagogyByName("Collaboration with no learning companion");
-            else if (simpleLC.equals("male"))
-                p = getPedagogyByName("Collaboration with Jake Semi Empathy");
-            else if (simpleLC.equals("female"))
-                p = getPedagogyByName("Collaboration with Jane Semi Empathy");
-                // if they want both, given them Jane semi and Jake semi empathy with collab
-            else if (simpleLC.equals("both")) {
-                p = getPedagogyByName("Collaboration with Jake Semi Empathy");
-                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-                p = getPedagogyByName("Collaboration with Jane Semi Empathy");
-            }
-            DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
-        }
+        
+        if (selectedLCs.length() > 0 ) {
+	        DbClassPedagogies.removeClassPedagogies(conn, classId);
+	
+	        if (simpleCollab.equals("none")) {
+	            if (simpleLC.equals("none")) {
+	                p = getPedagogyByName("No Learning Companion");
+	            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	            }
+	            else if (simpleLC.equals("male")) {
+	                p = getPedagogyByName("Jake Learning Companion");
+	            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	            }
+	            else if (simpleLC.equals("female")) {
+	                p = getPedagogyByName("Jane Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	            }
+	            // if they want both, given them Jane semi and Jake full empathy
+	            else if (simpleLC.equals("both")) {
+	                p = getPedagogyByName("Jane Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	                p = getPedagogyByName("Jake Learning Companion");
+	            }
+	            else if (simpleLC.equals("multi-lingual")) {
+	                p = getPedagogyByName("Lucas Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	                p = getPedagogyByName("Isabel Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	                p = getPedagogyByName("Jane Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	                p = getPedagogyByName("Jake Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	            }
+	            else if (simpleLC.equals("selectable")) {
+	            	String[] id = selectedLCs.split("~"); 
+	            	for(int i=0;i < id.length; i++) {
+	            		DbClassPedagogies.setClassPedagogy(conn, classId, id[i]);
+	            	}	
+	            }
+	            
+	        }
+	        else {
+	            if (simpleLC.equals("none"))
+	                p = getPedagogyByName("Collaboration with no learning companion");
+	            else if (simpleLC.equals("male"))
+	                p = getPedagogyByName("Collaboration with Jake Semi Empathy");
+	            else if (simpleLC.equals("female"))
+	                p = getPedagogyByName("Collaboration with Jane Semi Empathy");
+	                // if they want both, given them Jane semi and Jake semi empathy with collab
+	            else if (simpleLC.equals("both")) {
+	                p = getPedagogyByName("Collaboration with Jake Semi Empathy");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	                p = getPedagogyByName("Collaboration with Jane Semi Empathy");
+	            }
+	            DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+	        }
+    	}
     }
 
     private int gradeToNum (String grade) {
