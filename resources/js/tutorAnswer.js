@@ -7,34 +7,12 @@
  */
 
 
-
-// Flash problems grade themselves (x or check) prior to calling the server to inform it of the attempt.
-function flashProblemAnswerChosen (choice) {
-    debugAlert("flashProblemAnswerChosen CALLED! with: " + choice);
-    if (!sysGlobals.exampleWindowActive  || (globals.probMode != MODE_DEMO && globals.probMode != MODE_EXAMPLE && !isWaiting())) {
-        incrementTimers(globals);
-        servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime}, processFlashProblemAnswerChosenResult);
-    }
-}
-
-
-
-// if there is an intervention on attempt this will deal with it.  N.B. Flash problems grade the attempt prior to this
-// being called so there is no way to not grade them if the intervention were to want to delay grading.
-function processFlashProblemAnswerChosenResult(responseText, textStatus, XMLHttpRequest) {
-    var json = JSON.parse(responseText);
-    var isCorrect = json.isCorrect;
-    var interv = json.intervention;
-    showLearningCompanion(json);
-    processAttemptIntervention(interv);
-}
-
 function tutorhut_shortAnswerSubmitted (sym, answer) {
     debugAlert("answerChosen CALLED! with: " + answer);
     transients.sym = sym;
     if (!isWaiting() && globals.probMode != MODE_DEMO) {
         incrementTimers(globals);
-        servletGetWait("Attempt", {userInput: answer, probElapsedTime: globals.probElapsedTime}, processShortAnswerResult);
+        servletGetWait("Attempt", {userInput: answer, probElapsedTime: globals.probElapsedTime, langIndex: globals.probLangIndex}, processShortAnswerResult);
 
     }
 }
@@ -72,7 +50,7 @@ tutorhut_answerChosen = function (selectedButton, choice) {
         if (transients.answersChosenSoFar.indexOf(choice) < 0) {
             transients.answersChosenSoFar[transients.answersChosenSoFar.length] = choice; // adds an element to the end of the list
             incrementTimers(globals);
-            servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime}, processAnswerChosenResult);
+            servletGetWait("Attempt", {userInput: choice, probElapsedTime: globals.probElapsedTime, langIndex: globals.probLangIndex}, processAnswerChosenResult);
         }
     }
 };

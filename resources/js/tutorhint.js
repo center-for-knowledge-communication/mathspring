@@ -121,31 +121,23 @@ function callProblemPlayHint(hintLabel) {
 }
 
 function playHint (hintLabel) {
-    if (isHTML5Problem() || isFlashProblem()) {
-        if (isHTML5Problem()) {
-            var innerdoc =  document.getElementById(PROBLEM_WINDOW).contentWindow;
-            innerdoc.prob_playHint(hintLabel);
-        }
-        else if (isFlashProblem())
-            document.getElementById(FLASH_PROB_PLAYER).playHint(hintLabel);
+	if (isHTML5Problem()) {
+        var innerdoc =  document.getElementById(PROBLEM_WINDOW).contentWindow;
+        innerdoc.prob_playHint(hintLabel);
     }
 }
 
 var exampleHintStatus = true;
 function example_playHint(hintLabel) {
 	
-    if (isHTML5Example() || isFlashExample()) {
-       	try {
-	        if (isHTML5Example())
-	            document.getElementById(EXAMPLE_FRAME).contentWindow.prob_playHint(hintLabel);
-	        else
-	            document.getElementById(EXAMPLE_FLASH_PROB_PLAYER).playHint(hintLabel);
-    	}
-		catch(err) {
-	        exampleHintStatus = false;
-        	console.log(err.message);
-		}
-    }
+   	try {
+        if (isHTML5Example())
+            document.getElementById(EXAMPLE_FRAME).contentWindow.prob_playHint(hintLabel);
+	}
+	catch(err) {
+        exampleHintStatus = false;
+    	console.log(err.message);
+	}
 }
 
 function solveNextHint () {

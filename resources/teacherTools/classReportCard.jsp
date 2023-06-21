@@ -42,6 +42,8 @@
 <!-- Frank 07-11-21  	Issue #77 changes to Common Core Problem Detail Report -->
 <!-- Frank 08-21-21  	Issue #415 common core report add paging to detail report -->
 <!-- Frank 01-08-22  	Issue #578 added anonymous option to 2 reports, and Issue #417' removed 'fixed column' params for reports using paging option -->
+<!-- Frank 	02-04-23    Issue #723 - added class clustering - no changes required-->
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -229,6 +231,12 @@ System.out.println("msHost = " + msHost + msContext);
  * Frank	01-16-20  	Restore corrupted Spanish Special Characters
  * Frank    02-17-20    ttfixesR3
  */
+
+
+var isCluster = 0;
+var hasClusters = 0;
+var classColor = "";
+var titleClassName = "";
  
 var studentList; 
 var studentListThree; 
@@ -3351,37 +3359,68 @@ var completeDataChart;
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
         
         $(document).ready(function () {
-            registerAllEvents();
-            handleclickHandlers();
-            $("#content-conatiner").children().hide();
-            $("#splash_page").show();
-
-			if (teacherLoginType === "Normal") {
-				$("#report_five_panel").hide();
-			}
-			else {
-				$("#report_five_panel").show();
-			}
+		hasClusters = parseInt('${classInfo.hasClusters}');
+		isCluster = parseInt('${classInfo.isCluster}');
+		classColor = '${classInfo.color}';
+		className = '${classInfo.name}';
+		currentSelection = '${currentSelection}';
+       	var classGrade = parseInt('${classInfo.grade}');
+       	var simpleLowDiff = '${classInfo.simpleLowDiff}';
+       	simpleLowDiff = simpleLowDiff.replace('below',"");
+       	var simpleHighDiff = '${classInfo.simpleHighDiff}';
+       	simpleHighDiff = simpleHighDiff.replace('above',"");
+        lowGradeLevel = classGrade - parseInt(simpleLowDiff);
+        highGradeLevel = classGrade + parseInt(simpleHighDiff);
         
-            getFilterOne();
-            getFilterFour();
+  		gradesLevelsUsedInThisClass = "";
+        for (var gradeLevel = lowGradeLevel; gradeLevel <= highGradeLevel;gradeLevel = gradeLevel + 1) {
+           	gradesLevelsUsedInThisClass = gradesLevelsUsedInThisClass + gradeLevel + ".";
+        } 
+        var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
+  		document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
+  		
+        var titleClassname = "";
+        if (isCluster == 0) {                        
+           	titleClassname = 'home-title-' + '${classInfo.color}';
+           	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("report_card_for_class") %> : <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
+       	}
+        else {
+            document.getElementById("titleLine").innerHTML =  '<%= rb.getString("report_card_for_class") %> : <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
+           	titleClassname = 'home-title-' + '${classInfo.color}' + '-cluster';                	
+        }
 
-            getStudentListThree();           
-          	getFilterThree();
+        registerAllEvents();
+        handleclickHandlers();
             
-            getStudentListSix();           
-          	getFilterSix();
+        $("#content-conatiner").children().hide();
+        $("#splash_page").show();
 
-            getStudentListEight();           
-          	getFilterEight();
-          	
-            $('#reorg_prob_sets_handler').css('background-color', '');
-            $('#reorg_prob_sets_handler').css('color', '#dddddd');
+		if (teacherLoginType === "Normal") {
+			$("#report_five_panel").hide();
+		}
+		else {
+			$("#report_five_panel").show();
+		}
+       
+        getFilterOne();
+        getFilterFour();
 
-            $("#content-conatiner").children().hide();
-            $("#report-wrapper").show();
-            $("#report-wrapper2").show();
-            $("#perStudentPerProblemSetReport").hide();
+        getStudentListThree();           
+      	getFilterThree();
+        
+        getStudentListSix();           
+      	getFilterSix();
+
+        getStudentListEight();           
+      	getFilterEight();
+      	
+        $('#reorg_prob_sets_handler').css('background-color', '');
+        $('#reorg_prob_sets_handler').css('color', '#dddddd');
+
+        $("#content-conatiner").children().hide();
+        $("#report-wrapper").show();
+        $("#report-wrapper2").show();
+        $("#perStudentPerProblemSetReport").hide();
             
             
             $.ajax({
@@ -3512,11 +3551,12 @@ var completeDataChart;
     </nav>
     <div id="page-content-wrapper">
 
-        <h1 class="page-header">
-            <%= rb.getString("report_card_for_class") %>: <strong>${classInfo.name}</strong>&nbsp; [<%= rb.getString("class_code") %>:${classInfo.classid}]
+        <h1 id="classManagerHeader" class="home-page-header" >
+        	<div id="titleLine"></div>
         </h1>
-
-
+        <div id="classGrades" style="font-size:16px;" class="home-page-header2">
+        </div>
+        
         <div id="content-conatiner" class="container-fluid">
 
 				<div id="loading_spinner" style="display: none">
@@ -3807,7 +3847,7 @@ var completeDataChart;
                         </div>
                     </div>
 
-                    <div class="panel panel-default">
+                    <div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_seven" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven">

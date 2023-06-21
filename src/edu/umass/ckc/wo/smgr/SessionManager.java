@@ -98,6 +98,7 @@ public class SessionManager {
     private int mouseSaveInterval=0; // tells the client how often to save mouse coords to the server; <= 0 indicates no mouse tracking
     private int gazeDetectionOn=0;
     private String gazeParamsJSON="";
+    private String experiment = "";
     
     public SessionManager(Connection connection) {
         this.connection = connection;
@@ -358,7 +359,8 @@ public class SessionManager {
         ClassInfo cl = DbClass.getClass(connection, this.classId);
         
         this.gazeDetectionOn = cl.getGazeDetectionOn();
-        this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId);
+        this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId, 0);
+        this.experiment = cl.getExperiment();
 
 
         language = cl.getClassLanguageCode();
@@ -929,10 +931,6 @@ public class SessionManager {
         return timeInSession;
     }
 
-    public boolean isFirstLogin() throws SQLException {
-        return DbSession.getStudentSessions(connection, this.getStudentId()).size() == 1;
-    }
-
     public boolean isAssistmentsUser() {
         return assistmentsUser;
     }
@@ -1043,4 +1041,9 @@ public class SessionManager {
     	return this.gazeParamsJSON;
     }
 
+    public String getExperiment() {
+    	return this.experiment;
+    }
+    
+    
 }

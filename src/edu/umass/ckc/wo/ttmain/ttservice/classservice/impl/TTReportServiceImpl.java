@@ -8,7 +8,6 @@ import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.db.DbTeacher;
 import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.db.DbClass;
-import edu.umass.ckc.wo.login.LoginParams;
 import edu.umass.ckc.wo.login.PasswordAuthentication;
 import edu.umass.ckc.wo.myprogress.TopicSummaryGarden;
 import edu.umass.ckc.wo.smgr.User;
@@ -19,19 +18,21 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ClassStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherClassListEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassClusterListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportStudents;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportStudentsMapper;
-import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLiveDashboardMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.ClassLandingReportEvents;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassLandingReportEventsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassStudentsMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherLogEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherListEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.TeacherClassListEntryMapper;
+
+import edu.umass.ckc.wo.ttmain.ttmodel.datamapper.ClassClusterListEntryMapper;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTReportService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger;
@@ -41,7 +42,6 @@ import edu.umass.ckc.wo.util.StringUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +100,8 @@ import java.text.SimpleDateFormat;
  * Frank	08-20-21	Issue 496 added live dashboard support
   * Frank	08-20-21	Issue 578 handled anonymous report option
   * Frank	04-16-22	Issue# 634R2 use full topic list not activeTopics
+ * Frank 	02-04-23    Issue #723 - handle class clustering
+ * Frank 	05-13-23	Add validation to sutydent comment input processing
  */
 
 
@@ -118,7 +120,7 @@ public class TTReportServiceImpl implements TTReportService {
 	private ResourceBundle rb = null;
 	private String showNames = "Y";
 	private String selectedStudent = "";
-	private Locale ploc;
+//	private Locale ploc;
 
     @Override
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException {
@@ -131,7 +133,7 @@ public class TTReportServiceImpl implements TTReportService {
         	if (lang.substring(0,2).equals("es")) {
         		loc = new Locale("es","US");	
         	}        	
-    		ploc = loc;
+//    		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
         	// Hack - using classId to hold 'Target teacher ID' for teacher activities reports so use URL param not session variable
@@ -424,16 +426,26 @@ public class TTReportServiceImpl implements TTReportService {
                 	catch (Exception e) {
             			return "Unexpected Error";
                 	}
-                case "teacherClassList":
 
-                	// Note: classId parameter is used to communicate target teacherId for this report only
-            		List<TeacherClassListEntry> ClassListEntries = generateTeacherClassList(teacherId);
-                    String[][] clsData = ClassListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getTeacherId(), TeacherLogEntry1.getClassName(),TeacherLogEntry1.getClassId()}).toArray(String[][]::new);
-                    ObjectMapper clsMapper = new ObjectMapper();
-                    Map<String, Object> clsMap = new HashMap<>();
-                    clsMap.put("levelOneData", clsData);
-                    return clsMapper.writeValueAsString(clsMap);       
-
+                case "classClusterList":
+                	if (filter.equals("clusterList")) {
+	                	// Note: classId parameter is used to communicate target teacherId for this report only
+	            		List<ClassClusterListEntry> ClusterListEntries = generateClassClusterList(classId);
+	                    String[][] clusterData = ClusterListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getClassName(),TeacherLogEntry1.getClassId(),TeacherLogEntry1.getClassHasClusters(),TeacherLogEntry1.getClassIsCluster(),TeacherLogEntry1.getColor()}).toArray(String[][]::new);
+	                    ObjectMapper clusterMapper = new ObjectMapper();
+	                    Map<String, Object> clusterMap = new HashMap<>();
+	                    clusterMap.put("levelOneData", clusterData);
+	                    return clusterMapper.writeValueAsString(clusterMap);       
+        			}
+                	else {
+                		List<TeacherClassListEntry> ClassListEntries = generateTeacherClassList(teacherId);
+                        String[][] clsData = ClassListEntries.stream().map(TeacherLogEntry1 -> new String[]{TeacherLogEntry1.getClassName(),TeacherLogEntry1.getClassId(),TeacherLogEntry1.getClassHasClusters(),TeacherLogEntry1.getClassIsCluster(),TeacherLogEntry1.getColor()}).toArray(String[][]::new);
+                        ObjectMapper clsMapper = new ObjectMapper();
+                        Map<String, Object> clsMap = new HashMap<>();
+                        clsMap.put("levelOneData", clsData);
+                        return clsMapper.writeValueAsString(clsMap);                       		
+                	}
+                	
                 case "classLiveDashboard":
 
                 	// Note: classId parameter is used to communicate target teacherId for this report only
@@ -635,7 +647,7 @@ public class TTReportServiceImpl implements TTReportService {
                     	return "{\"status\":\"fail\",\"message\":\"" + errorMsg + "\"}";
                     }
                     else {
-                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login=");
+                    	String successMsg = rb.getString("message_will_be_displayed_at_student_login");
                     	return "{\"status\": \"success\", \"message\" : \"" + successMsg + "\"}";                    	
                     }
         	}
@@ -818,6 +830,11 @@ public class TTReportServiceImpl implements TTReportService {
     	else {
     		selectedStudent = "";
     	}
+
+    	String classesStr = classId;
+    	if (filters.length > 3) {
+    		classesStr = filters[3];
+    	}
     		
 		
 		List<ClassStudents> classStudents = generateClassReportPerStudent(teacherId, classId, filter);
@@ -937,12 +954,27 @@ public class TTReportServiceImpl implements TTReportService {
 
         Map<String, Object> params = new HashMap<String, Object>();
   //      params.put("filter", modFilter);
-        params.put("classId", classId);
+  //      params.put("classId", classId);
         params.put("tsFromDate", tsFromDate);
         params.put("tsToDate",tsToDate);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);        
+
+        String classesStr = classId;
+        String standards_query_first = "";
+        String standards_query_fourth = "";
+        try {
+        	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+        	standards_query_first = TTUtil.PER_STANDARD_QUERY_FIRST.replaceAll("CLASSID_TOKEN", classesStr);
+        	standards_query_fourth = TTUtil.PER_STANDARD_QUERY_FOURTH.replaceAll("CLASSID_TOKEN", classesStr);
+        }
+        catch (Exception e) {
+        	logger.error(e.getMessage());
+        	e.printStackTrace();
+        }
+
         
-        Map<String,PerClusterObjectBean> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STANDARD_QUERY_FIRST, namedParameters, (ResultSet mappedrow) -> {
+        
+        Map<String,PerClusterObjectBean> resultantValues = namedParameterJdbcTemplate.query(standards_query_first, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
                 String clusterID = mappedrow.getString("clusterId");
                 int noOfProblemsInCluster = mappedrow.getInt("noOfProblemsInCluster");
@@ -958,7 +990,7 @@ public class TTReportServiceImpl implements TTReportService {
              }
           return completeDataMap;
         });
-        Map<String,PerClusterObjectBean> resultFirstAttemptValues = namedParameterJdbcTemplate.query(TTUtil.PER_STANDARD_QUERY_FOURTH, namedParameters, (ResultSet mappedrow) -> {
+        Map<String,PerClusterObjectBean> resultFirstAttemptValues = namedParameterJdbcTemplate.query(standards_query_fourth, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
                 String clusterID = mappedrow.getString("clusterId");
                 int noOfTotalEfforts = mappedrow.getInt("totalSOFLogged");
@@ -1063,13 +1095,22 @@ public class TTReportServiceImpl implements TTReportService {
             Integer noOfProb = Integer.valueOf(noOfProblems.trim());
             int SKIP = 0, NOTR = 0, GIVEUP = 0, SOF = 0, SHINT = 0, SHELP = 0, ATT = 0, GUESS = 0, NODATA = 0;
             Map<String, Object> selectParams = new LinkedHashMap<String, Object>();
-            selectParams.put("classId", classId);
             selectParams.put("studId", studentId);
             selectParams.put("tsFromDate", tsFromDate);
             selectParams.put("tsToDate", tsToDate);
 
+            String classesStr = classId;
+            String students_query = "";
+            try {
+            	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+            	students_query = TTUtil.PER_STUDENT_QUERY_SECOND.replaceAll("CLASSID_TOKEN", classesStr);
+            }
+            catch (Exception e) {
+                logger.error(e.getMessage());
+                e.printStackTrace();
+            }
             
-            List<String> studentEfforts = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_SECOND, selectParams, new RowMapper<String>() {
+            List<String> studentEfforts = namedParameterJdbcTemplate.query(students_query, selectParams, new RowMapper<String>() {
                 @Override
                 public String mapRow(ResultSet resultSet, int i) throws SQLException {
                     if ("".equals(resultSet.getString("effort")) || resultSet.getString("effort") == null)
@@ -1078,7 +1119,7 @@ public class TTReportServiceImpl implements TTReportService {
                 }
             });
 
-            Map<String, List<String>> perstudentRecords = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_SECOND, selectParams, (ResultSet mappedRow) -> {
+            Map<String, List<String>> perstudentRecords = namedParameterJdbcTemplate.query(students_query, selectParams, (ResultSet mappedRow) -> {
                 Map<String, List<String>> studentData = new LinkedHashMap<>();
                 while (mappedRow.next()) {
                     List<String> studentRecordValues = new ArrayList<>();
@@ -1247,40 +1288,55 @@ public class TTReportServiceImpl implements TTReportService {
     	else {
     		selectedStudent = "";
     	}
-//         SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
-
-         Map<String, Object> studentFirstParams = new HashMap<String, Object>();
-         studentFirstParams.put("classId", classId);
-         studentFirstParams.put("tsFromDate", tsFromDate);
-         studentFirstParams.put("tsToDate", tsToDate);
-         SqlParameterSource studentFirstParamsParameters = new MapSqlParameterSource(studentFirstParams);
-         
-         List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_QUERY_FIRST, studentFirstParamsParameters, new ClassStudentsMapper());
-                 
-         if (selectedStudent.length() > 0) {
-	         Iterator<ClassStudents> i = classStudents.iterator();
-	         while (i.hasNext()) {
-	        	 ClassStudents stud = i.next();
-	        	 if (!stud.getStudentId().equals(selectedStudent)) {
-	        		 i.remove();
-	        	 }
-	         }         
-         }
-         return classStudents;
+    	try {
+	        Map<String, Object> studentFirstParams = new HashMap<String, Object>();
+	        studentFirstParams.put("tsFromDate", tsFromDate);
+	        studentFirstParams.put("tsToDate", tsToDate);
+	        SqlParameterSource studentFirstParamsParameters = new MapSqlParameterSource(studentFirstParams);
+	         
+    		String classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+	      	String students_query = TTUtil.PER_STUDENT_QUERY_FIRST.replaceAll("CLASSID_TOKEN", classesStr);
+	        List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(students_query, studentFirstParamsParameters, new ClassStudentsMapper());
+	                 
+	        if (selectedStudent.length() > 0) {
+		         Iterator<ClassStudents> i = classStudents.iterator();
+		         while (i.hasNext()) {
+		        	 ClassStudents stud = i.next();
+		        	 if (!stud.getStudentId().equals(selectedStudent)) {
+		        		 i.remove();
+		        	 }
+		         }         
+	        }
+	        return classStudents;
+    	}
+    	catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+	        return null;
+    	}
     }
 
     @Override
     public List<ClassLandingReportStudents> generateClassLandingReportOne(String teacherId, String classId, String filter) {
 
 
-    	Timestamp ts = xDaysAgoToDate(filter);
-		
-        Map<String, Object> eventParams = new HashMap<String, Object>();
-        eventParams.put("classId", classId);
-        eventParams.put("ts", ts);
-        SqlParameterSource eventNamedParameters = new MapSqlParameterSource(eventParams);
+    	String filters[] = filter.split("~");
 
-        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT_EVENTS_QUERY, eventNamedParameters, new ClassLandingReportEventsMapper());
+    	Timestamp ts = xDaysAgoToDate(filters[0]);
+
+    	String classesStr = classId;
+    	if (filters.length > 1) {
+    		classesStr = filters[1];
+    	}
+    	
+    	String event_query   = TTUtil.LANDING_REPORT_EVENTS_QUERY.replaceAll("CLASSID_TOKEN", classesStr);
+    	
+    	Map<String, Object> eventParams = new HashMap<String, Object>();
+        eventParams.put("ts", ts);
+
+		SqlParameterSource eventNamedParameters = new MapSqlParameterSource(eventParams);
+
+        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(event_query, eventNamedParameters, new ClassLandingReportEventsMapper());
 
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
@@ -1288,7 +1344,7 @@ public class TTReportServiceImpl implements TTReportService {
         int attemptTime = 0;
         int endTimeElapsed = 0;
         int probElapsedTime = 0;
-        String latestLogin = "";
+//        String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
@@ -1334,12 +1390,14 @@ public class TTReportServiceImpl implements TTReportService {
     		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
     	}
         
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("classId", classId);
-        params.put("ts", ts);
-        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
+    	String student_query = TTUtil.LANDING_REPORT_STUDENTS_QUERY.replaceAll("CLASSID_TOKEN", classesStr);
 
-        List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT_STUDENTS_QUERY, namedParameters, new ClassLandingReportStudentsMapper());
+    	Map<String, Object> studentparams = new HashMap<String, Object>();
+        studentparams.put("ts", ts);
+
+        SqlParameterSource studentNamedParameters = new MapSqlParameterSource(studentparams);
+
+        List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(student_query, studentNamedParameters, new ClassLandingReportStudentsMapper());
         
         for (ClassLandingReportStudents stu : classLandingReportStudents) {
         	//System.out.println("StudentID=" + stu.getStudentId());
@@ -1382,7 +1440,7 @@ public class TTReportServiceImpl implements TTReportService {
     	Timestamp tsToDate = null;
     	
     	String filters[] = filter.split("~");
-    	if (filters.length > 1) {    		
+    	if (filters.length > 0) {    		
     		String dateFilters[] = filters[1].split("thru");
     		tsFromDate = convertFromDate(dateFilters[0].trim());
     		tsToDate = convertToDate(dateFilters[1].trim());
@@ -1391,14 +1449,22 @@ public class TTReportServiceImpl implements TTReportService {
     		tsFromDate = defaultFromDate();
     		tsToDate = defaultToDate();    		
     	}
-		
-        Map<String, Object> eventParams = new HashMap<String, Object>();
-        eventParams.put("classId", classId);
+
+    	String classesStr = classId;
+    	if (filters.length > 2) {
+    		classesStr = filters[2];
+    	}   	
+ 
+    	String event_query   = TTUtil.LANDING_REPORT2_EVENTS_QUERY.replaceAll("CLASSID_TOKEN", classesStr);
+    	
+    	Map<String, Object> eventParams = new HashMap<String, Object>();
         eventParams.put("tsFromDate", tsFromDate);
         eventParams.put("tsToDate", tsToDate);
-        SqlParameterSource eventNamedParameters = new MapSqlParameterSource(eventParams);
 
-        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT2_EVENTS_QUERY, eventNamedParameters, new ClassLandingReportEventsMapper());
+
+		SqlParameterSource eventNamedParameters  = new MapSqlParameterSource(eventParams );
+    	
+        List<ClassLandingReportEvents> classLandingReportEvents = namedParameterJdbcTemplate.query(event_query, eventNamedParameters , new ClassLandingReportEventsMapper());
 
         Map<String, String> probElapsedMap = new HashMap<String, String>();
         Map<String, String> latestLoginMap = new HashMap<String, String>();
@@ -1406,7 +1472,7 @@ public class TTReportServiceImpl implements TTReportService {
         int attemptTime = 0;
         int endTimeElapsed = 0;
         int probElapsedTime = 0;
-        String latestLogin = "";
+//        String latestLogin = "";
         boolean countable = false;
         for (ClassLandingReportEvents event : classLandingReportEvents) {
         	switch (event.getAction()) {
@@ -1451,16 +1517,20 @@ public class TTReportServiceImpl implements TTReportService {
 //        	System.out.println("Last student - probElapsedTime = " + String.valueOf(probElapsedTime));
     		probElapsedMap.put(prevStudent, String.valueOf(probElapsedTime));
     	}
-        
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("classId", classId);
-        params.put("tsFromDate", tsFromDate);
-        params.put("tsToDate", tsToDate);
-        SqlParameterSource namedParameters = new MapSqlParameterSource(params);
 
-        List<ClassLandingReportStudents> classLandingReportStudents = namedParameterJdbcTemplate.query(TTUtil.LANDING_REPORT2_STUDENTS_QUERY, namedParameters, new ClassLandingReportStudentsMapper());
+    	String student_query = TTUtil.LANDING_REPORT2_STUDENTS_QUERY.replaceAll("CLASSID_TOKEN", classesStr);
+
+    	Map<String, Object> studentparams  = new HashMap<String, Object>();
+        studentparams .put("tsFromDate", tsFromDate);
+        studentparams .put("tsToDate", tsToDate);
+
+        SqlParameterSource studentNamedParameters  = new MapSqlParameterSource(studentparams );
+
+        List<ClassLandingReportStudents> classLandingReportStudents  = namedParameterJdbcTemplate.query(student_query, studentNamedParameters , new ClassLandingReportStudentsMapper());
         
-        for (ClassLandingReportStudents stu : classLandingReportStudents) {
+        
+        
+        for (ClassLandingReportStudents stu : classLandingReportStudents ) {
         	//System.out.println("StudentID=" + stu.getStudentId());
         	String timeInMS = probElapsedMap.get(stu.getStudentId());
         	//System.out.println("timeInMS=" + timeInMS);
@@ -1490,7 +1560,7 @@ public class TTReportServiceImpl implements TTReportService {
 //        	System.out.println("StudentID=" + stu.getStudentId() + " ElapsedTime=" + stu.getTimeInMS());
 //        }
 
-        return classLandingReportStudents;
+        return classLandingReportStudents ;
     }
 
  
@@ -1563,7 +1633,18 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, List<String>> finalMapLevelOneTemp = new LinkedHashMap<>();
         Map<String, String> columnNamesMap = new LinkedHashMap<>();
         Map<String, Object> allResult = new HashMap<>();
-        Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_TOPIC_QUERY_FIRST, namedParameters, (ResultSet mappedrow) -> {
+
+        String classesStr = classId;
+        String students_query = "";
+        try {
+        	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+        	students_query = TTUtil.PER_TOPIC_QUERY_FIRST.replaceAll("CLASSID_TOKEN", classesStr);
+        }
+        catch (Exception e) {
+        	logger.error(e.getMessage());
+        	e.printStackTrace();
+        }
+        Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(students_query, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
                 String studentId = mappedrow.getString("studentId");
                 Integer problemSetId = mappedrow.getInt("topicId");
@@ -1611,9 +1692,9 @@ public class TTReportServiceImpl implements TTReportService {
             return finalMapLevelOne;
         });
         finalMapLevelOne.forEach((studentId, studentDetails) -> {
-            Map<String, String> selectParams = new LinkedHashMap<String, String>();
-            selectParams.put("classId", classId);
-            selectParams.put("studId", studentId);
+//            Map<String, String> selectParams = new LinkedHashMap<String, String>();
+//            selectParams.put("classId", classId);
+//            selectParams.put("studId", studentId);
 
             List<String> tempTopicDescriptionList = finalMapLevelOneTemp.get(studentId);
             List<String> columnList = new ArrayList<String>(columnNamesMap.values());
@@ -1701,7 +1782,7 @@ public class TTReportServiceImpl implements TTReportService {
 
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("filter", modFilter);
-        params.put("classId", classId);
+        //params.put("classId", classId);
         params.put("tsFromDate", tsFromDate);
         params.put("tsToDate", tsToDate);
         SqlParameterSource namedParameters = new MapSqlParameterSource(params);
@@ -1714,8 +1795,22 @@ public class TTReportServiceImpl implements TTReportService {
         Map<String, String> descriptionIdMap = new LinkedHashMap<>();
         Map<String, Object> allResult = new HashMap<>();
         
+//        String psppQuery = TTUtil.PER_STUDENT_PER_PROBLEM;
+//        psppQuery.replace(":classId"), 
+        
+        String classesStr = classId;
+        String students_query = "";
+        try {
+        	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+        	students_query = TTUtil.PER_STUDENT_PER_PROBLEM.replaceAll("CLASSID_TOKEN", classesStr);
+        }
+        catch (Exception e) {
+        	logger.error(e.getMessage());
+        	e.printStackTrace();
+        }
 
-        Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(TTUtil.PER_STUDENT_PER_PROBLEM, namedParameters, (ResultSet mappedrow) -> {
+
+        Map<String, List<String>> resultantValues = namedParameterJdbcTemplate.query(students_query, namedParameters, (ResultSet mappedrow) -> {
             while (mappedrow.next()) {
             	String studentId = ((String) mappedrow.getString("studId")).trim();
                 if ((!selectedStudent.equals("")) && (!selectedStudent.equals(studentId) )) {
@@ -1812,8 +1907,8 @@ public class TTReportServiceImpl implements TTReportService {
                     tempProblemDescriptionList.add(description.trim().replace(" ", ""));
                 }
 
-                String strDebug = "[" + mappedrow.getString("studentName") + " " + studentId + " " + strProblemId + " " + description + " " + effort + " " + strBeginTime + " " + problemDate + " " + strProblemId  + "]";
-            	System.out.println(strDebug);
+                //String strDebug = "[" + mappedrow.getString("studentName") + " " + studentId + " " + strProblemId + " " + description + " " + effort + " " + strBeginTime + " " + problemDate + " " + strProblemId  + "]";
+            	//System.out.println(strDebug);
 
                 columnNamesMap.put(problemId.toString(), description);
                 finalMapLevelOne.put(studentId, studentValuesList);
@@ -1918,9 +2013,19 @@ public class TTReportServiceImpl implements TTReportService {
             params.put("tsToDate", tsToDate);
             SqlParameterSource namedParameters = new MapSqlParameterSource(params);
 
+            String classesStr = classId;
+            String students_query = "";
+            try {
+            	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+            	students_query = TTUtil.PER_TOPIC_QUERY_SECOND.replaceAll("CLASSID_TOKEN", classesStr);
+            }
+            catch (Exception e) {
+            	logger.error(e.getMessage());
+            	e.printStackTrace();
+            }
 
             
-            List<String[]> eachMasteryStudentPerTopicResults = namedParameterJdbcTemplate.query(TTUtil.PER_TOPIC_QUERY_SECOND, namedParameters, (ResultSet mappedrow) -> {
+            List<String[]> eachMasteryStudentPerTopicResults = namedParameterJdbcTemplate.query(students_query, namedParameters, (ResultSet mappedrow) -> {
                 List<String[]> arrayRecords = new ArrayList<>();
                 while (mappedrow.next()) {
                     String[] problemDetails = new String[10];
@@ -1932,12 +2037,13 @@ public class TTReportServiceImpl implements TTReportService {
                     problemDetails[4] = mappedrow.getString("screenShotURL");
                     problemDetails[5] = mappedrow.getString("mastery");
                     problemDetails[6] = mappedrow.getString("problemEndTime");
-                    if ("".equals(mappedrow.getString("effort")) || "unknown".equals(mappedrow.getString("effort")) || mappedrow.getString("effort") == null)
+                    if ("".equals(mappedrow.getString("effort")) || "unknown".equals(mappedrow.getString("effort")) || mappedrow.getString("effort") == null) {
                         problemDetails[7] = "NO DATA";
-                    else
+                    }
+                    else {
                         problemDetails[7] = mappedrow.getString("effort");
-                    arrayRecords.add(problemDetails);
-
+                    	arrayRecords.add(problemDetails);
+                    }
                 }
                 return arrayRecords;
             });
@@ -1954,14 +2060,25 @@ public class TTReportServiceImpl implements TTReportService {
             Map<String, String> selectParams = new LinkedHashMap<String, String>();
             ObjectMapper objMapper = new ObjectMapper();
 
-            selectParams.put("classId", classId);
             selectParams.put("studId", studentId);
 
+            String classesStr = classId;
+            String students_query = "";
+            try {
+            	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+            }
+            catch (Exception e) {
+            	logger.error(e.getMessage());
+            	e.printStackTrace();
+            }
+
+            
+            
             String queryType = "";
-            if (chartType.equals("avg"))
-                queryType = TTUtil.PER_TOPIC_QUERY_COMPLETE_AVG;
+            if (chartType.equals("avg")) 
+                queryType = TTUtil.PER_TOPIC_QUERY_COMPLETE_AVG.replaceAll("CLASSID_TOKEN", classesStr);
             else if (chartType.equals("max"))
-                queryType = TTUtil.PER_TOPIC_QUERY_COMPLETE_MAX;
+                queryType = TTUtil.PER_TOPIC_QUERY_COMPLETE_MAX.replaceAll("CLASSID_TOKEN", classesStr);
             else
                 queryType = TTUtil.PER_TOPIC_QUERY_COMPLETE_LATEST;
 
@@ -2013,7 +2130,7 @@ public class TTReportServiceImpl implements TTReportService {
            	String logMsg = "{ \"clusterId\" : \"" + clusterId + "\", \"dates\" : \"" +  filters[1].trim() + "\" }";     
     		if ("Normal".equals(teacherLoginType)) {
     	       	try {
-    	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, rb.getString("ProblemsInClusterReport"), logMsg);
+    	   			tLogger.logEntryWorker((int) Integer.valueOf(teacherId), 0, classId, "ProblemsInClusterReport", logMsg);
     	    	}
     	    	catch (Exception e) {
     	    		System.out.println("TeacherLogger error " + e.getMessage());
@@ -2023,11 +2140,22 @@ public class TTReportServiceImpl implements TTReportService {
     	    Map<String, Object>selectParams = new HashMap<String, Object>();
     	      
             Map<String, String> problemDescriptionMap = new LinkedHashMap<String, String>();
-            selectParams.put("classId", classId);
             selectParams.put("clusterID", clusterId);
             selectParams.put("tsFromDate", tsFromDate);
             selectParams.put("tsToDate", tsToDate);
-            List<String> problemIdsList = namedParameterJdbcTemplate.query(TTUtil.PER_STANDARD_QUERY_THIRD, selectParams, new RowMapper<String>() {
+            
+            String standards_query_third = "";
+            String classesStr = classId;
+            try {
+            	classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+            	standards_query_third = TTUtil.PER_STANDARD_QUERY_THIRD.replaceAll("CLASSID_TOKEN", classesStr);
+            }
+            catch (Exception e) {
+            	logger.error(e.getMessage());
+            	e.printStackTrace();
+            }
+            
+            List<String> problemIdsList = namedParameterJdbcTemplate.query(standards_query_third, selectParams, new RowMapper<String>() {
                 @Override
                 public String mapRow(ResultSet resultSet, int i) throws SQLException {
                     problemDescriptionMap.put(resultSet.getString("problemID"), resultSet.getString("name")
@@ -2532,6 +2660,7 @@ public class TTReportServiceImpl implements TTReportService {
         List<TeacherListEntry> teacherListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.TEACHER_LIST_QUERY_FIRST, namedParameters, new TeacherListEntryMapper());
         return teacherListEntries;
     }
+
     @Override
     public List<TeacherClassListEntry> generateTeacherClassList(String teacherId) {
     	// Note: Target teacherID is passed from requester in the ClassId parameter. 
@@ -2540,15 +2669,30 @@ public class TTReportServiceImpl implements TTReportService {
         return teacherClassListEntries;
     }
 
+    public List<ClassClusterListEntry> generateClassClusterList(String classId) {
+    	// Note: Target teacherID is passed from requester in the ClassId parameter. 
+        SqlParameterSource namedParameters = new MapSqlParameterSource("classId", classId);
+        List<ClassClusterListEntry> classClusterListEntries = (List) namedParameterJdbcTemplate.query(TTUtil.CLASS_CLUSTERLIST_QUERY, namedParameters, new ClassClusterListEntryMapper());
+        return classClusterListEntries;
+    }
+
     
     
-    public List<User> getClassStudentIDs(Connection conn, int classID) throws SQLException {
-        ResultSet rs = null;
+    public List<User> getClassStudentIDs(Connection conn, int classID, String classesInCluster) throws SQLException {
+  
+    	String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ")";
+
+        if (classesInCluster.length() == 0) {
+        	q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+        }
+    	
+    	ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
             stmt = conn.prepareStatement(q);
-            stmt.setInt(1, classID);
+            if (classesInCluster.length() == 0) {
+            	stmt.setInt(1, classID);
+            }
             rs = stmt.executeQuery();
             List<User> res = new ArrayList<User>();
             while (rs.next()) {
@@ -2603,12 +2747,18 @@ public class TTReportServiceImpl implements TTReportService {
     public ClassLiveDashboard generateLiveDashboard(String classId, String filter) {
     	// Note: Target teacherID is passed from requester in the ClassId parameter.
 
+    	String classes = "";
+    	String filters[] = filter.split("~");
+    	if (filters.length > 1 ) {
+    		classes = filters[1];
+    	}
+    	
     	int total = 0;
     	List<User> students = null;
 		ClassLiveDashboard testDashboard = new ClassLiveDashboard();
-		if (filter.equals("ProblemsSolved")) {
+		if (filters[0].equals("ProblemsSolved")) {
 			try {
-				students = getClassStudentIDs(connection.getConnection(), Integer.valueOf(classId));
+				students = getClassStudentIDs(connection.getConnection(), Integer.valueOf(classId), classes);
 				for (int i=0;i< students.size();i++ ) {
 					total = total + getProblemsSolved(connection.getConnection(),students.get(i).getId());
 				}

@@ -2,35 +2,16 @@ package edu.umass.ckc.wo.ttmain.ttmodel;
 
 
 /**
- * Frank 	02-26-20	Issue #45 & #21
-* Frank 	02-04-23    Issue #723 - handle class clusters 
+ * Frank 	01-15-23	Issue #723 new class 
  */
-public class TeacherClassListEntry {
+public class ClassClusterListEntry {
 
-    private String teacherId;
-    private String teacherName;
     private String classId;
     private String className;
     private String hasClusters;
     private String isCluster;
     private String color;
     
-    public String getTeacherId() {
-        return teacherId;
-    }
-
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String TeacherName) {
-        this.teacherName = teacherName;
-    }
-
     public String getClassName() {
         return className;
     }

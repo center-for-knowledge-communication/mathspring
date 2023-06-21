@@ -30,6 +30,9 @@
  *  Frank   11-30-21    Issue #551 - change how school year is displayed e.g. 2021/2022 for schoolYear=2022  
  *  Frank	07-28-22	issue #676 removed grades 9, 10, adult from the picklist temporarily until we get some math problems for them
  *  Frank 	11-27-22    Issue #714 - finish multi-lingual algorithms
+ *  Frank 	02-04-23    Issue #723 - Added class clustering
+ *  Frank 	02-04-23    Issue #723 - Added create class validation on cluster y/n
+ *  Frank	05-13-23	Issue #763 - make LCs selectable by class
  */
 
  System.out.println("teacherToolsMain starting");
@@ -262,34 +265,220 @@ catch (Exception e) {
         var targetTeacherID = "";
         var targetTeacherName = "";
         var classNameIdArr = null;
+        var homePageClassArr = null;
     	var messageStartDate = "";
     	var classesBundle = "";
 
-        
+		var t_isCluster = 0;
+		var t_hasClusters= 0;
+		var t_nextIsCluster = 0;
+		var t_nextHasClusters= 0;
+		var t_name = "";
+		var t_classid = "";
+		var t_schoolYear = "";
+		
+		var lcProfileArr = null;
         
         $(document).ready(function () {
-            $('#wrapper').toggleClass('toggled');
-            $("#report-wrapper").show();
-            $("#report-wrapper2").show();
+        	$('#wrapper').toggleClass('toggled');
             $("#teacher-activities-wrapper").hide();
             $("#panel-wrapper").hide();
             $("#form-wrapper").hide();
             $("#message-wrapper").hide();
             $("#edit-teacher-wrapper").hide();
-            
-                               
-            classNameIdArr = ${classNameIdArrayStr};
-			if (classNameIdArr[0].Id == 0) {
+          
+            var noClass = ${noClass};
+            if (noClass == false) {
+	            classNameIdArr = ${classNameIdArrayStr};
+				if (classNameIdArr[0].Id == 0) {
+		          	var x = document.getElementById("li_class_message_handler");
+	        		x.style.display = "none";
+				}
+	              
+	            homePageClassArr = ${homePageClassArrayStr};
+	            lcProfileArr = ${lcProfileStr};
+
+	            teacherId =  ${teacherId};
+				var myHTML = "";
+				var nbrOfClasses = homePageClassArr[0][7];
+				var nbrOfClusters = 0;
+	
+				for (let index = 0; index < nbrOfClasses; index++) {
+					nbrOfClusters += homePageClassArr[index][2];
+				}			
+				
+				myHTML  = '<div class="loader" style="display: none" ></div>';               
+				myHTML += '<div class="row"><div class="col-lg-6"><h1 class="page-header">';
+				if (nbrOfClasses > 0) {
+					myHTML += '<small><%= rb.getString("existing_classes") %></small>';
+					if (nbrOfClusters > 0) {
+						myHTML += '   |   ';
+						myHTML += '<small><%= rb.getString("clusters") %></small>';
+					}
+				}
+				else {
+					myHTML += '<small><%= rb.getString("no_pre-existing_classes") %></small>';
+				}
+				myHTML += '</h1></div></div>';
+				
+				var needsEndOfRowDiv = true;
+				
+				if (nbrOfClasses > 0) {
+					
+					
+					
+					for (let index = 0; index < nbrOfClasses; index++) {
+						t_isCluster = homePageClassArr[index][2];
+						t_hasClusters = homePageClassArr[index][3];
+						if (index < (nbrOfClasses - 1)) {
+							t_nextIsCluster = homePageClassArr[index+1][2];
+							t_nextHasClusters = homePageClassArr[index+1][3];
+						}
+	        			t_name = homePageClassArr[index][0];
+	        			t_classid = "" + homePageClassArr[index][1];
+	        			t_schoolYear = homePageClassArr[index][4];
+	        			t_color = homePageClassArr[index][5];
+	        			if (nbrOfClusters > 0) {       			
+						    if ((t_hasClusters > 0) || ((t_hasClusters+t_isCluster) == 0)) {
+						    	myHTML += '<div class="row">';	
+						    }
+	        			}
+	        			
+					    myHTML += '<div class="col-lg-3 col-md-6">';
+					    if (t_isCluster == 0) {
+						    myHTML += '<div class="panel panel-' + t_color + '">';
+					    }
+					    else {
+						    myHTML += '<div class="panel panel-' + t_color + '-cluster">';				    	
+					    }
+					    myHTML += '<div class="panel-heading">';
+					    myHTML += '<div class="row">';
+					    myHTML += '<div class="col-xs-3">';
+	
+					    if (t_isCluster == 0) {
+						    myHTML += '<img src="../../images/classroom.png" height="64" width="64">';
+					    }
+					    else {
+						    myHTML += '<img src="../../images/cluster.png" height="36" width="48">';
+					    }
+					    
+					    myHTML += '</div>';
+					    myHTML += '<div class="col-xs-9 text-right">';
+					    myHTML += '<div class="huge">' + t_name + '</div>';
+					    var labelYear = '<%= rb.getString("year") %>';
+					    var labelClassCode = '';
+					    
+					    if (t_isCluster == 0) {
+						    var toYear = t_schoolYear;
+						    var fromYear = toYear-1;
+						    myHTML += '<div class="pull-right">&nbsp;&nbsp;' + labelYear  + ':' + fromYear + '-' + toYear + '</div>';
+							if (t_hasClusters) {
+						    	labelClassCode = '<%= rb.getString("master_code") %>';
+							}
+							else {
+						    	labelClassCode = '<%= rb.getString("class_code") %>';							
+							}
+					    }
+					    else {
+					    	labelClassCode = '<%= rb.getString("cluster_code") %>';
+					    }
+	
+					    myHTML += '<div class="pull-right">&nbsp;&#91;' + labelClassCode + ':' + t_classid + '&#93;</div>';				    
+					    myHTML += '</div>';
+					    myHTML += '</div>';
+					    myHTML += '</div>';
+	
+						myHTML += '<div class="panel-footer">';
+						myHTML += '<a href="'+pgContext+'/tt/tt/viewClassDetails?classId=' + t_classid + '&#38;currentSelection=classHomePage">';				
+						myHTML += '<div>';
+						var labelViewClass = '<%= rb.getString("view_class") %>';
+						myHTML += '<span class="pull-left">' + labelViewClass + '</span>';
+						myHTML += '<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>';
+						myHTML += '</a>';
+	
+						myHTML += '<a href="'+pgContext+'/tt/tt/setClassActiveFlag?teacherId=' + teacherId +'&#38;classId=' + t_classid + '&#38;activeFlag=0">';
+						var labelArchiveClass = '<%= rb.getString("archive_class") %>';
+						myHTML += '<span class="pull-right"><i class="fa fa-archive fa-2x">&nbsp;</i></span>';
+						myHTML += '<span class="pull-right">' + labelArchiveClass + '</span>';
+						myHTML += '</a>';
+						myHTML += '</div>';
+						myHTML += '<div class="clearfix"></div>';
+					    myHTML += '</div></div>';
+				    	myHTML += '</div>';					    	
+					    
+	        			if (nbrOfClusters > 0) {       			
+					    	if (index == (nbrOfClasses - 1)) {
+						    	myHTML += '</div>';					    	
+						    }
+						    else {				    
+						    	if ((t_nextHasClusters > 0) || ((t_nextHasClusters+t_nextIsCluster) == 0)) {
+						    		myHTML += '</div>';	
+						    	}
+						    }
+	        			}       			
+					}
+				}
+	            
+				document.getElementById('report-wrapper').innerHTML = myHTML;
+
+				var fullLCDiv = '<br><div class="row">';
+				var itemsinrow = 4;
+				var itemcount = 0;
+
+				for (let index = 0; index < lcProfileArr.length; index++) {
+					if (itemcount == itemsinrow) {
+						fullLCDiv += "</div>";
+						fullLCDiv += '<br><div class="row">';
+						itemcount = 0;
+					}
+					  
+					itemcount = itemcount + 1;
+					myLCDiv = '<div class="col-md-2" style="border:black; border-width:2px; border-style:solid;outline-style: solid;outline-color: white;outline-width: 3px;">';			    
+					var id = 'LC' + (index + 1);
+					var lcname = lcProfileArr[index].lcname;
+					var lcshortname = lcProfileArr[index].lcshortname;
+					var lang = lcProfileArr[index].lang;
+					var url = lcProfileArr[index].url;
+
+
+//					myLCDiv += 'option  id="' + id + '" + value="' + lcProfileArr[index].id + '"></option>';                                            
+
+					myLCDiv += '<input type="checkbox" name="' + id + '" id="' + id + '" value="' + lcProfileArr[index].id + '" />';
+					myLCDiv += '<label for=' + id + '>';			
+					myLCDiv += '<img src="' + url +  lcshortname + '/character.png" width="120px" height="150px" />';
+					myLCDiv += '<span style="display:block; text-align: center;">' + lcshortname + lang + '</span>';		
+					myLCDiv += "</label>";
+					myLCDiv += "</div>";
+					console.log(myLCDiv);
+					fullLCDiv += myLCDiv;
+				}			
+				fullLCDiv += "</div>";
+				
+				document.getElementById('learning_companions').innerHTML = fullLCDiv;
+            }
+            else {
+				myHTML  = '<div class="loader" style="display: none" ></div>';               
+				myHTML += '<div class="row"><div class="col-lg-6"><h1 class="page-header">';
+				myHTML += '<small><%= rb.getString("no_pre-existing_classes") %></small>';
+				myHTML += '</h1></div></div>';
+				document.getElementById('report-wrapper').innerHTML = myHTML;
+				
 	          	var x = document.getElementById("li_class_message_handler");
         		x.style.display = "none";
-			}
+            }
+		
+            
             var pause = ${teacherPauseStudentUse};
             if (pause == "1")
             	$("#pause-status").show();            
             else 
             	$("#pause-status").hide();
+            
             registerAllEvents();
             handleclickHandlers();
+            $("#report-wrapper").show();
+            $("#report-wrapper2").show();
+
         });
 
         function createMessageClassList() {
@@ -653,7 +842,27 @@ catch (Exception e) {
 	                            message: '<%= rb.getString("emsg_minTime") %>'
 	                        }
 	                    }
-	                }
+	                },
+                    color: {
+                        validators: {
+                            notEmpty: {
+                                message: '<%= rb.getString("emsg_class_color") %>'
+                            }
+                        }
+                    },
+                    hasClusters: {
+                        validators: {
+                            notEmpty: {
+                                message: '<%= rb.getString("must_answer_clusters_question") %>'
+                            },
+	    			        regexp: {
+    	            			regexp: /[YNSyns]/,
+                                message: '<%= rb.getString("must_answer_clusters_question") %>'
+            				}   
+                            
+                        }
+                    }
+
                 }
             }).on('success.form.bv', function (e) {
                 $("#create_class_form").data('bootstrapValidator').resetForm();
@@ -1047,72 +1256,8 @@ function registerAllEvents(){
 	        </div>
         </div>            
         <div id="report-wrapper" class="row">
-           	<div class="loader" style="display: none" ></div>               
-                <div class="row">
-                    <div class="col-lg-12">
-                        <h1 class="page-header">
-                            <c:choose>
-                                <c:when test="${noClass == false}">
-                                    <small><%= rb.getString("existing_classes") %></small>
-                                </c:when>
-                                <c:otherwise>
-                                    <small><%= rb.getString("no_pre-existing_classes") %></small>
-                                </c:otherwise>
-                            </c:choose>
-
-                        </h1>
-                    </div>
-                </div>
-                <!-- /.row -->
-                <c:if test="${noClass == false}">
-
-                <c:forEach var="c" items="${classbean.classes}" varStatus="loop">
-                <c:if test="${(loop.index == 0 || loop.index%4  == 0)}">
-                <c:set var="terminator" value="${loop.index + 3}"/>
-                <div class="row">
-                    </c:if>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-green">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-bar-chart fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge">${c.name}</div>
-	                                    <div class="pull-right">&nbsp;&nbsp;<%= rb.getString("year") %>:${c.schoolYear-1}&sol;${c.schoolYear}</div>
-	                                    <div class="pull-right">&nbsp;[<%= rb.getString("class_code") %>:${c.classid}]</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="panel-footer">
-                           		<a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassDetails?classId=${c.classid}&currentSelection=classHomePage">
-                                  <div> 
-                                  	<span class="pull-left"><i class="fa fa-eye fa-2x"></i>&nbsp;</span>
-                                  	<span class="pull-left"><%= rb.getString("view_class") %></span>
-                                  </div>
-                              	</a>
-                                <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/setClassActiveFlag?teacherId=${teacherId}&classId=${c.classid}&activeFlag=0">
-                               		<div>
-	                                  	<span class="pull-right"><%= rb.getString("archive_class") %></span>
-	                                  	<span class="pull-right"><i class="fa fa-archive fa-2x">&nbsp;</i></span>
-	                                  </div>
-	                            </a>
-                                <div class="clearfix"></div>
-                             </div>
-                        </div>
-                    </div>
-                    <c:if test="${loop.index == terminator}">
-                    <!-- t div-->
-                </div>
-                </c:if>
-                <c:if test="${loop.last == 'true'}">
-                <!-- s div-->
-            </div>
-            </c:if>
-            </c:forEach>
-            </c:if>
         </div>
+
         <div id="report-wrapper2" class="row">
          <div class="row">
                     <div class="col-lg-12">
@@ -1128,7 +1273,7 @@ function registerAllEvents(){
                 <div class="row">
                     </c:if>
                     <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-red">
+                        <div class="panel panel-gray">
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
@@ -1420,7 +1565,23 @@ function registerAllEvents(){
                                                           class="form-control" type="text"/>
                                     </div>
                                 </div>
-                        	</div>
+                                <div class="form-group">
+                                    <label for="classGrade"><%= rb.getString("color_scheme") %></label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i
+                                                class="glyphicon glyphicon-education"></i></span>
+                                        <springForm:select path="color" class="form-control" id="classColor"
+                                                           name="color">
+                                            <springForm:option value=""><%= rb.getString("select_color_scheme") %></springForm:option>
+                                            <springForm:option class="panel-green" value="green"><%= rb.getString("green") %> </springForm:option>
+                                            <springForm:option class="panel-blue" value="blue"><%= rb.getString("blue") %> </springForm:option>
+                                            <springForm:option class="panel-red" value="red"><%= rb.getString("red") %> </springForm:option>
+                                            <springForm:option class="panel-violet" value="violet"><%= rb.getString("violet") %> </springForm:option>
+                                            <springForm:option class="panel-yellow" value="yellow"><%= rb.getString("yellow") %> </springForm:option>
+                                        </springForm:select>
+                                    </div>
+                                </div>
+                            </div>
                     	</div>
                    
                     	<div id="create_class_out_middle" class="col-md-4 col-sm-4">
@@ -1527,6 +1688,7 @@ function registerAllEvents(){
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div id="add_students_out" class="col-md-12 col-sm-12">
                         <div id="add_students_out_panel_default" class="panel panel-default">
@@ -1566,6 +1728,46 @@ function registerAllEvents(){
                                 <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="has_clusters_out" class="panel panel-default">
+                        <div class="panel-heading">
+                           <%= rb.getString("part_three_class_clustering") %>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <span class="input-group label label-warning"><%= rb.getString("what_are_clusters") %></span>
+                                <label><%= rb.getString("cluster_definition") %></label>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="form-group">
+                                   	<label for="hasClusters"><%= rb.getString("does_this_class_use_clusters") %></label>
+                                    <div class="input-group">
+                                    	<springForm:input path="hasClusters" id="hasClusters" name="hasClusters"
+                                    	class="form-control" type="text" value=""/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                <div class="row">
+                    <div id="learning_companions-section" class="panel panel-default">
+                        <div class="panel-heading">
+                           <%= rb.getString("part_four_learning_companions") %>
+                        </div>
+                        <div class="panel-body">
+                            <span class="input-group label label-warning"><%= rb.getString("what_are_learning_companions") %></span>
+                            <label><%= rb.getString("learning_companion_definition") %></label>
+	                        <br><br>
+                        	<label><%= rb.getString("learning_companion_prompt") %></label>
+                        </div>
+	                    <div id="learning_companions" class="container">
+
+						</div>
                     </div>
                 </div>
                 <div style="text-align:center;">

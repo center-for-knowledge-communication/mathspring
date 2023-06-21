@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 /**
  * Frank 	03-02-2020	Issue #45 teacher selection list
+ * Frank 	02-04-23    Issue #723 - handle class clusters 
  */
 public class TeacherClassListEntryMapper implements RowMapper {
     @Override
@@ -17,6 +18,9 @@ public class TeacherClassListEntryMapper implements RowMapper {
     	teacherClassListEntry.setTeacherName(resultSet.getString("teacherName"));
     	teacherClassListEntry.setClassId (resultSet.getString("classId"));
     	teacherClassListEntry.setClassName(resultSet.getString("className"));
+    	teacherClassListEntry.setClassHasClusters(resultSet.getString("hasClusters"));
+    	teacherClassListEntry.setClassIsCluster(resultSet.getString("isCluster"));
+    	teacherClassListEntry.setColor(resultSet.getString("color"));
         return teacherClassListEntry;
     }
 }

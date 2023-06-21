@@ -58,8 +58,10 @@
 <!-- Frank 08-07-22	issue #682 add refresh button to livedashboard -->
 <!-- Frank 09-23-22     Issue #632R3 - added select all/deselect all for standards list popup and made dropdown gable -->
 <!-- Frank 10-06-22     Issue #632R4 - group feedback changes and fix drag element init -->
-<!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms
-  
+<!-- Frank 11-27-22     Issue #714 - finish multi-lingual algorithms -->
+<!-- Frank 02-20-23     Issue #723 - Split off Problem set (topic) management code to classManageTopics.jsp -->
+<!-- Frank 02-20-23     Issue #725 - took color and school year off the edit form -->
+
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -72,7 +74,7 @@
 <%@ page import="java.sql.Connection"%>
 <%@ page import="edu.umass.ckc.wo.ttmain.ttservice.util.TeacherLogger"%>
 
-<% 
+<%
 
 ResourceBundle versions = null; 
 try {
@@ -354,7 +356,12 @@ System.out.println("msHost = " + msHost + msContext);
  * Frank	12-02-20	Issue #322 added currentSelection to classReportCard URL 
  */
  
- 
+ var isCluster = 0;
+ var hasClusters = 0;
+ var classColor = "";
+ var titleClassName = "";
+ var moveStudentId = "";     	       
+
  //Report1 Variables
 var perProblemSetReport;
 var perProblemSetLevelOne;
@@ -387,38 +394,13 @@ var studentData;
 var surveyStudentTable;
 var surveyQuestionTable;
 var apply_content_table;
-var filterLandingOne = "~7";
+var filterLandingOne = "7";
 var filterLandingTwo = "~0";
 
-var activeProblemSet;
-var inactiveProblemSets;
 var lowGradeLevel;
 var highGradeLevel;
 var gradesLevelsUsedInThisClass = "";
 
-var activeProblemSetsize = 0;
-var inactiveProblemSetsize = 0;
-
-var topicActiveSelectionInProgress = "";
-var topicPassiveSelectionInProgress = "";
-var topicActiveStandardInProgress = "";
-var topicPassiveStandardInProgress = "";
-
-var activeStandardsRow = null;
-var activeStandardsChild = null;
-var activeStandardsResponse = null;
-var activeStandardsJSONData = null;
-var activeStandardsTopicStandards = null;
-var activeStandardsTopicStandardsSorted = null;
-var activeStandardsRowID = "";
-
-var passiveStandardsRow = null;
-var passiveStandardsChild = null;
-var passiveStandardsResponse = null;
-var passiveStandardsJSONData = null;
-var passiveStandardsTopicStandards = null;
-var passiveStandardsTopicStandardsSorted = null;
-var passiveStandardsRowID = "";
 
 var plot_live_dashboard = null;
 var plot_effort_chart = null;
@@ -444,17 +426,19 @@ function getFilterLandingOne() {
 	else {
 		daysLandingOne = "" + nDays;
 	}
-	filterLandingOne = daysLandingOne;
+	filterLandingOne = daysLandingOne + '~' + classesInCluster;
 }
 
 function getFilterLandingTwo() {
-	
-	
+		
 	var d1 = parseInt(document.getElementById("selectDay_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay").value);
 
 	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
 	var m2 =  parseInt(document.getElementById("month").value) + 1;
+
+	document.getElementById("year_cal2").value = "2023";
+	document.getElementById("year").value = "2023";
 	
 	if ((d1 > 0) && (d2 > 0)) {
 		$('#calendarModalPopup').modal('hide');
@@ -475,7 +459,7 @@ function getFilterLandingTwo() {
 			toDate = temp;
 		}
 		document.getElementById("daysFilterLanding2").value = fromDate + " thru " + toDate;
-		filterLandingTwo = "~" + fromDate + "thru" + toDate;
+		filterLandingTwo = "~" + fromDate + "thru" + toDate + '~' + classesInCluster;
 	    $('#landing-report-loader').show();
 	    $.ajax({
             type : "POST",
@@ -508,17 +492,27 @@ function getFilterLandingTwo() {
 	}
 
 }
-var teacherClassSelections = "";
+
+function moveToDestination(id, isCluster) {
+	
+	var splitter = id.split(',');
+	if(splitter[1] == "0") {
+		moveThisStudent(splitter[0]);
+	}
+	else {
+		moveThisStudent(splitter[0]);
+	}
+}
 
 function moveThisStudent(id) {
 
-	var newClassId = document.getElementById('moveBtn').value;
+	var newClassId = id;
     $('#student_info_out').find('.loader').show();
 	$.ajax({
         type : "POST",
         url :pgContext+"/tt/tt/changeStudentClass",
         data : {
-        	studentId:id,
+        	studentId: moveStudentId,
         	newClassId: newClassId,
             lang: loc
         },
@@ -534,45 +528,13 @@ function moveThisStudent(id) {
                 $("#successMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("student_class_changed")%>");
                 $('#successMsgModelPopup').modal('show');
             }
+            $("#clusterList").hide();
 	    },
 	    error : function(e) {
 	        console.log(e);
 	    }
     });
 }
-
-
-
-function selectTeacherClass(myClassId) {
-
-
-
-	var txtClassId = "" + myClassId;
-	for (var i=0; i < classChoices.length; i++) {	
-		var splitter = classChoices[i].split(',');
-		if (splitter[2] === txtClassId) {
-			document.getElementById('moveBtn').value = splitter[2];			
-			document.getElementById('moveBtn').innerHTML = '<%= rb.getString("move_this_student_to")%>: ' + splitter[1];
-			break;
-		}
-	}
-	
-	$("#moveBtn").show();
-}
-
-var classChoices = [];
-
-function addToTeacherList(item, index) {
-    
-	var titem = "" + item;
-	var tlist = titem.split(",");
-
-	if (tlist[2] != classID) {
-		classChoices.push(titem);	
-		teacherClassSelections = teacherClassSelections +  "<li id='Class" + tlist[2] + "' class='dropdown-content' value='" + tlist[2] + "' onclick='selectTeacherClass(" + tlist[2] + ");'>" + tlist[1] + "</li>";
-	}
-}
-
 
 function logTeacherEvent(action,activityName) {
 
@@ -647,8 +609,46 @@ function userPrefixLookup() {
 
 }
 
+function startClusterLoader() {
+	
+    $('#createClusterLoader').show();
+
+}
 
 
+function cloneCurrentClass() {
+	
+//	CreateClassForm createForm = null;
+	
+	$('#clone_class_out').find('.loader').show();
+	$.ajax({
+	    type: "POST",
+	    url: pgContext + "/tt/ttCloneClass",
+	    data: {
+	        classId: classId
+	    },
+	    success: function (data) {
+	        $('#clone_class_out').find('.loader').hide();
+
+            if (response.includes("***")) {
+                $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
+                $('#errorMsgModelPopup').modal('show');
+            }else{
+                if (teacherLoginType === "Normal") {
+                	logTeacherEvent("createdClassCluster","");
+                }
+                $("#successMsgModelPopup").find("[class*='modal-body']").html("Created Class Cluster");
+                $('#successMsgModelPopup').modal('show');
+            }
+	    
+	    }
+	    ,
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+	});
+}
 
 function verifyProbMinMax() {
 
@@ -781,6 +781,7 @@ var liveDashboardTotal = 0;
 
 function liveDashboardPopulate() {
 	
+	var liveDashboardFilter = "ProblemsSolved" + "~" + classesInCluster;
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/getTeacherReports",
@@ -789,7 +790,7 @@ function liveDashboardPopulate() {
             teacherId: teacherID,
             reportType: 'classLiveDashboard',
             lang: loc,
-            filter: "ProblemsSolved"
+            filter: liveDashboardFilter
 
         },
         success : function(data) {
@@ -1265,488 +1266,6 @@ function updateStudentInfo(formName){
     });
 }
 
-function problemDetails(data, response) {
-    var JSONData = JSON.parse(response);
-    var standards = JSONData["topicStandars"];
-    var standardsSorted = JSONData["topicStandardsSorted"];
-    var problems = JSONData["problems"];
-    var html = "";
-    $.each(standardsSorted, function (i, obj) {
-    	var stdClass = "" + obj.code;
-    	var stdGrade = stdClass.substring(0,2);
-    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
-        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
-    	}
-    });
-
-    var selector = "#"+JSONData["problemLevelId"]+"_handler";
-
-    $(document.body).on('click', selector ,function(){
-        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
-            { "bPaginate": false,
-                <%=jc_rb.getString("language_text")%>
-                "bFilter": false,
-                "bLengthChange": false,
-                rowReorder: false,
-                "bSort": false
-
-                
-            }).fnGetNodes();
-
-        var rowsArray = [];
-        var problemIds = [""];
-        var i = 0;
-        $("input:checkbox:not(:checked)", rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-        for(var j=0; j < rowsArray.length; j++)
-            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
-
-	    $('#problem_set_content').find('.loader').show();
-	    $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/saveChangesForProblemSet",
-            data : {
-                problemIds: problemIds,
-                classid: classID,
-                problemsetId: JSONData["problemLevelId"]
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });	
-
-var save_selections = "<%= rb.getString("save_selections")%>";
-var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
-var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
-var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
-var summaryLabel="<%= rb.getString("summary")%>"; 
-var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut full_detail_table_bg'> " +
-    " <div class='panel panel-default full_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body full_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body full_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body full_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body full_detail_table_bg'> <button id="+JSONData["problemLevelId"]+'_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button></div></div>";
-
-    return higherlevelDetail + problemLevelDetails(JSONData,problems);
-
-}
-
-function problemLevelDetails(JSONData,problems){
-    var tableHeader = '<table id='+JSONData["problemLevelId"]+' class="table table-striped table-bordered hover" cellspacing="0" width="100%"><thead><tr><th><%= rb.getString("activated")%></th><th><%= rb.getString("id")%></th><th><%= rb.getString("name")%></th><th><%= rb.getString("nickname")%></th><th><%= rb.getString("difficulty")%></th><th><%= rb.getString("cc_standard")%></th><th>Type</th></tr></thead><tbody>';
-    var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
-    $.each(problems, function (i, obj) {
-        var html = "";
-        var flash = "";
-        var checkBox = "";
-        var flashWindow = "'" + JSONData["uri"]+"?questionNum="+obj.problemNo + "'" + attri ;
-        var htmlWindow =  "'" + JSONData["html5ProblemURI"]+obj.htmlDirectory+"/"+obj.resource+ "'" + attri;
-        var imageURL = problem_imageURL+obj['id']+'.jpg';
-        $.each(obj.ccStand, function (i, obj) {
-            html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
-        });
-        if(obj.type=='flash'){
-            flash = '<td><a rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
-        }else{
-            flash = '<td><a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+obj.id+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer;" rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
-        }
-        if(obj.activated){
-            checkBox =  "<tr><td><input type='checkbox' name='activated' checked='checked'></td>"
-        }else{
-            checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
-        }
-        var tnickname = obj.nickName;
-        if (tnickname == null) {
-        	tnickname = "";
-        }
-        if (tnickname.length > 94) {
-        	tnickname = tnickname.substr(0,90) + "...";
-        }
-        tableHeader +=  checkBox+
-            "<td>"+obj.id+"</td>"+
-            flash+
-            "<td>"+tnickname+"</td>"+
-            "<td>"+obj.difficulty+"</td>"+
-            "<td>"+html+"</td>"+
-            "<td>"+obj.type+"</td></tr>";
-    });
-    return tableHeader + "</tbody></table></div>";
-}
-
-
-var selectedStandard = "";
-
-function handleActiveStandardsSelect() {
-    var selected = $('#activeStandardsList').val();
-    selectedStandard = "";
-    $.each(selected, function (i, std) {
-    	if (i > 0) {
-    		selectedStandard = selectedStandard + ',';
-    	}
-    	selectedStandard = selectedStandard + std;
-    });
-
-	activeStandardsChild = standardsProblemDetails(activeStandardsRow.data(), activeStandardsResponse, selectedStandard);	                    	
-	activeStandardsRow.child(activeStandardsChild).show();	                    	
-    $('a[rel=popoverPerProblem]').popover({
-        html: true,
-        trigger: 'hover',
-        placement: 'top',
-        container: 'body',
-        content: function () {
-            return '<img  style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-        }
-    });
-    $(activeStandardsRowID).toggleClass('zoomIn zoomOut');
-
-}
-
-function handleActiveStandardsReset() {
- 
-    var elements = document.getElementById("activeStandardsList").options;
-    for(var i = 0; i < elements.length; i++){
-      if(elements[i].selected)
-	    elements[i].selected = false;
-    }
-}
-
-
-var activeHelpDisplayed = 0;
-function displayActiveStandardsHelp() {
-	if (activeHelpDisplayed == 1) {
-		document.getElementById("activeStandardsPopupHelp").style.visibility = 'hidden';		
-		activeHelpDisplayed = 0;
-	}
-	else {
-		document.getElementById("activeStandardsPopupHelp").style.visibility = 'visible';
-		activeHelpDisplayed = 1;
-	}
-}
-
-
-function handlePassiveStandardsSelect() {
-    selectedStandard = "";
-
-    var selected = $('#passiveStandardsList').val();
-    selectedStandard = "";
-    $.each(selected, function (i, std) {
-    	if (i > 0) {
-    		selectedStandard = selectedStandard + ',';
-    	}
-    	selectedStandard = selectedStandard + std;
-    });
-
-    passiveStandardsChild = standardsProblemDetails(passiveStandardsRow.data(), passiveStandardsResponse, selectedStandard);	                    	
-	passiveStandardsRow.child(passiveStandardsChild).show();	                    	
-    $('a[rel=popoverPerProblem]').popover({
-        html: true,
-        trigger: 'hover',
-        placement: 'top',
-        container: 'body',
-        content: function () {
-            return '<img  style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-        }
-    });
-    $(passiveStandardsRowID).toggleClass('zoomIn zoomOut');
-
-}
-
-function handlePassiveStandardsReset() {
-	 
-    var elements = document.getElementById("passiveStandardsList").options;
-    for(var i = 0; i < elements.length; i++){
-      if(elements[i].selected)
-	    elements[i].selected = false;
-    }
-}
-
-var passiveHelpDisplayed = 0;
-function displayPassiveStandardsHelp() {
-	if (passiveHelpDisplayed == 1) {
-		document.getElementById("passiveStandardsPopupHelp").style.visibility = 'hidden';		
-		passiveHelpDisplayed = 0;
-	}
-	else {
-		document.getElementById("passiveStandardsPopupHelp").style.visibility = 'visible';
-		passiveHelpDisplayed = 1;
-	}
-}
-
-function activeStandardsFilter() {
-	  var div, input, filter, ul, li, a, i;
-	  input = document.getElementById("myActiveInput");
-	  filter = input.value.toUpperCase();
-	  div = document.getElementById("activeStandardsList");
-	  a = div.getElementsByTagName("option");
-	  for (i = 0; i < a.length; i++) {
-	    var txtValue = a[i].textContent || a[i].innerText;
-	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-	      a[i].style.display = "";
-	    } else {
-	      a[i].style.display = "none";
-	    }
-	  }
-	}
-	
-function passiveStandardsFilter() {
-	  var div, input, filter, ul, li, a, i;
-	  input = document.getElementById("myPassiveInput");
-	  filter = input.value.toUpperCase();
-	  div = document.getElementById("passiveStandardsList");
-	  a = div.getElementsByTagName("option");
-	  for (i = 0; i < a.length; i++) {
-	    var txtValue = a[i].textContent || a[i].innerText;
-	    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-	      a[i].style.display = "";
-	    } else {
-	      a[i].style.display = "none";
-	    }
-	  }
-	}
-	
-
-function standardsProblemDetails(data, response, state) {
-
-    var JSONData = JSON.parse(response);
-    var standards = JSONData["topicStandars"];
-    var standardsSorted = JSONData["topicStandardsSorted"];
-    var problems = JSONData["problems"];
-    var html = "";
-    var html = "";
-    $.each(standardsSorted, function (i, obj) {
-    	var stdClass = "" + obj.code;
-    	var stdGrade = stdClass.substring(0,2);
-    	if (gradesLevelsUsedInThisClass.indexOf(stdGrade) >= 0) {
-        	html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
-    	}
-    });
-
-    
-    var saveSelector = "#"+JSONData["problemLevelId"]+"_save_handler";
-
-    $(document.body).on('click', saveSelector ,function(){
-        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
-            { "bPaginate": false,
-                <%=jc_rb.getString("language_text")%>
-                "bFilter": false,
-                "bLengthChange": false,
-                rowReorder: false,
-                "bSort": false
-
-                
-            }).fnGetNodes();
-
-        var rowsArray = [];
-        var problemIds = [""];
-        var i = 0;
-        $("input:checkbox:not(:checked)", rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-        for(var j=0; j < rowsArray.length; j++)
-            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
-
-	    $('#problem_set_content').find('.loader').show();
-	    $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/saveChangesForProblemSet",
-            data : {
-                problemIds: problemIds,
-                classid: classID,
-                problemsetId: JSONData["problemLevelId"]
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });	
-
-    var selectallSelector = "#"+JSONData["problemLevelId"]+"_selectall_handler";    
-    
-    $(document.body).on('click', selectallSelector ,function(){
-        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
-            { "bPaginate": false,
-                <%=jc_rb.getString("language_text")%>
-                "bFilter": false,
-                "bLengthChange": false,
-                rowReorder: false,
-                "bSort": false
-
-                
-            }).fnGetNodes();
-
-        var problemIds = [""];
-        
-	    $('#problem_set_content').find('.loader').show();
-	    $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/saveChangesForProblemSet",
-            data : {
-                problemIds: problemIds,
-                classid: classID,
-                problemsetId: JSONData["problemLevelId"]
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });	
-  
-    
-    var deselectallSelector = "#"+JSONData["problemLevelId"]+"_deselectall_handler";    
-    
-    $(document.body).on('click', deselectallSelector ,function(){
-        var rows = $("#"+JSONData["problemLevelId"]).dataTable(
-            { "bPaginate": false,
-                <%=jc_rb.getString("language_text")%>
-                "bFilter": false,
-                "bLengthChange": false,
-                rowReorder: false,
-                "bSort": false
-
-                
-            }).fnGetNodes();
-
-        var j=0;
-        var rowsArray = [];
-        var problemIds = [""];
-        var i = 0;
-        $("input:checkbox:not(:checked)", rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-
-        $("input:checkbox:checked", rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-        
-        for(j=0; j < rowsArray.length; j++)
-            problemIds      [j]  = $("#"+JSONData["problemLevelId"]).DataTable().row( rowsArray [j] ).data()[1];
-
-        
-        $('#problem_set_content').find('.loader').show();
-	    $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/saveChangesForProblemSet",
-            data : {
-                problemIds: problemIds,
-                classid: classID,
-                problemsetId: JSONData["problemLevelId"]
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("content_changes_saved")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });	
-    
-    
-    
-    
-	var save_selections = "<%= rb.getString("save_selections")%>";
-	var activate_save_all = "<%= rb.getString("activate_save_all")%>";
-	var deactivate_save_all = "<%= rb.getString("deactivate_save_all")%>";
-	var higherlevelDetailp1="<%= rb.getString("problem_set")%>";
-	var higherlevelDetailp2="<%= rb.getString("standards_covered_in_problemset")%>";
-	var higherlevelDetailp3="<%= rb.getString("student_will_see_selected_problems")%>";
-	var summaryLabel="<%= rb.getString("summary")%>"; 
-	var higherlevelDetail = "<div id=" + data[0] + " class='panel-body animated zoomOut standards_detail_table_bg'> " +
-    " <div class='panel panel-default standards_detail_table_bg'> <div class='panel-body'><strong>"+higherlevelDetailp1+": " + JSONData["topicName"] + "</strong></div> " +
-    " <div class='panel-body standards_detail_table_bg'><strong>"+higherlevelDetailp2+": " + html + "</strong></div>" +
-    " <div class='panel-body standards_detail_table_bg'><strong>"+summaryLabel+": " + JSONData["topicSummary"] + "</strong></div>"+
-    "<div class='panel-body standards_detail_table_bg'>"+higherlevelDetailp3+"</div>"+
-    "<div class='panel-body standards_detail_table_bg'>"+
-    "<button id="+JSONData["problemLevelId"]+'_save_handler'+" class='btn btn-primary btn-lg' aria-disabled='true'>"+save_selections+"</button>&nbsp;&nbsp;"+
-    "<button id="+JSONData["problemLevelId"]+'_selectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+activate_save_all+"</button>&nbsp;&nbsp;"+
-    "<button id="+JSONData["problemLevelId"]+'_deselectall_handler'+"  class='btn btn-primary btn-lg' aria-disabled='true'>"+deactivate_save_all+"</button>&nbsp;&nbsp;"+
-    "</div>"+
-    "</div>";
-
-	return higherlevelDetail + standardsProblemLevelDetails(JSONData,problems,selectedStandard);
-    
-}
-
-function standardsProblemLevelDetails(JSONData,problems, selectedStd){
-    var tableHeader = '<table id='+JSONData["problemLevelId"]+' class="table table-striped table-bordered hover" cellspacing="0" width="100%"><thead><tr><th><%= rb.getString("activated")%></th><th><%= rb.getString("id")%></th><th><%= rb.getString("name")%></th><th><%= rb.getString("nickname")%></th><th><%= rb.getString("difficulty")%></th><th><%= rb.getString("cc_standard")%></th><th>Type</th></tr></thead><tbody>';
-    var attri = ", 'ProblemPreview'"+","+"'width=750,height=550,status=yes,resizable=yes'";
-//    selectedStd = "8.G.B.8";
-    $.each(problems, function (i, obj) {
-    	var foundStandard = false;
-        var html = "";
-        var flash = "";
-        var checkBox = "";
-        var flashWindow = "'" + JSONData["uri"]+"?questionNum="+obj.problemNo + "'" + attri ;
-        var htmlWindow =  "'" + JSONData["html5ProblemURI"]+obj.htmlDirectory+"/"+obj.resource+ "'" + attri;
-        var imageURL = problem_imageURL+obj['id']+'.jpg';
-        $.each(obj.ccStand, function (i, obj) {
-        	if (selectedStd.indexOf(obj.idABC) > -1) {
-        		foundStandard = true;
-        	}
-            html += '<span style="margin-right: 10px;"><a href=' + obj.url + '>' + obj.code + '</a></span>';
-        });
-        if (foundStandard) {
-	        if(obj.type=='flash'){
-	            flash = '<td><a rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
-	        }else{
-	            flash = '<td><a href="'+pgContext+'/WoAdmin?action=AdminGetQuickAuthSkeleton&probId='+obj.id+'&teacherId=-1&reload=true&zoom=1" target="_blank" style="cursor:pointer;" rel="popoverPerProblem" data-img="' + imageURL + '">'+obj.name+'</a></td>';
-	        }
-	        if(obj.activated){
-	            checkBox =  "<tr><td><input type='checkbox' name='activated' checked='checked'></td>"
-	        }else{
-	            checkBox =  "<tr><td><input type='checkbox' name='activated'></td>"
-	        }
-	        var tnickname = obj.nickName;
-	        if (tnickname == null) {
-	        	tnickname = "";
-	        }
-	        if (tnickname.length > 94) {
-	        	tnickname = tnickname.substr(0,90) + "...";
-	        }
-	        tableHeader +=  checkBox+
-	            "<td>"+obj.id+"</td>"+
-	            flash+
-	            "<td>"+tnickname+"</td>"+
-	            "<td>"+obj.difficulty+"</td>"+
-	            "<td>"+html+"</td>"+
-	            "<td>"+obj.type+"</td></tr>";
-        }
-    });
-    return tableHeader + "</tbody></table></div>";
-}
 
 function handleclickHandlers() {
 
@@ -1810,19 +1329,6 @@ function handleclickHandlers() {
                     message: '<%= rb.getString("emsg_field_invalid")%>'
     			}        
                 
-            }, schoolYear: {
-                validators: {
-
-                    between: {
-                        min: new Date().getFullYear(),
-                        max: 2050,
-                        message: '<%= rb.getString("emsg_schoolYearRange")%>'
-                    },
-
-                    notEmpty: {
-                        message: '<%= rb.getString("emsg_schoolYear")%>'
-                    }
-                }
             }, gradeSection: {
                 validators: {
                     notEmpty: {
@@ -1886,6 +1392,7 @@ function handleclickHandlers() {
                     }
                 }
             }
+            
         }
     }).on('success.form.bv', function (e) {
         $("#edit_class_form").data('bootstrapValidator').resetForm();
@@ -1894,29 +1401,62 @@ function handleclickHandlers() {
         var bv = $form.data('bootstrapValidator');
         $.post($form.attr('action'), $form.serialize(), function (result) {        	
         })
+    });	
+
+    $("#cluster_class_form").bootstrapValidator({
+        // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            className: {
+                validators: {
+                    notEmpty: {
+                        message: '<%= rb.getString("emsg_className")%>'
+                    },
+			        regexp: {
+            			regexp: /^[a-zA-Z0-9 _\-\.]+$/,
+                        message: '<%= rb.getString("emsg_field_invalid")%>'
+        			}        
+                }
+            },
+	    	classLanguage: {
+	            validators: {
+	                notEmpty: {
+	                    message: '<%= rb.getString("emsg_classLanguage") %>'
+	                }
+	            }
+	        }
+        
+        }
+    }).on('success.form.bv', function (e) {
+        $("#cluster_class_form").data('bootstrapValidator').resetForm();
+        e.preventDefault();
+        var $form = $(e.target);
+        var bv = $form.data('bootstrapValidator');
+        $.post($form.attr('action'), $form.serialize(), function (result) {        	
+        })
     });
 	
+    
     $("#classHomePage").click(function () {
-        $('#reorg_prob_sets_handler').css('color', '#ffffff');
         $("#content-conatiner").children().hide();
-        
-        $("#splash_page").show();
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
+        }
     });
     
-    $("#reorg_prob_sets_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('color', '#ffffff');
-
-        $("#content-conatiner").children().hide();
-        $("#problem_set_content").show();
-    });
-
     $("#resetSurveySettings_handler").click(function () {
-        $('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
         $("#content-conatiner").children().hide();
         $("#reset_survey_setting_out").show();
     });
+
+//    $("#manage_topics").click(function () {
+//        var newlocation = '/ms/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=classManageTopics';
+//        $(location).attr('href', newlocation);
+//    });
 
     $("#addMoreStudentsToClass").click(function () {
         $("#addMoreStudents").show();
@@ -1929,25 +1469,16 @@ function handleclickHandlers() {
     });
 
     $("#manage_roster_handler").click(function () {
-    	$('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
         $("#content-conatiner").children().hide();
         $("#student_roster_out").show();
     });
     
     $("#manage_student_info_handler").click(function () {
-    	$('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
         $("#content-conatiner").children().hide();
         $("#student_info_out").show();
     });
     
     $("#manage_class_handler").click(function () {  
-        $('#reorg_prob_sets_handler').css('background-color', '');
-        $('#reorg_prob_sets_handler').css('color', '#dddddd');
-
         $("#content-conatiner").children().hide();
 /**
         $.ajax({
@@ -1975,20 +1506,28 @@ function handleclickHandlers() {
     });
 
     $("#cancelClassProfileBtn").click(function () {
-        $('#reorg_prob_sets_handler').css('color', '#ffffff');
         $("#content-conatiner").children().hide();
-        $("#splash_page").show();
-    });
-
-
-    $('#activateProbSetTable input[type="checkbox"]').click(function () {
-        if ($('#activateProbSetTable input[type="checkbox"]:checked').size()) {
-            $('#deactivateProblemSets').prop('disabled', false);
-        } else {
-            $('#deactivateProblemSets').prop('disabled', true);
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
         }
     });
 
+    $("#clone_class_handler").click(function () {
+        $("#content-conatiner").children().hide();
+        
+        $("#clone_class_out").show();
+    });
+    
+    $("#cancelCloneClassBtn").click(function () {
+        $("#content-conatiner").children().hide();
+        if (isCluster == 0) {        
+        	$("#splash_page").show();
+        }
+    });
+
+
+    
+    
     $('#select_activeSurveyList').click(function () {
         var client_table = $("#activeSurveyList").dataTable();
         var activate_Pre_Data;
@@ -2027,15 +1566,7 @@ function handleclickHandlers() {
           "${pageContext.request.contextPath}/teacherTools/feedbackRequest.jsp", "_blank"); 
     });
     
-    
-    $('#inActiveProbSetTable input[type="checkbox"]').click(function () {
-        if ($('#inActiveProbSetTable input[type="checkbox"]:checked').size()) {
-            $('#activateProblemSets').prop('disabled', false);
-        } else {
-            $('#activateProblemSets').prop('disabled', true);
-        }
-    });
-    
+
     $("#content_apply_handler").click(function () {
         $('#content_apply_handler').css('background-color', '');
         $('#content_apply_handler').css('color', '#dddddd');
@@ -2073,104 +1604,25 @@ function handleclickHandlers() {
         }
     });
 
-    $('a[rel="popoverOrder"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("order_problemset_will_be_shown")%>';
-        }
-    });
-    $('a[rel="popoveractivatedProblems"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("click_to_see_problems")%>';
-        }
-    });
-
-    $('a[rel="popoverstandardsProblems"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top',
-        content: function () {
-            return '<%= rb.getString("click_to_see_problems_by_standards")%>';
-        }
-    });
-
-    $('a[rel="popoverproblemsetSummary"]').popover({
-        html: false,
-        trigger: 'hover',
-        container: 'body',
-        placement: 'top'
-    });
 
 
 }
 
 function changeLandingPageHeaderAccordingToLanguage(){
 
-	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("most_recent_login")%>'};
 	return header;
 }
 
 function changeLandingPageHeader2AccordingToLanguage(){
 
-	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("most_recent_login")%>'};
+	var header = {'sid':  '<%= rb.getString("student_id")%>','sname': '<%= rb.getString("student_name")%>','uname':  '<%= rb.getString("username")%>','problems': '<%= rb.getString("problems_solved")%>','timeInMS': '<%= rb.getString("time_solving_problems")%>','latestLogin': '<%= rb.getString("most_recent_login")%>'};
 	return header;
 }
-
-function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "Hdr")) {
-    /* if present, the header is where you move the DIV from:*/
-    document.getElementById(elmnt.id + "Hdr").onmousedown = dragMouseDown;
-  } else {
-    /* otherwise, move the DIV from anywhere inside the DIV:*/
-    elmnt.onmousedown = dragMouseDown;
-  }
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
-
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-  }
-
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
-}
-
 
 function registerAllEvents(){
 	
     $('#wrapper').toggleClass('toggled');
-//    $('#reorg_prob_sets_handler').css('background-color','#e6296f');
-//    $('#reorg_prob_sets_handler').css('color', '#ffffff');
 
 
    $('#perTopicReportLegendTable').DataTable({
@@ -2389,412 +1841,6 @@ function registerAllEvents(){
 	
  	}
         
-	activeProblemSetsize = $('#activeproblemSetSize').val();
-    if(activeProblemSetsize != 0){
-
-		dragElement(document.getElementById("activeProblemsFilter"));
-
-		activetable = $('#activateProbSetTable').DataTable({
-        "bPaginate": false,
-        <%=jc_rb.getString("language_text")%>
-    	"bFilter": false,
-        "bLengthChange": false,
-        rowReorder: true,
-        "columnDefs": [
-            {
-                "targets": [ 0 ],
-                "width": "10%",
-                'className': 'reorder',
-                orderable: false
-            },
-            {
-                "targets": [ 1 ],
-                "width": "25%",
-                "orderable": false,
-            },
-            {
-                "targets": [ 2 ],
-                orderable: false,
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                    return '<a  class="active" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
-                }
-            },
-            {
-                "targets": [ 2 ],
-                "orderable": false,
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                    return '<a  class="activeStandards" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
-                }
-            },
-            {
-                "width": "25%",
-                "targets": [ 3 ],
-                "visible": false,
-                "orderable": false,
-
-            },
-            {
-                "targets": [ -2 ],
-                "orderable": false,
-                "width": "10%",
-                'className': 'dt-body-center'
-                
-            },
-            {
-                "targets": [ -1 ],
-                "orderable": false,
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                    return '<input type="checkbox">';
-                }
-            },
-        ]
-
-    });
-	
-	 $(".active").click(function () {
-
-		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
-        	alert("<%= rb.getString("standards_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
-	       	return;
-		}            
-
-        $(this).children(':first').toggleClass('rotate-icon');
-        var tr = $(this).closest('tr');
-        var row = activetable.row( tr );
-
-        if ( row.child.isShown() ) {
-            row.child.hide();
-            topicActiveSelectionInProgress = "";
-        }else{
-
-			topicActiveSelectionInProgress = "listall";
-			
-        	var rowID = '#'+row.data()[0];
-            $.ajax({
-                type : "POST",
-                url :pgContext+"/tt/tt/getProblemForProblemSets",
-                data : {
-                    problemID: row.data()[3],
-                    classid: classID
-                },
-                success : function(response) {
-                    if (response.includes("***")) {
-                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                        $('#errorMsgModelPopup').modal('show');
-                    }else {
-                        var child = problemDetails(row.data(), response);
-                        row.child(child).show();
-                        $('a[rel=popoverPerProblem]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'top',
-                            container: 'body',
-                            content: function () {
-                                return '<img  style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                        $(rowID).toggleClass('zoomIn zoomOut');
-                    }
-                }
-            });
-
-        }
-    });
-	
-	activetable.on( 'row-reorder', function ( e, diff, edit ) {
-        activetable.$('input').removeAttr( 'checked' );
-        var result = [];
-        for ( var i=0; i< diff.length ; i++ ) {
-            var rowData = activetable.row( diff[i].node ).data();
-            result[i] = rowData[3]+'~~'+ diff[i].newData+'~~'+diff[i].oldData;
-        }
-	    $('#problem_set_content').find('.loader').show();
-        $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/reOrderProblemSets",
-            data : {
-                problemSets: result,
-                classid: classID
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }
-            }
-        });
-    } );
-
-		
-	 $(".activeStandards").click(function () {
-
-		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
-	        	alert("<%= rb.getString("full_list_selection_in_progress")%>  <%= rb.getString("please_close_that_window_first")%>");
-	        	return;
-	        }	        
-
-	        var test_tr = $(this).closest('tr');
-	        var testActiveStandardsRow = activetable.row( test_tr );
-            var testActiveStandardsRowID = '#'+testActiveStandardsRow.data()[0];
-
-	        if (testActiveStandardsRowID === activeStandardsRowID) { 
-	        	activeStandardsRowID = "";
-			 	$(this).children(':first').toggleClass('rotate-icon');
-	        	testActiveStandardsRow.child.hide();
-                $('#activeProblemsFilter').hide();
-                topicSelectionInProgress = "";
-	        	topicActiveStandardInProgress = "";
-
-	        }else{
-				if (activeStandardsRowID.length > 0) {
-		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
-		        	return;					
-				}
-				
-	        	$(this).children(':first').toggleClass('rotate-icon');
-		        var tr = $(this).closest('tr');
-		        activeStandardsRow = activetable.row( tr );
-	        	topicSelectionInProgress = "standards";
-	        	topicActiveStandardInProgress = "activeStandards";
-	            activeStandardsRowID = '#'+activeStandardsRow.data()[0];
-	            
-	            $.ajax({
-	                type : "POST",
-	                url :pgContext+"/tt/tt/getProblemForProblemSets",
-	                data : {
-	                    problemID: activeStandardsRow.data()[3],
-	                    classid: classID
-	                },
-	                success : function(response) {
-                    	activeStandardsResponse = response;
-	                    if (activeStandardsResponse.includes("***")) {
-	                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-	                        $('#errorMsgModelPopup').modal('show');
-	                    }else {
-	                        activeStandardsJSONData = JSON.parse(activeStandardsResponse);
-	                        activeStandardsTopicStandards = activeStandardsJSONData["topicStandars"];
-	                        activeStandardsTopicStandardsSorted = activeStandardsJSONData["topicStandardsSorted"];
-	                        var topicStandardsSorted = activeStandardsJSONData["topicStandardsSorted"];
-							var activeStandardsList = "";
-	                        $.each(activeStandardsTopicStandardsSorted, function (i, obj) {	                        	
-	                        	var strcode = "" + obj.code[0];
-	                       		var icode = parseInt(strcode);
-	                       		if ((icode >= lowGradeLevel) && (icode <= highGradeLevel)) {
-	                        		activeStandardsList += '<option  id="std_' + obj.code + '" value="' + obj.code + '">' + obj.code + '</option>';
-	                       		}
-	                        });
-
-	                        document.getElementById('activeStandardsList').innerHTML = activeStandardsList;
-	        	        	$('#activeProblemsFilter').show();
-	                        document.getElementById("activeStandardsList").focus();
-	                    }
-	                }
-	            });
-
-	        }
-	    });
-
-    }
-
-    inactiveProblemSetsize = $('#inactiveproblemSetsSize').val();
-    if(inactiveProblemSetsize != 0){
-
-		dragElement(document.getElementById("passiveProblemsFilter"));
-
-		inactivetable = $('#inActiveProbSetTable').DataTable({
-        "bPaginate": false,
-        <%=jc_rb.getString("language_text")%>
-    	"bFilter": false,
-        "bSort" : false,
-        "bLengthChange": false,
-        rowReorder: false,
-        "bSort" : false,
-        "columnDefs": [
-            {
-                "targets": [ 0 ],
-                "width": "10%",
-                orderable: true
-            },
-            {
-
-
-                "targets": [ 1 ],
-                "width": "25%"
-            },
-            {
-                "targets": [ 2 ],
-                orderable: false,
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                    return '<a  class="passive" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
-                }
-            },
-            {
-                "targets": [ 2 ],
-                "orderable": false,
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                    return '<a  class="passiveStandards" aria-expanded="true" aria-controls="collapseOne"><i class="glyphicon glyphicon-menu-down"></i></a>';
-                }
-            },
-            {
-                "width": "25%",
-                "targets": [ 3 ],
-                "visible": false
-
-            },
-            {
-                "targets": [ -2 ],
-                "orderable": false,
-                "width": "10%",
-                'className': 'dt-body-center'
-            },
-            {
-                "targets": [ -1 ],
-                "width": "10%",
-                'className': 'dt-body-center',
-                'render': function (data, type, full, meta){
-                	if(full[2] != 0)
-                    return '<input type="checkbox">';
-                	else
-                	return '<input type="checkbox" disabled>';	
-                }
-            },
-        ]
-
-    });
-	
-    $(".passive").click(function () {
-    	
-		if ((topicPassiveStandardInProgress === "passiveStandards") || (topicActiveStandardInProgress === "activeStandards")) {			
-        	alert("<%= rb.getString("standards_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
-		   	return;
-		}            
-		 
-        $(this).children(':first').toggleClass('rotate-icon');
-        var tr = $(this).closest('tr');
-        var row = inactivetable.row( tr );
-
-        if ( row.child.isShown() ) {
-            row.child.hide();
-            topicPassiveSelectionInProgress = "";
-        }else{
-
-			topicPassiveSelectionInProgress = "listall";
-			
-            var rowID = '#'+row.data()[0];
-    	    $('#problem_set_content').find('.loader').show();
-            $.ajax({
-                type : "POST",
-                url :pgContext+"/tt/tt/getProblemForProblemSets",
-                data : {
-                    problemID: row.data()[3],
-                    classid: classID
-                },
-                success : function(response) {
-            	    $('#problem_set_content').find('.loader').hide();
-                    if (response.includes("***")) {
-                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                        $('#errorMsgModelPopup').modal('show');
-                    }else {
-                        var child = problemDetails(row.data(), response);
-                        row.child(child).show();
-                        $('a[rel=popoverPerProblem]').popover({
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'top',
-                            container: 'body',
-                            content: function () {
-                                return '<img style="max-width:400px; max-height:400px;" src="' + $(this).data('img') + '" />';
-                            }
-                        });
-                        $(rowID).toggleClass('zoomIn zoomOut');
-                    }
-                }
-            });
-
-        }
-    });
-
-	 $(".passiveStandards").click(function () {
-
-		 	if ((topicActiveSelectionInProgress === "listall") || (topicPassiveSelectionInProgress === "listall")) {
-	        	alert("<%= rb.getString("full_list_selection_in_progress")%><%= rb.getString("please_close_that_window_first")%>");
-	        	return;
-	        }	        
-
-	        var test_tr = $(this).closest('tr');
-	        var testPassiveStandardsRow = inactivetable.row( test_tr );
-            var testPassiveStandardsRowID = '#'+testPassiveStandardsRow.data()[0];
-
-	        if (testPassiveStandardsRowID === passiveStandardsRowID) { 
-	        	passiveStandardsRowID = "";
-			 	$(this).children(':first').toggleClass('rotate-icon');
-	        	testPassiveStandardsRow.child.hide();
-                $('#passiveProblemsFilter').hide();
-                topicSelectionInProgress = "";
-	        	topicPassiveStandardInProgress = "";
-
-	        }else{
-				if (passiveStandardsRowID.length > 0) {
-		        	alert("<%= rb.getString("another_window_is_already_open")%>  <%= rb.getString("please_close_that_window_first")%>");
-		        	return;					
-				}
-				
-	            $(this).children(':first').toggleClass('rotate-icon');
-		        var tr = $(this).closest('tr');
-		        passiveStandardsRow = inactivetable.row( tr );
-	        	topicSelectionInProgress = "standards";
-	        	topicPassiveStandardInProgress = "passiveStandards";
-	            passiveStandardsRowID = '#'+passiveStandardsRow.data()[0];
-
-	            $.ajax({
-	                type : "POST",
-	                url :pgContext+"/tt/tt/getProblemForProblemSets",
-	                data : {
-	                    problemID: passiveStandardsRow.data()[3],
-	                    classid: classID
-	                },
-	                success : function(response) {
-                 	passiveStandardsResponse = response;
-	                    if (passiveStandardsResponse.includes("***")) {
-	                        $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-	                        $('#errorMsgModelPopup').modal('show');
-	                    }else {
-	                        passiveStandardsJSONData = JSON.parse(passiveStandardsResponse);
-	                        passiveStandardsTopicStandards = passiveStandardsJSONData["topicStandars"];
-	                        passiveStandardsTopicStandardsSorted = passiveStandardsJSONData["topicStandardsSorted"];
-	                        
-							var passiveStandardsList = "";
-	                        $.each(passiveStandardsTopicStandardsSorted, function (i, obj) {
-	                        	var strcode = "" + obj.code[0];
-	                       		var icode = parseInt(strcode);
-	                       		if ((icode >= lowGradeLevel) && (icode <= highGradeLevel)) {
-	                        		passiveStandardsList += '<option  id="std_' + obj.code + '" value="' + obj.code + '">' + obj.code + '</option>';
-	                       		}
-	                        });
-	                        
-	                        document.getElementById('passiveStandardsList').innerHTML = passiveStandardsList;
-	                        $('#passiveProblemsFilter').show();
-	                        document.getElementById("passiveStandardsList").focus();
-	                    }
-	                }
-	            });
-
-	        }
-	    });    
-    
-    }
-
     var studentRosterSize = $('#studentRosterSize').val();
     if(studentRosterSize != 0) {
         studentRosterTable = $('#student_roster').DataTable({
@@ -2806,46 +1852,6 @@ function registerAllEvents(){
 
         });
     }
-
-    $("#deactivateProblemSets").click(function () {
-        var rows = $("#activateProbSetTable").dataTable().fnGetNodes();
-        var rowsArray = [];
-        var activateData = [];
-        var i = 0;
-
-        if (rows.length == 1) {
-            $("#errorMsgModelPopup").find("[class*='modal-body']").html("<%= rb.getString("every_class_must_have_active_problem")%>");
-            $('#errorMsgModelPopup').modal('show');
-        }
-        $("input:checkbox:not(:checked)",rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-        for(var j=0; j < rowsArray.length; j++) {
-            activateData[j] = $("#activateProbSetTable").DataTable().row(rowsArray [j]).data()[3];
-        }
-	    $('#problem_set_content').find('.loader').show();
-        $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/configureProblemSets",
-            data : {
-                activateData: activateData,
-                classid: classID,
-                activateFlag: 'deactivate'
-            },
-            success : function(response) {
-        	    $('#problem_set_content').find('.loader').hide();
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("selected_problemsets_are_deactivated")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });
 
     $('#createMoreStudentId').click(function () {
 
@@ -2882,38 +1888,6 @@ function registerAllEvents(){
     });
 
 
-    $("#activateProblemSets").click(function () {
-        var rows = $("#inActiveProbSetTable").dataTable().fnGetNodes();
-        var rowsArray = [];
-        var activateData = [];
-        var i = 0;
-        $("input:checked", rows).each(function(){
-            rowsArray[i] = $(this).closest('tr');
-            i++;
-        });
-        for(var j=0; j < rowsArray.length; j++)
-            activateData[j]  = $("#inActiveProbSetTable").DataTable().row( rowsArray [j] ).data()[3];
-
-        $.ajax({
-            type : "POST",
-            url :pgContext+"/tt/tt/configureProblemSets",
-            data : {
-                activateData: activateData,
-                classid: classID,
-                activateFlag: 'activate'
-            },
-            success : function(response) {
-                if (response.includes("***")) {
-                    $("#errorMsgModelPopup").find("[class*='modal-body']").html( response );
-                    $('#errorMsgModelPopup').modal('show');
-                }else{
-                    $("#successMsgModelPopupForProblemSets").find("[class*='modal-body']").html( "<%= rb.getString("selected_problemsets_are_activated")%>" );
-                    $('#successMsgModelPopupForProblemSets').modal('show');
-                }
-            }
-        });
-
-    });
     
     
     $("#apply_content").click(function () {
@@ -2950,19 +1924,16 @@ function registerAllEvents(){
         });
 
     });
-
-
+    
     $("#successMsgModelPopupForProblemSets").find("[class*='btn btn-default']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=classHomePage';
         $(location).attr('href', newlocation);
     });
     $("#successMsgModelPopupForProblemSets").find("[class*='close']").click(function () {
-        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=reorg_prob_sets_handler';
+        var newlocation = pgContext+'/tt/tt/viewClassDetails?classId='+classID+'&currentSelection=classHomePage';
         $(location).attr('href', newlocation);
     });
 	
-
-
 
 	
 }
@@ -2994,8 +1965,14 @@ function registerAllEvents(){
         var sessionID = "0";
         var prePostIds = '${prepostIds}'.split("~~");		
         var problem_imageURL = '${webContentpath}'+'problemSnapshots/prob_';
+        var classesInCluster = "";
         $(document).ready(function () {
 
+        	classesInCluster = '${classInfo.classesInCluster}'; 
+			hasClusters = parseInt('${classInfo.hasClusters}');
+			isCluster = parseInt('${classInfo.isCluster}');
+			classColor = '${classInfo.color}';
+			className = '${classInfo.name}';
         	var classGrade = parseInt('${classInfo.grade}');
         	var simpleLowDiff = '${classInfo.simpleLowDiff}';
         	simpleLowDiff = simpleLowDiff.replace('below',"");
@@ -3008,79 +1985,116 @@ function registerAllEvents(){
             	gradesLevelsUsedInThisClass = gradesLevelsUsedInThisClass + gradeLevel + ".";
             } 
             var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
-   			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
    		
         	generate_year_range(2021,2023);
             registerAllEvents();
             handleclickHandlers();
 
+            if (isCluster == 1) {
+            	document.getElementById("li_classHomePage").style.display = 'none';
+            	document.getElementById("li_classReportCard").style.display = 'none';
+            	document.getElementById("li_manage_roster").style.display = 'none';
+            	document.getElementById("li_manage_class").style.display = 'none';
+            	document.getElementById("li_live_garden").style.display = 'none';
+            	document.getElementById("li_live_dashboard").style.display = 'none';
+            	document.getElementById("li_teacher_feedback").style.display = 'none';
+            	document.getElementById("li_clone_class").style.display = 'none';
+            	document.getElementById("li_apply_content").style.display = 'none';
+            }
+            if (hasClusters == 0) {
+            	document.getElementById("li_clone_class").style.display = 'none';
+            }
+            
             $("#content-conatiner").children().hide();
 
-            if (currentSelection == "classHomePage") {
-            	$("#splash_page").show();            
-        	    $('#landing-report-loader').show();
-            	$("#classLandingReportOne").collapse('show');
-            }
-            else if (currentSelection == "reorg_prob_sets_handler") {
-                    $('#reorg_prob_sets_handler').click();
-            }            
-            else if (currentSelection == "manage_roster_handler") {
-                $('#manage_roster_handler').click();
-        	}            
-            else if (currentSelection == "manage_student_info_handler") {
-                $('#manage_student_info_handler').click();
-        	}            
-            else if (currentSelection == "manage_class_handler") {
-                $('#manage_class_handler').click();
-        	}            
-            else if (currentSelection == "content_apply_handler") {
-                $('#content_apply_handler').click();
-        	}            
-			if (teacherLoginType === "Normal") {
-            	$("#resetSurveySettings").hide();
-			}
-			else {
-            	$("#resetSurveySettings").show();    				
-			}
-			
-            $('#grade').val("${classInfo.grade}").change();
-            $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
-            $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
-            $("#schoolYear").val("${classInfo.schoolYear}").change();
-                     
-            $('#activeSurveyList').DataTable({
-                "bPaginate": false,
-                "bFilter": false,
-                "bLengthChange": false,
-                rowReorder: true,
-                columnDefs: [{
-                    "targets": [2],
-                    "orderable": false,
-                    "width": "20%",
-                    'className': 'dt-body-center',
-                    'render': function (data, type, full, meta) {
-                        if(full[0] == prePostIds[0])
-                            return '<input type="radio" checked="checked" name="pre_id" value="' + data + '">';
-                        return '<input type="radio" name="pre_id" value="' + data + '">';
-                    }
-                },
-                    {
-                        "targets": [3],
-                        "orderable": false,
-                        "width": "20%",
-                        'className': 'dt-body-center',
-                        'render': function (data, type, full, meta) {
-                            if(full[0] == prePostIds[1])
-                                return '<input type="radio" checked="checked" name="post_id" value="' + data + '">';
-                            return '<input type="radio" name="post_id" value="' + data + '">';
-                        }
-                    }
-                ],
-                select: {
-                    style: 'os',
-                    selector: 'td:first-child'
-                },
-            });
+        	var selection = "";
+        	var redirect = "";
+        	if (currentSelection.indexOf("~") >= 0) {
+        		var selections = currentSelection.split("~");
+        		selection = selections[0];
+        		redirect = selections[1];
+        	}
+        	else {
+        		selection = currentSelection;
+        	}
+        	if (redirect == "manage_topics") {
+        		window.location.href = '/ms/tt/tt/classManagerSubPage?classId=' + ${classInfo.classid} + '&currentSelection=classManageTopics';
+        	}
+        	else {
+       
+	            if (currentSelection == "classHomePage") {
+	            	var titleClassname = "";
+	                if (isCluster == 0) {                        
+		            	titleClassname = 'home-title-' + '${classInfo.color}';
+		            	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_class") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
+	            	}
+	                else {
+	                	document.getElementById("titleLine").innerHTML =  '<%= rb.getString("home_page_for_cluster") %>: <span class="' +  titleClassname + '">&nbsp;&nbsp;<strong>${classInfo.name}</strong>&nbsp;&nbsp;</span>';
+	                	titleClassname = 'home-title-' + '${classInfo.color}' + '-cluster';                	
+	                }
+	       			document.getElementById("classGrades").innerText = "<%= rb.getString("grade_levels")%> : [" + displayem + "]";
+	            	$("#splash_page").show();            
+	        	    $('#landing-report-loader').show();
+	            	$("#classLandingReportOne").collapse('show');
+	            }
+	            else if (currentSelection == "manage_roster_handler") {
+	                $('#manage_roster_handler').click();
+	        	}            
+	            else if (currentSelection == "manage_student_info_handler") {
+	                $('#manage_student_info_handler').click();
+	        	}            
+	            else if (currentSelection == "manage_class_handler") {
+	                $('#manage_class_handler').click();
+	        	}            
+	            else if (currentSelection == "content_apply_handler") {
+	                $('#content_apply_handler').click();
+	        	}            
+				if (teacherLoginType === "Normal") {
+	            	$("#resetSurveySettings").hide();
+				}
+				else {
+	            	$("#resetSurveySettings").show();    				
+				}
+				
+	            $('#grade').val("${classInfo.grade}").change();
+	            $('#lowEndDiff').val("${classInfo.simpleLowDiff}").change();
+	            $('#highEndDiff').val("${classInfo.simpleHighDiff}").change();
+	            $("#schoolYear").val("${classInfo.schoolYear}").change();
+	                     
+	            $('#activeSurveyList').DataTable({
+	                "bPaginate": false,
+	                "bFilter": false,
+	                "bLengthChange": false,
+	                rowReorder: true,
+	                columnDefs: [{
+	                    "targets": [2],
+	                    "orderable": false,
+	                    "width": "20%",
+	                    'className': 'dt-body-center',
+	                    'render': function (data, type, full, meta) {
+	                        if(full[0] == prePostIds[0])
+	                            return '<input type="radio" checked="checked" name="pre_id" value="' + data + '">';
+	                        return '<input type="radio" name="pre_id" value="' + data + '">';
+	                    }
+	                },
+	                    {
+	                        "targets": [3],
+	                        "orderable": false,
+	                        "width": "20%",
+	                        'className': 'dt-body-center',
+	                        'render': function (data, type, full, meta) {
+	                            if(full[0] == prePostIds[1])
+	                                return '<input type="radio" checked="checked" name="post_id" value="' + data + '">';
+	                            return '<input type="radio" name="post_id" value="' + data + '">';
+	                        }
+	                    }
+	                ],
+	                select: {
+	                    style: 'os',
+	                    selector: 'td:first-child'
+	                },
+	            });
+        	}
         });
 
     </script>
@@ -3112,42 +2126,53 @@ function registerAllEvents(){
     
     <script id="editStudentInformation">
 
+    var teacherClusterSelections = "";
+    var teacherClassSelections = "";
+    var classChoices = [];
+    var clusterChoices = [];
+
+    function selectTeacherCluster(myClassId) {
+
+    	var txtClassId = "" + myClassId;
+    	for (var i=0; i < clusterChoices.length; i++) {	
+    		var splitter = clusterChoices[i].split(',');
+    		if (splitter[1] === txtClassId) {
+    			moveToDestination(splitter[1] + ',' + splitter[3]);
+    			break;
+    		}
+    	}
+    }
+
+
+
+    function addToTeacherClassList(item, index) {
+        
+    	var titem = "" + item;
+    	var tlist = titem.split(",");
+
+    	if ((tlist[1] != classID) && (tlist[3] == 0))  {
+    		clusterChoices.push(titem);	
+    		teacherClusterSelections = teacherClusterSelections +  "<li id='Class" + tlist[1]  + "' class='dropdown-content' value='" + tlist[1] + "' onclick='selectTeacherCluster(" + tlist[1] + ");'>" + tlist[0] + "</li>";
+    	}
+    }
+
+    function addToTeacherClusterList(item, index) {
+        
+    	var titem = "" + item;
+    	var tlist = titem.split(",");
+
+    	if (tlist[1] != classID) {
+    		clusterChoices.push(titem);	
+    		teacherClusterSelections = teacherClusterSelections +  "<li id='Class" + tlist[1]  + "' class='dropdown-content' value='" + tlist[1] + "' onclick='selectTeacherCluster(" + tlist[1] + ");'>" + tlist[0] + "</li>";
+    	}
+    }
+
+
     function editStudentInformation(id,fname,lname,uname,context){
 
-    	
-        $.ajax({
-            type : "POST",
-            url : pgContext+"/tt/tt/getTeacherReports",
-            data : {
-            	classId: classID,
-                teacherId: teacherID,
-                reportType: 'teacherClassList',
-                lang: loc,
-                filter: "~"
 
-            },
-            success : function(data) {
-            	    if (data) {
-            	    	teacherClassSelections = "";
-            	    	$("#moveBtn").hide();
-            	    	var msg = "" + data;
-                       	var jsonData = $.parseJSON(data);
-       	                eachTeacherListData = jsonData.levelOneData;
-       	                eachTeacherListData.forEach(addToTeacherList);		           	             	
-       	             	document.getElementById("teacherList").innerHTML = "<ul>" + teacherClassSelections + "</ul>";
-                  	}
-                  	else {
-                  		alert("response data is null");
-                  	}
-            },
-            error : function(e) {
-            	alert("error");
-                console.log(e);
-            }
-        });
-	
     	
-    var tr = context.closest('tr')
+    var tr = context.closest('tr');
     var row = $('#student_roster').DataTable().row( tr );
 
 
@@ -3188,17 +2213,71 @@ function registerAllEvents(){
             '<div class="input-group"><button role="button" onclick="resetPassWordForThisStudent('+id+',\'' + uname + '\')" type="button" class="btn btn-primary"> <%= rb.getString("reset_password") %></button></div></form></div>';
 
 
-        var formHtmlChangeClass = '<div class="panel-body"><form id="ChangeClassfor'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="newClass"><%= rb.getString("new_class") %></label></div><div id="teacherList"></div><div class="input-group"><button id=moveBtn role="button" onclick="moveThisStudent('+id+')" type="button" class="btn btn-primary"></button></div></form></div>';    
-            
-        var tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
-            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
-            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> '+
-            '<li><a href="#changeClass'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("move_student_to_different_class") %> </a> </li> </ul>'+
-            '<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="changeClass'+id+'">'+formHtmlChangeClass+'</div> </div> </div>';
 
+
+        var moveTabHeading = '';
+        var tabPanel = "";
+		    moveStudentId = id;     	       
+ 	       	moveTabHeading = '<%= rb.getString("move_the_student") %>';
+            var formHtmlAssignToCluster = '<div class="panel-body"><form id="AssignToCluster'+id+'" onsubmit="event.preventDefault();"><div class="form-group"><div class="input-group"><label for="select_a_destination"><%= rb.getString("select_a_destination") %></label></div><div id="clusterList"></div><div class="input-group"><button id="moveClusterBtn" role="button" onclick="moveToDestination('+id+')" type="button" class="btn btn-primary"><%= rb.getString("submit") %></button></div></form></div>';  
+            tabPanel = '<div style="width: 70%"> <ul class="nav nav-tabs" role="tablist"> <li class="active"> ' +
+            '<a href="#home'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("update_student_information") %> </a> </li> ' +
+            '<li><a href="#profile'+id+'" role="tab" data-toggle="tab"> <%= rb.getString("reset_password_for_student") %> </a> </li> ' +
+         	'<li><a href="#assignCluster'+id+'" role="tab" data-toggle="tab">' + moveTabHeading + '</a> </li> </ul>'+
+         	'<div class="tab-content"> <div class="tab-pane fade active in" id="home'+id+'">'+formHtml+'</div><div class="tab-pane fade" id="profile'+id+'">'+formHtmlPassWord+'</div> <div class="tab-pane fade" id="assignCluster'+id+'">'+formHtmlAssignToCluster+'</div> </div> </div>';
+ 
         row.child(tabPanel).show();
-      }
+
+        var clusterListFilter = "";
+       	if (hasClusters == 1) {
+       		clusterListFilter = "clusterList";
+       	}
+   		else {
+       		clusterListFilter = "classList";
+		}
+       		
+            $.ajax({
+                type : "POST",
+                url : pgContext+"/tt/tt/getTeacherReports",
+                data : {
+                	classId: classID,
+                    teacherId: teacherID,
+                    reportType: 'classClusterList',
+                    lang: loc,
+                    filter: clusterListFilter
+
+                },
+                success : function(data) {
+                	    if (data) {
+                	    	clusterChoices = [];
+                	    	teacherClusterSelections = "";
+                	    	$("#moveClusterBtn").hide();
+                	    	var msg = "" + data;
+                           	var jsonData = $.parseJSON(data);
+           	                eachTeacherListData = jsonData.levelOneData;
+           	                if (clusterListFilter ==  "clusterList") {
+           	                	eachTeacherListData.forEach(addToTeacherClusterList);
+           	                }
+           	                else {
+           	                	eachTeacherListData.forEach(addToTeacherClassList);           	                	
+           	                }
+           	             	document.getElementById("clusterList").innerHTML = "<ul>" + teacherClusterSelections + "</ul>";
+           	             	$("#clusterList").show();
+                      	}
+                      	else {
+                      		alert("response data is null");
+                      	}
+                },
+                error : function(e) {
+                	alert("error");
+                    console.log(e);
+                }
+            });
+    
+    	}
     }
+    
+
     </script>
     
         
@@ -3262,37 +2341,38 @@ function registerAllEvents(){
                 <a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/ttMain"><i
                         class="fa fa-fw fa-home"></i> <%= rb.getString("home") %></a>
             </li>
-            <li>
+            <li id="li_classHomePage">
                 <a id="classHomePage" href="#"><i class="fa fa-fw fa-home"></i> <%= rb.getString("class_home") %></a>
             </li>
 
-            <li><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+            <li id="li_classReportCard"><a href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/viewClassReportCard?classId=${classInfo.classid}&currentSelection=classReportCard" id="report_card"><i class="fa fa-bar-chart"></i> <%= rb.getString("class_report_card") %></a></li>
+		
+            <li id="li_manageTopics"><a id="manage_topics" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/classManagerSubPage?classId=${classInfo.classid}&currentSelection=classManageTopics"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
+        
+            <li id="li_manage_roster"><a id="manage_roster_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_class_roster") %></a></li>
 
-            <li><a id="reorg_prob_sets_handler"><i class="fa fa-list"></i> <%= rb.getString("manage_problem_sets") %></a></li>
+            <li id="li_manage_student_info"><a id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
 
-            <li><a id="manage_roster_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_class_roster") %></a></li>
-
-            <li><a id="manage_student_info_handler"><i class="fa fa-fw fa-users"></i> <%= rb.getString("manage_student_info") %></a></li>
-
-            <li><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
-
+            <li id="li_manage_class"><a id="manage_class_handler"><i class="fa fa-fw fa-cog"></i> <%= rb.getString("manage_class") %></a></li>
+		
              <li id="resetSurveySettings"><a id="resetSurveySettings_handler"><i class="fa fa-fw fa-cog"></i><%= rb.getString("survey_settings") %></a></li>
             
-             <li><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
+             <li id="li_apply_content"><a id="content_apply_handler"><i class="fa fa-fw fa-cogs"></i><%= rb.getString("apply_class_content") %></a></li>
 
-             <li><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
+             <li id="li_live_dashboard"><a id="live-dashboard_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("live_dashboard") %></a></li>
 
-             <li><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
-            <li>
-                <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a>
-            </li>
-        </ul>
+             <li id="li_live_garden"><a id="live-garden_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("class_garden") %></a></li>
+             
+             <li id="li_teacher_feedback"> <a id="teacher_feedback_handler"><i class="fa fa-fw fa-search"></i> <%= rb.getString("send_us_feedback") %></a></li>
+             
+            <li id="li_clone_class" ><a id="clone_class_handler"><i class="fa fa-fw fa-cogs"></i> <%= rb.getString("create_class_cluster") %></a></li>
+		</ul>
         <!-- /#sidebar-end -->
     </nav>
     <div id="page-content-wrapper">
 
-        <h1 id="classManagerHeader" class="home-page-header">
-            <%= rb.getString("home_page_for_class") %>: <strong>${classInfo.name}</strong> 
+        <h1 id="classManagerHeader" class="home-page-header" >
+        	<div id="titleLine"></div>
         </h1>
         <div id="classGrades" style="font-size:16px;" class="home-page-header2">
         </div>
@@ -3310,197 +2390,6 @@ function registerAllEvents(){
 						class="fa fa-refresh fa-spin"
 						style="font-size: 36px; color: black"></i>
 				</div>
-
-				<div id="problem_set_content" style="width: 100%;">
-                <div class="loader" style="display: none" ></div>               
-			<input type="hidden" id="activeproblemSetSize" name="activeproblemSetSize" value="${activeproblemSet.size()}">
-			<input type="hidden" id="inactiveproblemSetsSize" name="inactiveproblemSetsSize" value="${inactiveproblemSets.size()}">
-			<c:if test="${activeproblemSet.size() != 0}">
-                <div>
-                    <h3 class="tt-page-header">
-                        <small><%= rb.getString("active_problem_sets") %></small>
-                    </h3>
-					<div id="activeProblemsFilter" class="activeCenterDiv report_filters" style="display:none;">
-  						<div id="activeProblemsFilterHdr" class="activeCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
-						<label><%= rb.getString("select_active_standard") %></label>
-                     	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myActiveInput" multiple onkeyup="activeStandardsFilter()">
-                        <select name="activeStandardsList" id="activeStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
-                       	</select>
-                       	<button id="activeFilterSubmit" class="btn btn-primary btn-sm" aria-disabled="true" onclick="handleActiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
-                       	<button id="activeFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handleActiveStandardsReset()"><%= rb.getString("reset") %></button> 
-                       	<button id="activeFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayActiveStandardsHelp()"><%= rb.getString("help") %></button> 
-						<div id="activeStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
-							<label><%= rb.getString("popup_btn_help_1") %></label><br>
-							<label><%= rb.getString("popup_btn_help_2") %></label><br>
-							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							
-						</div>
-					</div>
-
-                    <div class="panel panel-default">
-                        <div class="panel-body"><%= rb.getString("active_problem_sets_note1") %>
-                        </div>
-                        <div class="panel-body"><%= rb.getString("active_problem_sets_note2") %>
-                        </div>
-                        <div class="panel-body">
-                            <button id="deactivateProblemSets" class="btn btn-primary btn-lg" aria-disabled="true" disabled="disabled"><%= rb.getString("deactivate_problem_sets") %></button>
-                        </div>
-                    </div>
-                    <table id="activateProbSetTable" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th rowspan="2" align="center"><span><%= rb.getString("order") %>&nbsp;&nbsp;</span><a rel="popoverOrder"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
-                            <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
-                            <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
-                            <th style="text-align: center;" colspan="<c:out value='${activeproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
-                            <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
-                            <th rowspan="2"><%= rb.getString("deactivate_problem_set") %></th>
-                        </tr>
-
-                        <tr>
-                            <c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
-                                <th style="border-right-width: 1px;">${problemSetHeaders.key}</th>
-                            </c:forEach>
-                        </tr>
-
-                        </thead>
-                        <tbody>
-                        <c:forEach var="problemSet" varStatus="i" items="${activeproblemSet}">
-                        	<c:if test="${problemSet.numProbs > 0}">
-	                            <c:set var="gradeWiseProbNos" value="${problemSet.gradewiseProblemDistribution}"/>
-	                            <tr>
-	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-	                                <td>
-	                                    <a  class="active" aria-expanded="true" aria-controls="collapseOne">
-	                                        <i class="glyphicon glyphicon-menu-down"></i>
-	                                    </a>
-	                                </td>
-	                                <td>${problemSet.id}</td>
-	                                <td>
-	                                    <a  class="activeStandards" aria-expanded="true" aria-controls="collapseOne">
-	                                        <i class="glyphicon glyphicon-menu-down"></i>
-	                                    </a>
-	                                </td>
-	                                <c:forEach var="problemSetHeaders" items="${activeproblemSetHeaders}">
-	                                    <td><c:out value="${gradeWiseProbNos[problemSetHeaders.key]}"/></td>
-	                                </c:forEach>
-	                                
-	                                <td>${problemSet.numProbs}</td>
-	                                <td></td>
-	                            </tr>
-                            </c:if>
-                        </c:forEach>
-                        </tbody>
-                       
-                    </table>
-                </div>
-				</c:if>
-				<c:if test="${activeproblemSet.size() == 0}">
-				 <div>
-                    <h5 class="tt-page-header">
-                        <big><%= rb.getString("no_active_problem_sets_found") %></big>
-                    </h5>
-					</div>
-
-				</c:if>
-				<c:if test="${inactiveproblemSets.size() != 0}">
-                <div>
-                    <h3 class="tt-page-header">
-                        <small><%= rb.getString("inactive_problem_sets") %></small>
-                    </h3>
-
-					<div id="passiveProblemsFilter" class="passiveCenterDiv report_filters" style="display:none;">
-  						<div id="passiveProblemsFilterHdr" class="passiveCenterDivHdr"><%= rb.getString("click_here_to_drag") %></div>
-						<label><%= rb.getString("select_inactive_standard") %></label>
-                     	<input type="text" placeholder="<%= rb.getString("search") %>.." id="myPassiveInput" multiple onkeyup="passiveStandardsFilter()">
-                        <select name="passiveStandardsList" id="passiveStandardsList" class="form-control selectpicker"  multiple data-show-subtext="true" data-live-search="true" size="6" style="width: 200px;">  
-                       	</select>
-                       	<button id="passiveFilterSubmit" class="btn btn-primary btn-sm" onclick="handlePassiveStandardsSelect()"><%= rb.getString("show_problems") %></button> 
-                       	<button id="passiveFilterClear" class="btn btn-danger btn-sm" aria-disabled="true" onclick="handlePassiveStandardsReset()"><%= rb.getString("reset") %></button> 
-                       	<button id="passiveFilterHelp" class="btn btn-info btn-sm" aria-disabled="true" onclick="displayPassiveStandardsHelp()"><%= rb.getString("help") %></button> 
-						<div id="passiveStandardsPopupHelp" class="standardsHelpBox report_filters_help" style="visibility: hidden;">
-							<label><%= rb.getString("popup_btn_help_hdr") %></label><br>
-							<label><%= rb.getString("popup_btn_help_4") %></label><br>
-							<label><%= rb.getString("popup_btn_help_1") %></label><br>
-							<label><%= rb.getString("popup_btn_help_2") %></label><br>
-							<label><%= rb.getString("popup_btn_help_3") %></label><br>
-							
-						</div>
-					</div>
-
-                    <div class="panel panel-default">
-                        <div class="panel-body"><%= rb.getString("deactive_problem_sets_note1") %>
-                        </div>
-                        <div class="panel-body">
-                            <button id="activateProblemSets" class="btn btn-primary btn-lg" disabled="disabled" aria-disabled="true"><%= rb.getString("activate_problem_sets") %></button>
-                        </div>
-                    </div>
-
-                    <table id="inActiveProbSetTable" class="table table-striped table-bordered hover" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th rowspan="2"><%= rb.getString("order") %></th>
-                            <th rowspan="2"><%= rb.getString("problem_set") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_from_full_list") %><span>&nbsp;</span><a rel="popoveractivatedProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
-                            <th rowspan="2"><%= rb.getString("problem_id") %></th>
-                            <th rowspan="2"><%= rb.getString("choose_by_standards") %><span>&nbsp;</span><a rel="popoverstandardsProblems"><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></th>
-                            <th style="text-align: center;" colspan="<c:out value='${inActiveproblemSetHeaders.size()}'/>"><%= rb.getString("gradewise_distribution") %></th>
-                            <th rowspan="2"><%= rb.getString("number_of_problems") %></th>
-                            <th rowspan="2"><%= rb.getString("activate_problem_sets") %></th>
-                        </tr>
-                        <tr>
-                            <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
-                                <th style="border-right-width: 1px;">${problemSetHeaders.key}</th>
-                            </c:forEach>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach var="problemSet" varStatus="i" items="${inactiveproblemSets}">
-                        	<c:if test="${problemSet.numProbs > 0}">
-                            	<c:set var="gradeWiseProbNo" value="${problemSet.gradewiseProblemDistribution}"/>
-	                            <tr>
-	                                <td>${i.index + 1}</td>
-	                                <td>${problemSet.name}&nbsp;&nbsp;<a rel="popoverproblemsetSummary" data-content='ID=${problemSet.id} ${problemSet.summary}'><i class="fa fa-question-circle-o" aria-hidden="true"></i></a></td>
-	                                <td>
-	                                    <a  class="passive" aria-expanded="true" aria-controls="collapseOne">
-	                                        <i class="glyphicon glyphicon-menu-down"></i>
-	                                    </a>
-	                                </td>
-	                                <td>${problemSet.id}</td>
-	                                <td>
-	                                    <a  class="passiveStandards" aria-expanded="true" aria-controls="collapseOne">
-	                                        <i class="glyphicon glyphicon-menu-down"></i>
-	                                    </a>
-	                                
-	                                </td>
-	                                <c:forEach var="problemSetHeaders" items="${inActiveproblemSetHeaders}">
-	                                    <td><c:out value="${gradeWiseProbNo[problemSetHeaders.key]}"/></td>
-	                                </c:forEach>
-
-	                                <td>${problemSet.numProbs}</td>
-	                                <td></td>
-	                            </tr>
-                            </c:if>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-				</c:if>
-				<c:if test="${inactiveproblemSets.size() == 0}">
-				 <div>
-                    <h5 class="tt-page-header">
-                        <big><%= rb.getString("no_inactive_problem_sets_found") %></big>
-                    </h5>
-					</div>
-				</c:if>
-
-            </div>
-
             <div id="reset_survey_setting_out" style="display:none; width: 100%;">
 
                 <div class="container-fluid">
@@ -3607,7 +2496,6 @@ function registerAllEvents(){
                     </div>
                 </div>
             <div id="class_Level_Reports_Container" class="row" style="display:none;width: 75%;">
-
             </div>
 
     </div>
@@ -3797,6 +2685,102 @@ function registerAllEvents(){
             </div>
 
 
+            <div id="clone_class_out" style="display:none;width: 100%;">
+
+                <div class="row">
+	                <div class="col-md-10">
+	                    <h3 class="tt-page-header">
+	                        <small><%= rb.getString("create_class_cluster") %></small>
+	                    </h3>
+	                </div>
+                </div>
+                <div class="loader" style="display: none" ></div>               
+                        <div class="panel-body" id="cloneClassProfile">
+				            <springForm:form id="cluster_class_form" method="post"
+				                             action="${pageContext.request.contextPath}/tt/tt/ttCloneClass"
+				                             modelAttribute="createClassForm">
+				                <div class="row">
+				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
+				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
+				                    
+				                    <input type="hidden" name="town" id="town" value="${classInfo.town}">
+				                    <input type="hidden" name="school" id="school" value="${classInfo.school}">
+				                    <input type="hidden" name="schoolYear" id="schoolYear" value="${classInfo.schoolYear}">
+				                    <input type="hidden" name="section" id="section" value="${classInfo.section}">
+				                    
+				                    <input type="hidden" name="classGrade" id="classGrade" value="${classInfo.grade}">
+				                    <input type="hidden" name="lowEndDiff" id="lowEndDiff" value="${classInfo.simpleLowDiff}">
+				                    <input type="hidden" name="highEndDiff" id="highEndDiff" value="${classInfo.simpleHighDiff}">
+				                    
+				                    <input type="hidden" name="maxProb" id="maxProb" value="${classInfo.maxProb}">
+				                    <input type="hidden" name="minProb" id="minProb" value="${classInfo.minProb}">
+				                    <input type="hidden" name="maxTime" id="maxTime" value="${classInfo.maxTime}">
+				                    <input type="hidden" name="minTime" id="minTime" value="${classInfo.minTime}">
+				                    <input type="hidden" name="color"   id="color"   value="${classInfo.color}">
+
+				                    
+			                        <div class="panel panel-default">
+					                    <div id="clone_class_out" class="col-md-4 col-sm-4">
+				                            <div class="panel-heading">
+				                                <%= rb.getString("identification_settings") %>
+				                            </div>
+				                             <div class="panel-body">
+				                                <div class="form-group">
+				                                    <label for="className"><%= rb.getString("cluster_name") %></label>
+				                                    <div class="input-group">
+				                                    <span class="input-group-addon"><i
+				                                            class="glyphicon glyphicon-blackboard"></i></span>
+				                                        <springForm:input path="className" id="className" name="className"
+				                                                          class="form-control" type="text" onblur="startClusterLoader()" value="${classInfo.name}"/>
+				                                    </div>
+				                                </div>
+				                                
+				                               <div class="form-group">
+				                                    <label for="classLanguage"><%= rb.getString("class_language") %></label>
+				                                    <div class="input-group">
+				                                        <span class="input-group-addon"><i
+				                                                class="glyphicon glyphicon-education"></i></span>
+				                                        <springForm:select path="classLanguage" class="form-control" id="classLanguage"
+				                                                           name="classLanguage" value="${classInfo.classLanguageCode}>">
+				                                            <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
+				                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
+				                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+				                                        </springForm:select>
+				                                    </div>
+				                                </div>
+				                                
+				                                
+					                        </div>
+					                    </div>
+					                   		                        
+				                    </div>
+				                </div>
+				                
+				                <div class="row">
+				                        <div class="panel-body class="col-md-offset-5 col-sm-offset-5 col-md-4 col-sm-4">
+				                            <button id="cloneClassBtn" type="submit" class="btn btn-primary btn-lg" aria-disabled="true"><%= rb.getString("submit_changes") %></button>
+				                            <button id="cancelCloneClassBtn" class="btn btn-danger btn-lg" aria-disabled="true"><%= rb.getString("cancel") %></button>
+				                        </div>
+				                </div>
+				            </springForm:form>
+				            <div id="createClusterLoader" class="loader" style="display: none" ></div>               
+				            <div class="col-lg-12">
+				                <h1 class="page-header">
+				                    <small><%= rb.getString("setup_cluster_instructions") %></small>
+				                </h1>
+				            </div>
+				            <div id="no-refresh-msg">
+				            	<div class="row">
+				                 <h1 class="tt-paused-logins-message">
+									<%= rb.getString("do_not_reload_page") %>                 
+								</h1>
+				                 </div>
+				            </div>
+                </div>            
+                        
+            </div>
+
+
 
 
 
@@ -3815,6 +2799,8 @@ function registerAllEvents(){
 				                    <input type="hidden" name="classId" id="classId" value=" ${classInfo.classid}">
 				                    <input type="hidden" name="teacherId" id="teacherId" value="${teacherId}">
 				                    <input type="hidden" name="classLanguage" id="classLanguage" value="${classInfo.classLanguageCode}">
+				                    <input type="hidden" name="schoolYear" id="schoolYear" value="${classInfo.schoolYear}">
+				                    <input type="hidden" name="color"   id="color"   value="${classInfo.color}">
 			                        <div class="panel panel-default">
 					                    <div id="create_class_out" class="col-md-4 col-sm-4">
 				                            <div class="panel-heading">
@@ -3848,20 +2834,7 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.school}"/>
 				                                    </div>
 				                                </div>
-				                               <div class="form-group">
-				                                    <label for="schoolYear"><%= rb.getString("year") %></label>
-				                                    <div class="input-group">
-				                                        <span class="input-group-addon"><i
-				                                                class="glyphicon glyphicon-hourglass"></i></span>
-				                                        <springForm:select path="schoolYear" class="form-control" id="schoolYear"
-				                                                           name="schoolYear" value="${classInfo.schoolYear}">
-				                                            <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-				                                            <springForm:option value="2021">2020/2021</springForm:option>
-				                                            <springForm:option value="2022">2021/2022</springForm:option>
-				                                            <springForm:option value="2023">2022/2023</springForm:option>
-				                                        </springForm:select>
-				                                    </div>
-				                                </div>
+
 				                                <div class="form-group">
 				                                    <label for="gradeSection"><%= rb.getString("section") %></label>
 				                                    <div class="input-group">
@@ -3871,6 +2844,7 @@ function registerAllEvents(){
 				                                                          class="form-control" type="text" value="${classInfo.section}"/>
 				                                    </div>
 				                                </div>
+
 					                        	</div>
 					                    	</div>
 					                   
@@ -3921,7 +2895,7 @@ function registerAllEvents(){
 				                                        <span class="input-group-addon"><i
 				                                                class="glyphicon glyphicon-education"></i></span>
 				                                        <springForm:select path="highEndDiff" class="form-control" id="highEndDiff"
-				                                                           name="highEndDiff">
+				                                                           name="highEndDiff" value="${classInfo.simpleHighDiff}">
 				                                            <springForm:option value=""><%= rb.getString("select_complexity") %></springForm:option>
 				                                            <springForm:option value="above3"><%= rb.getString("three_grades_above") %></springForm:option>
 				                                            <springForm:option value="above2"><%= rb.getString("two_grades_above") %></springForm:option>
@@ -4241,6 +3215,7 @@ function registerAllEvents(){
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -4280,6 +3255,7 @@ function registerAllEvents(){
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
 			              </select>       
 			          </div>			 
 			        </div>

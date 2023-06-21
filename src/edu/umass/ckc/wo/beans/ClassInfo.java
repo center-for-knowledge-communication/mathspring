@@ -6,6 +6,8 @@ import edu.umass.ckc.wo.woreports.Report;
  * Frank	07-08-20	issue #156 added isActive flag
  * Frank	10-31-20	issue #293 added advanced settings
  * Frank	06-26-21	Added gaze_detection_on handling
+ *  Frank 	02-04-23    Issue #723 - handle class clustering
+ *  Frank	05-13-23	issue #763 - make LCs selectable by class
  */
 
 public class ClassInfo {
@@ -25,7 +27,7 @@ public class ClassInfo {
     private int statusReportPeriodDays;
     private int studentEmailPeriodDays;
     private int studentEmailIntervalDays;
-    private String flashClient;
+    private String experiment;
     private String grade;
     private String simpleLC;
     private String simpleDiffRate;
@@ -42,11 +44,16 @@ public class ClassInfo {
     private boolean isDefaultClass;
     private int isActive;
     private int gazeDetectionOn; // <= 0 indicates gaze detection off in client.
+    private int hasClusters;
+    private int isCluster;
+    private String color;
+    private String classesInCluster;
+    private String altClassLanguageCode;
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int pretestPoolId, String pretestPoolDescr,
                      int logType, int emailStatusInterval, int statusReportPeriodDays, int studentEmailIntervalDays,
-                     int studentReportPeriodDays, String grade, int isActive, int gazeDetectionOn) {
+                     int studentReportPeriodDays, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color, String experiment) {
         this.school = school;
         this.schoolYear = schoolYear;
         this.name = name;
@@ -66,22 +73,29 @@ public class ClassInfo {
         this.grade= grade;
         this.isActive= isActive;
         this.gazeDetectionOn = gazeDetectionOn;
+        this.hasClusters= hasClusters;
+        this.isCluster= isCluster;
+        this.color=color;
+        this.classesInCluster = classesInCluster;
+        this.altClassLanguageCode = altClassLanguageCode;
+        this.experiment = experiment;
+    }
 
+    
+     
+    public ClassInfo(String school, int schoolYear, String name, String town, String section,
+                     int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color, String experiment ) {
+        this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive, gazeDetectionOn, hasClusters, isCluster, color, experiment);
     }
     
     public ClassInfo(String school, int schoolYear, String name, String town, String section,
                      int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, int isActive, int gazeDetectionOn) {
-        this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, "5", isActive, gazeDetectionOn);
-    }
-
-    public ClassInfo(String school, int schoolYear, String name, String town, String section,
-                     int classid, int teachid, String teacherName, int propGroupId, int logType, int pretestPoolId,
-                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, String flashClient, String grade, int isActive, int gazeDetectionOn) {
-        this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
-                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive, gazeDetectionOn);
-        this.flashClient = flashClient;
+                     int emailStatusReportIntervalDays, int statusReportPeriodDays, int studentReportIntervalDays, int studentReportPeriodDays, String experiment, String grade, int isActive, int gazeDetectionOn, int hasClusters, int isCluster, String color) {
+    	this(school,schoolYear,name,town,section,classid,teachid,teacherName,propGroupId, pretestPoolId, null,logType,
+                emailStatusReportIntervalDays, statusReportPeriodDays, studentReportIntervalDays, studentReportPeriodDays, grade, isActive, gazeDetectionOn, hasClusters, isCluster, color, experiment);
+        this.experiment = experiment;
     }
 
     public String getSchool() {
@@ -172,12 +186,12 @@ public class ClassInfo {
         this.studentEmailIntervalDays = studentEmailIntervalDays;
     }
 
-    public String getFlashClient() {
-        return flashClient;
+    public String getExperiment() {
+        return experiment;
     }
 
-    public void setFlashClient(String flashClient) {
-        this.flashClient = flashClient;
+    public void setExperiment(String experiment) {
+        this.experiment = experiment;
     }
 
     public String getGrade() {
@@ -228,10 +242,10 @@ public class ClassInfo {
         this.simpleHighDiff = simpleHighDiff;
     }
 
-    public void setSimpleConfigDefaults() {
+    public void setSimpleConfigDefaults(String lc) {
         this.simpleCollab="none";
         this.simpleDiffRate="normal";
-        this.simpleLC = "both";
+        this.simpleLC = lc;
         this.simpleLowDiff="below2";
         this.simpleHighDiff="above1";
     }
@@ -260,6 +274,10 @@ public class ClassInfo {
 		this.classLanguageCode = classLanguageCode;
 	}
 
+	public void setAltClassLanguageCode(String altLanguageCode) {
+		this.altClassLanguageCode = altLanguageCode;
+	}
+	
 	public boolean isDefaultClass() {
 		return isDefaultClass;
 	}
@@ -315,4 +333,41 @@ public class ClassInfo {
         this.gazeDetectionOn = gazeDetectionOn;
     }
     
+    public int getHasClusters() {
+        return hasClusters;
+    }
+
+    public void setHasClusters(int HasClusters) {
+       this.hasClusters = HasClusters;
+    }
+    
+    public int getIsCluster() {
+        return isCluster;
+    }
+
+    public void setIsCluster(int isCluster) {
+       this.hasClusters = isCluster;
+    }
+    public String getColor() {
+    	if (color == null) 
+    		return "green";
+    	else
+    		return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+    
+    public String getClassesInCluster() {
+   		return classesInCluster;
+    }
+
+    public void setClassesInCluster(String classesInCluster) {
+        this.classesInCluster = classesInCluster;
+    }
+
+
+    
+
 }

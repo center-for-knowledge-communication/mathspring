@@ -1,7 +1,4 @@
 package edu.umass.ckc.wo.woserver;
-
-import edu.umass.ckc.wo.assistments.AssistmentsHandler;
-
 import edu.umass.ckc.wo.content.CCContentMgr;
 import edu.umass.ckc.wo.content.LessonMgr;
 import edu.umass.ckc.wo.exc.AssistmentsBadInputException;

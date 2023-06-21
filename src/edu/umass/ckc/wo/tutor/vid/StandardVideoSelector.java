@@ -47,13 +47,17 @@ public class StandardVideoSelector implements VideoSelector {
     public String selectVideo(Connection conn, int targetProbId) throws SQLException {
 
         Problem p = ProblemMgr.getProblem(targetProbId);
+        String videoUrl = null;
         if (p.hasVideo())
             return p.getVideo();
         List<CCStandard> standards = p.getStandards();
-        
-        String standardCode = standards.get(0).getCode();
-        String videoUrl = DbVideo.getVideoByStandardCode(conn, standardCode, p.getProblemLanguage());
-        
+        try {
+        	String standardCode = standards.get(0).getCode();
+        	videoUrl = DbVideo.getVideoByStandardCode(conn, standardCode, p.getProblemLanguage());
+        }
+        catch (Exception e) {
+        	System.out.println("No standards found: prob " + p.getName());
+        }
         return videoUrl;
         		
         // Re-implemented functionality to retrieve video for a problem, when video not found and commented previous code below (issue #384)

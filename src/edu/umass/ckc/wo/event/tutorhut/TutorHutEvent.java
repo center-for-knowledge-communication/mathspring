@@ -18,6 +18,7 @@ public abstract class TutorHutEvent extends SessionEvent {
     protected long clickTime; //  timestamp given by Javascript (ms since Jan 1, 1970 midnight)
     protected static String ELAPSED_TIME = "elapsedTime";
     protected int eventCounter;
+    protected int langIndex;
 
     protected HttpServletResponse servletResponse;  // THis is so the Tutor can forward to JSPs
     protected HttpServletRequest servletRequest;  // THis is so the Tutor can forward to JSPs
@@ -32,6 +33,7 @@ public abstract class TutorHutEvent extends SessionEvent {
         String et = p.getString(ELAPSED_TIME,"0");
         this.eventCounter = p.getInt("eventCounter",-1);
         this.clickTime = p.getLong("clickTime",0);
+        this.langIndex = p.getInt("langIndex",0);
         long etl=0;
         try {
             etl = Long.parseLong(et);
@@ -72,4 +74,13 @@ public abstract class TutorHutEvent extends SessionEvent {
     public long getClickTime() {
         return clickTime;
     }
+
+    public int getLangIndex() {
+        return langIndex;
+    }
+
+    public void setLangIndex(int langIndex) {
+        this.langIndex = langIndex;
+    }
+
 }

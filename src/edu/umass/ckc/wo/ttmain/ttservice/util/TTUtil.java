@@ -39,6 +39,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank    03-15-21  	Issue #398 New feature to move student from one class to another - added getter for teacherClassList
  * Frank 	03-22-21  	Issue #391 change date selection to use BETWEEN for date range
  * Frank	05-11-21	Issue #463 add between dates clause to some queries for filtering
+ * Frank 	02-04-23    Issue #723 - handle class clustering
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -69,16 +70,23 @@ public class TTUtil {
     public static final String UPDATE_SURVEY_SETTING_FOR_CLASS_POST = "UPDATE classconfig SET posttest=(:posttest), showPostSurvey=(:showPostSurvey) where classId=(:classId)";
 
     /** SQL Queries For Reports **/
-    public static final String PER_STUDENT_QUERY_FIRST ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.mode != 'demo' and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate)  GROUP BY studId order by studId ; ";
-    public static final String PER_STUDENT_QUERY_SECOND ="select sh.id,sh.problemId, pg.description,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL,sh.isSolved,sh.numMistakes,sh.numHints,sh.numAttemptsToSolve,sh.effort,sh.videoSeen,sh.exampleSeen,pr.standardID, round(od.diff_level,6) as diff_level,sh.mastery,sh.topicId,pg.description,sh.problemEndTime,sh.timeToSolve,sh.timeToFirstAttempt from studentproblemhistory sh, problem pr, problemgroup pg,overallprobdifficulty od where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.mode != 'demo' and sh.problemId = pr.id and sh.problemId = od.problemId and sh.topicId=pg.id and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by sh.problemEndTime desc;";
-    public static final String PER_STUDENT_PER_PROBLEM = "select s.id as studentId, concat(s.fname,' ',s.lname) As studentName, s.username as username, sh.studId, sh.problemId as problemId,sh.effort as effort,sh.problemBeginTime as problemBeginTime, p.name as description, p.nickname as nickname from student s JOIN studentproblemhistory sh ON sh.studId = s.id JOIN problem as p ON sh.problemId = p.id where s.classId=(:classId) and p.standardID like (:filter) and problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by s.username, problemBeginTime asc;";
+    public static final String PER_STUDENT_QUERY_FIRST ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId in ( CLASSID_TOKEN ) and sh.mode != 'demo' and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate)  GROUP BY studId order by studId ; ";
+    public static final String PER_STUDENT_QUERY_SECOND ="select sh.id,sh.problemId, pg.description,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL,sh.isSolved,sh.numMistakes,sh.numHints,sh.numAttemptsToSolve,sh.effort,sh.videoSeen,sh.exampleSeen,pr.standardID, round(od.diff_level,6) as diff_level,sh.mastery,sh.topicId,pg.description,sh.problemEndTime,sh.timeToSolve,sh.timeToFirstAttempt from student s,studentproblemhistory sh, problem pr, problemgroup pg,overallprobdifficulty od where sh.studId in ( select id from student where s.classId IN ( CLASSID_TOKEN )) and sh.studId=(:studId) and sh.studid = s.id and sh.mode != 'demo' and sh.problemId = pr.id and sh.problemId = od.problemId and sh.topicId=pg.id and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by sh.problemEndTime desc;";
     
-    public static final String PER_TOPIC_QUERY_FIRST = "select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,sh.topicId,json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id= (:classId))))) as description,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery, sh.problemBeginTime as problemBeginTime from student s,studentproblemhistory sh , problemgroup_description_multi_language pgl where s.id=sh.studId and s.classId=(:classId) and  sh.topicId = pgl.pg_pg_grp_id and sh.mode != 'demo' and sh.problemBeginTime  BETWEEN (:tsFromDate) AND (:tsToDate) group by sh.topicId,studId order by studId";
-    public static final String PER_TOPIC_QUERY_SECOND = "select sh.topicId,sh.problemId,CAST(sh.mastery AS DECIMAL(16,2)) AS mastery,sh.effort,sh.problemBeginTime as problemBeginTime,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL, sh.problemBeginTime as problemBeginTime from studentproblemhistory sh,problem pr where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.topicId=(:topicId) and sh.mode != 'demo' and sh.problemId = pr.id  and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by sh.topicId,problemEndTime asc";
+    //public static final String PER_STUDENT_TOPIC_QUERY_SECOND ="select sh.id,sh.problemId, pg.description,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL,sh.isSolved,sh.numMistakes,sh.numHints,sh.numAttemptsToSolve,sh.effort,sh.videoSeen,sh.exampleSeen,pr.standardID, round(od.diff_level,6) as diff_level,sh.mastery,sh.topicId,pg.description,sh.problemEndTime,sh.timeToSolve,sh.timeToFirstAttempt from studentproblemhistory sh, problem pr, problemgroup pg,overallprobdifficulty od where sh.studId in ( select id from student where classId=(:classId)) and sh.studId=(:studId) and sh.mode != 'demo' and sh.problemId = pr.id and sh.problemId = od.problemId and sh.topicId=pg.id and sh.problemEndTime BETWEEN (:tsFromDate) AND (:tsToDate) order by sh.topicId,sh.problemEndTime desc;";
+    public static final String PER_STUDENT_PER_PROBLEM = "select s.id as studentId, concat(s.fname,' ',s.lname) As studentName, s.username as username, sh.studId, sh.problemId as problemId,sh.effort as effort,sh.problemBeginTime as problemBeginTime, p.name as description, p.nickname as nickname from student s JOIN studentproblemhistory sh ON sh.studId = s.id JOIN problem as p ON sh.problemId = p.id where s.classId in ( CLASSID_TOKEN ) and p.standardID like (:filter) and problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by s.username, problemBeginTime asc;";
+    
+    
+    
+    public static final String PER_TOPIC_QUERY_FIRST = "select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName,sh.topicId,json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = (select class_language from class where id=(:classId) )))) as description,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery, sh.problemBeginTime as problemBeginTime from student s,studentproblemhistory sh , problemgroup_description_multi_language pgl where s.id=sh.studId and s.classId in ( CLASSID_TOKEN ) and  sh.topicId = pgl.pg_pg_grp_id and sh.mode != 'demo' and sh.problemBeginTime  BETWEEN (:tsFromDate) AND (:tsToDate) group by sh.topicId,studId order by studId";
+    public static final String PER_TOPIC_QUERY_SECOND = "select sh.topicId,sh.problemId,CAST(sh.mastery AS DECIMAL(16,2)) AS mastery,sh.effort,sh.problemBeginTime as problemBeginTime,sh.problemEndTime,pr.name,pr.nickname, pr.statementHTML,pr.screenShotURL, sh.problemBeginTime as problemBeginTime from studentproblemhistory sh,problem pr where sh.studId in ( select id from student as s where s.classId in ( CLASSID_TOKEN )) and sh.studId=(:studId) and sh.topicId=(:topicId) and sh.mode != 'demo' and sh.problemId = pr.id  and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) order by sh.topicId,problemEndTime asc";
 
-    public static final String PER_TOPIC_QUERY_COMPLETE_MAX = "select sh.topicId,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh where s.classId=(:classId) and studId=(:studId) and sh.mode != 'demo' group by sh.topicId";
-    public static final String PER_TOPIC_QUERY_COMPLETE_AVG = "select sh.topicId,CAST(AVG(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh where s.classId=(:classId) and studId=(:studId) and sh.mode != 'demo' group by sh.topicId";
+    
+    
+    public static final String PER_TOPIC_QUERY_COMPLETE_MAX = "select sh.topicId,CAST(MAX(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh where s.classId in ( CLASSID_TOKEN ) and studId=(:studId) and sh.mode != 'demo' group by sh.topicId";
+    public static final String PER_TOPIC_QUERY_COMPLETE_AVG = "select sh.topicId,CAST(AVG(sh.mastery) AS DECIMAL(16,2)) AS mastery from student s,studentproblemhistory sh where s.classId in ( CLASSID_TOKEN ) and studId=(:studId) and sh.mode != 'demo' group by sh.topicId";
     public static final String PER_TOPIC_QUERY_COMPLETE_LATEST = "select sh.topicId, CAST(sh.mastery AS DECIMAL(16,2)) AS mastery from studentproblemhistory sh where sh.id IN (SELECT MAX(shs.id) from studentproblemhistory shs where studId=(:studId) and shs.mode != 'demo' group by shs.topicId)";
+
 
     public static final String PER_PROBLEM_QUERY_FIRST = "select distinct(e.problemId)as problemID,pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description from eventlog e,problem pr,standard std, student student where student.trialUser=0 and student.classId=(:classId) and probElapsed<600000 and e.action in ('Attempt', 'BeginProblem','EndProblem', 'Hint') and student.id = e.studId and e.problemId = pr.id and pr.standardID=std.id order by student.id, e.id";
     public static final String PER_PROBLEM_QUERY_SECOND = "select e.* from eventlog e, student where student.trialUser=0 and student.classId=(:classId) and  e.problemId=(:problemId) and probElapsed<600000 and e.action in ('Attempt', 'BeginProblem','EndProblem', 'Hint') and student.id = e.studId order by student.id, e.id";
@@ -86,16 +94,17 @@ public class TTUtil {
     public static final String PER_PROBLEM_QUERY_FOURTH = "select h.* from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and h.effort != 'null' and h.effort != '' and student.id = h.studId order by student.id, h.id";
     public static final String PER_PROBLEM_QUERY_FIFTH = "select count(distinct h.studId) as noOfStudents from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and student.id = h.studId;";
 
-    public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster, problemBeginTime from studentproblemhistory h, standard std, problem p, cluster cc where studid in (select id from student where classId=(:classId)) and std.clusterID = cc.id and h.mode != 'demo' and std.id=p.standardID and p.id=h.problemId and h.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) group by std.clusterID";
-    public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=p.standardID and p.id=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";
-    public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId=(:classId)) and std.clusterID=(:clusterID) and mode='practice' and std.id=pr.standardID and h.problemId = pr.id and h.problemBeginTime  BETWEEN (:tsFromDate) AND (:tsToDate)";
-    public static final String PER_STANDARD_QUERY_FOURTH = "SELECT * FROM (select std.clusterId,count(h.effort) as totalSOFLogged, problemBeginTime from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=p.standardID and p.id=h.problemId and  h.effort = 'SOF' and h.effort != 'null' group by std.clusterID) as A join ( select std.clusterId,count(h.effort) as totoaleffortlogged, problemBeginTime from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId =(:classId)) and mode='practice' and std.id=pr.standardID and pr.id=h.problemId and h.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) and  h.effort != 'null' group by std.clusterID) as B on A.clusterId=B.clusterId";
+    public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster, problemBeginTime from studentproblemhistory h, standard std, problem p, cluster cc where studid in (select id from student where classId in ( CLASSID_TOKEN )) and std.clusterID = cc.id and h.mode != 'demo' and std.id=p.standardID and p.id=h.problemId and h.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) group by std.clusterID";
+//    public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId  in ( CLASSID_TOKEN )) and mode='practice' and std.id=p.standardID and p.id=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";
+    public static final String PER_STANDARD_QUERY_THIRD = "select distinct(h.problemId),pr.name,pr.standardID, pr.standardCategoryName,pr.screenShotURL,std.description  from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId in ( CLASSID_TOKEN )) and std.clusterID=(:clusterID) and mode='practice' and std.id=pr.standardID and h.problemId = pr.id and h.problemBeginTime  BETWEEN (:tsFromDate) AND (:tsToDate)";
+    public static final String PER_STANDARD_QUERY_FOURTH = "SELECT * FROM (select std.clusterId,count(h.effort) as totalSOFLogged, problemBeginTime from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId in ( CLASSID_TOKEN )) and mode='practice' and std.id=p.standardID and p.id=h.problemId and  h.effort = 'SOF' and h.effort != 'null' group by std.clusterID) as A join ( select std.clusterId,count(h.effort) as totoaleffortlogged, problemBeginTime from studentproblemhistory h, standard std, problem pr where studid in (select id from student where classId in ( CLASSID_TOKEN )) and mode='practice' and std.id=pr.standardID and pr.id=h.problemId and h.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) and  h.effort != 'null' group by std.clusterID) as B on A.clusterId=B.clusterId";
 
-    public static final String LANDING_REPORT_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime > (:ts) GROUP BY studId order by studentName;";
-    public static final String LANDING_REPORT_EVENTS_QUERY ="select distinct s.id AS studentId, s.classid, e.clickTime as clickTime, e.action as action, e.sessNum as sessNum, e.probElapsed as probElapsed, e.elapsedTime as elapsedTime from student as s, class as c, eventlog as e where s.classid = (:classId) and e.studId = s.id and e.clickTime > (:ts) order by e.studId, e.time ASC;";
+    public static final String LANDING_REPORT_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems, s.classId from student s,studentproblemhistory sh where s.id=sh.studId and s.classId in ( CLASSID_TOKEN  ) and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime > (:ts) GROUP BY studId order by studentName;";
 
-    public static final String LANDING_REPORT2_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId=(:classId) and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) GROUP BY studId order by studentName;";
-    public static final String LANDING_REPORT2_EVENTS_QUERY ="select distinct s.id AS studentId, s.classid, e.clickTime as clickTime, e.action as action, e.sessNum as sessNum, e.probElapsed as probElapsed, e.elapsedTime as elapsedTime from student as s, class as c, eventlog as e where s.classid = (:classId) and e.studId = s.id and e.clickTime BETWEEN (:tsFromDate) AND (:tsToDate) order by e.studId, e.time ASC;";
+    public static final String LANDING_REPORT_EVENTS_QUERY ="select distinct s.id AS studentId, s.classid, e.clickTime as clickTime, e.action as action, e.sessNum as sessNum, e.probElapsed as probElapsed, e.elapsedTime as elapsedTime from student as s, class as c, eventlog as e where s.classId in ( CLASSID_TOKEN  ) and e.studId = s.id and e.clickTime > (:ts) order by e.studId, e.time ASC;";
+
+    public static final String LANDING_REPORT2_STUDENTS_QUERY ="Select studId AS studentId,concat(s.fname,' ',s.lname) As studentName, s.userName As userName, sh.problemBeginTime, count(problemId) AS noOfProblems from student s,studentproblemhistory sh where s.id=sh.studId and s.classId in ( CLASSID_TOKEN ) and sh.isSolved = 1 and sh.mode != 'demo' and sh.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) GROUP BY studId order by studentName;";
+    public static final String LANDING_REPORT2_EVENTS_QUERY ="select distinct s.id AS studentId, s.classid, e.clickTime as clickTime, e.action as action, e.sessNum as sessNum, e.probElapsed as probElapsed, e.elapsedTime as elapsedTime from student as s, class as c, eventlog as e where s.classid in ( CLASSID_TOKEN ) and e.studId = s.id and e.clickTime BETWEEN (:tsFromDate) AND (:tsToDate) order by e.studId, e.time ASC;";
     
     public static final String EMOTION_REPORT = "select e.userInput from eventlog e where studId =(:studId) and action='InputResponse' and userInput != 'null' and userInput not like '%howDoYouFeel%' and userInput not like '%-1%'";
     public static final String EMOTION_REPORT_DOWNLOAD = "select e.studId,e.userInput,s.userName,e.problemId,e.time,pr.name,pr.nickname, pr.standardID, round(od.diff_level,2)as diff_level,e.curTopicId,pg.description from eventlog e, problem pr,overallprobdifficulty od, student s, problemgroup pg   where studId =(:studId) and action='InputResponse' and  userInput != 'null' and userInput not like '%howDoYouFeel%' and e.problemId = od.problemId and e.problemId = pr.id  and e.curTopicId=pg.id and s.id=e.studId and userInput not like '%-1%' and e.time BETWEEN (:tsFromDate) AND (:tsToDate) " ;
@@ -123,7 +132,9 @@ public class TTUtil {
     
     public static final String TEACHER_LOG_QUERY_FIRST ="select teacherId AS teacherId,concat(t.fname,' ',t.lname) As teacherName, t.userName As userName,action As action, classId as classId, activityName as activityName, time as timestamp from teacher t ,teacherlog tlog where t.id=tlog.teacherId and t.id=(:targetId) order by time DESC;";
     public static final String TEACHER_LIST_QUERY_FIRST ="select distinct teacherlog.teacherId, teacher.userName from teacherlog join teacher where teacher.ID = teacherlog.teacherId order by teacher.userName;";
-    public static final String TEACHER_CLASSLIST_QUERY ="select t.ID as teacherId, c.teacher as teacherName, c.id as classId, c.name as className from teacher t, class c where t.ID = (:teacherId) and t.ID = c.teacherId;";
+    public static final String TEACHER_CLASSLIST_QUERY ="select t.ID as teacherId, c.teacher as teacherName, c.id as classId, c.name as className, cc.hasClusters as hasClusters, cc.isCluster as isCluster, cc.color as color from teacher t, class c, classconfig as cc where t.ID = (:teacherId) and t.ID = c.teacherId and c.id = cc.classId and c.isactive = 1;";
+//    public static final String TEACHER_CLASSLIST_QUERY ="select c.id as classId, c.name as className, cc.isCluster as isCluster, cc.hasClusters as hasClusters, cc.color as color from teacher t, class c, classconfig as cc where t.ID = (:teacherId) and t.ID = c.teacherId and c.id = cc.classId;";
+    public static final String CLASS_CLUSTERLIST_QUERY ="select cmc.clusterId as classId, c.name as className, cc.isCluster as isCluster, cc.hasClusters as hasClusters, cc.color as color from class as c, classconfig as cc, class_map_clusters as cmc where cmc.classId = (:classId) and cmc.clusterId = cc.classId and c.isactive = 1 and cmc.clusterId = c.id order by cmc.classid asc, cmc.clusterId asc"; 
 
     
     public static final String COUNT_STUDENTS_USING_CLASS = "select count(distinct h.studId), s.userName, s.classId from studentproblemhistory h, student s where h.studId = s.id and s.classId = ?";
@@ -234,6 +245,14 @@ public class TTUtil {
 
 	public List<Topic> updateTopicNameAndDescription(List<Topic> activeproblemSet, Integer classId,
 			Connection connection, NamedParameterJdbcTemplate namedParameterJdbcTemplate, boolean isActiveProblemSet) {
+
+		try {
+			cc = DbClass.getClass(connection, classId);
+		}
+		catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
 		MapSqlParameterSource sqlSurce = new MapSqlParameterSource();
 		sqlSurce.addValue("classId", classId);
 		List<Topic> activeList = new ArrayList<>();
@@ -252,19 +271,31 @@ public class TTUtil {
 			                // We get the set of CCStandards for this topic from the ProblemMgr
 			                Set<CCStandard> stds = ProblemMgr.getTopicStandards(tp.getId());
 			                tp.setCcStandards(stds);
-							activeList.add(tp);
+
+			                try {
+			                	cc = DbClass.getClass(connection, classId);
+			                	if (hasStandardWithinBounds(tp.getCcStandards().iterator(),cc.getGrade(),cc.getSimpleLowDiff(),cc.getSimpleHighDiff())) {
+			                		activeList.add(tp);
+			                		System.out.println("Added to active list " + tp.getName());
+			                	}
+			                	else {
+			                		System.out.println("Topic not within standards. Not added " + tp.getName());
+			                	}
+			                }
+			                catch (Exception tpe) {
+			                	System.out.println(tpe.getMessage());
+			                }							
+			                
+			                
+			                
 						}
 						return activeList;
 					});
 			return activeListTopics;
 
 		} else {
-			try {
-				cc = DbClass.getClass(connection, classId);
-			}
-			catch(Exception e) {
-				System.out.println(e.getMessage());
-			}
+
+			
 			List<Integer> activeProblemSetIds = activeproblemSet.stream().map(x -> x.getId())
 					.collect(Collectors.toList());
 			List<Topic> inactiveTopicList = new ArrayList<>();
@@ -285,7 +316,7 @@ public class TTUtil {
 			                try {
 			                	if (hasStandardWithinBounds(tp.getCcStandards().iterator(),cc.getGrade(),cc.getSimpleLowDiff(),cc.getSimpleHighDiff())) {
 			                		inactiveTopicList.add(tp);
-			                		System.out.println("Added " + tp.getName());
+			                		System.out.println("Added to inactive list  " + tp.getName());
 			                	}
 			                	else {
 			                		System.out.println("Topic not within standards. Not added " + tp.getName());

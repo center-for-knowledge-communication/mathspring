@@ -1,15 +1,13 @@
 package edu.umass.ckc.wo.tutor.pedModel;
 
 import edu.umass.ckc.servlet.servbase.UserException;
-import edu.umass.ckc.wo.assistments.AssistmentsHandler;
-import edu.umass.ckc.wo.assistments.CoopUser;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.content.Hint;
 import edu.umass.ckc.wo.content.Problem;
 import edu.umass.ckc.wo.content.TopicIntro;
 import edu.umass.ckc.wo.content.Video;
-import edu.umass.ckc.wo.db.DbCoopUsers;
+
 import edu.umass.ckc.wo.event.internal.InternalEvent;
 import edu.umass.ckc.wo.event.tutorhut.*;
 import edu.umass.ckc.wo.interventions.AskGoalsIntervention;
@@ -52,6 +50,7 @@ import net.sf.json.JSONObject;
  * To change this template use File | Settings | File Templates.
  * Frank	06-26-2021	added support for gaze detection
  * Frank	07-03-21	added logging to evemtLog and updating gazewanderingevents with reciprocal links
+ * Frank	05-13-23	temporary fix for multi-lingual study
  */
 public class BasePedagogicalModel extends PedagogicalModel implements PedagogicalMoveListener {
 
@@ -291,15 +290,6 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
 //        this.studentModel.updateEmotionalState(this.smgr,e.getProbElapsedTime(),e.getElapsedTime());
         this.studentModel.endProblem(smgr, smgr.getStudentId(),e.getProbElapsedTime(),e.getElapsedTime());
         r.setEffort(this.studentModel.getEffort());
-
-        if (Settings.usingAssistments)
-        {
-            CoopUser assu = DbCoopUsers.getUserFromWayangStudId(smgr.getConnection(), smgr.getStudentId());
-            if (assu != null) {
-                smgr.setAssistmentsUser(true);
-                AssistmentsHandler.logToAssistmentsProblemEnd(smgr, (EndProblemEvent) e);
-            }
-        }
 
         if (learningCompanion != null )
             learningCompanion.processEndProblem(smgr,(EndProblemEvent) e,r);
@@ -678,9 +668,37 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
      */
      public ProblemResponse getNextProblem(NextProblemEvent e) throws Exception {
         Problem curProb = problemSelector.selectProblem(smgr, e, lastProblemScore);
+        if (smgr.getExperiment().equals("multi-lingual")) {
+        	ProblemMgr.reloadProblem(smgr.getConnection(),curProb.getId());
+        }
+        curProb  = ProblemMgr.getProblem(curProb.getId());
         // typically it takes 125 ms to finish the above call
+        StudentState state = smgr.getStudentState();
         ProblemResponse r=null;
         if (curProb != null) {
+            if (smgr.getExperiment().equals("multi-lingual")) {
+	        	if (state.getLangIndex() > 0) {
+	        		int altProbId = ProblemMgr.getProblemPair(curProb.getId());
+	        		//int altProbId = ProblemMgr.getProblemPair(2042);
+	        		if (altProbId > 0 ) {
+	        			
+		        		Problem altProb = ProblemMgr.getProblem(altProbId);
+	
+		        		curProb.setNickname(altProb.getNickname());
+		        		curProb.setStatementHTML(altProb.getStatementHTML());
+		        		curProb.setProblemFormat(altProb.getProblemFormat());
+		        		curProb.setQuestType(altProb.getQuestType());
+		        		curProb.setAudioFileId(altProb.getAudioFileId());
+		        		curProb.setAnswer(altProb.getAnswer());
+		        		curProb.setAnswers(altProb.getAnswers());
+		        		curProb.setAnswersViewList ();
+		        		curProb.getAnswersViewList ();
+		        		curProb.setHints(altProb.getHints());
+		        		curProb.setNumHints(altProb.getNumHints());
+			            
+	        		}
+        		}
+        	}
             curProb.setMode(Problem.PRACTICE);
 
             problemGiven(curProb); // inform pedagogical move listeners that a problem is given.
@@ -731,6 +749,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         long t = System.currentTimeMillis();
         Response r=null;
         StudentState state = smgr.getStudentState();
+        
         Problem curProb=null;
         // First grade the last practice problem which sets the lastProblemScore property of this class (used by subsequent code)
         this.lastProblemScore = gradeLastProblem();
@@ -762,7 +781,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         }
 
         if (r != null && r instanceof ProblemResponse) {
-             curProb = ((ProblemResponse) r).getProblem();
+            curProb = ((ProblemResponse) r).getProblem();
         }
         if (learningCompanion != null )
             learningCompanion.processNextProblemRequest(smgr,e,r);

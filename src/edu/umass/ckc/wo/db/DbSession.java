@@ -34,34 +34,6 @@ import java.util.Locale;
 public class DbSession {
     private static final Logger logger = Logger.getLogger(DbSession.class);
 
-
-    public static List<Session> getStudentSessions(Connection conn, int studId) throws SQLException {
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        try {
-            List<Session> sessions = new ArrayList<Session>();
-            String q = "select id,beginTime,lastAccessTime,clientType from session where studid=?";
-            stmt = conn.prepareStatement(q);
-            stmt.setInt(1, studId);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                int sessId = rs.getInt(1);
-                Timestamp beginTime = rs.getTimestamp(2);
-                Timestamp lastAccessTime = rs.getTimestamp(3);
-                String flashClient = rs.getString(4);
-                Session s = new Session(sessId, studId, beginTime, lastAccessTime);
-                s.setClientType(flashClient);
-                sessions.add(s);
-            }
-            return sessions;
-        } finally {
-            if (stmt != null)
-                stmt.close();
-            if (rs != null)
-                rs.close();
-        }
-    }
-
     public static Timestamp getLastLogin(Connection conn, int studId) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;

@@ -2747,20 +2747,32 @@ function showTable4b() {
 
 
 	var filter = "";
+	var type = "";
+	var sort = "";
 
     const rb4bContent = document.querySelectorAll('input[name="optRadio4bContent"]');
     for (const rb4bc of rb4bContent) {
         if (rb4bc.checked) {
-        	filter = rb4bc.value;
+        	type = rb4bc.value;
             break;
         }
     }
-    	
+
+    const rb4bSort = document.querySelectorAll('input[name="optRadio4bSort"]');
+    for (const rb4bs of rb4bSort) {
+        if (rb4bs.checked) {
+        	sort = rb4bs.value;
+            break;
+        }
+    }
+
+    filter = type + "~" + sort;
+    
     var jsonData_4b = null;
     var cols_4b = [];
 
     var tbl_4b = document.getElementById("table4b");
-    
+    document.getElementById("table4b").innerHTML = "";    
 	$('#table4b-loader').show();
     
     $.ajax({
@@ -6321,6 +6333,12 @@ function updateAllCohortSlices() {
 											<label class="radio-inline"><input id="radioErrorsDate"  value="date" type="radio" name="optRadio4bContent" checked>Order By Date</label>
 											<label class="radio-inline"><input id="radioErrorsClassId" value="classId" type="radio" name="optRadio4bContent">Order By Class Id</label>
 											<label class="radio-inline"><input id="radioErrorsProdlemId" value="problemId" type="radio" name="optRadio4bContent">Order By Problem Id</label>
+										</div>
+									</div>                            
+	                            	<div class="row">                           
+										<div class="form-group">
+											<label class="radio-inline"><input id="radioErrorsSortAsc"  value="asc" type="radio" name="optRadio4bSort" checked>Sort Descending</label>
+											<label class="radio-inline"><input id="radioErrorsSortDesc" value="desc" type="radio" name="optRadio4bSort">Sort Ascending</label>
 										</div>
 									</div>                            
 	                            </div>	                        

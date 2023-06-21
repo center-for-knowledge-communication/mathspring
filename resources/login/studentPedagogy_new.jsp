@@ -2,6 +2,8 @@
   Author: kartik
   
   Frank 08-03-21 Issues 150 AND 487 class message and worksheet location 
+  Frank 04-05-23 added lang
+  Frank 05-13-23 issue #763 make Learning Companins selectable by class
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.Locale"%>
@@ -39,16 +41,25 @@ catch (Exception e) {
          <h4><%= rb.getString("want_to_work_with")%></h4>
 		<c:forEach items="${lcprofile}" var="lcompanion" varStatus="loop">
 			<c:if test="${(loop.index == 0 || loop.index%3  == 0)}">
-				<c:set var="terminator" value="${loop.index + 2}"/>
+				<c:set var="terminator" value="${loop.index + 4}"/>
 			<div class="row">	
 			</c:if>
-			<div class="col-md-4">			    
+			<div class="col-md-3">			    
        			<label class="radio-inline">
-          			<input type="radio" name="optLC" id="LC${loop.index}" value="${lcompanion.key}" required ${lcompanion.value[2]}>
-          			<c:if test="${lcompanion.value[1] != 'NoLC'}">
-          				<img src="${url}/${lcompanion.value[1]}/character.png" width="150px" height="188px">
+          			<input type="radio" name="optLC" id="LC${loop.index}" value="${lcompanion.key}" required ${lcompanion.value[3]}>
+          			<c:if test="${lcompanion.value[1] == 'Jane'}">
+          				<img src="${url}/${lcompanion.value[1]}/character.png" width="120px" height="150px">
           			</c:if>
-          			<span style="display:block; text-align: center;">${lcompanion.value[1]}</span>
+          			<c:if test="${lcompanion.value[1] == 'Jake'}">
+          				<img src="${url}/${lcompanion.value[1]}/character.png" width="120px" height="150px">
+          			</c:if>
+          			<c:if test="${lcompanion.value[1] == 'Lucas'}">
+          				<img src="${url2}/${lcompanion.value[1]}/character.png" width="120px" height="150px">
+          			</c:if>
+          			<c:if test="${lcompanion.value[1] == 'Isabel'}">
+          				<img src="${url2}/${lcompanion.value[1]}/character.png" width="120px" height="150px">
+          			</c:if>
+          			<span style="display:block; text-align: center;">${lcompanion.value[1]}${lcompanion.value[2]}</span>
          		</label>
        		</div>
 		    <c:if test="${loop.index == terminator}">

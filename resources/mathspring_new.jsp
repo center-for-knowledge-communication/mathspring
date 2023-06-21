@@ -24,21 +24,45 @@ catch (Exception e) {
 }
 
 Locale loc = request.getLocale(); 
+Locale loc1 = request.getLocale(); 
+Locale loc2 = request.getLocale();
+
 String lang = loc.getLanguage();
 String country = loc.getCountry();
 
 System.out.println("locale set to:" + lang + "-" + country );	
 
-if (!lang.equals("es")) {
-	loc = new Locale("en","US");	
-}			
+if (lang.equals("en")) {
+	loc1 = new Locale("en","US");	
+	loc2 = new Locale("es","US");	
+}
+else {
+	loc1 = new Locale("es","US");	
+	loc2 = new Locale("en","US");		
+}
 		
 ResourceBundle rb = null;
+
+ResourceBundle rb1 = null;
 try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
+	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
 }
 catch (Exception e) {
 //	logger.error(e.getMessage());
+}
+ResourceBundle rb2 = null;
+try {
+	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
+}
+catch (Exception e) {
+//	logger.error(e.getMessage());
+}
+
+if (lang.equals("en")) {
+	rb = rb1;
+}
+else {
+	rb = rb2;	
 }
 %>
 
@@ -141,6 +165,9 @@ else
 	var what_are_your_goals = "<%= rb.getString("what_are_your_goals") %>";
 	var lets_see_our_progress = "<%= rb.getString("lets_see_our_progress") %>";
 	var waiting_for_partner = "<%= rb.getString("waiting_for_partner") %>";
+	var initializing_camera = "<%= rb.getString("initializing_camera") %>";
+	var wait_for_camera = "<%= rb.getString("wait_for_camera") %>";
+	var camera_initialized = "<%= rb.getString("camera_initialized") %>";	
 </script>
 
 
@@ -186,7 +213,9 @@ else
             gazeDetectionOn: ${gazeDetectionOn},
             gazeParamsJSON: ${gazeParamsJSON},
             gazeWanderingUI: "",
-            probType : '${probType}',
+            probType: '${probType}',
+            experiment : '${experiment}',
+            probLangIndex : 0,
             exampleProbType : null,
             probId : ${probId},
             probMode: '${probMode}',
@@ -228,6 +257,7 @@ else
             problemContentDomain : '${problemContentDomain}',
             problemContentPath : '${problemContentPath}',
             webContentPath : '${webContentPath}',
+            webContentPath2 : '${webContentPath2}',
             <%--servletContextPath : '${pageContext.request.contextPath}',--%>
             servletName : '${servletName}',
             probplayerPath : '${probplayerPath}',
@@ -360,8 +390,6 @@ label {
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="650" height="650"
 		title="<%= rb.getString("watch_and_listen_instructions")%>">
-		<%-- This iframe gets replaced by swfobject.embed.   It replaces it with the Flash object/embed tags for showing a problem OR an the html
-     of an HTML5 problem (perhaps in an iframe if we must)--%>
 		<iframe id="exampleFrame" name="iframe2" width="650" height="650"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
@@ -394,7 +422,13 @@ label {
 						class="fa fa-plus" aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
-				</a> <a href="#" class="huytran-sitenav__button" id="hint"> <span
+				</a> 
+				<a href="#" class="huytran-sitenav__button huytran-sitenav__button--first"
+					id="nextProb1"> <span class="huytran-sitenav__icon"> <i
+						class="fa fa-plus" aria-hidden="true"></i>
+				</span> <span class="huytran-sitenav__buttontitle"><%= rb2.getString("next_problem") %></span>
+				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
+				</a>				<a href="#" class="huytran-sitenav__button" id="hint"> <span
 					class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o"
 						aria-hidden="true"></i>
 				</span> <span class="huytran-sitenav__buttontitle"><span
@@ -473,9 +507,6 @@ label {
 					<iframe id="problemWindow" class="probWindow" name="iframe1"
 						width="650" height="650" src="${activityURL}" frameborder="no"
 						scrolling="no"> </iframe>
-					<div id="flashContainer1">
-						<div id="flashContainer2"></div>
-					</div>
 					<div class="huytran-practice__info">
 						<p id="pid">${probId}</p>
 						<h2>&nbsp</h2>
@@ -887,8 +918,15 @@ label {
 	    	document.getElementById("gazeMonitor6").innerHTML = "";
 	    }
 	    else {
-	    	document.getElementById("monitorBox").style.visibility = "hidden";	    
+    		document.getElementById("monitorBox").style.visibility = "hidden";
 	    }
+		if (globals.experiment == "multi-lingual") {
+			// Show 'Proxima problema' button
+		    document.getElementById("nextProb1").style.display = "block";
+		}
+		else {
+		    document.getElementById("nextProb1").style.display = "none";			
+		}
     });
     
     $(document).ready(function() {
@@ -935,8 +973,8 @@ label {
 		<p id="instructionsP">${instructions}</p>
 		<div class="empty"></div>
 	</div>
-	<%-- This div contains information about the current problem (its topic and standard)--%>
-	<%--<div id="problemTopicAndStandards" style="display: none;">Topic:<br/>Standards:</div>--%>
+	<%-- This div contains information about the current problem --%>
+	<div id="problemId" style="display: block;">Problem Id: ${probId}</div>
 	<%-- Only shown to test users--%>
 	<div id="varBindings" style="display: none;"></div>
 

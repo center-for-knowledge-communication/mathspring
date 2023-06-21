@@ -14,6 +14,8 @@ import java.util.List;
  * Date: 2/10/14
  * Time: 11:42 AM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank 05-13-23	Issue {@link #buildIS(SessionManager)}763 make LCs selectable by class
  */
 public class InterventionSelectorSpec implements Comparable<InterventionSelectorSpec> {
     private int id;
@@ -70,7 +72,7 @@ public class InterventionSelectorSpec implements Comparable<InterventionSelector
 
     private boolean checkValidFreq (String inputFreq) {
         inputFreq = inputFreq.toLowerCase();
-        return inputFreq.equals(ONCE) || inputFreq.equals(ONCE_PER_SESSION) || inputFreq.equals(ONCE_PER_TOPIC);
+        return inputFreq.equals(ONCE) || inputFreq.equals(ONCE_PER_SESSION) || inputFreq.equals(ONCE_PER_TOPIC)  || inputFreq.equals(ALWAYS);
     }
 
     public int getId() {

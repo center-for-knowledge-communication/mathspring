@@ -3,10 +3,13 @@ package edu.umass.ckc.wo.login.interv;
 /* Author: Kartik
  * 
  * Frank	08-03-21	Issue 150 and 487 Added test for gaze, Worksheet location and class Messages
+ * Frank	05-13-23	Issue #763 make LCs selectable by class
  */
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,15 +34,16 @@ public class StudentPedagogy extends LoginInterventionSelector {
 	
     public Intervention selectIntervention (SessionEvent e) throws Exception {
         long shownTime = this.interventionState.getTimeOfLastIntervention();
-        if ( shownTime > 0)
-            return null;
+
+        if (shownTime > 0) {
+        	return null;
+        }
         else {
             super.selectIntervention(e);
         	String studentPedagogyUrl = JSP_NEW;
         	int classId = smgr.getClassID();
         	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
         	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
-
 /*        	
         	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
         	if (gazeDetectionOn > 0) {
@@ -67,11 +71,9 @@ public class StudentPedagogy extends LoginInterventionSelector {
 	            }
         	}
         	
-            //String messageFromTeacher = "Let's try reading the first hint on each problem. The textarea tag defines a multi-line text input control.  The element is often used in a form, to collect user inputs like comments or reviews.";
-        	//studentPedagogyUrl = studentPedagogyUrl + "&messageFromTeacher=" + messageFromTeacher;
-
         	LoginIntervention li = new LoginIntervention(studentPedagogyUrl);
             li.setUrl(Settings.webContentPath + "LearningCompanion");
+            li.setUrl2(Settings.webContentPath2 + "LearningCompanion");
             li.setLCprofile(lcprofile);
         	return li;                    
         }

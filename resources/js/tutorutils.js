@@ -161,7 +161,7 @@ function sendEndEvent(globals) {
     updateTimers();
     if (globals.lastProbType == '')
         return;
-    else if (globals.lastProbType == HTML_PROB_TYPE || globals.lastProbType == FLASH_PROB_TYPE )
+    else if (globals.lastProbType == HTML_PROB_TYPE)
     {
         isExample = isDemoOrExampleMode()
         servletGetWait("EndProblem",{probId: globals.lastProbId, probElapsedTime: globals.probElapsedTime,  clickTime: globals.clickTime, isExample: isExample},processEndProblem);

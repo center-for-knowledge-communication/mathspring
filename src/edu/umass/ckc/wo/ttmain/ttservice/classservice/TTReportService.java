@@ -9,6 +9,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ClassLiveDashboard;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherLogEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.TeacherClassListEntry;
+import edu.umass.ckc.wo.ttmain.ttmodel.ClassClusterListEntry;
 import edu.umass.ckc.wo.ttmain.ttmodel.EditStudentInfoForm;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerClusterObjectBean;
 import edu.umass.ckc.wo.ttmain.ttmodel.PerProblemReportBean;
@@ -70,6 +71,8 @@ public interface TTReportService {
     public List<TeacherListEntry> generateTeacherList(String targetId);
 
     public List<TeacherClassListEntry> generateTeacherClassList(String targetId);
+    
+    public List<ClassClusterListEntry> generateClassClusterList(String targetId);
     
     public ClassLiveDashboard generateLiveDashboard(String classId, String filter);
     

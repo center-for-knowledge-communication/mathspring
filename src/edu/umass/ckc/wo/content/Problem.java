@@ -297,6 +297,7 @@ public class Problem implements Activity {
         if (isQuickAuth()) {
             jo.element("statementHTML", statementHTML);
             jo.element("probContentPath", Settings.webContentPath);
+            jo.element("webContentPath2", Settings.webContentPath2);
             jo.element("probDir",this.getProblemDir()); // DM 1/23/18 Added probDir so we can have problem_XXX for dir
             jo.element("questionAudio", questionAudio);  // DM 1/23/18 e.g. {[file.mp3]}
             jo.element("questionImage", imageURL); // DM 1/23/18 this will be Either a URL or {[myimage.jpg]}
@@ -407,6 +408,10 @@ public class Problem implements Activity {
 
     public String getAnswer() {
         return answer;
+    }
+
+    public void setAnswer(String ans) {
+        answer = ans;
     }
 
     public String getMode () {
@@ -645,6 +650,25 @@ public class Problem implements Activity {
         return questType.name();
     }
 
+    public void setQuestType (String strQuestType) {
+    	if (strQuestType.equals("shortAnswer"))
+    		this.questType = QuestType.shortAnswer;
+    	if (strQuestType.equals("longAnswer"))
+    		this.questType = QuestType.longAnswer;
+    	if (strQuestType.equals("multiChoice"))
+    		this.questType = QuestType.multiChoice;
+    	if (strQuestType.equals("multiSelect"))
+    		this.questType = QuestType.multiSelect;
+    }
+
+    public String getProblemFormat() {
+        return problemFormat;
+    }
+
+    public void setProblemFormat(String format) {
+        this.problemFormat = format;
+    }
+
     public String getImageURL() {
         return imageURL;
     }
@@ -659,6 +683,10 @@ public class Problem implements Activity {
 
     public int getAudioFileId() {
         return audioFileId;
+    }
+    
+    public void setAudioFileId(int id) {
+        this.audioFileId = id;
     }
     
     public void updateHintListForDemoProblems(Hint answerHint) {

@@ -39,6 +39,7 @@ import java.util.List;
  * Frank	11-10-20	issue #293R3 validate classconfig fields after fetching them
  * Frank	06-26-21	Added gaze_detction_on handling
  * Frank	08-03021	Issues 150 and 487
+ * Frank 	02-04-23    Issue #723 - handle class clustering
  */
 public class DbClass {
 
@@ -54,10 +55,10 @@ public class DbClass {
 
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language," +
                     "maxNumberProbsToShowPerTopic,minNumberProbsToShowPerTopic,maxTimeInTopic,minTimeInTopic," +
-                    "isActive, f.gaze_detection_on from class c, classconfig f" +
+                    "isActive, f.gaze_detection_on, f.hasClusters, f.isCluster, f.color, c.experiment from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -77,7 +78,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -88,7 +89,7 @@ public class DbClass {
                 boolean showPreSurvey = true;
                 String getPreSurvey = rs.getString(23);
                 String getClassLanguage = rs.getString(24);
-
+                String altClassLanguage = "es";
                 int maxProb = 40;
                 if (rs.getObject(25) != null && !rs.wasNull()) {
                 	maxProb = rs.getInt(25);
@@ -117,8 +118,12 @@ public class DbClass {
                 //int minProb = rs.getInt(26);
                 //int maxTime = rs.getInt(27);
                 //int minTime = rs.getInt(28);
+                
+                
+                // creation of altClassLanguage concept for multi-lingual study in March 2023
                 if("English".equals(getClassLanguage)) {
                 	getClassLanguage = "en:"+getClassLanguage;
+                	altClassLanguage = "es:Spanish";
                 } else {
                 	String getQueryCode = "select language_code from ms_language where language_name = ?";
                 	s2 = conn.prepareStatement(getQueryCode);
@@ -126,6 +131,7 @@ public class DbClass {
                     rs2 = s2.executeQuery();
                      if (rs2.next()) {
                     	 getClassLanguage = rs2.getString("language_code")+":"+getClassLanguage;
+                    	 altClassLanguage = "en:English";
                      }
                 }
                 
@@ -133,9 +139,14 @@ public class DbClass {
                     showPreSurvey = false;
                 int isActive = rs.getInt(29);
                 int gazeDetectionOn = rs.getInt(30);
-                ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
-                        pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn);
+                int hasClusters = rs.getInt(31);
+                int isCluster = rs.getInt(32);
+                String color = rs.getString(33);
+                
+                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval, statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,experiment,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
+                		
+                
+                
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -144,6 +155,7 @@ public class DbClass {
                 ci.setShowPostSurvey(showPostSurvey);
                 ci.setShowPreSurvey(showPreSurvey);
                 ci.setClassLanguageCode(getClassLanguage);
+                ci.setAltClassLanguageCode(altClassLanguage);
                 ci.setMaxProb(String.valueOf(maxProb));
                 ci.setMinProb(String.valueOf(minProb));
                 if (maxTime > 0) {
@@ -177,8 +189,8 @@ public class DbClass {
         try {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive,c.gaze_detection_on from class c, classconfig f" +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, c.isActive,c.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
                     " where f.classid=c.id order by " + ( orderByTeacher ? "c.teacher" : "c.id");
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -197,7 +209,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -208,10 +220,12 @@ public class DbClass {
                 int classId = rs.getInt(23);
                 int isActive = rs.getInt(24);
                 int gazeDetectionOn = rs.getInt(25);
+                int hasClusters = rs.getInt(26);
+                int isCluster = rs.getInt(27);
+                String color = rs.getString(28);
                 
-                ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
-                        pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade,isActive,gazeDetectionOn);
+                ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval,statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,experiment,grade,isActive,gazeDetectionOn,hasClusters,isCluster,color);
+                                
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -236,8 +250,8 @@ public class DbClass {
         try {
             List<ClassInfo> classes = new ArrayList<ClassInfo>();
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
-                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.flashClient, c.grade," +
-                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive, c.gaze_detection_on from class c, classconfig f" +
+                    "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
+                    "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey, c.id, isActive, c.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
                     " where f.classid=c.id and c.createTimeStamp > date_add(now(), interval -2 year) order by c.id desc";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
@@ -256,7 +270,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String flashClient = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15); // k12 or college
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -267,9 +281,15 @@ public class DbClass {
                 int classId = rs.getInt(23);
                 int isActive = rs.getInt(24);
                 int gazeDetectionOn = rs.getInt(25);
+                int hasClusters = rs.getInt(26);
+                int isCluster = rs.getInt(27);
+                String color = rs.getString(28);
+                
+                
                 ClassInfo ci = new ClassInfo(sch, yr, name, town, sec, classId, teacherId, teacherName, propgroupid, logType,
                         pretestPoolId, emailInterval, statusReportPeriodDays, studentEmailIntervalDays,
-                        studentEmailPeriodDays,flashClient,grade, isActive, gazeDetectionOn);
+                        studentEmailPeriodDays,experiment,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
+                
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -314,6 +334,60 @@ public class DbClass {
                 rs.close();
         }
 
+    }
+
+    /**
+     * Given a name of a propgroup (typically "default") this will return the id
+     *
+     * @param conn
+     * @param name
+     * @return
+     * @throws SQLException
+     */
+    public static String getPropGroupByClassId(Connection conn, int classId) throws SQLException {
+
+    	String studyName = "";
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            String q = "select name from propgroup where id=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, classId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                studyName = rs.getString(1);
+            } 
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
+        return studyName;
+    }
+    
+    public static void updatePropGroupInClass(Connection conn, int classId, String studyName) throws SQLException {
+
+        int defaultPropGroup = 1;
+
+    	ResultSet rs = null;
+        PreparedStatement ps = null;
+        if (studyName.equals("ML_Study")) {
+        	defaultPropGroup = 99;
+        }
+
+        try {
+            String q = "update class set propGroupId = ? where id = ?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, defaultPropGroup);
+            ps.setInt(2, classId);
+            ps.executeUpdate();
+        } finally {
+            if (ps != null)
+                ps.close();
+            if (rs != null)
+                rs.close();
+        }
     }
 
     public static String getTeacherName(Connection conn, int teacherID) throws SQLException {
@@ -421,22 +495,60 @@ public class DbClass {
 		}
 }
 
-    public static int editClassConfig(Connection conn, int classId, String classGrade, String highEndDiff, String lowEndDiff) throws Exception {
+    public static int editClassConfig(Connection conn, int classId, String highEndDiff, String lowEndDiff,String color) throws Exception {
 		PreparedStatement s = null;
 		try {
-			String q = "update classconfig set simpleHighDiff=?, simpleLowDiff=? " +
+			String q = "update classconfig set simpleHighDiff=?, simpleLowDiff=?, color=? " +
 			"where classId=?";
 			s = conn.prepareStatement(q);
 			s.setString(1, highEndDiff);
 			s.setString(2, lowEndDiff);
-			s.setInt(3, classId);
+			s.setString(3, color);
+			s.setInt(4, classId);
 			return s.executeUpdate();
 		} finally {
 			if (s != null)
 			s.close();
 		}
-}
+    }
 
+    public static int addNewMasterClass(Connection conn, int classId) throws Exception {
+		PreparedStatement s = null;
+		PreparedStatement s2 = null;
+		try {
+			String q2 = "update classconfig set hasClusters=1 where classId=?";
+			s2 = conn.prepareStatement(q2);
+			s2.setInt(1, classId);
+			s2.executeUpdate();
+
+			String q = "insert into class_map_clusters set classId=?, clusterId = ?;"; 					
+			s = conn.prepareStatement(q);
+			s.setInt(1, classId);
+			s.setInt(2, classId);
+			
+			return s.executeUpdate();
+		} finally {
+			if (s != null)
+			s.close();
+		}
+    };
+    
+    public static int addNewClassCluster(Connection conn, int classId, int newClassId) throws Exception {
+		PreparedStatement s = null;
+		try {
+			String q = "insert into class_map_clusters set classId=?, clusterId = ?;"; 
+					
+			s = conn.prepareStatement(q);
+			s.setInt(1, classId);
+			s.setInt(2, newClassId);
+			return s.executeUpdate();
+		} finally {
+			if (s != null)
+			s.close();
+		}
+    };
+    
+    
     public static int setIsActiveFlag(Connection conn, int classId, String flag) throws Exception {
 		PreparedStatement s = null;
 		try {
@@ -456,7 +568,7 @@ public class DbClass {
     
     public static int insertClass(Connection conn, String className,
                                   String school, String schoolYear,
-                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId) throws Exception {
+                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId, String color) throws Exception {
         ResultSet newid = null;
         PreparedStatement s = null;
         try {
@@ -487,7 +599,13 @@ public class DbClass {
             newid = s.getGeneratedKeys();
             newid.next();
             int classId = newid.getInt(1);
-            insertClassConfig(conn, classId);
+            String altClassLanguageCode = "";
+            if("English".equals(languageDescription)) {
+            	altClassLanguageCode = "es:Spanish";
+            } else {
+               	 altClassLanguageCode = "en:English";
+            }
+            insertClassConfig(conn, classId, color, altClassLanguageCode);
             return newid.getInt(1);
         } catch (SQLException e) {
             System.out.println(e.getErrorCode());
@@ -506,14 +624,19 @@ public class DbClass {
 
  
 
-	public static void insertClassConfig(Connection conn, int classId) throws SQLException {
-        PreparedStatement stmt = null;
+	public static void insertClassConfig(Connection conn, int classId, String color, String altLanguage) throws SQLException {
+ 
+		
+		PreparedStatement stmt = null;
         try {
-            // relying on the default values defined in DB for the fields pretest,posttest,mfr,
+
+        	// relying on the default values defined in DB for the fields pretest,posttest,mfr,
             // spatialR,tutoring,
-            String q = "insert into ClassConfig (classId) values (?)";
+            String q = "insert into ClassConfig (classId, color, altLanguage) values (?,?,?)";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classId);
+            stmt.setString(2, color);
+            stmt.setString(3, altLanguage);
             stmt.execute();
         } catch (SQLException e) {
             if (e.getErrorCode() == Settings.duplicateRowError || e.getErrorCode() == Settings.keyConstraintViolation)
@@ -565,6 +688,48 @@ public class DbClass {
                 if (ci != null)
                     result.add(ci);
             }
+            return result.toArray(new ClassInfo[result.size()]);
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    // rewrote the method below so that it uses the getClass method to get each ClassInfo object.
+    // This makes this method compatible with the ClassInfo objects built by getClass.
+    public static ClassInfo[] getClassesForHomePage (Connection conn, int teacherId) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            List<ClassInfo> result = new ArrayList<ClassInfo>();
+            String q = "select class_map_clusters.clusterId from class, classconfig, class_map_clusters where teacherid=? and class_map_clusters.clusterId = classconfig.classId and class.isactive = 1 and class_map_clusters.classId = class.id order by class_map_clusters.classid asc, class_map_clusters.clusterId asc;";
+            String q2 = "select * from class as c, classconfig as cc where teacherid=? and c.ID = cc.classId and cc.isCluster = 0 and cc.hasClusters = 0 order by c.ID asc;";
+
+            // First get the cluster classes
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1,teacherId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                int classId= rs.getInt(1);
+                ClassInfo ci = getClass(conn,classId);
+                if (ci != null)
+                    result.add(ci);
+            }
+            
+            // Then get the rest of the non-cluster classes
+            stmt = conn.prepareStatement(q2);
+            stmt.setInt(1,teacherId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                int classId= rs.getInt(1);
+                ClassInfo ci = getClass(conn,classId);
+                if (ci != null)
+                    result.add(ci);
+            }            	
+            
             return result.toArray(new ClassInfo[result.size()]);
         }
         finally {
@@ -628,7 +793,7 @@ public class DbClass {
         PreparedStatement s = null;
         try {
             String q = "select c.id,teacher,school,schoolYear,name,town,section,propgroupid,pretestPoolId, pool.description, " +
-                    "logType,teacherId, c.flashClient, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
+                    "logType,teacherId, c.experiment, c.isActive from class c, prepostpool pool where name='" + className + "' and pretestPoolId=pool.id";
             s = conn.prepareStatement(q);
             rs = s.executeQuery();
             if (rs.next()) {
@@ -644,12 +809,12 @@ public class DbClass {
                 String pretestPoolDescr = rs.getString(10);
                 int logType = rs.getInt(11);
                 int teacherId = rs.getInt(12);
-                String cl = rs.getString(13);
+                String experiment = rs.getString(13);
                 int isActive = rs.getInt(14);
                 int gazeDetectionOn = 0;
+
                 ClassInfo c = new ClassInfo(sch, yr, name, town, sec, id, teacherId, teacherName, propgroupid, pretestPoolId,
-                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn);
-                c.setFlashClient(cl);
+                        pretestPoolDescr, logType, 0, 7, 0, 7, "5", isActive, gazeDetectionOn,0,0,"green",experiment);
                 return c;
             }
         } finally {
@@ -1203,9 +1368,11 @@ public class DbClass {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=? order by fname,lname,username";
+        	
+        	String classesInCluster = DbClass.getStringClassesInCluster(conn, String.valueOf(classID));
+        	
+            String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ") order by fname,lname,username";
             stmt = conn.prepareStatement(q);
-            stmt.setInt(1, classID);
             rs = stmt.executeQuery();
             List<User> res = new ArrayList<User>();
             while (rs.next()) {
@@ -1285,13 +1452,22 @@ public class DbClass {
                 boolean tutoring = rs.getBoolean("tutoring");
                 boolean useDefaultHutActivationRules = rs.getBoolean("useDefaultHutActivationRules");
                 int maxNumProbsPerTopic = rs.getInt("maxNumberProbsToShowPerTopic");
+                int minNumProbsPerTopic = rs.getInt("minNumberProbsToShowPerTopic");
                 int maxTimeInTopic = rs.getInt("maxTimeInTopic");
+                int minTimeInTopic = rs.getInt("minTimeInTopic");
                 int contentFailureThreshold = rs.getInt("contentFailureThreshold");
                 double topicMastery = rs.getDouble("topicMastery");
+                String simpleLC = rs.getString("simpleLC");
+                String simpleCollab = rs.getString("simpleCollab");
+                String simpleLowDiff = rs.getString("simpleLowDiff");
+                String simpleHighDiff = rs.getString("simpleHighDiff");
+                String simpleDiffRate = rs.getString("simpleDiffRate");
+                String color = rs.getString("color");
+                
                 String q2 = "insert into classconfig (classId,pretest,posttest,mfr,fantasy," +
                         "spatialR,tutoring,useDefaultHutActivationRules,maxNumberProbsToShowPerTopic," +
-                        "maxTimeInTopic,contentFailureThreshold,topicMastery) values " +
-                        "(?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "maxTimeInTopic,contentFailureThreshold,topicMastery,simpleLC,simpleCollab,SimpleLowDiff,simpleHighDiff,simpleDiffRate,minNumberProbsToShowPerTopic,minTimeInTopic,hasClusters,isCluster,color) values " +
+                        "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 ps = conn.prepareStatement(q2);
                 ps.setInt(1, newClassId);
                 ps.setBoolean(2, pretest);
@@ -1308,6 +1484,16 @@ public class DbClass {
                 ps.setInt(10, maxTimeInTopic);
                 ps.setInt(11, contentFailureThreshold);
                 ps.setDouble(12, topicMastery);
+                ps.setString(13, simpleLC);
+                ps.setString(14, simpleCollab);
+                ps.setString(15, simpleLowDiff);
+                ps.setString(16, simpleHighDiff);
+                ps.setString(17, simpleDiffRate);
+                ps.setInt(18, minNumProbsPerTopic);
+                ps.setInt(19, minTimeInTopic);
+                ps.setInt(20, 0);
+                ps.setInt(21, 1);
+                ps.setString(22,color);
                 ps.executeUpdate();
                 ps.close();
             }
@@ -1661,6 +1847,29 @@ public class DbClass {
         }
     }
 
+    public static int getClassMaxTimeInTopic(Connection conn, int classId) throws SQLException {
+    	
+    	int maxTime = 0;
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select maxTimeInTopic from classConfig where classId=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                maxTime = rs.getInt(1);
+                return maxTime;
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    	return maxTime;
+    }
+    	
     public static void main( String[] args )
     {
 
@@ -1856,7 +2065,96 @@ public class DbClass {
             if (rs != null)
                 rs.close();
         }
-
     }
     
+    public static List<String> getListClassesInCluster(Connection conn, String classId) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        List<String> result = new ArrayList<String>();
+        try {
+            String q = "select clusterId from class_map_clusters as cmc, class as c where c.id = cmc.clusterId and cmc.classId=? and c.isActive = 1";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                result.add(String.valueOf(rs.getInt(1)));
+            }
+            return result;
+        }
+        catch (SQLException e) {
+            System.out.println(e.getErrorCode());
+            return result;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public static String getStringClassesInCluster(Connection conn, String classId) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        int i = 0;
+        String result = "";
+        try {
+            String q = "select clusterId from class_map_clusters as cmc, class as c where c.id = cmc.clusterId and cmc.classId=? and c.isActive = 1";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,classId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                if (i > 0) {
+                	result += ',';
+            	}
+                result += String.valueOf(rs.getInt(1));
+                i++;
+            }
+            if (result.length() == 0) {
+            	result = classId;
+            }
+            return result;
+        }
+        catch (SQLException e) {
+            System.out.println(e.getErrorCode());
+            return result;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public static final boolean isClassNameInUse(Connection conn, String newName) {
+    	boolean result = true;
+    	
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+        	String q = "select name from class where name = ?";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1,newName);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+               	result = true;
+            }
+            else {
+            	result = false;
+            }
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        catch(SQLException e) {
+        	System.out.println(e.getMessage());
+        }
+
+    	
+    	return result;
+    }
 }
+
+    

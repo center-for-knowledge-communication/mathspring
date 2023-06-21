@@ -68,6 +68,7 @@ public class ProblemMgr {
     private static VideoSelector vidSel = new StandardVideoSelector();
     private static int[] topicIds;
     private static boolean loaded=false;
+    private static Map<Integer, Integer> allProblemPairs = new HashMap<Integer, Integer>();
 
 
     public static boolean isLoaded () {
@@ -78,12 +79,14 @@ public class ProblemMgr {
         if (!loaded) {
             loaded = true;
             problemIds = new ArrayList<Integer>();
+            allProblemPairs = new HashMap<Integer, Integer>();
             allProblems = new HashMap<Integer, Problem>();
             allTopics = new ArrayList<Topic>();
             probIdsByTopic = new HashMap<Integer,ArrayList<Integer>>();
             stdsByTopic = new HashMap<Integer,Set<CCStandard>>();
             loadTopics(conn);
             loadAllProblems(conn);
+            loadAllProblemPairs(conn);
             updateProbProbGroup(conn);
             fillTopicProblemMap(conn);
             fillTopicStandardMap(conn);
@@ -581,6 +584,35 @@ public class ProblemMgr {
             if (ps != null)
                 ps.close();
         }
+    }
+
+    private static void loadAllProblemPairs(Connection conn) throws Exception {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String q = "select * from BaseProblemJoin";
+            ps = conn.prepareStatement(q);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                allProblemPairs.put(rs.getInt("baseProblemID"), rs.getInt("problemID"));
+            }
+        } finally {
+              if (ps != null)
+                   ps.close();
+              if (rs != null)
+                   rs.close();
+        }
+    }
+
+    public static int getProblemPair(int curProb ) {
+    	int result = 0;
+    	try {
+    		result = allProblemPairs.get(curProb);  
+    	}
+    	catch (Exception e) {
+    		result = 0;
+    	}
+    	return result;
     }
 
     public static String getProblemMediaFilename (Connection conn, int pmfId) throws SQLException {

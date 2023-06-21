@@ -73,11 +73,6 @@ function processTopicIntroIntervention (interv) {
 function showTopicIntro (resource, topic, resourceType) {
     if (resourceType === 'html')
         showTopicIntroHTML(resource);
-    // if nothing pop up an alert
-    else if (typeof(resource) != 'undefined' && resource != '')
-        showFlashProblem(resource,null,null,FLASH_CONTAINER_INNER, false);
-    else alert("Beginning topic: "  + topic + ".  No Flash movie to show")
-
 
 }
 

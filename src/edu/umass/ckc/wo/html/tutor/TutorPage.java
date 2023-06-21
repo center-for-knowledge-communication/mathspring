@@ -24,6 +24,8 @@ import javax.servlet.RequestDispatcher;
  * Frank	10-07-20  Issue #261 change problem header
  * Kartik 04-22-21 Issue #390 Added session clock functionality
  * Frank	06-26-21	Added support for gaze detection
+ * Frank 	02-04-23    Issue #723 - set isTesteUser
+ * Frank	05-23-23	Issue #763 - exception case for new Learning Companions at a different url
  */
 public class TutorPage {
     public static final String TUTOR_MAIN_JSP = "mathspring.jsp"; // this is the HTML page that is the tutor hut (plugged with global variables below)
@@ -70,14 +72,12 @@ public class TutorPage {
 
 
         // Path to the Flash client is given by web.xml param for WoTutorServlet
-        String flashClientPath = Settings.flashClientPath + smgr.getClient() ;
         info.getRequest().setAttribute("instructions",null);
         info.getRequest().setAttribute("studId",smgr.getStudentId());
         appendLogMsg("studId",Integer.toString(smgr.getStudentId()));
         info.getRequest().setAttribute("userName", smgr.getUserName());
         info.getRequest().setAttribute("studentFirstName", smgr.getStudentModel().getStudentFirstName());
         info.getRequest().setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
-        info.getRequest().setAttribute("flashClientPath",flashClientPath);
         info.getRequest().setAttribute("formalityServlet",Settings.formalityServletURI);
         LearningCompanion lc = smgr.getLearningCompanion();
         String character = "", strategy = "";
@@ -99,6 +99,7 @@ public class TutorPage {
 //        info.getRequest().setAttribute("problemContentPath", Settings.isDevelopmentEnv ?  Settings.devWebContentPath : Settings.problemContentPath);
         info.getRequest().setAttribute("problemContentPath", Settings.problemContentPath);
         info.getRequest().setAttribute("webContentPath",  Settings.webContentPath);
+        info.getRequest().setAttribute("webContentPath2",  Settings.webContentPath2);
         info.getRequest().setAttribute("elapsedTime",0);
         info.getRequest().setAttribute("lastProbId",-1);
         info.getRequest().setAttribute("topicId",-1);
@@ -126,12 +127,16 @@ public class TutorPage {
         info.getRequest().setAttribute("timeInSession", smgr.getTimeInSession());
         info.getRequest().setAttribute("gazeDetectionOn", smgr.getGazeDetectionOn());
         info.getRequest().setAttribute("gazeParamsJSON", smgr.getGazeParamsJSON());
+        info.getRequest().setAttribute("experiment", smgr.getExperiment());
 
-        if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId()))
+        if (DbUser.isTestUser(smgr.getConnection(),smgr.getStudentId())) {
             info.getRequest().setAttribute("showAnswer", true);
-        else
+            info.getRequest().setAttribute("isTestUser","1");
+        }
+        else {
             info.getRequest().setAttribute("showAnswer", false);
-
+            info.getRequest().setAttribute("isTestUser","0");
+        }
         if (DbUser.isShowTestControls(smgr.getConnection(), smgr.getStudentId()))
             info.getRequest().setAttribute("showProblemSelector", true);
         else
@@ -172,14 +177,20 @@ public class TutorPage {
         info.getRequest().setAttribute("resource", resource);
         info.getRequest().setAttribute("answer", answer);
         appendLogMsg("answer",answer);
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv) {
 
 //                info.getRequest().setAttribute("learningCompanionMovie",  Settings.devWebContentPath + "/LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
-            } else
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-
+            } else {
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+            	}
+            	else {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+            	}
+            }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
 
         info.getRequest().setAttribute("probType", lastProbType==null ? "" : lastProbType);
@@ -259,13 +270,19 @@ public class TutorPage {
         info.getRequest().setAttribute("probType", "intervention"); // This is how we tell the client its getting an intervention in the activityJSON
         info.getRequest().setAttribute("activityJSON", intervResponse.getJSON().toString());
         appendLogMsg("activity",intervResponse.getJSON().toString());
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv) {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath +  "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             }
             else {
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+            	}
+            	else {
+            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+            	}
             }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
 
         info.getRequest().setAttribute("lastProbType", lastProbType==null ? "" : lastProbType);
@@ -325,12 +342,18 @@ public class TutorPage {
         info.getRequest().setAttribute("probType", problem.getType());
         info.getRequest().setAttribute("activityJSON", response.getJSON().toString());
         appendLogMsg("activity",response.getJSON().toString());
-        if (smgr.getLearningCompanion() != null)
+        if (smgr.getLearningCompanion() != null) {
             if (Settings.isDevelopmentEnv)
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath  + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-            else
-                info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
-
+            else {
+            	if (smgr.getLearningCompanion().getCharactersName().equals("Jane") || smgr.getLearningCompanion().getCharactersName().equals("Jake")) {
+		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+		    	}
+		    	else {
+		    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
+		    	}
+            }
+    	}
         else  info.getRequest().setAttribute("learningCompanionMovie","");
         info.getRequest().setAttribute("lastProbType", lastProbType==null ? "" : lastProbType);
 

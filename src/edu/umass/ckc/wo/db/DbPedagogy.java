@@ -8,8 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -30,6 +32,9 @@ import edu.umass.ckc.wo.tutor.Pedagogy;
 import edu.umass.ckc.wo.tutor.Settings;
 import edu.umass.ckc.wo.tutor.probSel.LessonModelParameters;
 import edu.umass.ckc.wo.xml.JDOMUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,6 +45,8 @@ import edu.umass.ckc.wo.xml.JDOMUtils;
  * 
  * Frank	08-03-21	Issue 150 and 487 - Remember LCProfile selection on login page
  * Frank	08-03-21	Issue 150 and 487 - Remove "No Companion" option from LCGetProfiles()
+ * Frank	04-05023	Issue 725 add lang text to lcprofile
+ * Frank	05-13-23	Issue #763 - make LCs selectable by class
  */
 public class DbPedagogy {
 
@@ -118,7 +125,7 @@ public class DbPedagogy {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
-            String q = "select id,isBasic,definition,login,lesson,name,simpleConfigName from pedagogy where active=1";
+            String q = "select id,isBasic,definition,login,lesson,name,simpleConfigName,lcsource from pedagogy where active=1";
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             while (rs.next()) {
@@ -128,7 +135,8 @@ public class DbPedagogy {
                 String login = rs.getString(4);
                 String lesson = rs.getString(5);
                 String name = rs.getString(6);
-                String simpleConfigName = rs.getString(6);
+                String simpleConfigName = rs.getString(7);
+                String lcsource = rs.getString(8);
                 PedagogyParser pp = new PedagogyParser();
                 Pedagogy ped = pp.parsePed(xml); // Fully instantiated pedagogy based on XML only
                 // now replace the fields from the db into the pedagogy
@@ -141,6 +149,7 @@ public class DbPedagogy {
                 ped.setLogin(login);
                 ped.setLesson(lesson);
                 ped.setName(name);
+                ped.setLCsource(lcsource);
                 // only basic pedagogies should have a simpleConfig name (used in the teacher tools TEACHER view of pedagogies)
                 if (isBasic)
                     ped.setSimpleConfigName(simpleConfigName);
@@ -401,11 +410,14 @@ public class DbPedagogy {
     }
 
     public static Map<Integer, List<String>> getLCprofiles(Connection conn, int classId, int currStudentPedId) throws SQLException {
+    	
 		Map<Integer, List<String>> LCprofiles = new HashMap<Integer, List<String>>();
+
+    	List<String> LCprofilesArr = new ArrayList<>();
 		ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-        	String q = "select cp.pedagogyId, p.name, p.shortName from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+        	String q = "select cp.pedagogyId, p.name, p.shortName, p.lcsource, p.lang from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
 //        			"UNION\r\n" + 
 //        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
             stmt = conn.prepareStatement(q);
@@ -420,7 +432,9 @@ public class DbPedagogy {
             	else {
             		checked = " ";           		
             	}
-            	LCprofiles.put(pedId, new ArrayList<String>(Arrays.asList(rs.getString(2), rs.getString(3), checked)));
+            	String lang = " (" + rs.getString(5) + ")";
+            	String LCdef = pedId + "~" + rs.getString(2) + "~" + rs.getString(3) + "~" + lang + "~" + checked +  "~"  + rs.getString(4);
+            	LCprofilesArr.add(LCdef);
             }
         } finally {
             if (stmt != null)
@@ -428,7 +442,59 @@ public class DbPedagogy {
             if (rs != null)
                 rs.close();
         }
+        Collections.shuffle(LCprofilesArr);
+        
+        ListIterator <String> lit = LCprofilesArr.listIterator();
+        
+        while (lit.hasNext()) {
+        	String element = lit.next();
+        	String sp[] = element.split("~");
+        
+        	int pedid = Integer.valueOf(sp[0]);
+        	LCprofiles.put(pedid, new ArrayList<String>(Arrays.asList(sp[1], sp[2], sp[3], sp[4])));
+        }
+
 		return LCprofiles;
+    }
+
+    public static String getSelectableLCprofiles(Connection conn) throws SQLException {
+        JSONArray resultArr = new JSONArray();
+        String lcProfileStr = "";
+        int rowCount = 0;
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select p.id, p.name, p.shortName, p.lcsource, p.lang from pedagogy p where p.selectable = 1"; 
+            stmt = conn.prepareStatement(q);
+            rs = stmt.executeQuery();
+            while (rs.next()) {           	
+            	int id = rs.getInt(1);
+            	String url = Settings.webContentPath + "LearningCompanion/";
+            	if ((rs.getString(4).equals("webContentPath2"))){
+                	url = Settings.webContentPath2 + "LearningCompanion/";
+            	}
+           		String lang = " (" + rs.getString(5) + ")";
+            	JSONObject resultJson = new JSONObject();
+            	resultJson.put("id", String.valueOf(id));                       		
+            	resultJson.put("lcname", rs.getString(2));                       		
+            	resultJson.put("lcshortname", rs.getString(3));                       		
+            	resultJson.put("lang", lang);                 
+            	resultJson.put("url",url);
+                resultArr.add(resultJson);
+            }
+            Collections.shuffle(resultArr);
+            lcProfileStr = resultArr.toString();
+	               
+	    } catch (JSONException e1) {
+	                // TODO Auto-generated catch block
+	              e1.printStackTrace();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+		return lcProfileStr;
     }
 
     public static void main(String[] args) {

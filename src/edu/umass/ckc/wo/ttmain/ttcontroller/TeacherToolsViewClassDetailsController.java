@@ -59,7 +59,8 @@ import javax.servlet.http.HttpSession;
  * Frank 	04-01-21  	Issue #418 getStudentList()
  * Frank 	05-17-21  	Issue #471 Pass teacherLoginType value in map to classReportCard
  * Frank    05-20-21  	Issue #473 fix username update bug
- * Frank   10-09-2021	issue #528 Research Tool 
+ * Frank   10-09-2021	issue #528 Research Tool
+ * Frank 	02-04-23    Issue #723 - Added class clustering 
  */
 
 @Controller
@@ -81,11 +82,14 @@ public class TeacherToolsViewClassDetailsController {
 
     @Autowired
     private TeacherLogger tLogger;
+    
+    private String subPages  = "classReportCard,classManageTopics";
 
     @RequestMapping(value = "/tt/viewClassDetails", method = RequestMethod.GET)
     public String viewClassDetails(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection ) throws TTCustomException {
 
-	   	 Locale loc = request.getLocale(); 
+    	logger.error("TESTING viewClassDetails");
+    	Locale loc = request.getLocale(); 
 	   	 String lang = loc.getLanguage();
 	   	 String country = loc.getCountry();
 	
@@ -101,9 +105,18 @@ public class TeacherToolsViewClassDetailsController {
 //    		logger.error(e.getMessage());	
     	}
 
+    	String selection = "";
+    	if (currentSelection.indexOf("~") >= 0) {
+    		String selections[] = currentSelection.split("~");
+    		selection = selections[0];
+    	}
+    	else {
+    		selection = currentSelection;
+    	}
+    	
     	HttpSession session = request.getSession();
     	int sTeacherId = (int) session.getAttribute("teacherId");
-    	if (currentSelection.equals("classHomePage")) {
+    	if (selection.equals("classHomePage")) {
 			try {
 				int teacherId = 0;
     			teacherId = (int) session.getAttribute("teacherId");
@@ -135,7 +148,7 @@ public class TeacherToolsViewClassDetailsController {
 			}
     	}
     	else {
-        	if (currentSelection.equals("")) {    		
+        	if (selection.equals("")) {    		
 				int teacherId = (int) session.getAttribute("teacherId");
 				if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 					tLogger.logEntryWorker(teacherId, 0, "logout", "Multiple teacher logins detected");
@@ -151,7 +164,7 @@ public class TeacherToolsViewClassDetailsController {
     	}
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
-   		ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+   		//ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
     	map.addAttribute("createClassForm", new CreateClassForm());
         map.addAttribute("teacherId", String.valueOf(sTeacherId));
         session.setAttribute("classId",classId);
@@ -229,6 +242,82 @@ public class TeacherToolsViewClassDetailsController {
         session.setAttribute("classId",classId);
         return "teacherTools/classReportCard";
     }
+
+    @RequestMapping(value = "/tt/classManagerSubPage", method = RequestMethod.GET)
+    public String classManageTopics(ModelMap map, HttpServletRequest request, @RequestParam("classId") String classId,   @RequestParam("currentSelection") String currentSelection  ) throws TTCustomException {
+
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
+    	
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+    	HttpSession session = request.getSession();
+    	int sTeacherId = (int) session.getAttribute("teacherId");
+    	if (subPages.indexOf(currentSelection) >= 0) {
+			try {
+	    		if (!DbClass.validateClassTeacher(connection.getConnection(),Integer.valueOf(classId),sTeacherId)) {
+	    			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+	    				tLogger.logEntryWorker(sTeacherId, 0, "logout", "Multiple teacher logins detected");
+	    			}
+	    	    	session.removeAttribute("tLogger");
+	    	    	session.removeAttribute("teacherUsername");
+	    	    	session.removeAttribute("teacherId");
+	    			session.invalidate();
+	    			String msg = rb.getString("multiple_teacher_logins_detected");
+	                request.setAttribute("message",msg);
+	    	        return "login/loginK12_teacher";
+	    		}
+			}
+			catch(SQLException e) {
+				logger.debug(e.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+			catch(java.lang.NullPointerException ne) {
+				logger.debug(ne.getMessage());
+				String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+	            request.setAttribute("message",msg);
+		        return "login/loginK12_teacher";			
+			}
+    	}
+    	else {   		
+			int teacherId = (int) session.getAttribute("teacherId");
+			if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
+				tLogger.logEntryWorker(teacherId, 0, "logout", "Multiple teacher logins detected");
+			}
+	    	session.removeAttribute("tLogger");
+	    	session.removeAttribute("teacherUsername");
+	    	session.removeAttribute("teacherId");
+			session.invalidate();
+			String msg = rb.getString("system_error") + " " + rb.getString("log_in_and_try_again");
+            request.setAttribute("message",msg);
+	        return "login/loginK12_teacher";
+    	}
+
+    	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
+        if (currentSelection.equals("classManageTopics")) {
+        	ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+        }
+    	map.addAttribute("createClassForm", new CreateClassForm());
+        map.addAttribute("teacherId", String.valueOf(sTeacherId));
+        map.addAttribute("teacherLoginType", (String) session.getAttribute("teacherLoginType"));
+        session.setAttribute("classId",classId);
+        session.setAttribute("currentSelection",currentSelection);
+        return "teacherTools/" + currentSelection;
+    }
+    
     
     @RequestMapping(value = "/tt/reOrderProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String  reOrderProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
@@ -368,9 +457,9 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/changeStudentClass", method = RequestMethod.POST)
     public @ResponseBody
-    String changeStudentClass(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "newClassId") String newClassId ) throws TTCustomException {
+    String changeStudentClass(@RequestParam(value = "studentId") String studentId, @RequestParam(value = "newClassId") String newClassId,  @RequestParam("lang") String lang ) throws TTCustomException {
     	System.out.println("changeStudentClass");
-    	return pvService.changeClassForStudent(studentId,newClassId);
+    	return pvService.changeClassForStudent(studentId,newClassId, lang);
     }
     
     

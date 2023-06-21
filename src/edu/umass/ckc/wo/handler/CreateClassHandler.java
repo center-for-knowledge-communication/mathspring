@@ -28,6 +28,9 @@ import java.util.List;
  * <p>Company: </p>
  * @author unascribed
  * @version 1.0
+ * 
+  *  Frank 	02-04-23    Issue #723 - Added class color
+  *  Frank 05-13-23		Issue #763 make LCs selectable by class
  */
 
 public class CreateClassHandler  {
@@ -186,11 +189,11 @@ public class CreateClassHandler  {
             // When a class is first created, we use the default prop group.
             // We'll allow it to be altered in the page that allows the user to edit the class fields.
             newid = DbClass.insertClass(conn,className, school, schoolYear, town, section,tid,
-                    defaultPropGroup, 0, grade,"en:English");
+                    defaultPropGroup, 0, grade,"en:English", "green");
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(conn,newid);
                 ClassInfo info = DbClass.getClass(conn,newid);
-                info.setSimpleConfigDefaults();
+                info.setSimpleConfigDefaults("both");
                 ClassInfo[] classes = DbClass.getClasses(conn,e.getTeacherId());
                 Classes bean = new Classes(classes);
                 // The form submission event will go back to AlterClassHandler
@@ -254,7 +257,7 @@ public class CreateClassHandler  {
             // When a class is first created, we use the default prop group.
             // We'll allow it to be altered in the page that allows the user to edit the class fields.
             newid = DbClass.insertClass(conn,className, school, schoolYear, town, section,tid,
-                    defaultPropGroup, 0, grade,"en:English");
+                    defaultPropGroup, 0, grade,"en:English", "green");
             if (newid != -1) {
                 Integer adminId = (Integer) req.getSession().getAttribute("adminId"); // determine if this is admin session
                 req.setAttribute("sideMenu",adminId != null ? "adminSideMenu.jsp" : "teacherSideMenu.jsp"); // set side menu for admin or teacher
