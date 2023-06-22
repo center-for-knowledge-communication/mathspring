@@ -41,7 +41,7 @@
 		<!-- <param-value>http://msadmin-prod/mscontent/</param-value> -->
 
 		<!-- <param-value>http://rose.cs.umass.edu/mathspring/mscontent/</param-value> -->
-		<param-value>https://ckc.mathspring.org:8443/MSContent/</param-value>
+		<param-value>https://ckc.mathspring.org/MSContent/</param-value>
 	</context-param>
 	
   <context-param>
