@@ -23,4 +23,5 @@ public interface TTMiscService {
 
     public String getCohortHelp(String helpTopic, String lang, String filter) throws TTCustomException;
     
+    public String msAdmin(String reportType, String lang, String filter) throws TTCustomException;
 }
