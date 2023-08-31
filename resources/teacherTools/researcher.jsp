@@ -290,6 +290,8 @@ var currentCohortWeeks = {};
 var cohortWeeks = [];
 var currentCohortDateArr = [];
 
+var currentExperimentId = "multi-lingual"; 
+
 var noEndDate = "2000-01-01 00:00:00.0";
 
 var currentTeachersArr = [];
@@ -463,7 +465,9 @@ function refreshLocalData() {
         }
     });
     
-	document.getElementById("chart2_div").style.visibility = 'hidden';
+
+
+    document.getElementById("chart2_div").style.visibility = 'hidden';
 	document.getElementById("chart2b_div").style.visibility = 'hidden';
 	document.getElementById("chart2c_div").style.visibility = 'hidden';
 	document.getElementById("chart3_div").style.visibility = 'hidden';
@@ -522,7 +526,7 @@ $(document).ready(function () {
 	    }	    
 	});	
 	
-	jQuery(document).on('show.bs.collapse','#msviewerGroup',function (e){
+	jQuery(document).on('show.bs.collapse','#msAdminGroup',function (e){
 	    var clicked = $(document).find("[href='#" + $(e.target).attr('id') + "']");
 
 	    if ($(e.target).attr('id') == "table_4b") {
@@ -927,6 +931,13 @@ function handleCohortSelect(event) {
 	   	}
 	   	else {
 	   		currentWeekHdr = " - ended " + msEndDateStr;   			   		
+	   	   	document.getElementById("editCohortFormSubmit").style.display = "none";
+	   	   	document.getElementById("addCohortTeacher").style.display = "none";
+	   	   	document.getElementById("addCohortClass").style.display = "none";
+	   	   	//document.getElementById("updateAllSlices").style.display = "none";
+	   	   	
+	   	 
+
 	   	}
    	}
 
@@ -1112,7 +1123,7 @@ function addCohortForm() {
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
         data : {
-            cohortId: currentCohortId,
+        	cohortId: currentCohortId,
             command: 'getNewCohortId',
             lang: loc,
             filter: "0" 
@@ -1166,7 +1177,7 @@ function editCohortForm() {
         type : "POST",
         url : pgContext+"/tt/tt/cohortAdmin",
         data : {
-            cohortId: currentCohortId,
+        	cohortId: currentCohortId,
             command: 'getCohortInfo',
             lang: loc,
             filter: currentCohortId 
@@ -1215,6 +1226,131 @@ function editCohortForm() {
 
 }
 
+function addExperimentForm() {
+
+	$('#addExperimentFormModalPopup').modal('hide');
+    
+    var jsonData = null;
+    var cols = [];
+
+   
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            command: 'getNewExperimentId',
+            lang: loc,
+            filter: "0" 
+       
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	jsonData = $.parseJSON(data);	
+            	var newExperimentId  = jsonData.newExperimentId;
+            	//document.getElementById("add_experiment_hdr").innerHTML = "Experiment Id# " + newExperimentId;            	
+
+            	document.getElementById("newExperimentId").value = newExperimentId;
+            	document.getElementById("experimentName").value = "";
+            	document.getElementById("experimentSchoolYear").value = "";
+
+                $('#addExperimentFormModalPopup').modal('show');
+            
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
+function editExperimentForm() {
+
+	$('#editExperimentFormModalPopup').modal('hide');
+	
+	var filter = "0";
+    
+    var jsonData = null;
+
+	var name;
+	
+   	name = prompt("Enter experiment name","");
+   	if (name.length == 0) {
+   		alert('Must enter experiment name');
+   		return;
+   	}
+	
+       
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            command: 'getExperimentInfo',
+            lang: loc,
+            filter: name 
+       
+        },
+        success : function(data) {
+        	if (data) {
+               	
+            	jsonData = $.parseJSON(data);
+            	var result = jsonData.result;
+            	if (result == "success" ) {
+	            	document.getElementById("experimentId").value = jsonData.id;
+	            	document.getElementById("experimentName").value = jsonData.name;
+	            	document.getElementById("experimentSchoolYear").value = jsonData.schoolYear;
+	            	document.getElementById("experimentOptionString").value = jsonData.optionString;
+				
+                	$('#editExperimentFormModalPopup').modal('show');
+            	}
+            	else {
+            		alert(result);
+            	}
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+}
+
+function editExperimentClasses(cmd) {
+
+	var filter = "";
+	var id = "";
+	var expName = "";
+	
+	if (cmd === "remove") {
+		id = prompt("Enter class id");
+		expName = prompt("Enter experiment  name");
+		var conf = confirm("Are you sure you want to remove class id: " + id + " from " + expName + " experiment");
+		if (conf) {
+			filter = "remove" + "~" +  id+ "~" + expName;
+			adminExperimentClasses(filter);				
+		}
+	}
+	if (cmd === "add") {
+		id = prompt("Enter class id");
+		expName = prompt("Enter experiment  name");
+		var conf = confirm("Are you sure you want to add class id: " + id + " to " + expName + " experiment");
+		if (conf) {
+			filter = "add" + "~" +  id + "~" + expName;
+			adminExperimentClasses(filter);
+		}
+	}
+}
 
 function changeTeacherActivitiesReportHeaderAccordingToLanguage(){
 	var languagePreference = window.navigator.language;
@@ -5251,6 +5387,7 @@ function editCohortFormSubmit() {
     
 }
 
+
 function adminCohortTeachers(filter) {
 
 	
@@ -5297,6 +5434,160 @@ function adminCohortClasses(filter) {
         	if (data) {
             	alert(data);
             	refreshLocalData();
+            }
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+function addExperimentFormSubmit() {
+
+	var filter = document.getElementById("addExperimentName").value;
+	filter = filter + "~" + document.getElementById("addExperimentSchoolYear").value;
+	filter = filter + "~" + document.getElementById("addExperimentOptionString").value;
+
+	$.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            cohortId: 0,
+            command: 'addNewExperimentInfo',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+        		if (data.substring(0,5) == "error") {        	
+            		alert(data);
+        		}
+        		else {        			
+        			alert(document.getElementById("addExperimentName").value + " added successfully");
+        			$('#addExperimentFormModalPopup').modal('hide');        			        			
+        		}
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+}   
+	
+function chatPromptFormDisplay() {
+
+	$('#chatPromptFormModalPopup').modal('show');
+}
+
+
+function chatPromptSubmit() {
+
+	//var filter = document.getElementById("addExperimentName").value;
+	//filter = filter + "~" + document.getElementById("addExperimentSchoolYear").value;
+	//filter = filter + "~" + document.getElementById("addExperimentOptionString").value;
+	var filter = "How many days are there in February?"
+
+   	var choicesArr = [];
+			
+			
+		filter = document.getElementById("chatPromptId").value;
+		$.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            command: 'chatPrompt',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+        		if (data.substring(0,5) == "error") {        	
+            		alert("Error: " + data);
+        		}
+        		else {
+        			var resp = data;
+                	var jsonData = $.parseJSON(data);
+                	var choicesArr = jsonData.choices;
+					var text = choicesArr[0].text; 
+        			document.getElementById("chatResponseId").value = text;
+        		}        		
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+function editExperimentFormSubmit() {
+
+	var filter = document.getElementById("experimentId").value;
+	filter = filter + "~" + document.getElementById("experimentName").value;
+	filter = filter + "~" + document.getElementById("experimentSchoolYear").value;
+	filter = filter + "~" + document.getElementById("experimentOptionString").value;
+
+	$.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            command: 'updateExperimentInfo',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+        		if (data.substring(0,5) == "error") {        	
+            		alert(data);
+        		}
+        		else {
+        			alert(document.getElementById("experimentName").value + " changed successfully");
+        			$('#editExperimentFormModalPopup').modal('hide');         			
+        		}
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+    
+}
+
+
+
+function adminExperimentClasses(filter) {
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/msAdmin",
+        data : {
+            command: 'adminExperimentClasses',
+            lang: loc,
+            filter: filter
+        },
+        success : function(data) {
+        	if (data) {
+            	alert(data);
             }
         	else {
         		alert('<%= rwrb.getString("response_data_null") %>');
@@ -5386,10 +5677,10 @@ function updateAllCohortSlices() {
 	
 //	if (currentCohortId == "5") {
 		
-		if (!(cohortsArr[currentCohortIndex].cohortEnddate == noEndDate)) {		
-			alert(cohortsArr[currentCohortIndex].cohortName +  " has ended.  No more updates allowed.");
-			return;
-		}
+//		if (!(cohortsArr[currentCohortIndex].cohortEnddate == noEndDate)) {		
+//			alert(cohortsArr[currentCohortIndex].cohortName +  " has ended.  No more updates allowed.");
+//			return;
+//		}
 
 		updateCohortFilter = currentCohortDateArr[currentCohortIndex] + "~7~" + currentWeek;
 	    
@@ -5487,7 +5778,7 @@ function updateAllCohortSlices() {
     <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomDashboard"  href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
 	<li><a id="reportCardLink" onclick="launchReportCard();"><%= rwrb.getString("class_report_card") %></a></li>
-    <li><a data-toggle="tab"  href="#MSViewerTools">MS Viewer Tools</a></li>
+    <li><a data-toggle="tab"  href="#MSAdminTools">MS Admin Tools</a></li>
     <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
     <li><a data-toggle="tab"  href="#Help">Help</a></li>
     <li>
@@ -6304,7 +6595,7 @@ function updateAllCohortSlices() {
 		</div>
 
 
-	    <div id="MSViewerTools" class="col-sm-12 tab-pane fade container">
+	    <div id="MSAdminTools" class="col-sm-12 tab-pane fade container">
 	    	<h3>MS Support Tools</h3>
 			<div class="row">
 				<div id="tablesCohortName">				
@@ -6315,12 +6606,12 @@ function updateAllCohortSlices() {
 	
 	            <div id="tables-wrapper" class="row" width: 100%;">
 	
-	                <div class="panel-group" id="msviewerGroup">
+	                <div class="panel-group" id="msAdminGroup">
 	                
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msviewerGroup" href="#table_4b">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msAdminGroup" href="#table_4b">
 	                                    Errors Reported by Students 
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6361,7 +6652,7 @@ function updateAllCohortSlices() {
 	                   <div class="panel panel-default">
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
-	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msviewerGroup" href="#table_4c">
+	                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#msAdminGroup" href="#table_4c">
 	                                    Teacher Feedback 
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
@@ -6393,7 +6684,83 @@ function updateAllCohortSlices() {
 	                        </div>
 	                    </div>
 					</div>
+					<br>
+					<h3>Experiment Admin Tools</h3>					
+					
+                    <div  id="editExperiment" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="ms_experiment" class="accordion-toggle" data-toggle="collapse" data-parent="#msAdminGroup" href="#admin7">
+                                    Experiment Information
+                                </a>
+                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="admin7" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input class="btn btn-lg btn-primary" onclick="addExperimentForm();" type="submit" value="<%= rwrb.getString("add") %>">
+								  <input class="btn btn-lg btn-primary" onclick="editExperimentForm();" type="submit" value="<%= rwrb.getString("edit_view") %>">
+								  <input class="btn btn-lg btn-primary" onclick="listExperimentForm();" type="submit" value="List">
+                            </div>
+ 
+                            <div class="panel-body">
+                                <div id="adminExperimentForm" class="table table-striped table-bordered hover display nowrap" width="100%">
+
+                                </div>
+                            </div>	
+                        </div>
+                    </div>                   
+
+
+                    	                                       
+                    <div  id="AdminClassExperiment" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="ms_experiment_class" class="accordion-toggle" data-toggle="collapse" data-parent="#msAdminGroup" href="#admin8">
+                                    Modify Experiment/Class connection
+                                </a>
+                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="admin8" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input class="btn btn-lg btn-primary" onclick="editExperimentClasses('add');" type="submit" value="<%= rwrb.getString("add") %>">
+								  <input class="btn btn-lg btn-primary" onclick="editExperimentClasses('remove');" type="submit" value="<%= rwrb.getString("remove") %>">
+                            </div>
+ 
+                            <div class="panel-body">
+                                <div id="adminExperimentClassForm" class="table table-striped table-bordered hover display nowrap" width="100%">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>                   
+					<br>
+					<h3>AI Chat tools</h3>					
 	
+                    <div  id="AdminChatForm" class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="admin_chat" class="accordion-toggle" data-toggle="collapse" data-parent="#msAdminGroup" href="#admin9">
+                                    Chat with OpenAI
+                                </a>
+                               	<button type="button" class="close" onclick="$('.collapseAdmin').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="admin9" class="panel-collapse collapse">  
+                            <div class="panel-body report_filters">                           
+								  <input class="btn btn-lg btn-primary" onclick="chatPromptFormDisplay();" type="submit" value="Chat Prompt">
+                            </div>
+ 
+                            <div class="panel-body">
+                                <div id="chatFormBody" class="table table-striped table-bordered hover display nowrap" width="100%">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>                   
 	
 	                    
 	
@@ -6444,7 +6811,7 @@ function updateAllCohortSlices() {
 	                        <div id="admin4" class="panel-collapse collapse">  
 	                            <div class="panel-body report_filters">                           
 									  <input class="btn btn-lg btn-primary" onclick="addCohortForm();" type="submit" value="<%= rwrb.getString("add") %>">
-									  <input class="btn btn-lg btn-primary" onclick="editCohortForm();" type="submit" value="<%= rwrb.getString("change") %>">
+									  <input class="btn btn-lg btn-primary" onclick="editCohortForm();" type="submit" value="<%= rwrb.getString("edit_view") %>">
 	                            </div>
 	 
 	                            <div class="panel-body">
@@ -6753,12 +7120,75 @@ function updateAllCohortSlices() {
 				</div>
             </div>
             <div class="modal-footer">
-				<button type="button" class="btn btn-success" onclick="editCohortFormSubmit();"><%= rb.getString("submit")%></button>
+				<button type="button" class="btn btn-success" id="editCohortFormSubmit" onclick="editCohortFormSubmit();"><%= rb.getString("submit")%></button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
             </div>
         </div>
     </div>
 </div>
+
+
+<div id="addExperimentFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<div id="add_cohort_hdr">Update Experiment</div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="newExperimentId" style="width:100px">Experiment Id:</label><input id="newExperimentId" name="newExperimentId" style="width:50px readonly"></input>
+				</div>
+				<div>
+					<label for="addExperimentName" style="width:100px">Experiment Name:</label><input id="addExperimentName" name="addExperimentName" style="width:300px"></input>
+				</div>
+				<div>			
+					<label for="addExperimentSchoolYear" style="width:100px">School Year:</label><input id="addExperimentSchoolYear" name="addExperimentSchoolYear" style="width:60px"></input>
+				</div>
+				<div>			
+					<label for="addExperimentOptionString" style="width:100px">Option String:</label><input id="addExperimentOptionString" name="addExperimentOptionString" style="width:600px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" onclick="addExperimentFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="editExperimentFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="edit_cohort_hdr"></div>Experiment</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="experimentName" style="width:100px">ID:</label><input id="experimentId" name="experimentId" style="width:50px" readonly></input>
+				</div>
+				<div>
+					<label for="experimentName" style="width:100px">Name:</label><input id="experimentName" name="experimentName" style="width:300px" readonly></input>
+				</div>
+				<div>			
+					<label for="experimentSchoolYear" style="width:100px">School Year:</label><input id="experimentSchoolYear" name="experimentSchoolYear"style="width:60px"></input>
+				</div>
+				<div>			
+					<label for="experimentOptionString" style="width:100px">Options:</label><input id="experimentOptionString" name="experimentOptionString"style="width:600px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" id="editExperimentFormSubmit" onclick="editExperimentFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div id="cohortHelpModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
@@ -6777,6 +7207,36 @@ function updateAllCohortSlices() {
         </div>
     </div>
 </div>
+
+<div id="chatPromptFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<div id="add_cohort_hdr">OpenAI chat box</div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="chatPrompt" style="width:500px">Enter Chat Prompt:</label><input id="chatPromptId" name="chatPromptId" style="width:500px"></input>
+				</div>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="chatResponse" style="width:500px">Chat Response:</label>
+<!--				<input id="chatResponseId" name="chatResponseId" style="width:500px"></input> -->
+                   	<textarea id="chatResponseId" name="responseText" class="form-control" rows="10" cols="60" required ></textarea>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" onclick="chatPromptSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#chatPromptFormModalPopup').modal('hide');"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <div id="calendarModalPopupOne" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg">
@@ -6871,7 +7331,7 @@ function updateAllCohortSlices() {
 
           		<div class="offset-md-6">
 	                <button type="button" class="btn btn-success" onclick="getFilterOne();" ><%= rb.getString("submit") %></button>
-	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupOne').modal('hide');" ><%= rb.getString("cancel") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#chatPrompt').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
     	</div>

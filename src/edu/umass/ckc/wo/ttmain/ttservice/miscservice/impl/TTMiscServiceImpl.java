@@ -1,6 +1,16 @@
 package edu.umass.ckc.wo.ttmain.ttservice.miscservice.impl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2106,6 +2117,43 @@ public class TTMiscServiceImpl implements TTMiscService {
     }
     
  */   
+    public String msAdmin(String command, String lang, String filter) throws TTCustomException {
+    	
+    	String result = "theCommand";
+    	try {
+    		Connection conn = connection.getConnection();
+    		switch (command) {
+    		case "getExperimentInfo":
+    			result = getExperimentInfo(conn, filter);
+    			break;
+    		case "getNewExperimentId":
+    			result = getNewExperimentId(conn, filter);
+    			break;
+    		case "addNewExperimentInfo":
+    			result = addNewExperimentInfo(conn, filter);
+    			break;
+    		case "updateExperimentInfo":
+    			result = updateExperimentInfo(conn, filter);
+    			break;
+    		case "adminExperimentClasses":
+    			result = adminExperimentClasses(conn, filter);
+    			break;
+    		case "chatPrompt":
+    			result = chatPrompt(conn, filter);
+    			break;
+    		default:
+    			System.out.println("unrecognized command:" + command);
+    			return "unrecognized command:" + command;
+    		}
+    	}
+    	catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
+    	
+    	return result;
+    };
+
+    
     
     public String cohortAdmin(String cohortId, String command, String lang, String filter) throws TTCustomException {
     	
@@ -2970,9 +3018,9 @@ public class TTMiscServiceImpl implements TTMiscService {
         String classId = splitter[4];
     	ResultSet rs = null;        
         
-        if (!(splitter[1].startsWith("202"))) {
-        	return "error - school year invalid";
-        }        
+//        if (!(splitter[1].startsWith("202"))) {
+//        	return "error - school year invalid";
+//        }        
         
         String regex = "^(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])/[0-9]{4}$";
 
@@ -3093,9 +3141,9 @@ public class TTMiscServiceImpl implements TTMiscService {
         	return "error - end date format invalid";
         }
                 
-        if (!(splitter[1].startsWith("202"))) {
-        	return "error - school year invalid";
-        }
+//        if (!(splitter[1].startsWith("202"))) {
+//        	return "error - school year invalid";
+//        }
 
         
         
@@ -3356,7 +3404,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 		                stmt2.close();
 		        }
         	}
-    	}
+    	} 
 
     	return result;
     	
@@ -3720,5 +3768,482 @@ public class TTMiscServiceImpl implements TTMiscService {
 		}
 		return ts;
     }
+
     
+    public String getNewExperimentId(Connection conn, String filter) throws SQLException {
+	   	
+    	String result = "error";
+    	
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;    	
+	    	
+    	String q = "select id from experiment order by id desc limit 1;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+        	rs = stmt.executeQuery();
+            if (rs.next()) {
+            	int lastId = rs.getInt("id");
+            	lastId = lastId + 1;
+                JSONObject experimentJson = new JSONObject();            	
+                experimentJson.put("newExperimentId", String.valueOf(lastId));
+            	result = experimentJson.toString();
+            }
+            stmt.close();
+        }
+        catch (Exception e) {
+        	result = "DB error";
+        	System.out.println(result);
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }    	
+    	return result;
+    	
+    	
+    }
+    
+    public String getExperimentInfo(Connection conn, String filter) throws SQLException {
+	   	
+    	
+        JSONObject experimentJson = new JSONObject();
+    	
+    	String result = "unexpected error";
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;    	
+	    	
+    	String q = "select id, name, schoolYear, optionString from  experiment where name = ?;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setString(1, filter);
+        	rs = stmt.executeQuery();
+            if (rs.next()) {
+            	experimentJson.put("id", rs.getString("id"));
+
+            	experimentJson.put("name", rs.getString("name"));
+                
+            	experimentJson.put("schoolYear", String.valueOf(rs.getInt("schoolYear")));
+
+            	experimentJson.put("optionString", String.valueOf(rs.getString("optionString")));
+            	experimentJson.put("result", "success");
+
+            }
+            else {
+            	experimentJson.put("result", "experiment not found");            	
+            }
+
+            stmt.close();
+            
+        	return experimentJson.toString();
+        }
+        catch (Exception e) {
+        	experimentJson.put("result", "DB error");            	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+        experimentJson.put("result", result);		            	
+        
+    	return experimentJson.toString();
+    	
+    	
+    }
+    
+    public String addNewExperimentInfo(Connection conn, String filter) throws SQLException {
+    	
+
+    	String[] splitter = filter.split("~");
+    	
+    	if (splitter.length < 3) {
+    		return "error - missing parameter)";
+    	}
+    	    	
+    	String search_result = "";
+    	
+        PreparedStatement stmt = null;    	
+    	ResultSet rs = null;        
+        String name = splitter[0];
+    	int schoolYear =  2023;
+        if (!(splitter[1].startsWith("202"))) {
+        	return "error - school year invalid";
+        }
+        else {
+        	schoolYear = Integer.valueOf(splitter[1]);
+        }
+        
+        
+        String q_val = "select name from experiment where name = ? ";
+
+        try {        	
+        	stmt = conn.prepareStatement(q_val);
+            stmt.setString(1, name);	  
+        	rs = stmt.executeQuery();
+            if (rs.next()) {
+            	search_result = "error - experiment already exists";
+            }
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	search_result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+        if (search_result.startsWith("error")) {
+        	return search_result;
+        }
+        
+        String result = "success";
+    	String q = "insert into experiment (name, schoolYear, optionString) values (?,?,?);";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setString(1, name);	            
+            stmt.setInt(2, schoolYear);	  
+            stmt.setString(3, splitter[2]);           	
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+     
+        return result;
+    	
+    }
+
+    
+
+    public String updateExperimentInfo(Connection conn, String filter) throws SQLException {
+    	
+
+    	String result = "success";
+
+    	String[] splitter = filter.split("~");
+    	    	
+    	int id = Integer.valueOf(splitter[0]);
+
+    	int schoolYear =  2023;
+        if (!(splitter[2].startsWith("202"))) {
+        	return "error - school year invalid";
+        }
+        else {
+        	try {
+        		schoolYear = Integer.valueOf(splitter[2]);
+        	}
+        	catch (Exception e) {
+        		schoolYear =  2023;
+        	}
+        }
+    	String optionString = splitter[3];
+        
+                
+        PreparedStatement stmt = null;    	
+    	String q = "update experiment set schoolYear = ?, optionString = ? where id = ?;";
+        try {        	
+        	stmt = conn.prepareStatement(q);
+            stmt.setInt(1, schoolYear);	            
+            stmt.setString(2, optionString);
+            stmt.setInt(3, id);	            
+            int status = stmt.executeUpdate();		
+            stmt.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());
+        	result = "error " + e.getMessage();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }    	
+    	return result;
+    	
+    }
+
+    public String adminExperimentClasses(Connection conn, String filter) throws SQLException {
+    	
+
+    	System.out.println("filter = " + filter);
+    	String[] splitter = filter.split("~");
+    	
+    	String cmd = splitter[0];
+    	String strClassId = splitter[1];
+    	String name = splitter[2];
+    	
+    	int classId = Integer.valueOf(strClassId);
+    	int experimentId = 0;
+    	
+    	String result = "";
+   	
+    	ResultSet rs1 = null;
+        PreparedStatement stmt1 = null;
+    	ResultSet rs2 = null;
+        PreparedStatement stmt2 = null;
+    	ResultSet rs3 = null;
+        PreparedStatement stmt3 = null;
+    	ResultSet rs4 = null;
+        PreparedStatement stmt4 = null;
+
+        
+		// Get id from name
+		try {
+			String q2 = "select id from experiment where name = ?;";
+
+            stmt2 = conn.prepareStatement(q2);
+            stmt2.setString(1, name);
+            rs2 = stmt2.executeQuery();
+            if (rs2.next()) {
+            	experimentId = rs2.getInt("id");
+            }
+            else {
+            	return "error - " + name + " not found";
+            }
+        	stmt2.close();
+            rs2.close();
+        } finally {
+            if (stmt2 != null)
+                stmt2.close();
+            if (rs2 != null)
+                rs2.close();
+        }
+
+		try {
+			String q2 = "select id, name, isActive from class where id = ? and isActive = 1;";
+
+            stmt2 = conn.prepareStatement(q2);
+            stmt2.setInt(1, classId);
+            rs2 = stmt2.executeQuery();
+            if (!rs2.next()) {
+            	return "class " + strClassId + ":  not found";
+            }
+        	stmt2.close();
+            rs2.close();
+        } finally {
+            if (stmt2 != null)
+                stmt2.close();
+            if (rs2 != null)
+                rs2.close();
+        }
+
+		
+    	if (cmd.equals("add")) {
+
+    		
+    		// Check for already exists
+    		try {
+				String q1 = "select cme.experimentId as cmeId, exp.id as expId, exp.name as name, cls.id as classId from experiment as exp, class as cls, class_map_experiment as cme where cls.id = ? and cme.classId = ? and exp.id = ?;";
+
+	            stmt1 = conn.prepareStatement(q1);
+	            stmt1.setInt(1, classId);
+	            stmt1.setInt(2, classId);
+	            stmt1.setInt(3, experimentId);
+	            rs1 = stmt1.executeQuery();
+	            if (rs1.next()) {
+            		result  = "Class " + strClassId + " already added to experiment: " + name;
+	            	return result;
+	            }
+	        	stmt1.close();
+	            rs1.close();
+	        } finally {
+	            if (stmt1 != null)
+	                stmt1.close();
+	            if (rs1 != null)
+	                rs1.close();
+	        }
+    		// do the insert
+	        try {
+	            String q3 = "insert into class_map_experiment (experimentId, classid) values (?,?);";
+	            stmt3 = conn.prepareStatement(q3);
+	            stmt3.setInt(1, experimentId);
+	            stmt3.setInt(2, classId);
+	            int sqlresult = stmt3.executeUpdate();
+	            
+	            if (sqlresult != 0) {
+	            	result = "Class added to cohort";
+	            }
+	            else {
+	            	result = "error - class not added"; 
+	            }
+        	
+	        	stmt3.close();
+	            return result;    	
+	        } finally {
+	            if (stmt3 != null)
+	                stmt3.close();
+	        }
+    	}
+    	
+        if (cmd.equals("remove")) {
+
+
+        	try {
+	            String q4 = "delete from class_map_experiment where experimentId = ? and classid = ?;";
+	            stmt4 = conn.prepareStatement(q4);
+	            stmt4.setInt(1, experimentId);
+	            stmt4.setInt(2, classId);
+	            int sqlresult = stmt4.executeUpdate();
+	            
+	            if (sqlresult == 0) {
+	            	result = "error - class not found"; 
+	            }
+	            else {
+	            	result = "Class removed from experiment";
+	            }
+        	
+	        	stmt4.close();
+	            return result;    	
+	        } finally {
+	            if (stmt4 != null)
+	                stmt4.close();
+	        }
+    	} 
+
+    	return result;
+    	
+    }
+    
+    
+    public String chatPrompt(Connection conn, String filter) throws SQLException {
+	   	
+    	String result = "error";
+    	
+    	
+    	
+    	
+    	result =  "";
+    	
+    	listTokens();
+    	
+    	
+    	
+    	result = prompts(filter);   	
+    	
+    	
+    	return result;
+    	
+    	
+    }
+
+
+
+
+	public String readLinesAsString(File file) {
+		List<String> returnLines = new LinkedList<String>();
+		String text = "";
+		try {
+			text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())),
+					StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return text;
+	}
+	public List<String> readLines(File file) {
+		List<String> returnLines = new LinkedList<String>();
+		try {
+			String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())),
+					StandardCharsets.UTF_8);
+			String[] lines = text.split("\n");
+			for (String line : lines) {
+				returnLines.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return returnLines;
+	}
+	public void writeStringToFile(String line, File file) {
+		try {
+			FileWriter myWriter = null;
+			if (file.exists()) {
+				myWriter = new FileWriter(file, true);//if file exists append to file. Works fine.
+			} else {
+				System.out.println("Could not find the file " + file + ". Creating it again");
+				file.createNewFile();
+				myWriter = new FileWriter(file);
+			}
+			myWriter.write(line);
+			myWriter.close();
+			// System.out.println("Successfully wrote to the file. "+file.getAbsolutePath());
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("An error occurred in writing to file " + file + " e=" + e);
+		}
+	}
+
+	public  void listTokens() {
+		try {
+		//This API will fetch the models available.
+			URL url = new URL("https://api.openai.com/v1/models");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Accept", "application/json");
+		//Make sure you put the right Organization key saved earlier.
+			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
+			con.setDoOutput(true);
+		//Make sure you put the right API Key saved earlier.
+			con.setRequestProperty("Authorization", "Bearer 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");
+			int responseCode = con.getResponseCode();
+			System.out.println("Response Code : " + responseCode);
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			System.out.println(response);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	
+	public String prompts(String question) {
+		try {
+			URL url = new URL("https://api.openai.com/v1/completions");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Accept", "application/json");
+			//Make sure you put the right Organization key saved earlier.
+			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
+			con.setDoOutput(true);
+			//Make sure you put the right API Key saved earlier.
+			con.setRequestProperty("Authorization", "Bearer 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");
+			
+        	JSONObject promptJson = new JSONObject();
+        	promptJson.put("model","text-davinci-003");
+        	promptJson.put("prompt",question);
+        	promptJson.put("max_tokens",1024);
+        	promptJson.put("temperature",0.5);
+        	String jsonInputString = promptJson.toString();
+        	
+			try (OutputStream os = con.getOutputStream()) {
+				byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+				os.write(input, 0, input.length);
+			}
+			int responseCode = con.getResponseCode();
+			System.out.println("Response Code : " + responseCode);
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			System.out.println(response);
+			String result = response.toString();
+			return result;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return e.getMessage();
+		}
+	}    
 }
