@@ -3,7 +3,7 @@ function generate_year_range() {
   
   var currentYear = Number(currenYearStr);
   var years = "";
-  for (var year = currentYear - 3; year <= currentYear; year++) {
+  for (var year = currentYear - 5; year <= currentYear; year++) {
 	  if (year == currentYear)  { 
 		  years += "<option value='" + year + "' checked>" + year + "</option>";
 	  }
