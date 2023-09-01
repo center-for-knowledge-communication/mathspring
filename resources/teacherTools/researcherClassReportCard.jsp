@@ -1156,21 +1156,21 @@ function getFilterNine() {
 
 	filterNine = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
 
-	var d1 = parseInt(document.getElementById("selectDay_r8_cal2").value);
-	var d2 =  parseInt(document.getElementById("selectDay_r8_cal1").value);
+	var d1 = parseInt(document.getElementById("selectDay_r9_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r9_cal1").value);
 
-	var m1 = parseInt(document.getElementById("month_r8_cal2").value) + 1;
-	var m2 =  parseInt(document.getElementById("month_r8_cal1").value) + 1;
+	var m1 = parseInt(document.getElementById("month_r9_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r9_cal1").value) + 1;
 	
 	if ((d1 > 0) && (d2 > 0)) {
-		$('#calendarModalPopupEight').modal('hide');
+		$('#calendarModalPopupNine').modal('hide');
 
-		var fromDate = m1 + "/" + document.getElementById("selectDay_r8_cal2").value + "/" +  document.getElementById("year_r8_cal2").value;
-		var toDate = m2 + "/" + document.getElementById("selectDay_r8_cal1").value + "/" + document.getElementById("year_r8_cal1").value;
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r9_cal2").value + "/" +  document.getElementById("year_r9_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r9_cal1").value + "/" + document.getElementById("year_r9_cal1").value;
 
 		if (languageSet == "es") {
-			fromDate = document.getElementById("selectDay_r8_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r8_cal2").value;
-			toDate = document.getElementById("selectDay_r8_cal1").value + "/" + m2 + "/" + document.getElementById("year_r8_cal1").value;
+			fromDate = document.getElementById("selectDay_r9_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r9_cal2").value;
+			toDate = document.getElementById("selectDay_r9_cal1").value + "/" + m2 + "/" + document.getElementById("year_r9_cal1").value;
 		}
 		
 		var older = Date.parse(fromDate);
@@ -1181,7 +1181,7 @@ function getFilterNine() {
 			toDate = temp;
 		}	
 
-		document.getElementById("daysFilterEight").value = fromDate + " thru " + toDate;
+		document.getElementById("daysFilterNine").value = fromDate + " thru " + toDate;
 		filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
 		
 	
@@ -1191,8 +1191,8 @@ function getFilterNine() {
 	}		
 	else {
 		if ((d1 + d2) == 0) {
-			document.getElementById("daysFilterEight").value = "";
-			filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+			document.getElementById("daysFilterNine").value = "";
+			filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterNine").value + "~" + showNamesState;
 
 			if (selectedStudentNine.length > 0) {
 				filterNine += "~" + selectedStudentNine;	
@@ -4868,7 +4868,7 @@ var completeDataChart;
 					</div>
 
 
-                    <div class="panel panel-default">
+                    <div class="panel panel-default hidden">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_nine" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
@@ -4900,7 +4900,7 @@ var completeDataChart;
 		                        <div class="panel-body report_filters">
 		                        	<div id="chooseDateRange" class="row">
 		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r9_cal1();initCalendar_r9_cal2();$('#calendarModalPopupEight').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r9_cal1();initCalendar_r9_cal2();$('#calendarModalPopupNine').modal('show');" ><%= rb.getString("choose_date_range") %></button>
 						                </div>
 		                        		<div class="col-md-3">                       
 										    <input id="daysFilterNine" style="width:220px" type="text" name="" value="" >   
@@ -5650,8 +5650,8 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterEight();" ><%= rb.getString("submit") %></button>
-	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupEight').modal('hide');" ><%= rb.getString("cancel") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterNine();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupNine').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
     	</div>
