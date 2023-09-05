@@ -579,6 +579,7 @@ function getFilterOne() {
 			a_href = a_href + "&filter=";
 			a_href = a_href + filterOne;
 			document.getElementById("downloadReportOneBtn").href = a_href;
+			$('#calendarModalPopupOne').modal('hide');
 		}
 		else {
 			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
@@ -662,6 +663,7 @@ function getFilterFour() {
 			a_href = a_href + "&filter=";
 			a_href = a_href + filterFour;
 			document.getElementById("downloadReportFourProblemBtn").href = a_href;	
+			$('#calendarModalPopupFour').modal('hide');
 		}
 		else {
 			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
@@ -681,16 +683,6 @@ function getFilterSeven() {
 			
 }
 
-
-function getFilterEight() {
-
-	var showNamesState = "N";
-	if (document.getElementById("showNamesEight").checked == true) {
-		showNamesState = "Y";
-	}
-	filterEight = "~" + "~" + showNamesState;		
-			
-}
 
 function getStudentListEight() {
 	
@@ -848,6 +840,7 @@ function getFilterThree() {
 			a_href = a_href + "&filter=";
 			a_href = a_href + filterThree;
 			document.getElementById("downloadReportThreeEmotionBtn").href = a_href;
+			$('#calendarModalPopupThree').modal('hide');
 		}
 		else {
 			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
@@ -942,6 +935,7 @@ function getFilterEight() {
 			if (selectedStudentEight.length > 0) {
 				filterEight += "~" + selectedStudentEight;	
 			}
+			$('#calendarModalPopupEight').modal('hide');
 		
 		}
 		else {
@@ -4002,17 +3996,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal1" name="selectDay_r6_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r6_cal1" onclick="next_r6_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r6_cal1" data-lang="en">
-			              <thead id="thead-month_r6_cal1"></thead>
-			              <tbody id="calendar-body_r6_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r6_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r6_cal1" onchange="jump_r6_cal1()">
@@ -4035,23 +4018,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal1" onclick="next_r6_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal1" data-lang="en">
+			              <thead id="thead-month_r6_cal1"></thead>
+			              <tbody id="calendar-body_r6_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal2" name="selectDay_r6_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r6_cal2" onclick="next_r6_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r6_cal2" data-lang="en">
-			              <thead id="thead-month_r6_cal2"></thead>
-			              <tbody id="calendar-body_r6_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r6_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r6_cal2" onchange="jump_r6_cal2()">
@@ -4074,6 +4057,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal2" onclick="next_r6_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal2" data-lang="en">
+			              <thead id="thead-month_r6_cal2"></thead>
+			              <tbody id="calendar-body_r6_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -4102,17 +4096,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal1" name="selectDay_r1_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
-			              <thead id="thead-month_r1_cal1"></thead>
-			              <tbody id="calendar-body_r1_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r1_cal1" onchange="jump_r1_cal1()">
@@ -4135,23 +4118,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
+			              <thead id="thead-month_r1_cal1"></thead>
+			              <tbody id="calendar-body_r1_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal2" name="selectDay_r1_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
-			              <thead id="thead-month_r1_cal2"></thead>
-			              <tbody id="calendar-body_r1_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r1_cal2" onchange="jump_r1_cal2()">
@@ -4174,6 +4157,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
+			              <thead id="thead-month_r1_cal2"></thead>
+			              <tbody id="calendar-body_r1_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -4202,17 +4196,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal1" name="selectDay_r4_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r4_cal1" onclick="next_r4_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r4_cal1" data-lang="en">
-			              <thead id="thead-month_r4_cal1"></thead>
-			              <tbody id="calendar-body_r4_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r4_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r4_cal1" onchange="jump_r4_cal1()">
@@ -4235,23 +4218,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal1" onclick="next_r4_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal1" data-lang="en">
+			              <thead id="thead-month_r4_cal1"></thead>
+			              <tbody id="calendar-body_r4_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal2" name="selectDay_r4_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r4_cal2" onclick="next_r4_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r4_cal2" data-lang="en">
-			              <thead id="thead-month_r4_cal2"></thead>
-			              <tbody id="calendar-body_r4_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r4_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r4_cal2" onchange="jump_r4_cal2()">
@@ -4274,6 +4257,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal2" onclick="next_r4_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal2" data-lang="en">
+			              <thead id="thead-month_r4_cal2"></thead>
+			              <tbody id="calendar-body_r4_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -4303,17 +4297,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r3_cal1" name="selectDay_r3_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r3_cal1" onclick="previous_r3_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r3_cal1" onclick="next_r3_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r3_cal1" data-lang="en">
-			              <thead id="thead-month_r3_cal1"></thead>
-			              <tbody id="calendar-body_r3_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r3_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r3_cal1" onchange="jump_r3_cal1()">
@@ -4336,23 +4319,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal1" onclick="previous_r3_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal1" onclick="next_r3_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal1" data-lang="en">
+			              <thead id="thead-month_r3_cal1"></thead>
+			              <tbody id="calendar-body_r3_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r3_cal2" name="selectDay_r3_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r3_cal2" onclick="previous_r3_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r3_cal2" onclick="next_r3_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r3_cal2" data-lang="en">
-			              <thead id="thead-month_r3_cal2"></thead>
-			              <tbody id="calendar-body_r3_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r3_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r3_cal2" onchange="jump_r3_cal2()">
@@ -4375,6 +4358,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal2" onclick="previous_r3_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal2" onclick="next_r3_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal2" data-lang="en">
+			              <thead id="thead-month_r3_cal2"></thead>
+			              <tbody id="calendar-body_r3_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -4404,17 +4398,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r8_cal1" name="selectDay_r8_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r8_cal1" onclick="previous_r8_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r8_cal1" onclick="next_r8_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r8_cal1" data-lang="en">
-			              <thead id="thead-month_r8_cal1"></thead>
-			              <tbody id="calendar-body_r8_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r8_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r8_cal1" onchange="jump_r8_cal1()">
@@ -4437,23 +4420,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal1" onclick="previous_r8_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal1" onclick="next_r8_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal1" data-lang="en">
+			              <thead id="thead-month_r8_cal1"></thead>
+			              <tbody id="calendar-body_r8_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r8_cal2" name="selectDay_r8_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r8_cal2" onclick="previous_r8_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r8_cal2" onclick="next_r8_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r8_cal2" data-lang="en">
-			              <thead id="thead-month_r8_cal2"></thead>
-			              <tbody id="calendar-body_r8_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r8_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r8_cal2" onchange="jump_r8_cal2()">
@@ -4476,6 +4459,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal2" onclick="previous_r8_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal2" onclick="next_r8_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal2" data-lang="en">
+			              <thead id="thead-month_r8_cal2"></thead>
+			              <tbody id="calendar-body_r8_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
