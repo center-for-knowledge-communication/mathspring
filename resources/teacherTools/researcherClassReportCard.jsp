@@ -508,7 +508,7 @@ function getFilterLandingTwo() {
 }
 
 
-function getFilterSix() {
+function getFilterSix(submit) {
 	
 	document.getElementById("daysFilterSix").value = "";
 		
@@ -562,7 +562,8 @@ function getFilterSix() {
 		
 	}
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupSix').modal('hide');
 			document.getElementById("daysFilterSix").value = "";
 			filterSix = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterSix").value + "~" + showNamesState;
 
@@ -579,13 +580,15 @@ function getFilterSix() {
 			document.getElementById("downloadReportSixBtn").href = a_href;
 		}
 		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
 		}
 	}
 	
 }
 
-function getFilterOne() {
+function getFilterOne(submit) {
 
 	document.getElementById("daysFilterOne").value = "";
 	
@@ -632,7 +635,8 @@ function getFilterOne() {
 		document.getElementById("downloadReportOneBtn").href = a_href;
 	}
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupOne').modal('hide');
 			document.getElementById("daysFilterOne").value = "";
 			filterOne = "~" + "" + "~" + showNamesState;			
 			var a_href = '${pageContext.request.contextPath}';
@@ -645,12 +649,14 @@ function getFilterOne() {
 			document.getElementById("downloadReportOneBtn").href = a_href;
 		}
 		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
 		}
 	}
 }
 
-function getFilterFour() {
+function getFilterFour(submit) {
 
 	document.getElementById("daysFilterFour").value = "";
 	
@@ -703,7 +709,8 @@ function getFilterFour() {
 		document.getElementById("downloadReportFourProblemBtn").href = a_href;
 	}
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupFour').modal('hide');
 			document.getElementById("daysFilterFour").value= "";	
 		
 			filterFour = "~" + "" + "~" + "Y";		
@@ -727,19 +734,11 @@ function getFilterFour() {
 			document.getElementById("downloadReportFourProblemBtn").href = a_href;	
 		}
 		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
 		}
 	}
-}
-
-function getFilterEight() {
-
-	var showNamesState = "N";
-	if (document.getElementById("showNamesEight").checked == true) {
-		showNamesState = "Y";
-	}
-	filterEight = "~" + "~" + showNamesState;		
-			
 }
 
 function getStudentListEight() {
@@ -761,38 +760,6 @@ function getStudentListEight() {
     });
 	
 }
-
-
-function getFilterNine() {
-
-	var showNamesState = "N";
-	if (document.getElementById("showNamesNine").checked == true) {
-		showNamesState = "Y";
-	}
-	filterNine = "~" + "~" + showNamesState;		
-			
-}
-
-function getStudentListNine() {
-	
-    $.ajax({
-        type : "POST",
-        url :pgContext+"/tt/tt/getStudentList",
-        data : {
-            classId: classID
-        },
-        success : function(response) {
-        	console.log(response);
-        	studentListNine = response;
-        	populateStudentSelectionListNine()
-        },
-        error : function(e) {
-            console.log(e);
-        }
-    });
-	
-}
-
 
 function getStudentListThree() {
 	
@@ -843,7 +810,7 @@ function addStudentThree2(item, index) {
 
 
 
-function getFilterThree() {
+function getFilterThree(submit) {
 	
 	document.getElementById("daysFilterThree").value = "";
 		
@@ -906,7 +873,8 @@ function getFilterThree() {
 		
 	}
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupThree').modal('hide');
 			document.getElementById("daysFilterThree").value = "";
 			filterThree = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterThree").value + "~" + showNamesState;
 
@@ -932,7 +900,9 @@ function getFilterThree() {
 			document.getElementById("downloadReportThreeEmotionBtn").href = a_href;
 		}
 		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
 		}
 	}
 	
@@ -980,49 +950,6 @@ function populateTopicSelectionListEight() {
 	
 }
 
-var topicSelectionListNine = "";
-function populateTopicSelectionListNine() {
-
-	var topicFilter = "English";
-	if (languageSet == "es") {
-		topicFilter = "Spanish";
-	}
-    $.ajax({
-        type : "POST",
-        url : pgContext+"/tt/tt/getTeacherReports",
-        data : {
-            classId: classID,
-            teacherId: teacherID,
-            reportType: 'getClassTopicNamesList',
-            lang: loc,
-            filter: topicFilter
-        },
-        success : function(data) {        
-        	var topicData = $.parseJSON(data);
-           	
-
-            for (var i = 0; i < topicData.length; i++) {
-            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
-            }
-
-            topicSelectionListNine = "<select name='topics' id='topicsNine' size='5' style='width:220px' >"; 	
-
-            for (var i = 0; i < topicData.length; i++) {
-        		topicSelectionListNine += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
-            }
-        	studentSelectionListEight += "</select>";
-        	document.getElementById("topicSelectionListNine").innerHTML=topicSelectionListNine; 
-            
-        },
-        error : function(e) {
-            console.log(e);
-        }
-	});
-
-	
-}
-
-
 var studentSelectionListEight = "";
 function populateStudentSelectionListEight() {
 	
@@ -1050,38 +977,9 @@ function addStudentEight2(item, index) {
 	}
 }
 
-var studentSelectionListNine = "";
-function populateStudentSelectionListNine() {
+function getFilterEight(submit) {
 	
-	var studentsArrNine = studentListNine.split(",");	
-
-	studentSelectionListNine = "<select name='students' id='studentsNine' size='5' style='width:220px' >"; 	
-	studentsArrNine.forEach(addStudentNine1);
-	studentsArrNine.forEach(addStudentNine2);
-	studentSelectionListNine += "</select>";
-	document.getElementById("studentSelectionListNine").innerHTML=studentSelectionListNine; 
-
-}
-
-function addStudentNine1(item, index) {
-	var sArr = item.split("~");
-	if ((sArr[2].length + sArr[1].length) > 0) {
-		studentSelectionListNine += "<option value='" + sArr[3]  + "'>" + sArr[2] + " "  +  sArr[1]  + "</option>";
-	}
-}
-
-function addStudentNine2(item, index) {
-	var sArr = item.split("~");
-	if  ((sArr[2].length + sArr[1].length) == 0) {
-		studentSelectionListNine += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
-	}
-}
-
-
-
-function getFilterEight() {
-	
-	//document.getElementById("daysFilterEight").value = "";
+	document.getElementById("daysFilterEight").value = "";
 		
 	var showNamesState = "N";
 	if (document.getElementById("showNamesEight").checked == true) {
@@ -1090,7 +988,7 @@ function getFilterEight() {
 
 	var selectedStudentEight =  document.getElementById("studentsEight").value;
 
-	filterEight = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
+	filterEight = "~" + "~" + showNamesState;
 
 	var d1 = parseInt(document.getElementById("selectDay_r8_cal2").value);
 	var d2 =  parseInt(document.getElementById("selectDay_r8_cal1").value);
@@ -1118,7 +1016,7 @@ function getFilterEight() {
 		}	
 
 		document.getElementById("daysFilterEight").value = fromDate + " thru " + toDate;
-		filterEight = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+		filterEight = "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
 		
 	
 		if (selectedStudentEight.length > 0) {
@@ -1126,81 +1024,21 @@ function getFilterEight() {
 		}
 	}		
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupEight').modal('hide');
 			document.getElementById("daysFilterEight").value = "";
-			filterEight = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
 
+			filterEight = "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+			
+		
 			if (selectedStudentEight.length > 0) {
 				filterEight += "~" + selectedStudentEight;	
+			}		
+		}
+		else {					
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
 			}
-		
-		}
-		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
-		}
-	}
-	
-}
-
-
-function getFilterNine() {
-	
-	//document.getElementById("daysFilterNine").value = "";
-		
-	var showNamesState = "N";
-	if (document.getElementById("showNamesNine").checked == true) {
-		showNamesState = "Y";
-	}
-
-	var selectedStudentNine =  document.getElementById("studentsNine").value;
-
-	filterNine = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
-
-	var d1 = parseInt(document.getElementById("selectDay_r9_cal2").value);
-	var d2 =  parseInt(document.getElementById("selectDay_r9_cal1").value);
-
-	var m1 = parseInt(document.getElementById("month_r9_cal2").value) + 1;
-	var m2 =  parseInt(document.getElementById("month_r9_cal1").value) + 1;
-	
-	if ((d1 > 0) && (d2 > 0)) {
-		$('#calendarModalPopupNine').modal('hide');
-
-		var fromDate = m1 + "/" + document.getElementById("selectDay_r9_cal2").value + "/" +  document.getElementById("year_r9_cal2").value;
-		var toDate = m2 + "/" + document.getElementById("selectDay_r9_cal1").value + "/" + document.getElementById("year_r9_cal1").value;
-
-		if (languageSet == "es") {
-			fromDate = document.getElementById("selectDay_r9_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r9_cal2").value;
-			toDate = document.getElementById("selectDay_r9_cal1").value + "/" + m2 + "/" + document.getElementById("year_r9_cal1").value;
-		}
-		
-		var older = Date.parse(fromDate);
-		var newer = Date.parse(toDate);
-		if (newer < older) {
-			var temp = fromDate;
-			fromDate = toDate;
-			toDate = temp;
-		}	
-
-		document.getElementById("daysFilterNine").value = fromDate + " thru " + toDate;
-		filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
-		
-	
-		if (selectedStudentNine.length > 0) {
-			filterNine += "~" + selectedStudentNine;	
-		}
-	}		
-	else {
-		if ((d1 + d2) == 0) {
-			document.getElementById("daysFilterNine").value = "";
-			filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterNine").value + "~" + showNamesState;
-
-			if (selectedStudentNine.length > 0) {
-				filterNine += "~" + selectedStudentNine;	
-			}
-		
-		}
-		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
 		}
 	}
 	
@@ -3032,7 +2870,7 @@ var completeDataChart;
     });
 
     $('#showReportThreeBtn').on('click', function ()  {    	
-        getFilterThree();
+        getFilterThree('submit');
         $('#collapseThreeLoader').show();
         $.ajax({
             type : "POST",
@@ -3066,7 +2904,7 @@ var completeDataChart;
     $('#showReportFourBtn').on('click', function ()  {    	
 
    
-        getFilterFour();
+        getFilterFour('submit');
         $('#collapseFourLoader').show();
 
         $.ajax({
@@ -3240,7 +3078,7 @@ var completeDataChart;
         var showProblemNames = true;
         var forPaper = false;
         
-		getFilterEight();
+		getFilterEight('submit');
         
         var testFilterEight = filterEight.split("~");
         if (testFilterEight.length < 4) {
@@ -3647,7 +3485,7 @@ var completeDataChart;
                   	       title: '<%= rb.getString("problems")%>',
                   	     },
              	         yaxis: {
-                    	   title: '<%= rb.getString("mastery")%>',
+                    	   title: '<%= rb.getString("difficulty")%> & <%= rb.getString("mastery")%>',
                     	   dtick: 0.2,
                       	   range: [0, 10]
                     	 },
@@ -3697,429 +3535,6 @@ var completeDataChart;
 
     });
 
-	$('#showReportNineBtn').on('click', function ()  {    	
-
-	  	   
-        getFilterNine();
-        
-        var testFilterNine = filterNine.split("~");
-        if (testFilterNine.length < 4) {
-        	alert("You must select a student");
-        	return;
-        }
-        
-        $("#studentProblemAchievementReport").hide();
-        $('#collapseNineLoader').show();
-
-            
-        $.ajax({
-            type : "POST",
-            url : pgContext+"/tt/tt/getTeacherReports",
-            data : {
-                classId: classID,
-                teacherId: teacherID,
-                reportType: 'perStudentReport',
-                lang: loc,
-                filter: filterNine
-            },
-            success : function(data) {
-                $('#collapseNineLoader').hide();
-                var jsonData = $.parseJSON(data);
-                effortMap = jsonData.effortChartValues;
-                emotionMap = jsonData.fullstudentEmotionsMap;
-                commentsMap = jsonData.fullstudentEmotionsComments;
-                emotionLevelOne = jsonData.levelOneData;
-                eachStudentData = jsonData.eachStudentDataValues;
- 
- 
-                var selectedStudentInfo = emotionLevelOne[0];
-                if (selectedStudentInfo == null) {
-                	alert("<%= rb.getString("no_student_activity_found")%>");
-                	return;
-                }
-                var selectedStudentId = selectedStudentInfo[0];
-           		
-                var studentDataList = eachStudentData[selectedStudentId];
-                var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
-/*
-                outputStudentDataList.sort(function(a,b) {
-                    if(a[10] == 'Problem was not completed')
-                        return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
-                    if( b[10] == 'Problem was not completed' )
-                        return new Date('1900-01-01 00:00:00.0').getTime() - new Date('1900-01-01 00:00:01.0').getTime();
-                    else
-                        return new Date(b[10]).getTime() - new Date(a[10]).getTime();
-                });
-*/                                          
-				var selectedTopicNine =  document.getElementById("topicsNine").value;
-
-				var rptNineTitle = '<%= rb.getString("student_problem_solving_history")%>';
-				if (selectedTopicNine.length > 0) {
-					rptNineTitle = rptNineTitle + " ( " + topicNameMap.get(selectedTopicNine) + " )";
-				}
-           		var problems = [];
-           		var problemIds = [];
-           		var hints = [];
-           		var attempts = [];
-           		var videos = [];
-           		var difficulty = [];
-           		var mastery = [];
-           		var topic = [];
-           		var topicname = [];
-           		var minutesOnProblem = [];
-           		var maxMinutes = 0;
-           		var barWidth = [];
-           		//var myColors = ['rgba(38, 242, 19,1)', 'rgba(38, 242, 19,1)', 'rgba(141, 211, 199,1)', 'rgba(38, 242, 19,1)', 'rgba(190, 186, 218,1)','rgba(155, 235, 148,1)','rgba(141, 211, 199,1)'];
-           		var effColors = [];
-           		var effText = [];
-           		var achievementColors = [];
-           		var achievementValues = [];
-           		
-           		var prevMastery = 0.0;
-           		var prevTopic = 0;
-           		var prevDifficulty = -1;
-           		var prevEffort = "";
-           		
-           		var maxYaxis = 1;          		
-               
-           		var useThisOne = true;
-           		
-                $.each(outputStudentDataList, function (i, obj) {
-                	useThisOne = true;
-               		var pTopic = obj[17];
-    				if ((selectedTopicNine.length > 0) && (!(pTopic == selectedTopicNine))) {
-    					useThisOne = false;
-    				}
-                	if (obj[8] === "NO DATA") {                		
-    					useThisOne = false;
-    				}
-    				
-					
-                	if (useThisOne) {                		
-	               		var p = "" + i + ": "+ obj[0];
-	               		var pHints = parseInt(obj[6]);
-	               		var pAttempts = parseInt(obj[7]);
-	               		var pVideos = parseInt(obj[12]);
-						problems.push(p);
-	               		effColors.push(getEffortColorRGB(obj[8]));
-	               		effText.push(obj[8]);
-	               		hints.push(parseInt(obj[6], 10));
-	               		attempts.push(parseInt(obj[7], 10));
-	               		videos.push(parseInt(obj[12], 10));
-	               		var currDifficulty = parseFloat(obj[15], 10);
-	               		currDifficulty = 10.0 * currDifficulty;
-	               		difficulty.push(currDifficulty);
-	               		
-	               		
-	               		
-	               		var currAchievement = 0;
-	               		
-	               		if (prevDifficulty > 0) {
-	               			currAchievement = (currDifficulty + prevDifficulty ) /2;
-	               		}
-	               		else {
-	               			currAchievement = currDifficulty;
-	               		}
-	               		
-	               		achievementValues.push(currAchievement);
-	               		
-	               		if ((obj[8] == "SOF") || (obj[8] == "ATT")) {
-	               			prevDifficulty = currDifficulty
-		               		achievementColors.push(getAchievementColorRGB(currAchievement));
-	               		}
-	               		else {
-		               		achievementColors.push(getAchievementColorRGB(0));	               			
-	               		}
-	               		
-	               		
-	               		topic.push(pTopic);
-	               		var ptopicname = topicNameMap.get(pTopic);
-	               		topicname.push(ptopicname);
-	               		var pmastery = parseFloat(obj[16], 10);
-	               		if ((pmastery == 0.0) && (pTopic == prevTopic) && (obj[10] === "Problem was not completed")) {
-	               			pmastery = prevMastery;
-	               		}
-	               		else {
-	               			pmastery = 10.0 * pmastery;
-	               		}
-	               		mastery.push(pmastery);
-	               		prevMastery = pmastery;
-	               		prevTopic = pTopic;
-	               		barWidth.push(1);
-	               		problemIds.push(obj[11]);
-	               		var isSolved = parseInt(obj[4], 10);
-		        		var timeToSolve = parseInt(obj[19], 10);
-		        		if (timeToSolve < 0) {
-		        			timeToSolve = 0;
-		        		}
-		        		var minutesToSolve = timeToSolve/60000;
-		        		if (minutesToSolve > 15) {
-		        			minutesToSolve = 15;
-		        		}
-		        		
-		        		var timeToFirstAttempt = parseInt(obj[20], 10);
-		        		if (timeToFirstAttempt < 0) {
-		        			timeToFirstAttempt = 0;
-		        		}
-						var minutesToFirstAttempt =  timeToFirstAttempt/60000;
-		        		if (minutesToFirstAttempt > 15) {
-		        			minutesToFirstAttempt = 15;
-		        		}
-											
-		        		if (minutesToSolve > maxYaxis) {
-		        			maxYaxis = minutesToSolve;
-		        		}
-	    			
-		        		if (pHints > maxYaxis) {
-		        			maxYaxis = pHints;
-		        		}
-		        		if (pAttempts > maxYaxis) {
-		        			maxYaxis = pAttempts;
-		        		}
-	
-		        		if (pVideos > maxYaxis) {
-		        			maxYaxis = pVideos;
-		        		}	        		
-	
-	   					if (isSolved > 0) {
-	                   		minutesOnProblem.push(minutesToSolve);    						
-	   					}
-	   					else {
-	   						if (minutesToFirstAttempt > 0) {	
-	   							minutesOnProblem.push(minutesToFirstAttempt);
-	   						}
-	   						else {
-	   						}
-	   					}
-						minutesOnProblem.push(0.2);
-   					
-                	}
-                });
-
-				maxYaxis = maxYaxis;
-        		if (maxYaxis > 15) {
-        			maxYaxis = 15;
-        		}
-        		
-        		if (maxYaxis < 10) {
-        			maxYaxis = 10;
-        		}
-
-        		
-				var maxWidth = 800;       
-				if (problems.length > 16) {
-					maxWidth = problems.length * 50;    		 
-				}
-                
-           		var traceHints = {
-             			  x: problems,
-         				  y: hints, 
-						  name: '<%= rb.getString("hints")%>',
-         				  type: 'scatter',
-       					  mode: 'lines+markers',
-       					  marker: {
-       					    color: 'rgb(219, 64, 82)',
-       					    size: 8
-       					  },
-       					  line: {
-       					    color: 'rgb(219, 64, 82)',
-       					    width: 1
-       					  }         				
-         		};
-
-           		var traceAttempts = {
-           			  x: problems,
-       				  y: attempts, 
-					  name: '<%= rb.getString("attempts")%>',
-       				  type: 'scatter',
-   					  mode: 'lines+markers',
-   					  marker: {
-   					    color: 'rgb(55, 128, 191)',
-   					    size: 8
-   					  },
-   					  line: {
-   					    color: 'rgb(55, 128, 191)',
-   					    width: 1
-   					  }         				
-       				};
-
-           		var traceVideos = {
-             			  x: problems,
-         				  y: videos, 
-  					  name: '<%= rb.getString("videos")%>',
-         				  type: 'scatter',
-     					  mode: 'lines+markers',
-     					  marker: {
-     					    color: 'rgb(153, 0, 153)',
-     					    size: 8
-     					  },
-     					  line: {
-     					    color: 'rgb(153, 0, 153)',
-     					    width: 1
-     					  }         				
-         				};
- 
-           		var traceDifficulty = {
-           			  x: problems,
-       				  y: difficulty, 
-					  name: '<%= rb.getString("difficulty")%>',
-					  yaxis: 'y',
-					  type: 'scatter',
-   					  mode: 'lines+markers',
-   					  marker: {
-   					    color: 'rgb(0, 0, 0)',
-   					    size: 8
-   					  },
-   					  line: {
-   					    color: 'rgb(0, 0, 0)',
-   					    width: 2
-   					  }         				
-       				};
-           		
-           		var traceMastery = {
-             			  x: problems,
-         				  y: mastery, 
-	  					  name: '<%= rb.getString("mastery")%>',
-						  yaxis: 'y',
-         				  type: 'scatter',
-     					  mode: 'lines+markers',
-     					  marker: {
-     					    color: 'rgb(0, 153, 51)',
-     					    size: 8
-     					  },
-     					  line: {
-     					    color: 'rgb(0, 153, 51)',
-     					    width: 2
-     					  },        				
-               	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
-                          text: topicname,
-
-         				};
-           		
-           		var traceAchievement = {
-           			  x: problems,
-       				  y: achievementValues, 
-	  					  name: 'Achievement',
-						  yaxis: 'y',
-       				  type: 'scatter',
-   					  mode: 'markers',
-       				  marker:{
-       				    color: achievementColors,
-       				 	symbol: 'diamond',
-       				 	size: 8
-     				  },
-  				
-             	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
-                        text: topicname,
-
-       				};
-         		
-/*          		
-           		var trace3 = {
-           				  x: [problems], 
-           				  y: [1, 1, 2, 3, 4, 3, 5],
-           				  name: 'Minutes',
-           				  marker:{
-           				    color: myColors
-           				  },
-           				  type: 'bar'
-           				};
-*/
-           		var traceProblems = {
-           			  x: problems,
-           			  y: minutesOnProblem,
-       				  name: '<%= rb.getString("minutes")%>',
-       				  showlegend: false,
-       				  mode: 'markers',
-       				  marker:{
-         				    color: effColors
-       				  },
-           			  type: 'bar',
-           	          hovertemplate: '<%= rb.getString("minutes")%> %{y:.2f}<br><i><%= rb.getString("click_to_see_the_problem")%></i>',           			  
-                      text: effText,
-           			};           		
-           		
- 		
-           		var data = [];
-                if (document.getElementById("trackHintsNine").checked == true) {
-	           		data.push(traceHints);
-                }
-                if (document.getElementById("trackAttemptsNine").checked == true) {
-		           	data.push(traceAttempts);
-                }
-                if (document.getElementById("trackVideosNine").checked == true) {
-    	       		data.push(traceVideos);
-                }
-                if (document.getElementById("trackDifficultyNine").checked == true) {
-    	       		data.push(traceDifficulty);
-                }
-                if (document.getElementById("trackMasteryNine").checked == true) {
-    	       		data.push(traceMastery);
-                }
-                if (document.getElementById("trackAchievementNine").checked == true) {
-    	       		data.push(traceAchievement);
-                }
-           		data.push(traceProblems);
-//           		var data = [traceHints, traceAttempts, traceVideos, traceProblems];
-
-           	    layout = {
-           	    	 width:(maxWidth),
-           	    	 height:800,          	         
-           	    	 xaxis: {
-               	       type: 'category',
-               	       title: '<%= rb.getString("problems")%>',
-               	     },
-          	         yaxis: {
-                 	   title: '<%= rb.getString("difficulty")%> / <%= rb.getString("mastery")%>',
-                 	   dtick: .25,
-                   	   range: [0, maxYaxis]
-                 	 },
-           			 
-                 	 legend: {
-                 	    x: 0,
-                 	    y: 1,
-                 	    traceorder: 'normal',
-                 	    font: {
-                 	      family: 'sans-serif',
-                 	      size: 16,
-                 	      color: '#000'
-                 	    },
-                 	    bgcolor: '#E2E2E2',
-                 	    bordercolor: '#000000',
-                 	    borderwidth: 1
-                 	 },           	         
-           	    	 hovermode:'x',
-           	         title:rptNineTitle ,
-           	      	 displayModeBar: false,
-
-           	      };   
-           	    
-                var myPlot = document.getElementById('');
-           		
-           		Plotly.newPlot('studentProblemAchievementReportNine', data, layout);     
-           		
-           		myPlot.on('plotly_click', function(data){
-					var i = data.points[0].pointIndex;
-					var myY = data.points[0].fullData.y[i];
-					var imageURL = problem_imageURL+problemIds[i] +'.jpg';
-					document.getElementById('studentProblemAchievementSnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
-			        $("#studentProblemAchievementPopup").modal('show');
-           		});
-
-           		populateTopicSelectionListNine();
-           		$("#studentProblemAchievementReportNine").show();
-                
-            },
-            error : function(e) {
-                console.log(e);
-            }
-        });
-        
-        
-
-
-    });
-    
     
     $('body').on('click', 'a.getStudentDetail', function () {
         $(this).children(':first').toggleClass('rotate-icon');
@@ -4398,20 +3813,17 @@ var completeDataChart;
             handleclickHandlers();
             $("#content-conatiner").children().hide();
         
-            getFilterOne();
-            getFilterFour();
+            getFilterOne('');
+            getFilterFour('');
 
             getStudentListThree();           
-          	getFilterThree();
+          	getFilterThree('');
             
             getStudentListSix();           
-          	getFilterSix();
+          	getFilterSix('');
             
             getStudentListEight();           
-          	getFilterEight();
-          	
-            getStudentListNine();           
-          	getFilterNine();
+          	getFilterEight('');
           	
             $('#reorg_prob_sets_handler').css('background-color', '');
             $('#reorg_prob_sets_handler').css('color', '#dddddd');
@@ -4422,7 +3834,6 @@ var completeDataChart;
             $("#perStudentPerProblemSetReport").hide();
 
             populateTopicSelectionListEight();
-            populateTopicSelectionListNine();
             
         });
 
@@ -4532,7 +3943,7 @@ var completeDataChart;
                         <div id="collapseSix" class="panel-collapse collapse">                
                             <div class="panel-body report_filters">                           
 								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix();">
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterSix('');">
 							</div>
 	                        <div class="panel-body report_filters">
 	                        	<div id="chooseDateRange" class="row">
@@ -4558,7 +3969,7 @@ var completeDataChart;
 	
 							</div>
                             <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesSix" name="" value="Y"  onblur="getFilterSix('');" checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
 								  <input id="showReportSixBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -4609,7 +4020,7 @@ var completeDataChart;
                         <div id="collapseThree" class="panel-collapse collapse">
                            <div class="panel-body report_filters hidden">                           
 								  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterThree();">
+								  <input id="standardsFilter" style="width:48px" type="text" name="" value="" onblur="getFilterThree('');">
 							</div>
 	                        <div class="panel-body report_filters">
 	                        	<div id="chooseDateRange" class="row">
@@ -4635,7 +4046,7 @@ var completeDataChart;
 	
 							</div>
                             <div class="panel-body report_filters">
-      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesThree" name="" value="Y"  onblur="getFilterThree();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesThree" name="" value="Y"  onblur="getFilterThree('');"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
                             </div>
                             <div class="panel-body report_filters">                           
 								  <input id="showReportThreeBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -4674,7 +4085,7 @@ var completeDataChart;
 					                </div>
 	 							</div>
 	                            <div class="panel-body report_filters">
-	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesOne" name="" value="Y"  onblur="getFilterOne('');"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
     	                        </div>
 	 						</div>  
                             <div class="panel-body report_filters">                           
@@ -4743,7 +4154,7 @@ var completeDataChart;
                         <div id="collapseFour" class="panel-collapse collapse">
 	                            <div class="panel-body report_filters hidden">                           
 									  <label class="report_filters"><%= rb.getString("standards_e_g") %></label>
-									  <input id="standardsFilterFour" style="width:48px" type="text" name="" value="" onblur="getFilterFour();">
+									  <input id="standardsFilterFour" style="width:48px" type="text" name="" value="" onblur="getFilterFour('');">
 								</div>
 	                            <div class="panel-body report_filters">                           
 		                        	<div id="chooseDateRange" class="row">
@@ -4800,19 +4211,19 @@ var completeDataChart;
                         </div>
                         <div id="collapseEight" class="panel-collapse collapse">
 	                            <div class="panel-body report_filters">                           
-									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');" checked>
 									  <label class="report_filters">Track Mastery</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();" checked>
+									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');" checked>
 									  <label class="report_filters">Track Difficulty</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Attempts</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackHints" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackHints" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Hints</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight();">
+									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Videos</label>
 								</div>
 		                        <div class="panel-body report_filters">
@@ -4853,7 +4264,7 @@ var completeDataChart;
 		
 		
 	                            <div class="panel-body report_filters hidden">
-	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight('');"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
 	                            </div>
 	                            <div class="panel-body report_filters">                           
 									  <input id="showReportEightBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -4863,86 +4274,6 @@ var completeDataChart;
 			            	<div id="studentProblemHistoryReport" style="overflow-x: scroll;overflow-y: scroll;">
 			            	</div> 
 			            	<div id="studentProblemAchievementReport" style="overflow-x: scroll;overflow-y: scroll;">
-			            	</div> 
-                        </div>
-					</div>
-
-
-                    <div class="panel panel-default hidden">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a id="report_nine" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
-									<%= rb.getString("student_gradebook_problem_solving_history") %>
-                                </a>
-                                <button id="nineButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
-                            </h4>
-                        </div>
-                        <div id="collapseNine" class="panel-collapse collapse">
-	                            <div class="panel-body report_filters hidden">                           
-									  <input id="trackMasteryNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
-									  <label class="report_filters">Track Mastery</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackDifficultyNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
-									  <label class="report_filters">Track Difficulty</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackAchievementNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();" checked>
-									  <label class="report_filters">Track Achievement</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackAttemptsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();">
-									  <label class="report_filters">Track Attempts</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackHintsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine();">
-									  <label class="report_filters">Track Hints</label>
-									  &nbsp;|&nbsp;
-									  <input id="trackVideosNine" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterNine();">
-									  <label class="report_filters">Track Videos</label>
-								</div>
-		                        <div class="panel-body report_filters">
-		                        	<div id="chooseDateRange" class="row">
-		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r9_cal1();initCalendar_r9_cal2();$('#calendarModalPopupNine').modal('show');" ><%= rb.getString("choose_date_range") %></button>
-						                </div>
-		                        		<div class="col-md-3">                       
-										    <input id="daysFilterNine" style="width:220px" type="text" name="" value="" >   
-						                </div>
-		 							</div>  
-		
-								</div>
-							     <div class="panel-body report_filters">
-	                        		<div class="row">
-	                        			<div class="col-md-2 offset-md-1">
-											<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
-	                        			</div>
-	                        			<div class="col-md-3">
-	                        			</div>
-	                        			<div class="col-md-3">
-											<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
-	                        			</div>
-	                        		</div>
-	                        		<div class="row">
-	                        			<div id="studentSelectionListNine" name="studentSelectionListNine" class="col-md-2 offset-md-1"> 
-											<select name='students' id='studentsNine' size='5' style='width:220px' >
-											</select>				                
-										</div>
-	                        			<div class="col-md-3">
-	                        			</div>	                        		
-		                        		<div id="topicSelectionListNine" name="topicSelectionListNine" class="col-md-3">                       
-											<select name='topics' id='topicsNine' size='5' style='width:220px' >
-											</select>				                
-										</div>
-									</div>
-	                            </div>                            
-		
-		
-	                            <div class="panel-body report_filters hidden">
-	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesNine" name="" value="Y"  onblur="getFilterNine();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
-	                            </div>
-	                            <div class="panel-body report_filters">                           
-									  <input id="showReportNineBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
-								</div>
-                            <div id="collapseNineLoader" class="loader" style="display: none" >
-                           	</div>                            
-			            	<div id="studentProblemAchievementReportNine" style="overflow-x: scroll;overflow-y: scroll;">
 			            	</div> 
                         </div>
 					</div>
@@ -4967,17 +4298,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal1" name="selectDay_r6_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r6_cal1" onclick="next_r6_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r6_cal1" data-lang="en">
-			              <thead id="thead-month_r6_cal1"></thead>
-			              <tbody id="calendar-body_r6_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r6_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r6_cal1" onchange="jump_r6_cal1()">
@@ -5000,23 +4320,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal1" onclick="previous_r6_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal1" onclick="next_r6_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal1" data-lang="en">
+			              <thead id="thead-month_r6_cal1"></thead>
+			              <tbody id="calendar-body_r6_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r6_cal2" name="selectDay_r6_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r6_cal2" onclick="next_r6_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r6_cal2" data-lang="en">
-			              <thead id="thead-month_r6_cal2"></thead>
-			              <tbody id="calendar-body_r6_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r6_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r6_cal2" onchange="jump_r6_cal2()">
@@ -5039,6 +4359,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r6_cal2" onclick="previous_r6_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r6_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r6_cal2" onclick="next_r6_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r6_cal2" data-lang="en">
+			              <thead id="thead-month_r6_cal2"></thead>
+			              <tbody id="calendar-body_r6_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5046,7 +4377,7 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterSix();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterSix('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupSix').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
@@ -5067,17 +4398,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal1" name="selectDay_r1_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
-			              <thead id="thead-month_r1_cal1"></thead>
-			              <tbody id="calendar-body_r1_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r1_cal1" onchange="jump_r1_cal1()">
@@ -5100,23 +4420,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
+			              <thead id="thead-month_r1_cal1"></thead>
+			              <tbody id="calendar-body_r1_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal2" name="selectDay_r1_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
-			              <thead id="thead-month_r1_cal2"></thead>
-			              <tbody id="calendar-body_r1_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r1_cal2" onchange="jump_r1_cal2()">
@@ -5139,6 +4459,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
+			              <thead id="thead-month_r1_cal2"></thead>
+			              <tbody id="calendar-body_r1_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5146,7 +4477,7 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterOne();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterOne('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupOne').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
@@ -5167,17 +4498,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal1" name="selectDay_r4_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r4_cal1" onclick="next_r4_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r4_cal1" data-lang="en">
-			              <thead id="thead-month_r4_cal1"></thead>
-			              <tbody id="calendar-body_r4_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r4_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r4_cal1" onchange="jump_r4_cal1()">
@@ -5200,23 +4520,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal1" onclick="previous_r4_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal1" onclick="next_r4_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal1" data-lang="en">
+			              <thead id="thead-month_r4_cal1"></thead>
+			              <tbody id="calendar-body_r4_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r4_cal2" name="selectDay_r4_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r4_cal2" onclick="next_r4_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r4_cal2" data-lang="en">
-			              <thead id="thead-month_r4_cal2"></thead>
-			              <tbody id="calendar-body_r4_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r4_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r4_cal2" onchange="jump_r4_cal2()">
@@ -5239,6 +4559,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r4_cal2" onclick="previous_r4_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r4_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r4_cal2" onclick="next_r4_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r4_cal2" data-lang="en">
+			              <thead id="thead-month_r4_cal2"></thead>
+			              <tbody id="calendar-body_r4_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5246,7 +4577,7 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterFour();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterFour('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupFour').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
@@ -5268,17 +4599,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r3_cal1" name="selectDay_r3_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r3_cal1" onclick="previous_r3_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r3_cal1" onclick="next_r3_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r3_cal1" data-lang="en">
-			              <thead id="thead-month_r3_cal1"></thead>
-			              <tbody id="calendar-body_r3_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r3_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r3_cal1" onchange="jump_r3_cal1()">
@@ -5301,23 +4621,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal1" onclick="previous_r3_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal1" onclick="next_r3_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal1" data-lang="en">
+			              <thead id="thead-month_r3_cal1"></thead>
+			              <tbody id="calendar-body_r3_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r3_cal2" name="selectDay_r3_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r3_cal2" onclick="previous_r3_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r3_cal2" onclick="next_r3_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r3_cal2" data-lang="en">
-			              <thead id="thead-month_r3_cal2"></thead>
-			              <tbody id="calendar-body_r3_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r3_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r3_cal2" onchange="jump_r3_cal2()">
@@ -5340,6 +4660,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r3_cal2" onclick="previous_r3_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r3_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r3_cal2" onclick="next_r3_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r3_cal2" data-lang="en">
+			              <thead id="thead-month_r3_cal2"></thead>
+			              <tbody id="calendar-body_r3_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5347,7 +4678,7 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterThree();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterThree('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupThree').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
@@ -5408,17 +4739,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_cal2" name="selectDay_cal_2">
 				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
-			              <thead id="thead-month_cal2"></thead>
-			              <tbody id="calendar-body_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_cal2" onchange="jump_cal2()">
@@ -5441,6 +4761,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
+			              <thead id="thead-month_cal2"></thead>
+			              <tbody id="calendar-body_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5471,17 +4802,6 @@ var completeDataChart;
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r8_cal1" name="selectDay_r8_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r8_cal1" onclick="previous_r8_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r8_cal1" onclick="next_r8_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r8_cal1" data-lang="en">
-			              <thead id="thead-month_r8_cal1"></thead>
-			              <tbody id="calendar-body_r8_cal1"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r8_cal1"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r8_cal1" onchange="jump_r8_cal1()">
@@ -5504,23 +4824,23 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal1" onclick="previous_r8_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal1" onclick="next_r8_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal1" data-lang="en">
+			              <thead id="thead-month_r8_cal1"></thead>
+			              <tbody id="calendar-body_r8_cal1"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r8_cal2" name="selectDay_r8_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r8_cal2" onclick="previous_r8_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r8_cal2" onclick="next_r8_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r8_cal2" data-lang="en">
-			              <thead id="thead-month_r8_cal2"></thead>
-			              <tbody id="calendar-body_r8_cal2"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r8_cal2"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month_r8_cal2" onchange="jump_r8_cal2()">
@@ -5543,6 +4863,17 @@ var completeDataChart;
 			                  <option value=2022>2022</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r8_cal2" onclick="previous_r8_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r8_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r8_cal2" onclick="next_r8_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r8_cal2" data-lang="en">
+			              <thead id="thead-month_r8_cal2"></thead>
+			              <tbody id="calendar-body_r8_cal2"></tbody>
+			          </table>
+			          
 			        </div>
             	</div>
             </div>
@@ -5550,114 +4881,13 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterEight();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterEight('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupEight').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>
     	</div>
 	</div>
 </div>	
-
-<div id="calendarModalPopupNine" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
-    <div class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="row">
-            <div class="modal-body" role="dialog">
-			     <div class="wrapper-calender col-sm-6">
-			      <div class="container-calendar">
-                        <input type="hidden" id="selectDay_r9_cal1" name="selectDay_r9_cal1">
-   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r9_cal1" onclick="previous_r9_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r9_cal1" onclick="next_r9_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r9_cal1" data-lang="en">
-			              <thead id="thead-month_r9_cal1"></thead>
-			              <tbody id="calendar-body_r9_cal1"></tbody>
-			          </table>
-			          
-			          <div class="footer-container-calendar">
-			              <label for="month_r9_cal1"><%= rb.getString("jump_to") %>: </label>
-			              <select id="month_r9_cal1" onchange="jump_r9_cal1()">
-			                  <option value=0><%= rb.getString("Jan") %></option>
-			                  <option value=1><%= rb.getString("Feb") %></option>
-			                  <option value=2><%= rb.getString("Mar") %></option>
-			                  <option value=3><%= rb.getString("Apr") %></option>
-			                  <option value=4><%= rb.getString("May") %></option>
-			                  <option value=5><%= rb.getString("Jun") %></option>
-			                  <option value=6><%= rb.getString("Jul") %></option>
-			                  <option value=7><%= rb.getString("Aug") %></option>
-			                  <option value=8><%= rb.getString("Sep") %></option>
-			                  <option value=9><%= rb.getString("Oct") %></option>
-			                  <option value=10><%= rb.getString("Nov") %></option>
-			                  <option value=11><%= rb.getString("Dec") %></option>
-			              </select>
-			              <select id="year_r9_cal1" onchange="jump_r9_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			              </select>       
-			          </div>
-			      </div>			      
-			    </div> 
-			    <div class="wrapper-calender col-sm-6">
-			      <div class="container-calendar">
-                        <input type="hidden" id="selectDay_r9_cal2" name="selectDay_r9_cal2">
-				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r9_cal2" onclick="previous_r9_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r9_cal2" onclick="next_r9_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r9_cal2" data-lang="en">
-			              <thead id="thead-month_r9_cal2"></thead>
-			              <tbody id="calendar-body_r9_cal2"></tbody>
-			          </table>
-			          
-			          <div class="footer-container-calendar">
-			              <label for="month_r9_cal2"><%= rb.getString("jump_to") %>: </label>
-			              <select id="month_r9_cal2" onchange="jump_r9_cal2()">
-			                  <option value=0><%= rb.getString("Jan") %></option>
-			                  <option value=1><%= rb.getString("Feb") %></option>
-			                  <option value=2><%= rb.getString("Mar") %></option>
-			                  <option value=3><%= rb.getString("Apr") %></option>
-			                  <option value=4><%= rb.getString("May") %></option>
-			                  <option value=5><%= rb.getString("Jun") %></option>
-			                  <option value=6><%= rb.getString("Jul") %></option>
-			                  <option value=7><%= rb.getString("Aug") %></option>
-			                  <option value=8><%= rb.getString("Sep") %></option>
-			                  <option value=9><%= rb.getString("Oct") %></option>
-			                  <option value=10><%= rb.getString("Nov") %></option>
-			                  <option value=11><%= rb.getString("Dec") %></option>
-			              </select>
-			              <select id="year_r9_cal2" onchange="jump_r9_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			              </select>       
-			          </div>			 
-			        </div>
-            	</div>
-            </div>
-            </div>
-           <div class="modal-footer">
-
-          		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterNine();" ><%= rb.getString("submit") %></button>
-	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupNine').modal('hide');" ><%= rb.getString("cancel") %></button>
-                </div> 
-         </div>
-    	</div>
-	</div>
-</div>	
-
 
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg" style="min-width:1100px">
