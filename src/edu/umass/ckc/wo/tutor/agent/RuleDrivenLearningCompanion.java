@@ -239,4 +239,11 @@ public class RuleDrivenLearningCompanion extends LearningCompanion {
         return "rules";  // this indicates that the messages are selected by the Java class itself (as opposed to a rule-set)
     }
 
+	@Override
+	public Response processTranslateProblemRequest(SessionManager smgr, TranslateProblemEvent e, Response r)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return processEvent(smgr,e,r);
+	}
+
 }

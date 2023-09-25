@@ -121,6 +121,21 @@ public class DbSession {
         }
     }
 
+    public static void updateSessionPageLangIndex(Connection conn, int sessionId, int updatedValue) throws SQLException {
+        PreparedStatement ps = null;
+        try {
+            String q = "update session set pageLangIndex=? where id=?";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, updatedValue);
+            ps.setInt(2, sessionId);
+            int n = ps.executeUpdate();
+
+        } finally {
+            if (ps != null)
+                ps.close();
+        }
+    }
+
     /**
      * At the time the sessionMgr is built we extract some commonly used data from the session table and store it in this object
      *
@@ -132,19 +147,23 @@ public class DbSession {
     public static String[] setSessionInfo(Connection conn, int sessionId) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
+    	String[] res = new String[4];
         try {
-            String q = "select sess.studId, stud.classId, lang from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
+            String q = "select sess.studId, stud.classId, lang, pageLangIndex from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
             ps = conn.prepareStatement(q);
             ps.setInt(1, sessionId);
             rs = ps.executeQuery();
             if (rs.next()) {
-                String[] res = new String[3];
                 res[0] = String.valueOf(rs.getInt(1));    // studId
                 res[1] = String.valueOf(rs.getInt(2));    // classId
                 res[2] = rs.getString(3);                 // lang abbr from locale
+                res[3] = String.valueOf(rs.getInt(4));    // page lang index for multi-lingual
                 return res;
 //                this.curGUIState= rs.getString(2);
             } else throw new NoSessionException(sessionId);
+        } catch (Exception e){
+        	System.out.println(e.getMessage());
+        	throw new NoSessionException(sessionId);
         } finally {
             rs.close();
             ps.close();

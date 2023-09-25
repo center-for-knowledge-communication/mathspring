@@ -697,6 +697,14 @@ catch (Exception e) {
         		targetTeacherID = tlist[0];
         	}
         }
+ 
+        function altSpanishOff() {
+			document.getElementById("altSpanish").style.display = "hidden";
+       }            
+
+       function altEnglishOff() {
+			document.getElementById("altSpanish").style.display = "hidden";
+       }            
         
         
 //        document.getElementById("className").addEventListener("blur", myFunction);
@@ -927,7 +935,14 @@ catch (Exception e) {
                 $("#dropdownDiv").hide();
                                
                 });
-            		 
+
+             $("#priEnglish").click( function() {
+            	 altSpanishOff();
+             })            
+             $("#priSpanish").click( function() {
+            	 altEnglishOff();
+             })            
+            
              $("#pwdBtn").click(function () {                    
                  var pwd = document.getElementById("pwd").value; 
                  $.ajax({
@@ -1510,8 +1525,21 @@ function registerAllEvents(){
                                         <springForm:select path="classLanguage" class="form-control" id="classLanguage"
                                                            name="classLanguage">
                                             <springForm:option value=""><%= rb.getString("select_language_for_class") %></springForm:option>
-                                            <springForm:option value="en:English"><%= rb.getString("english") %></springForm:option>
-                                            <springForm:option value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+                                            <springForm:option id="priEnglish" value="en:English"><%= rb.getString("english") %></springForm:option>
+                                            <springForm:option id="priSpanish" value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+                                        </springForm:select>
+                                    </div>
+                                </div>
+                               <div class="form-group">
+                                    <label for="altLanguage"><%= rb.getString("alt_language") %></label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i
+                                                class="glyphicon glyphicon-education"></i></span>
+                                        <springForm:select path="altLanguage" class="form-control" id="altLanguage"
+                                                           name="altLanguage">
+                                            <springForm:option value="">(For bi-lingual) <%= rb.getString("select_alt_language_for_class") %>)</springForm:option>
+                                            <springForm:option id="altEnglish" value="en:English"><%= rb.getString("english") %></springForm:option>
+                                            <springForm:option id="altSPanish" value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -1553,6 +1581,7 @@ function registerAllEvents(){
                                             <springForm:option value="2021">2020/2021</springForm:option>
                                             <springForm:option value="2022">2021/2022</springForm:option>
                                             <springForm:option value="2023">2022/2023</springForm:option>
+                                            <springForm:option value="2023">2023/2024</springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -1601,9 +1630,9 @@ function registerAllEvents(){
                                             <springForm:option value="6"><%= rb.getString("grade") %> 6</springForm:option>
                                             <springForm:option value="7"><%= rb.getString("grade") %> 7</springForm:option>
                                             <springForm:option value="8"><%= rb.getString("grade") %> 8</springForm:option>
-<!--                                             
                                             <springForm:option value="9"><%= rb.getString("grade") %> 9</springForm:option>
                                             <springForm:option value="10"><%= rb.getString("grade") %> 10</springForm:option>
+<!--                                             
                                             <springForm:option value="adult"><%= rb.getString("grade") %> adult</springForm:option>
 -->
                                         </springForm:select>

@@ -18,7 +18,8 @@ public abstract class TutorHutEvent extends SessionEvent {
     protected long clickTime; //  timestamp given by Javascript (ms since Jan 1, 1970 midnight)
     protected static String ELAPSED_TIME = "elapsedTime";
     protected int eventCounter;
-    protected int langIndex;
+    protected int probLangIndex;
+    protected int translateProbId;
 
     protected HttpServletResponse servletResponse;  // THis is so the Tutor can forward to JSPs
     protected HttpServletRequest servletRequest;  // THis is so the Tutor can forward to JSPs
@@ -33,7 +34,8 @@ public abstract class TutorHutEvent extends SessionEvent {
         String et = p.getString(ELAPSED_TIME,"0");
         this.eventCounter = p.getInt("eventCounter",-1);
         this.clickTime = p.getLong("clickTime",0);
-        this.langIndex = p.getInt("langIndex",0);
+        this.probLangIndex = p.getInt("probLangIndex",0);
+        this.translateProbId = p.getInt("translateProbId",0);
         long etl=0;
         try {
             etl = Long.parseLong(et);
@@ -75,12 +77,20 @@ public abstract class TutorHutEvent extends SessionEvent {
         return clickTime;
     }
 
-    public int getLangIndex() {
-        return langIndex;
+    public int getProbLangIndex() {
+        return probLangIndex;
     }
 
-    public void setLangIndex(int langIndex) {
-        this.langIndex = langIndex;
+    public void setProbLangIndex(int probLangIndex) {
+        this.probLangIndex = probLangIndex;
     }
 
+    public int getTranslateProbId() {
+        return this.translateProbId;
+    }
+
+    public void setTranslateProbId(int translateProbId) {
+        this.translateProbId = translateProbId;
+    }
+    
 }

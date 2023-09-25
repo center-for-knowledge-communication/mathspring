@@ -25,7 +25,6 @@ import edu.umass.ckc.wo.tutor.probSel.PedagogicalModelParameters;
 import edu.umass.ckc.wo.tutor.probSel.ReviewModeProblemSelector;
 import edu.umass.ckc.wo.tutor.response.HintResponse;
 import edu.umass.ckc.wo.event.internal.InternalEvent;
-import edu.umass.ckc.wo.event.tutorhut.GazeWanderingEvent;
 import edu.umass.ckc.wo.tutor.response.ProblemResponse;
 import edu.umass.ckc.wo.tutor.response.Response;
 import edu.umass.ckc.wo.tutormeta.*;
@@ -160,7 +159,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
 
         if (e instanceof AttemptEvent) {
-        	state.setLangIndex(e.getLangIndex());
+        	state.setLangIndex(e.getProbLangIndex());
             r = processAttempt((AttemptEvent) e);
             studentModel.save();
             return r;
@@ -178,10 +177,24 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
             else if (ee.getMode().equalsIgnoreCase(REVIEW_MODE) || state.isInReviewMode())
                 r = processReviewModeNextProblemRequest(ee);
             else {
-            	state.setLangIndex(e.getLangIndex());
+            	state.setLangIndex(e.getProbLangIndex());
             	r = processNextProblemRequest((NextProblemEvent) e);
             }
             studentModel.save();
+            System.out.println("Time to process NextProblem event " + (System.currentTimeMillis() - t));
+            return r;
+        }
+
+
+        else if (e instanceof TranslateProblemEvent)  {
+        	TranslateProblemEvent ee = (TranslateProblemEvent)  e;
+            long t = System.currentTimeMillis();
+
+            state.setLangIndex(ee.getProbLangIndex());
+            state.setTranslateProbId(ee.getTranslateProbId());
+           	r = processTranslateProblemRequest((TranslateProblemEvent) ee);
+
+           	studentModel.save();
             System.out.println("Time to process NextProblem event " + (System.currentTimeMillis() - t));
             return r;
         }
@@ -200,6 +213,16 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         }
         else if (e instanceof ShowVideoEvent) {
             r = processShowVideoRequest((ShowVideoEvent) e);
+            studentModel.save();
+            return r;
+        }
+        else if (e instanceof ShowLCListEvent) {
+            r = processLCListRequest((ShowLCListEvent) e);
+            studentModel.save();
+            return r;
+        }
+        else if (e instanceof ChangeStudentLCEvent) {
+            r = processChangeStudentLCRequest((ChangeStudentLCEvent) e);
             studentModel.save();
             return r;
         }
@@ -228,10 +251,11 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         else if (e instanceof BeginProblemEvent) {
             long t = System.currentTimeMillis();
             r = processBeginProblemEvent((BeginProblemEvent) e);
-            e.setLangIndex(state.getLangIndex());
+            e.setProbLangIndex(state.getLangIndex());
+            e.setTranslateProbId(state.getTranslateProbId());
             studentModel.save();
             System.out.println("Time to process BeginProblem event " + (System.currentTimeMillis() - t));
-            System.out.println("langIndex in BeginProblem event " + String.valueOf(state.getLangIndex()));
+            System.out.println("probLangIndex in BeginProblem event " + String.valueOf(state.getLangIndex()));
 
             return r;
         }
@@ -369,7 +393,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
     }
 
-    // On request from Ivon 2/5/18 if a student report comes in about a problem we need to put it on a list of problems
+	// On request from Ivon 2/5/18 if a student report comes in about a problem we need to put it on a list of problems
     // that are broken for that user.   This gets stored in the student state that persists for all their sessions.
     //  The problem selectors will not select problems in this list.   Logs (event and problemhistory will have a special
     // status for this broken problem)
@@ -415,6 +439,9 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
     public abstract Response processGazeWanderingRequest (GazeWanderingEvent e) throws Exception;
     // results: ProblemResponse | InterventionResponse
+    
+    public abstract Response processTranslateProblemRequest (TranslateProblemEvent e) throws Exception;
+    
     public abstract Response processNextProblemRequest (NextProblemEvent e) throws Exception;
 
     public abstract Response processStudentSelectsProblemRequest (NextProblemEvent e) throws Exception;
@@ -586,4 +613,15 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
     public abstract void addPedagogicalMoveListener(PedagogicalMoveListener pml);
 
+	public Response processLCListRequest(ShowLCListEvent e) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    public Response processChangeStudentLCRequest(ChangeStudentLCEvent e) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }

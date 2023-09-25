@@ -135,6 +135,33 @@ public class DbUser {
         }
     }
 
+    public static boolean showExampleForTopic(Connection conn, int studId, int topicId) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String q = "select count(*) from studentproblemhistory where studid=? and topicId=? and isSolved = 1 limit 1";
+            ps = conn.prepareStatement(q);
+            ps.setInt(1, studId);
+            ps.setInt(2, topicId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                int problemWasSolved = rs.getInt(1);
+                if (problemWasSolved > 0)
+                	return false;
+                else
+                	return true;
+            }
+            return false;
+        } finally {
+            if (rs != null)
+                rs.close();
+            if (ps != null)
+                ps.close();
+
+        }
+    }
+
+
     /**
      * returns a worksheet location.  Left, Right, or Center
      * @param conn

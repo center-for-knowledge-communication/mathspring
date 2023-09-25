@@ -457,6 +457,80 @@ public class DbPedagogy {
 		return LCprofiles;
     }
 
+    public static String getLShortname(Connection conn, int pedId) throws SQLException {
+    	
+
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        String shortname = "";
+        try {
+        	String q = "select shortName from pedagogy p where p.id = ?"; 
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, pedId);
+            rs = stmt.executeQuery();
+            String checked = " ";
+            while (rs.next()) {
+            	shortname = rs.getString(1);
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+		return shortname;
+    }
+
+    
+    public static String getLCprofilesJSON(Connection conn, int classId, int currStudentPedId) throws SQLException {
+    	
+        JSONArray resultArr = new JSONArray();
+        String lcProfileStr = "";
+
+    	List<String> LCprofilesArr = new ArrayList<>();
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select cp.pedagogyId, p.name, p.shortName, p.lcsource, p.lang from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+//        			"UNION\r\n" + 
+//        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            String checked = " ";
+            while (rs.next()) {
+           
+            	int id = rs.getInt(1);
+            	String url = Settings.webContentPath + "LearningCompanion/";
+            	if ((rs.getString(4).equals("webContentPath2"))){
+                	url = Settings.webContentPath2 + "LearningCompanion/";
+            	}
+           		String lang = " (" + rs.getString(5) + ")";
+            	JSONObject resultJson = new JSONObject();
+            	resultJson.put("id", String.valueOf(id));                       		
+            	resultJson.put("lcname", rs.getString(2));                       		
+            	resultJson.put("lcshortname", rs.getString(3));                       		
+            	resultJson.put("lang", lang);                 
+            	resultJson.put("url",url);
+                resultArr.add(resultJson);
+           
+            }
+            Collections.shuffle(resultArr);
+            lcProfileStr = resultArr.toString();
+
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+		return lcProfileStr;
+    }
+    
+    
+    
     public static String getSelectableLCprofiles(Connection conn) throws SQLException {
         JSONArray resultArr = new JSONArray();
         String lcProfileStr = "";

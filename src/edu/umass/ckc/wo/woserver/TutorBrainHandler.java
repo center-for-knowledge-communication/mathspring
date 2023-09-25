@@ -230,6 +230,34 @@ public class TutorBrainHandler {
                 new TutorLogger(smgr).logHomeEvent((HomeEvent) e);
                 return false;
             }
+            else if (e instanceof ChangeLanguageEvent) {
+            	String res[] = DbSession.setSessionInfo(smgr.getConnection(),smgr.getSessionId());
+//            	smgr.setPageLangIndex(Integer.valueOf(res[4]));
+            	smgr.togglePageLangIndex();
+            	DbSession.updateSessionPageLangIndex(smgr.getConnection(),smgr.getSessionId(),smgr.getPageLangIndex());
+            	servletInfo.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
+
+            	
+                if (Settings.useNewGUI()) {
+                    new DashboardHandler(
+                            this.servletInfo.getServletContext(),
+                            smgr,
+                            smgr.getConnection(),
+                            servletInfo.getRequest(),
+                            servletInfo.getResponse()
+                    ).showNewSplashPage(LandingPage.JSP_NEW,false);
+                } else {
+                    new DashboardHandler(
+                            this.servletInfo.getServletContext(),
+                            smgr,
+                            smgr.getConnection(),
+                            servletInfo.getRequest(),
+                            servletInfo.getResponse()
+                    ).showSplashPage(LandingPage.JSP, false);
+                }
+                new TutorLogger(smgr).logChangeLanguageEvent((ChangeLanguageEvent) e);
+                return false;
+            }
             else if (e instanceof NavigationEvent) {
                 View v = new NavigationHandler(servletInfo.getServletContext(), smgr, servletInfo.getConn(), servletInfo.getRequest(), servletInfo.getResponse()).handleRequest((NavigationEvent) e);
                 if (v == null)
@@ -270,6 +298,8 @@ public class TutorBrainHandler {
                 String quickAuthJSP = "quickAuthProblem.jsp";
                 disp = servletInfo.getRequest().getRequestDispatcher(quickAuthJSP);
                 servletInfo.getRequest().setAttribute("problem",p);
+                servletInfo.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
+                servletInfo.getRequest().setAttribute("pageLang",smgr.getPageLocale().getLanguage());
                 servletInfo.getRequest().setAttribute("sessionId",smgr.getSessionNum());
                 servletInfo.getRequest().setAttribute("eventCounter",smgr.getEventCounter());
                 servletInfo.getRequest().setAttribute("elapsedTime",((GetQuickAuthProblemSkeletonEvent) e).getElapsedTime());

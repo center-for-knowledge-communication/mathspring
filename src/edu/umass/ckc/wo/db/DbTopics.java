@@ -323,6 +323,120 @@ public class DbTopics {
     }
 
 
+
+    /** Gets topics for a class that are active and have problems that are ready.
+     *  Takes an additional flag (includeTestableProblems ) which will also include a topic
+     *  in the return list if it has testable problems
+     * @return
+     */
+    public static List<Topic> getClassPlayableTopics (Connection conn, int classId, boolean includeTestableProblems, String lang) throws SQLException {
+        List<Topic> possibleTopics  = getClassActiveTopics(conn,classId,lang);
+        Iterator<Topic> itr = possibleTopics.iterator();
+        while (itr.hasNext()) {
+            Topic t = itr.next();
+            if (!ProblemMgr.isTopicPlayable(t.getId(), includeTestableProblems)) {
+                itr.remove();
+            }
+        }
+        return possibleTopics;
+
+    }
+
+
+
+
+
+
+    public static List<Topic> getClassActiveTopics (Connection conn, int classId, String lang) throws SQLException {
+        List<Topic> topics = getClassActiveTopicsHelper(conn, classId, false, lang);
+        if (topics.size() == 0)
+            return getClassActiveTopicsHelper(conn, classId, true, lang);
+        else return topics;
+    }
+
+
+
+
+    /**
+     *
+     * @param conn
+     * @param classId  Will be used to get active topics for a class when isDefault is false
+     * @param isDefault controls whether topics are found for the class or by using the default set of topics
+     * @return
+     * @throws SQLException
+     */
+    private static List<Topic> getClassActiveTopicsHelper (Connection conn, int classId, boolean isDefault, String lang) throws SQLException {
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
+        try {
+            String q = "select probGroupId, \r\n" + 
+            		"CONVERT (pgl.pg_lanuage_description USING utf8) as description, seqPos, CONVERT (pgl.pg_language_name USING utf8) as name \r\n" +
+            		"from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where "
+            		+(isDefault ? "isDefault=1 " : "classid=? ")+ 
+            		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
+            		"and topic.id=probGroupId and seqPos > 0 and topic.active=1 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
+            		"order by seqPos;";
+
+            
+            stmt = conn.prepareStatement(q);
+            if (!isDefault)
+                stmt.setInt(1,classId);
+            rs = stmt.executeQuery();
+            List<Topic> topics = new ArrayList<Topic>();
+            while (rs.next()) {
+
+                String topicNameStr = rs.getString("name");
+                topicNameStr = topicNameStr.replace("{", "");                
+                topicNameStr = topicNameStr.replaceAll("\"", "~");                
+                String key = "~" + lang + "~: ~";
+                int offset =  topicNameStr.indexOf(key);               
+                offset += 7;                
+                topicNameStr = topicNameStr.substring(offset);
+                int length = topicNameStr.indexOf("~");
+                String topicName = topicNameStr.substring(0,length-1);
+                
+
+            	Topic t = new Topic(rs.getInt(1),topicName);
+                t.setSeqPos(rs.getInt(3));
+                t.setOldSeqPos(t.getSeqPos());
+
+                
+                
+                
+                
+                String topicSummaryStr = rs.getString("description");
+                topicSummaryStr = topicSummaryStr.replace("{", "");                
+                topicSummaryStr = topicSummaryStr.replaceAll("\"", "~");                
+                key = "~" + lang + "~: ~";
+                offset =  topicSummaryStr.indexOf(key);               
+                offset += 7;                
+                topicSummaryStr = topicSummaryStr.substring(offset);
+                length = topicSummaryStr.indexOf("~");
+                String topicSummary = topicSummaryStr.substring(0,length-1);
+                
+                if("".equals(topicSummary) || topicSummary == null)
+                        topicSummary = "The problemset does not have a description";
+                t.setSummary(topicSummary);
+                // We get the set of CCStandards for this topic from the ProblemMgr
+                Set<CCStandard> stds = ProblemMgr.getTopicStandards(t.getId());
+                t.setCcStandards(stds);
+                topics.add(t);
+            }
+            return topics;
+        }
+        finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
+    
+    
+    
+    
     /**
     *
     * @param conn

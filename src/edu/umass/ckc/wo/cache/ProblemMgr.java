@@ -359,7 +359,7 @@ public class ProblemMgr {
                 String ml_name = name_mdo.toString();
                 Object desc_mdo = rs.getObject("pg_lanuage_description");
                 String ml_desc = desc_mdo.toString();
-                Topic t = new Topic(id, description, summary, ml_name, ml_desc);
+                Topic t = new Topic(id, ml_desc, ml_name, ml_name, ml_desc);
                 allTopics.add(t);
             }
         } finally {
@@ -394,6 +394,31 @@ public class ProblemMgr {
         return null;
     }
 
+    public static String getTopicMlName(int id, String lang)
+    {
+        for (Topic t : allTopics)
+        {
+            if (t.getId() == id)
+            {
+                return t.getMlName(lang);
+            }
+        }
+        return null;
+    }
+    
+    public static String getTopicMlDescription(int id, String lang)
+    {
+        for (Topic t : allTopics)
+        {
+            if (t.getId() == id)
+            {
+                return t.getMlDescription(lang);
+            }
+        }
+        return null;
+    }
+    
+    
     public static HashMap<String, ArrayList<String>> getVarDomain(int id, Connection conn) throws SQLException {
         String s = "select p.name, p.values from ProblemParamSet p where problemID="+Integer.toString(id);
         PreparedStatement ps = conn.prepareStatement(s);

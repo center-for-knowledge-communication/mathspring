@@ -18,16 +18,45 @@ catch (Exception e) {
 //	logger.error(e.getMessage());	
 }
 
+int pageLangIndex = 0;
+
+try {
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
+
+
+String pageLang = (String) request.getAttribute("pageLang");
+
+
 Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+
+
+try {
+	if (pageLang.equals("es")) {
+		loc = new Locale("es","US");	
+	}
+	else {
+		loc = new Locale("en","US");	
+	}	
+}
+catch (Exception e) {
+	 System.out.println("pageLang r " + e.getMessage());
+	 loc = new Locale("en","US");
+}
 
 ResourceBundle rb = null;
+
 try {
 	rb = ResourceBundle.getBundle("MathSpring",loc);
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	System.out.println(e.getMessage());
 }
+
 
 String ctx = request.getContextPath();
 
@@ -41,13 +70,24 @@ String ctx = request.getContextPath();
         <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css?ver=<%=versions.getString("css_version")%>"/>
         <script src="js/jquery-1.10.2.js"></script>
         <script>
-        	var contextPath = "<%=ctx%>";
-        	var submitText =        "<%= rb.getString("submit") %>";
-        	var stepText =          "<%= rb.getString("step") %>";
-        	var correctAnswerText = "<%= rb.getString("correct_answer") %>";
-        	var feedback =          "<%= rb.getString("feedback") %>";
-        	var hintText =          "<%= rb.getString("hint") %>";
-        	var playhintText =      "<%= rb.getString("play_hint") %>";
+	    	var submitText =        "undef";
+    		var stepText =          "undef";
+    		var correctAnswerText = "undef";
+    		var feedback =          "undef";
+    		var hintText =          "undef";
+    		var playhintText =      "undef";
+	    	var step_by_step_solution =        "undef";
+    		
+	        $(document).ready(function () {
+	        	contextPath = "<%=ctx%>";
+	        	submitText =        "<%= rb.getString("submit") %>";
+	        	stepText =          "<%= rb.getString("step") %>";
+	        	correctAnswerText = "<%= rb.getString("correct_answer") %>";
+	        	feedback =          "<%= rb.getString("feedback") %>";
+	        	hintText =          "<%= rb.getString("hint") %>";
+	        	playhintText =      "<%= rb.getString("play_hint") %>";
+	        	step_by_step_solution = "<%= rb.getString("step_by_step_solution") %>";
+	        });
 
         </script>
         <script src="js/quickAuth/format2json.js?ver=<%=versions.getString("js_version")%>"></script>
@@ -62,6 +102,26 @@ String ctx = request.getContextPath();
                 tex2jax: {inlineMath: [['$$', '$$'], ['\\(', '\\)']], displayMath: [['\\[', '\\]']]},
                 TeX: {extensions: ["color.js"]}
             });
+    	
+			$(document).ready(function() {
+				console.log("ready");
+				console.log('window.parent.probLang: ' + window.parent.probLang);
+				console.log('heading: ' + window.parent.step_by_step_solution);
+				console.log('button: ' + window.parent.submit_answer);
+				console.log('altheading: ' + window.parent.alt_step_by_step_solution);
+				console.log('altbutton: ' + window.parent.alt_submit_answer);
+				if (window.parent.probLang == 'en') {
+					document.getElementById("HintHeader").innerHTML =  window.parent.step_by_step_solution;
+					document.getElementById("submit_answer").innerHTML =  window.parent.submit_answer;
+
+
+				}
+				else {
+					document.getElementById("HintHeader").innerHTML =  window.parent.alt_step_by_step_solution;
+					document.getElementById("submit_answer").innerHTML =  window.parent.alt_submit_answer;
+				}
+	        });
+
         </script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <script type="text/javascript">
@@ -78,6 +138,8 @@ String ctx = request.getContextPath();
          </c:choose>>
 
         <div id="HintContainer" style="display: none">
+            <div id="HintHeader">
+            </div>
             <div id="HintThumbs">
             </div>
             <div class="clear"></div>
@@ -96,7 +158,7 @@ String ctx = request.getContextPath();
             <div id="MultipleChoiceAnswers" style="display: none">
             </div>
             <div id="SubmitAnswerBox" style="display:none">
-                <button id="submit_answer" type="button"><%= rb.getString("submit_answer") %></button>
+                <button id="submit_answer" type="button"></button>
                 <div id="Grade_Check" class="short_answer_check"></div>
                 <div id="Grade_X" class="short_answer_x"></div>
                 <div id="Grade_Circle" class="short_answer_circle"></div>

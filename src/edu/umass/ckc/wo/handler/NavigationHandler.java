@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.handler;
 
 import edu.umass.ckc.wo.event.NavigationEvent;
 import edu.umass.ckc.wo.log.TutorLogger;
+import edu.umass.ckc.wo.login.LandingPage;
 import edu.umass.ckc.wo.smgr.SessionManager;
 import edu.umass.ckc.servlet.servbase.View;
 import edu.umass.ckc.servlet.servbase.UserException;

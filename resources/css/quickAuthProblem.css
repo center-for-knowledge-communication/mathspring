@@ -56,6 +56,15 @@ body {
     width: 50%;
     overflow: hidden;
 }
+#HintHeader{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 5px 10px -5px;
+    font-size: 20px;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    text-align: center;
+}
+
 #HintThumbs{
     display: flex;
     flex-direction: row;

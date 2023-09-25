@@ -3,6 +3,7 @@ package edu.umass.ckc.wo.handler;
 import edu.umass.ckc.wo.beans.Topic;
 import edu.umass.ckc.wo.cache.ProblemMgr;
 import edu.umass.ckc.wo.db.DbClass;
+import edu.umass.ckc.wo.db.DbSession;
 import edu.umass.ckc.wo.db.DbStudentComment;
 import edu.umass.ckc.wo.db.DbTopics;
 import edu.umass.ckc.wo.event.NavigationEvent;
@@ -60,7 +61,11 @@ public class MyProgressHandler {
     }
 
     public View handleRequest(SessionEvent e) throws Exception {
-        if (e instanceof NavigationEvent  ) {
+        if (e instanceof NavigationEvent) {
+        	if (((NavigationEvent) e).getFrom().equals("my_progress")) {
+        		smgr.togglePageLangIndex();
+        		DbSession.updateSessionPageLangIndex(smgr.getConnection(),smgr.getSessionId(),smgr.getPageLangIndex());
+        	}
             showProgressPage(e);
             return null;
         }
@@ -84,6 +89,7 @@ public class MyProgressHandler {
             int totalProblems= ee.getTotalProblems();
 
             String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
+        	request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
             request.setAttribute("clientPath", null);
             request.setAttribute("learningCompanion", learningCompanion);
             request.setAttribute("backToVillageURL", null);
@@ -188,6 +194,7 @@ public class MyProgressHandler {
         // Similarly for the topicId.   If they aren't passed in, then its the old system and we get them from the student state.
         int probId = (pid != null && pid.length() != 0) ? Integer.parseInt(pid) : smgr.getStudentState().getCurProblem();
         int topicId = (topid != null && topid.length() != 0) ? Integer.parseInt(topid) : smgr.getStudentState().getCurTopic();
+    	request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
         request.setAttribute("probId",probId);
         request.setAttribute("topicId",topicId);
         request.setAttribute("sessionId",smgr.getSessionNum());

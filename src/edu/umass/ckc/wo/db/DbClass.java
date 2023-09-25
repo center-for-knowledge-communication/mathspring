@@ -1400,6 +1400,35 @@ public class DbClass {
 
     }
 
+    public static List <String> getStudentPairs(Connection conn) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	
+        	
+        	String q = "select * from MLStudentPairs;";
+        	String result = "";
+        	
+            stmt = conn.prepareStatement(q);
+            rs = stmt.executeQuery();
+            List<String> res = new ArrayList<String>();
+            while (rs.next()) {            	
+            	result = result + rs.getString("EnglishUsername");
+            	result = result + '~';
+            	result = result + rs.getString("SpanishUsername");
+            	res.add(result);
+            	result = "";
+            }
+            return res;
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+    }
+
     public static List<User> getClassStudentsByName(Connection conn, int classID) throws SQLException {
         ResultSet rs = null;
         PreparedStatement stmt = null;

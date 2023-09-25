@@ -195,6 +195,17 @@ public class TTReportServiceImpl implements TTReportService {
                 			showNames = "Y";   			
                 		}
                 	}                	
+
+                	String tmpClassId = classId;
+            		String selectedStudent = filters[3].trim();
+            		String classStudentArr[] = selectedStudent.split(":");
+
+            		if (classStudentArr.length == 2) {
+            			tmpClassId = classStudentArr[0];
+            			selectedStudent = classStudentArr[1];
+            		}
+            		
+                	
                 	
             		if ("Normal".equals(teacherLoginType)) {
 	                	try {
@@ -213,9 +224,10 @@ public class TTReportServiceImpl implements TTReportService {
                         }
                     }
                     
+                    
                     String[][] levelOneData = classStudents.stream().map(classStudents1 -> new String[]{classStudents1.getStudentId(), classStudents1.getStudentName(), classStudents1.getUserName(), classStudents1.getNoOfProblems()}).toArray(String[][]::new);
                     Map<String, String> studentIdMap = classStudents.stream().collect(Collectors.toMap(studMap -> studMap.getStudentId(), studMap -> studMap.getNoOfProblems()));
-                    Map<String, Map<String, List<String>>> effortValues = generateEfortMapValues(studentIdMap, classId, filter);
+                    Map<String, Map<String, List<String>>> effortValues = generateEfortMapValues(studentIdMap, tmpClassId, filter);
                     Map<String, List<Document>> genemotioMap   = generateEmotionMapValues(studentIdMap);
                     Map<String,Map<String,int[]>> fullstudentEmotionsMap = new HashMap<>();
                     Map<String,Map<String,List<String>>> fullstudentEmotionsComments = new HashMap<>();
@@ -456,6 +468,10 @@ public class TTReportServiceImpl implements TTReportService {
                     String topicNameList = getClassTopicNamesList(connection.getConnection(), classId, filter);
                     return topicNameList ;
                     
+                case "getTopicNamesListByClass":
+                    String topicNameListByClass = getTopicNamesListByClass(connection.getConnection(), classId, filter);
+                    return topicNameListByClass ;
+
                 case "classLiveGarden":
 
                 	List<Topic> gardenTopics = null;;
@@ -765,6 +781,60 @@ public class TTReportServiceImpl implements TTReportService {
         }
         return resultArr.toString();
 
+    }    
+     
+    public String getTopicNamesListByClass(Connection conn, String classId, String filter) {
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();            
+    	String strTopics = "";
+    	
+    	try {
+    		int count = 0;
+    		ResultSet rs1 = null;
+    		PreparedStatement stmt1 = null;
+    		String q1 = "select distinct sph.topicId from studentproblemhistory as sph, student as st, class as cl where sph.studId = st.id and st.classid = cl.id and cl.id = ?";
+
+    		stmt1 = conn.prepareStatement(q1);
+            stmt1.setString(1, classId);
+            rs1 = stmt1.executeQuery();
+            while (rs1.next()) {
+            	try {
+            		int topic = rs1.getInt(1);
+                	String q = "select json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = ?))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = ?))) as summary from problemgroup_description_multi_language pgl where pgl.pg_pg_grp_id = ?;";
+
+                    stmt = conn.prepareStatement(q);
+                    stmt.setString(1, filter);
+                    stmt.setString(2, filter);
+                    stmt.setInt(3, topic);
+                    rs = stmt.executeQuery();
+
+                    while (rs.next()) {
+                    	JSONObject resultJson = new JSONObject();
+                		resultJson.put("name", rs.getString("summary"));
+                		resultJson.put("description", rs.getString("description"));
+                		resultJson.put("topicId", String.valueOf(topic));
+                    	resultArr.add(resultJson);
+                    }
+                    stmt.close();
+                    rs.close();
+                }
+                catch (Exception e) {
+                	System.out.println(e.getMessage());        
+                }
+
+            }
+            stmt1.close();
+            rs1.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        }
+    	System.out.println(strTopics);        
+    	
+    	
+        return resultArr.toString();
     }    
     
     
@@ -1253,6 +1323,7 @@ public class TTReportServiceImpl implements TTReportService {
     	Timestamp tsFromDate = null;
     	Timestamp tsToDate = null;
     	
+    	
     	String filters[] = filter.split("~");
     	String modFilter = "%";
     	if (filters.length > 0) {
@@ -1281,11 +1352,17 @@ public class TTReportServiceImpl implements TTReportService {
    			tsToDate = defaultToDate();    		    			    		
     	}
     	
-    	
-    	if (filters.length > 3) {
-    		selectedStudent = filters[3].trim();
-    	}
-    	else {
+
+    	String tmpClassId = classId;
+		String selectedStudent = filters[3].trim();
+		String classStudentArr[] = selectedStudent.split(":");
+
+		if (classStudentArr.length == 2) {
+			tmpClassId = classStudentArr[0];
+			selectedStudent = classStudentArr[1];
+		}
+		
+    	if (filters.length  <= 3) {
     		selectedStudent = "";
     	}
     	try {
@@ -1294,7 +1371,7 @@ public class TTReportServiceImpl implements TTReportService {
 	        studentFirstParams.put("tsToDate", tsToDate);
 	        SqlParameterSource studentFirstParamsParameters = new MapSqlParameterSource(studentFirstParams);
 	         
-    		String classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), classId);
+    		String classesStr = DbClass.getStringClassesInCluster(connection.getConnection(), tmpClassId);
 	      	String students_query = TTUtil.PER_STUDENT_QUERY_FIRST.replaceAll("CLASSID_TOKEN", classesStr);
 	        List<ClassStudents> classStudents = (List) namedParameterJdbcTemplate.query(students_query, studentFirstParamsParameters, new ClassStudentsMapper());
 	                 

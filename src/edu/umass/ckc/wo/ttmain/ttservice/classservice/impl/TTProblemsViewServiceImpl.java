@@ -1,6 +1,8 @@
 package edu.umass.ckc.wo.ttmain.ttservice.classservice.impl;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -31,7 +33,7 @@ import edu.umass.ckc.wo.ttmain.ttmodel.ProblemsView;
 import edu.umass.ckc.wo.ttmain.ttservice.classservice.TTProblemsViewService;
 import edu.umass.ckc.wo.ttmain.ttservice.util.TTUtil;
 import edu.umass.ckc.wo.tutor.Settings;
-
+import edu.umass.ckc.wo.tutor.probSel.PedagogicalModelParameters;
 import edu.umass.ckc.wo.smgr.User;
 
 /**
@@ -193,7 +195,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
     	System.out.println("deleteInactiveStudents - message=" + message);
         return message;
     }
-
 
     @Override
     public String resetPassWordForStudent(String studentId, String userName, String newPassWordTobeSet) throws TTCustomException {
@@ -384,8 +385,6 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
   		
   		
         try {
-      		
-
       		theList = DbClass.getClassStudents(connection.getConnection(), Integer.valueOf(classId.trim()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -411,4 +410,89 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         }
         return result;
     }    
+
+    @Override
+    public String getStudentPairedList(String classId) {
+    	
+  		String result = ""; 
+    	try {
+    	
+	    	List<String> theList = DbClass.getStudentPairs(connection.getConnection());
+	  		
+	    	String s1 = "";
+        	String en_classId = "";
+        	String en_studId  = "";
+        	String en_fname   = "";
+	    	
+        	String sp_classId = "";
+        	String sp_studId  = "";
+        	String sp_fname   = "";
+        	String userNamekey ="";
+        	
+        	int counter = 0;
+        	Connection conn = connection.getConnection();
+	        ListIterator iterator = theList.listIterator();
+	        if (iterator.hasNext()) {        	
+		        while (iterator.hasNext()) {
+		        	String strPair = (String) iterator.next();
+		        	String[] unames = strPair.split("~");
+	                	s1 = "";
+		        		String q1 = "select cl.id as en_classId, st.id as en_studId, st.userName as en_userName, st.fname as en_fname  from MLStudentPairs as ml, student as st, class as cl where ml.EnglishUsername = st.userName and st.userName = ? and cl.id  = st.classId;";
+		            	en_classId = "";
+		            	en_studId  = "";
+		            	en_fname   = "";
+		    	    	sp_classId = "";
+		            	sp_studId  = "";
+		            	sp_fname   = "";
+		            	userNamekey ="";
+		            	
+			        	ResultSet rs1 = null;
+			        	PreparedStatement stmt1 = null;
+			        	stmt1 = conn.prepareStatement(q1);
+			            stmt1.setString(1, unames[0]);
+			            rs1 = stmt1.executeQuery();
+			            if (rs1.next()) {
+			            	en_classId = String.valueOf(rs1.getInt("en_classId"));
+			            	en_studId = String.valueOf(rs1.getInt("en_studId"));
+			            	en_fname = rs1.getString("en_fname");
+			            	userNamekey = rs1.getString("en_userName");
+			            }
+			            rs1.close();
+			            stmt1.close();
+			            if (en_studId == "") {
+			            	continue;
+			            }
+		        		String q2 = "select cl.id as sp_classId, st.id as sp_studId, st.userName as sp_userName, st.fname as sp_fname  from MLStudentPairs as ml, student as st, class as cl where ml.SpanishUsername = st.userName and st.userName = ? and cl.id  = st.classId;";
+	
+			        	ResultSet rs2 = null;
+			        	PreparedStatement stmt2 = null;
+			        	stmt2 = conn.prepareStatement(q2);
+			            stmt2.setString(1, unames[1]);
+			            rs2 = stmt2.executeQuery();
+			            if (rs2.next()) {
+			            	sp_classId = String.valueOf(rs2.getInt("sp_classId"));
+			            	sp_studId = String.valueOf(rs2.getInt("sp_studId"));
+			            	sp_fname = rs2.getString("sp_fname");
+			            	userNamekey = userNamekey + " " + rs2.getString("sp_userName");
+			            }
+			            s1 =  en_classId + ":" + sp_classId + "~" + en_studId + ":" + sp_studId + "~" + en_fname + ":"  + sp_fname + "~" + userNamekey;
+			            rs1.close();
+			            stmt1.close();
+			            if (sp_studId == "") {
+			            	continue;
+			            }
+			            if (counter > 0 ) {
+			            	result = result + ",";
+			            }
+			            result = result + s1;
+			            counter = counter + 1;
+		        }
+	        }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+        return result;
+    }    
 }
+
