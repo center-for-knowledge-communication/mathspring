@@ -752,7 +752,7 @@ function getStudentListEight() {
         success : function(response) {
         	console.log(response);
         	studentListEight = response;
-        	populateStudentSelectionListEight()
+        	populateStudentSelectionListEight();
         },
         error : function(e) {
             console.log(e);
@@ -921,7 +921,7 @@ function populateTopicSelectionListEight() {
         data : {
             classId: classID,
             teacherId: teacherID,
-            reportType: 'getClassTopicNamesList',
+            reportType: 'getTopicNamesListByClass',
             lang: loc,
             filter: topicFilter
         },
@@ -1043,6 +1043,193 @@ function getFilterEight(submit) {
 	}
 	
 }
+
+var topicSelectionListNine = "";
+function populateTopicSelectionListNine() {
+
+	var topicFilter = "English";
+	if (languageSet == "es") {
+		topicFilter = "Spanish";
+	}
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+            classId: classID,
+            teacherId: teacherID,
+            reportType: 'getTopicNamesListByClass',
+            lang: loc,
+            filter: topicFilter
+        },
+        success : function(data) {        
+        	var topicData = $.parseJSON(data);
+           	
+
+            for (var i = 0; i < topicData.length; i++) {
+            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+            }
+
+            topicSelectionListNine = "<select name='topics' id='topicsNine' size='5' style='width:220px' >"; 	
+
+            for (var i = 0; i < topicData.length; i++) {
+        		topicSelectionListNine += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
+            }
+        	topicSelectionListNine += "</select>";
+        	document.getElementById("topicSelectionListNine").innerHTML=topicSelectionListNine; 
+            
+        },
+        error : function(e) {
+            console.log(e);
+        }
+	});
+
+	
+}
+
+var studentSelectionListNine = "";
+
+var studentsArrNine = "";
+
+function populateStudentSelectionListNine() {
+	
+
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentPairedList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListNine = response;
+        	var studentsArrNine = studentListNine.split(",");	
+
+        	studentSelectionListNine = "<select name='students' id='studentsNine' size='5' style='width:220px' >"; 	
+        	studentsArrNine.forEach(addStudentNine1);
+        	//studentsArrNine.forEach(addStudentNine2);
+        	studentSelectionListNine += "</select>";
+        	document.getElementById("studentSelectionListNine").innerHTML=studentSelectionListNine; 
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+}
+
+
+function addStudentNine1(item, index) {
+	var sArr = item.split("~");
+	if (sArr.length > 0) {
+		if ((sArr[2].length + sArr[1].length) > 0) {
+			studentSelectionListNine += "<option value='" + item  + "'>" + sArr[2]  + "</option>";
+		}
+	}
+}
+
+function addStudentNine2(item, index) {
+	var sArr = item.split("~");
+	if  ((sArr[2].length + sArr[1].length) == 0) {
+		studentSelectionListNine += "<option value='" + sArr[3]  + "'>" + sArr[0]  + "</option>";
+	}
+}
+
+
+function getStudentListNine() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListNine = response;
+        	populateStudentSelectionListNine();
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+/*
+function getStudentPairedList() {
+	
+    $.ajax({
+        type : "POST",
+        url :pgContext+"/tt/tt/getStudentPairedList",
+        data : {
+            classId: classID
+        },
+        success : function(response) {
+        	console.log(response);
+        	studentListNine = response;
+        	populateStudentSelectionListNine();
+        },
+        error : function(e) {
+            console.log(e);
+        }
+    });
+	
+}
+*/
+
+function getFilterNine(submit) {
+	
+	//document.getElementById("daysFilterNine").value = "";
+		
+	var showNamesState = "N";
+	if (document.getElementById("showNamesNine").checked == true) {
+		showNamesState = "Y";
+	}
+
+//	selectedStudentNine =  document.getElementById("studentsNine").value;
+	
+	
+	filterNine = document.getElementById("standardsFilter").value + "~" + "~" + showNamesState;
+
+	var d1 = parseInt(document.getElementById("selectDay_r9_cal2").value);
+	var d2 =  parseInt(document.getElementById("selectDay_r9_cal1").value);
+
+	var m1 = parseInt(document.getElementById("month_r9_cal2").value) + 1;
+	var m2 =  parseInt(document.getElementById("month_r9_cal1").value) + 1;
+	
+	if ((d1 > 0) && (d2 > 0)) {
+		$('#calendarModalPopupNine').modal('hide');
+
+		var fromDate = m1 + "/" + document.getElementById("selectDay_r9_cal2").value + "/" +  document.getElementById("year_r9_cal2").value;
+		var toDate = m2 + "/" + document.getElementById("selectDay_r9_cal1").value + "/" + document.getElementById("year_r9_cal1").value;
+
+		if (languageSet == "es") {
+			fromDate = document.getElementById("selectDay_r9_cal2").value + "/" +  m1 + "/" + document.getElementById("year_r9_cal2").value;
+			toDate = document.getElementById("selectDay_r9_cal1").value + "/" + m2 + "/" + document.getElementById("year_r9_cal1").value;
+		}
+		
+		var older = Date.parse(fromDate);
+		var newer = Date.parse(toDate);
+		if (newer < older) {
+			var temp = fromDate;
+			fromDate = toDate;
+			toDate = temp;
+		}	
+
+		document.getElementById("daysFilterNine").value = fromDate + " thru " + toDate;
+		filterNine = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterNine").value + "~" + showNamesState;
+
+	}		
+	else {
+		if ( (d1 + d2) == 0 )  {
+
+		}
+		else {
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
+		}
+	}	
+}
+
 
 
 function nicknameOpen(problemName) {
@@ -3535,6 +3722,534 @@ var completeDataChart;
 
     });
 
+	$('#showReportNineBtn').on('click', function ()  {    	
+
+        getFilterNine('submit');
+        
+        var selectedStudentNine =  document.getElementById("studentsNine").value;       
+        if (selectedStudentNine.length == 0) {
+        	alert("You must select a student");
+        	return;
+        }
+	
+        $("#studentProblemAchievementReport").hide();
+        $('#collapseNineLoader').show();
+        
+		var selectedPair = selectedStudentNine.split("~");
+		
+		var classIdArr = selectedPair[0].split(":");
+		var studIdArr = selectedPair[1].split(":");
+		var filterNine1 = filterNine + "~" + classIdArr[0] + ":" + studIdArr[0];	
+
+		$.ajax({
+            type : "POST",
+            url : pgContext+"/tt/tt/getTeacherReports",
+            data : {
+                classId: classIdArr[0],
+                teacherId: teacherID,
+                reportType: 'perStudentReport',
+                lang: loc,
+                filter: filterNine1
+            },
+            success : function(data) {
+            	showChartNine(data,0);
+        		classIdArr = selectedPair[0].split(":");
+        		studIdArr = selectedPair[1].split(":");
+        		var filterNine2 = filterNine + "~"  + classIdArr[1] + ":" + studIdArr[1];	
+
+                $.ajax({
+                    type : "POST",
+                    url : pgContext+"/tt/tt/getTeacherReports",
+                    data : {
+                        classId: classIdArr[1],
+                        teacherId: teacherID,
+                        reportType: 'perStudentReport',
+                        lang: loc,
+                        filter: filterNine2
+                    },
+                    success : function(data) {
+                    	showChartNine(data,1);
+                	},
+                	error : function(e) {
+                    	console.log(e);
+                	}
+            	});
+        	},
+        	error : function(e) {
+            	console.log(e);
+        	}
+    	});
+    
+    
+
+
+});
+            	
+function showChartNine(data, chartIndex) {
+                $('#collapseNineLoader').hide();
+                var jsonData = $.parseJSON(data);
+                effortMap = jsonData.effortChartValues;
+                emotionMap = jsonData.fullstudentEmotionsMap;
+                commentsMap = jsonData.fullstudentEmotionsComments;
+                emotionLevelOne = jsonData.levelOneData;
+                eachStudentData = jsonData.eachStudentDataValues;
+ 
+                var selectedStudentInfo = emotionLevelOne[0];
+                if (selectedStudentInfo == null) {
+                	alert("<%= rb.getString("no_student_activity_found")%>");
+                	return;
+                }
+                
+       
+                var selectedStudentId = selectedStudentInfo[0];
+           		
+                var studentDataList = eachStudentData[selectedStudentId];
+                var outputStudentDataList = Object.keys(studentDataList).map(function(key) {return studentDataList[key];});
+/*
+                outputStudentDataList.sort(function(a,b) {
+                    if(a[10] == 'Problem was not completed')
+                        return new Date('1900-01-01 00:00:01.0').getTime() - new Date('1900-01-01 00:00:00.0').getTime();
+                    if( b[10] == 'Problem was not completed' )
+                        return new Date('1900-01-01 00:00:00.0').getTime() - new Date('1900-01-01 00:00:01.0').getTime();
+                    else
+                        return new Date(b[10]).getTime() - new Date(a[10]).getTime();
+                });
+*/                                          
+				var selectedTopicNine =  document.getElementById("topicsNine").value;
+
+				var rptNineTitle = '<%= rb.getString("student_problem_solving_history")%>';
+				if (chartIndex == 0) {
+					rptNineTitle = rptNineTitle + " - English ";
+				}
+				else {
+					rptNineTitle = rptNineTitle + " - Spanish ";
+				}
+				if (selectedTopicNine.length > 0) {
+					rptNineTitle = rptNineTitle + " ( " + topicNameMap.get(selectedTopicNine) + " )";
+				}
+
+				var charts = [];
+           		var traceProblems = [];
+				var traceAchievement = [];
+				var traceMastery = [];
+				var traceDifficulty = [];
+				var traceVideos = [];
+				var traceAttempts = [];
+				var traceHints = [];
+				
+				
+           		var problems = [];
+           		var problemIds = [];
+           		var hints = [];
+           		var attempts = [];
+           		var videos = [];
+           		var difficulty = [];
+           		var mastery = [];
+           		var topic = [];
+           		var topicname = [];
+           		var minutesOnProblem = [];
+           		var maxMinutes = 0;
+           		var barWidth = [];
+           		//var myColors = ['rgba(38, 242, 19,1)', 'rgba(38, 242, 19,1)', 'rgba(141, 211, 199,1)', 'rgba(38, 242, 19,1)', 'rgba(190, 186, 218,1)','rgba(155, 235, 148,1)','rgba(141, 211, 199,1)'];
+           		var effColors = [];
+           		var effText = [];
+           		var achievementColors = [];
+           		var achievementValues = [];
+           		
+           		
+           		var prevMastery = 0.0;
+           		var prevTopic = 0;
+           		var prevDifficulty = -1;
+           		var prevEffort = "";
+           		
+           		var maxYaxis = 1;          		
+               
+           		var useThisOne = true;
+           		
+                $.each(outputStudentDataList, function (i, obj) {
+                	useThisOne = true;
+               		var pTopic = obj[17];
+    				if ((selectedTopicNine.length > 0) && (!(pTopic == selectedTopicNine))) {
+    					useThisOne = false;
+    				}
+                	if (obj[8] === "NO DATA") {                		
+    					useThisOne = false;
+    				}
+    				
+					
+                	if (useThisOne) {                		
+	               		var p = "" + i + ": "+ obj[0];
+	               		var pHints = parseInt(obj[6]);
+	               		var pAttempts = parseInt(obj[7]);
+	               		var pVideos = parseInt(obj[12]);
+						problems.push(p);
+	               		effColors.push(getEffortColorRGB(obj[8]));
+	               		effText.push(obj[8]);
+	               		hints.push(parseInt(obj[6], 10));
+	               		attempts.push(parseInt(obj[7], 10));
+	               		videos.push(parseInt(obj[12], 10));
+	               		var currDifficulty = parseFloat(obj[15], 10);
+	               		currDifficulty = 10.0 * currDifficulty;
+	               		difficulty.push(currDifficulty);
+	               		
+	               		
+	               		
+	               		var currAchievement = 0;
+	               		
+	               		if (prevDifficulty > 0) {
+	               			currAchievement = (currDifficulty + prevDifficulty ) /2;
+	               		}
+	               		else {
+	               			currAchievement = currDifficulty;
+	               		}
+	               		
+	               		achievementValues.push(currAchievement);
+	               		
+	               		if ((obj[8] == "SOF") || (obj[8] == "ATT")) {
+	               			prevDifficulty = currDifficulty
+		               		achievementColors.push(getAchievementColorRGB(currAchievement));
+	               		}
+	               		else {
+		               		achievementColors.push(getAchievementColorRGB(0));	               			
+	               		}
+	               		
+	               		
+	               		topic.push(pTopic);
+	               		var ptopicname = topicNameMap.get(pTopic);
+	               		topicname.push(ptopicname);
+	               		var pmastery = parseFloat(obj[16], 10);
+	               		if ((pmastery == 0.0) && (pTopic == prevTopic) && (obj[10] === "Problem was not completed")) {
+	               			pmastery = prevMastery;
+	               		}
+	               		else {
+	               			pmastery = 10.0 * pmastery;
+	               		}
+	               		mastery.push(pmastery);
+	               		prevMastery = pmastery;
+	               		prevTopic = pTopic;
+	               		barWidth.push(1);
+	               		problemIds.push(obj[11]);
+	               		var isSolved = parseInt(obj[4], 10);
+		        		var timeToSolve = parseInt(obj[19], 10);
+		        		if (timeToSolve < 0) {
+		        			timeToSolve = 0;
+		        		}
+		        		var minutesToSolve = timeToSolve/60000;
+		        		if (minutesToSolve > 15) {
+		        			minutesToSolve = 15;
+		        		}
+		        		
+		        		var timeToFirstAttempt = parseInt(obj[20], 10);
+		        		if (timeToFirstAttempt < 0) {
+		        			timeToFirstAttempt = 0;
+		        		}
+						var minutesToFirstAttempt =  timeToFirstAttempt/60000;
+		        		if (minutesToFirstAttempt > 15) {
+		        			minutesToFirstAttempt = 15;
+		        		}
+											
+		        		if (minutesToSolve > maxYaxis) {
+		        			maxYaxis = minutesToSolve;
+		        		}
+	    			
+		        		if (pHints > maxYaxis) {
+		        			maxYaxis = pHints;
+		        		}
+		        		if (pAttempts > maxYaxis) {
+		        			maxYaxis = pAttempts;
+		        		}
+	
+		        		if (pVideos > maxYaxis) {
+		        			maxYaxis = pVideos;
+		        		}	        		
+	
+	   					if (isSolved > 0) {
+	                   		minutesOnProblem.push(minutesToSolve);    						
+	   					}
+	   					else {
+	   						if (minutesToFirstAttempt > 0) {	
+	   							minutesOnProblem.push(minutesToFirstAttempt);
+	   						}
+	   						else {
+	   						}
+	   					}
+						minutesOnProblem.push(0.2);
+   					
+                	}
+                });
+
+				maxYaxis = maxYaxis;
+        		if (maxYaxis > 15) {
+        			maxYaxis = 15;
+        		}
+        		
+        		if (maxYaxis < 10) {
+        			maxYaxis = 10;
+        		}
+
+        		
+				var maxWidth = 800;       
+				if (problems.length > 16) {
+					maxWidth = problems.length * 50;    		 
+				}
+                
+           		traceHints[chartIndex] = {
+             			  x: problems,
+         				  y: hints, 
+						  name: '<%= rb.getString("hints")%>',
+         				  type: 'scatter',
+       					  mode: 'lines+markers',
+       					  marker: {
+       					    color: 'rgb(219, 64, 82)',
+       					    size: 8
+       					  },
+       					  line: {
+       					    color: 'rgb(219, 64, 82)',
+       					    width: 1
+       					  }         				
+         		};
+
+           		traceAttempts[chartIndex] = {
+           			  x: problems,
+       				  y: attempts, 
+					  name: '<%= rb.getString("attempts")%>',
+       				  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(55, 128, 191)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(55, 128, 191)',
+   					    width: 1
+   					  }         				
+       				};
+
+           		traceVideos[chartIndex] = {
+             			  x: problems,
+         				  y: videos, 
+  					  name: '<%= rb.getString("videos")%>',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(153, 0, 153)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(153, 0, 153)',
+     					    width: 1
+     					  }         				
+         				};
+ 
+           		traceDifficulty[chartIndex] = {
+           			  x: problems,
+       				  y: difficulty, 
+					  name: '<%= rb.getString("difficulty")%>',
+					  yaxis: 'y',
+					  type: 'scatter',
+   					  mode: 'lines+markers',
+   					  marker: {
+   					    color: 'rgb(0, 0, 0)',
+   					    size: 8
+   					  },
+   					  line: {
+   					    color: 'rgb(0, 0, 0)',
+   					    width: 2
+   					  }         				
+       				};
+           		
+           		traceMastery[chartIndex] = {
+             			  x: problems,
+         				  y: mastery, 
+	  					  name: '<%= rb.getString("mastery")%>',
+						  yaxis: 'y',
+         				  type: 'scatter',
+     					  mode: 'lines+markers',
+     					  marker: {
+     					    color: 'rgb(0, 153, 51)',
+     					    size: 8
+     					  },
+     					  line: {
+     					    color: 'rgb(0, 153, 51)',
+     					    width: 2
+     					  },        				
+               	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
+                          text: topicname,
+
+         				};
+           		
+           		traceAchievement[chartIndex] = {
+           			  x: problems,
+       				  y: achievementValues, 
+	  					  name: 'Achievement',
+						  yaxis: 'y',
+       				  type: 'scatter',
+   					  mode: 'markers',
+       				  marker:{
+       				    color: achievementColors,
+       				 	symbol: 'diamond',
+       				 	size: 8
+     				  },
+  				
+             	          hovertemplate: '%{y:1.5f}<br><i>' + '<b>%{text}</b></i>',
+                        text: topicname,
+
+       				};
+         		
+/*          		
+           		var trace3 = {
+           				  x: [problems], 
+           				  y: [1, 1, 2, 3, 4, 3, 5],
+           				  name: 'Minutes',
+           				  marker:{
+           				    color: myColors
+           				  },
+           				  type: 'bar'
+           				};
+*/
+           		traceProblems[chartIndex] = {
+           			  x: problems,
+           			  y: minutesOnProblem,
+       				  name: '<%= rb.getString("minutes")%>',
+       				  showlegend: false,
+       				  mode: 'markers',
+       				  marker:{
+         				    color: effColors
+       				  },
+           			  type: 'bar',
+           	          hovertemplate: '<%= rb.getString("minutes")%> %{y:.2f}<br><i><%= rb.getString("click_to_see_the_problem")%></i>',           			  
+                      text: effText,
+           			};           		
+           		
+ 		
+           		var data = [];
+                if (document.getElementById("trackHintsNine").checked == true) {
+	           		data.push(traceHints[chartIndex]);
+                }
+                if (document.getElementById("trackAttemptsNine").checked == true) {
+		           	data.push(traceAttempts[chartIndex]);
+                }
+                if (document.getElementById("trackVideosNine").checked == true) {
+    	       		data.push(traceVideos[chartIndex]);
+                }
+                if (document.getElementById("trackDifficultyNine").checked == true) {
+    	       		data.push(traceDifficulty[chartIndex]);
+                }
+                if (document.getElementById("trackMasteryNine").checked == true) {
+    	       		data.push(traceMastery[chartIndex]);
+                }
+                if (document.getElementById("trackAchievementNine").checked == true) {
+    	       		data.push(traceAchievement);
+                }
+           		data.push(traceProblems[chartIndex]);
+//           		var data = [traceHints, traceAttempts, traceVideos, traceProblems];
+
+
+           	    layout1 = {
+           	    	 width:(maxWidth),
+           	    	 height:400,          	         
+           	    	 xaxis: {
+               	       type: 'category',
+               	       title: 'PROBLEMS',
+                	    font: {
+                   	      family: 'sans-serif',
+                   	      size: 20,
+                   	      color: '#000'
+                   	    }
+               	     },
+          	         yaxis: {
+                 	   title: 'BAR = MINUTES;  LINES = VALUES',
+                	    font: {
+                   	      family: 'sans-serif',
+                   	      size: 16,
+                   	      color: '#000'
+                   	    },
+                 	   dtick: 1,
+                   	   range: [0, maxYaxis]
+                 	 },
+                 	 legend: {
+                 	    x: 0,
+                 	    y: 1,
+                 	    traceorder: 'normal',
+                 	    font: {
+                 	      family: 'sans-serif',
+                 	      size: 18,
+                 	      color: '#000'
+                 	    },
+                 	    bgcolor: '#E2E2E2',
+                 	    bordercolor: '#000000',
+                 	    borderwidth: 1
+                 	 },           	         
+           	    	 hovermode:'x',
+           	         title:rptNineTitle ,
+           	      	 displayModeBar: false,
+
+           	      };   
+
+           	    
+				layout2 = {
+           	    	 width:(maxWidth),
+           	    	 height:800,          	         
+           	    	 xaxis: {
+               	       type: 'category',
+               	       title: '<%= rb.getString("problems")%>',
+               	     },
+          	         yaxis: {
+                 	   title: '<%= rb.getString("difficulty")%> / <%= rb.getString("mastery")%>',
+                 	   dtick: .25,
+                   	   range: [0, maxYaxis]
+                 	 },
+           			 
+                 	 legend: {
+                 	    x: 0,
+                 	    y: 1,
+                 	    traceorder: 'normal',
+                 	    font: {
+                 	      family: 'sans-serif',
+                 	      size: 16,
+                 	      color: '#000'
+                 	    },
+                 	    bgcolor: '#E2E2E2',
+                 	    bordercolor: '#000000',
+                 	    borderwidth: 1
+                 	 },           	         
+           	    	 hovermode:'x',
+           	         title:rptNineTitle ,
+           	      	 displayModeBar: false,
+
+           	      };
+				
+           	    if (chartIndex == 0) {
+	                var myPlot1 = document.getElementById('studentProblemAchievementReportNine1');
+	           		
+	           		Plotly.newPlot('studentProblemAchievementReportNine1', data, layout1);     
+	           		
+	           		myPlot1.on('plotly_click', function(data){
+						var i = data.points[0].pointIndex;
+						var myY = data.points[0].fullData.y[i];
+						var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+						document.getElementById('studentProblemAchievementSnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+				        $("#studentProblemAchievementPopup").modal('show');
+	           		});
+           	    }
+
+           	    if (chartIndex == 1) {
+           	    
+	           	    var myPlot2 = document.getElementById('studentProblemAchievementReportNine2');
+	           		
+	           		Plotly.newPlot('studentProblemAchievementReportNine2', data, layout1);     
+	           		
+	           		myPlot2.on('plotly_click', function(data){
+						var i = data.points[0].pointIndex;
+						var myY = data.points[0].fullData.y[i];
+						var imageURL = problem_imageURL+problemIds[i] +'.jpg';
+						document.getElementById('studentProblemAchievementSnapshot').innerHTML = '<span><strong><%= rb.getString("problem_id")%> :'+ problemIds[i] + '</strong></span>' + '<img  style="max-width:600px; max-height:600px;" src="'+ imageURL + '"/>';
+				        $("#studentProblemAchievementPopup").modal('show');
+	           		});
+           	    }
+           		populateTopicSelectionListNine();
+           		$("#studentProblemAchievementReportNine2").show();
+}                
     
     $('body').on('click', 'a.getStudentDetail', function () {
         $(this).children(':first').toggleClass('rotate-icon');
@@ -3825,6 +4540,8 @@ var completeDataChart;
             getStudentListEight();           
           	getFilterEight('');
           	
+	        getStudentListNine();           
+          	
             $('#reorg_prob_sets_handler').css('background-color', '');
             $('#reorg_prob_sets_handler').css('color', '#dddddd');
 
@@ -3834,6 +4551,7 @@ var completeDataChart;
             $("#perStudentPerProblemSetReport").hide();
 
             populateTopicSelectionListEight();
+            populateTopicSelectionListNine();
             
         });
 
@@ -4277,6 +4995,88 @@ var completeDataChart;
 			            	</div> 
                         </div>
 					</div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a id="report_nine" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
+									<%= rb.getString("student_gradebook_problem_solving_history") %>
+                                </a>
+                                <button id="nineButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
+                            </h4>
+                        </div>
+                        <div id="collapseNine" class="panel-collapse collapse">
+	                            <div class="panel-body report_filters">                           
+									  <input id="trackMasteryNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine('');" checked>
+									  <label class="report_filters">Track Mastery</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackDifficultyNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine('');" checked>
+									  <label class="report_filters">Track Difficulty</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackAchievementNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine('');" checked>
+									  <label class="report_filters">Track Achievement</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackAttemptsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine('');">
+									  <label class="report_filters">Track Attempts</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackHintsNine" type="checkbox" style="width:48px" name="" value="" onblur="getFilterNine('');">
+									  <label class="report_filters">Track Hints</label>
+									  &nbsp;|&nbsp;
+									  <input id="trackVideosNine" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterNine('');">
+									  <label class="report_filters">Track Videos</label>
+								</div>
+		                        <div class="panel-body report_filters">
+		                        	<div id="chooseDateRange" class="row">
+		                        		<div class="col-md-2 offset-md-1">                       
+						                	<button type="button" class="btn btn-primary" onclick="initCalendar_r9_cal1();initCalendar_r9_cal2();$('#calendarModalPopupNine').modal('show');" ><%= rb.getString("choose_date_range") %></button>
+						                </div>
+		                        		<div class="col-md-3">                       
+										    <input id="daysFilterNine" style="width:220px" type="text" name="" value="" >   
+						                </div>
+		 							</div>  
+		
+								</div>
+							     <div class="panel-body report_filters">
+	                        		<div class="row">
+	                        			<div class="col-md-2 offset-md-1">
+											<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
+	                        			</div>
+	                        			<div class="col-md-3">
+	                        			</div>
+	                        			<div class="col-md-3">
+											<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
+	                        			</div>
+	                        		</div>
+	                        		<div class="row">
+	                        			<div id="studentSelectionListNine" name="studentSelectionListNine" class="col-md-2 offset-md-1"> 
+											<select name='students' id='studentsNine' size='5' style='width:220px' >
+											</select>				                
+										</div>
+	                        			<div class="col-md-3">
+	                        			</div>	                        		
+		                        		<div id="topicSelectionListNine" name="topicSelectionListNine" class="col-md-3">                       
+											<select name='topics' id='topicsNine' size='5' style='width:220px' >
+											</select>				                
+										</div>
+									</div>
+	                            </div>                            
+		
+		
+	                            <div class="panel-body report_filters hidden">
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesNine" name="" value="Y"  onblur="getFilterNine('');"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	                            </div>
+	                            <div class="panel-body report_filters">                           
+									  <input id="showReportNineBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
+								</div>
+                            <div id="collapseNineLoader" class="loader" style="display: none" >
+                           	</div>                            
+			            	<div id="studentProblemAchievementReportNine1" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+			            	<div id="studentProblemAchievementReportNine2" style="overflow-x: scroll;overflow-y: scroll;">
+			            	</div> 
+                        </div>
+					</div>
+
 
              </div>
         </div>
@@ -4888,6 +5688,108 @@ var completeDataChart;
     	</div>
 	</div>
 </div>	
+
+<div id="calendarModalPopupNine" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="row">
+            <div class="modal-body" role="dialog">
+			     <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r9_cal1" name="selectDay_r9_cal1">
+   				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
+			          <div class="footer-container-calendar">
+			              <label for="month_r9_cal1"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r9_cal1" onchange="jump_r9_cal1()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r9_cal1" onchange="jump_r9_cal1()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>
+			      </div>			      
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r9_cal1" onclick="previous_r9_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r9_cal1" onclick="next_r9_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r9_cal1" data-lang="en">
+			              <thead id="thead-month_r9_cal1"></thead>
+			              <tbody id="calendar-body_r9_cal1"></tbody>
+			          </table>
+			          
+			    </div> 
+			    <div class="wrapper-calender col-sm-6">
+			      <div class="container-calendar">
+                        <input type="hidden" id="selectDay_r9_cal2" name="selectDay_r9_cal2">
+				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
+			          <div class="footer-container-calendar">
+			              <label for="month_r9_cal2"><%= rb.getString("jump_to") %>: </label>
+			              <select id="month_r9_cal2" onchange="jump_r9_cal2()">
+			                  <option value=0><%= rb.getString("Jan") %></option>
+			                  <option value=1><%= rb.getString("Feb") %></option>
+			                  <option value=2><%= rb.getString("Mar") %></option>
+			                  <option value=3><%= rb.getString("Apr") %></option>
+			                  <option value=4><%= rb.getString("May") %></option>
+			                  <option value=5><%= rb.getString("Jun") %></option>
+			                  <option value=6><%= rb.getString("Jul") %></option>
+			                  <option value=7><%= rb.getString("Aug") %></option>
+			                  <option value=8><%= rb.getString("Sep") %></option>
+			                  <option value=9><%= rb.getString("Oct") %></option>
+			                  <option value=10><%= rb.getString("Nov") %></option>
+			                  <option value=11><%= rb.getString("Dec") %></option>
+			              </select>
+			              <select id="year_r9_cal2" onchange="jump_r9_cal2()">
+			                  <option value=2020>2020</option>
+			                  <option value=2021>2021</option>
+			                  <option value=2022>2022</option>			              
+			              </select>       
+			          </div>			 
+			        </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r9_cal2" onclick="previous_r9_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r9_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r9_cal2" onclick="next_r9_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r9_cal2" data-lang="en">
+			              <thead id="thead-month_r9_cal2"></thead>
+			              <tbody id="calendar-body_r9_cal2"></tbody>
+			          </table>
+			          
+            	</div>
+            </div>
+            </div>
+           <div class="modal-footer">
+
+          		<div class="offset-md-6">
+	                <button type="button" class="btn btn-success" onclick="getFilterNine('s7bmit');" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupNine').modal('hide');" ><%= rb.getString("cancel") %></button>
+                </div> 
+         </div>
+    	</div>
+	</div>
+</div>	
+
+
 
 <div id="studentEffortRecordedProblem" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog modal-lg" style="min-width:1100px">
