@@ -190,8 +190,9 @@ function displayHintCount () {
 }
 
 function showProblemInfo (pid, name, topic, standards) {
-    $("#pid").text(pid + ":" + name);  // shows the problem ID + resource
-	 $("#problemTopicAndStandards").html(
+    $("#pid").text(pid + ":" + name);  // shows the problem ID + resource         
+    
+    $("#problemTopicAndStandards").html(
 			 "<p style='float: left'>" + globals.teacherName + " - " + globals.className + "</p>" +
 			 "<p style='float: right'>" + problem_current_topic + " " + topic + " | " + problem_standards + " "  + standards  + "</p>"
 	 );
@@ -257,6 +258,33 @@ function nextProb(globals,isSessionBegin=false) {
         servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, langIndex: globals.probLangIndex}, processNextProblemResult);    	
 }
 
+
+function translateProb(globals,isSessionBegin=false) {
+
+	toggleSolveDialogue(false);
+    if (!globals.showMPP)
+        hideMPP()
+    if (globals.trace)
+        debugAlert("in NextProb ");
+    incrementTimers(globals);
+    // call the server with a nextProblem event and the callback fn processNextProblemResult will deal with result
+    showHourglassCursor(true);
+    // A HACK.  Because the Topic Intro is an intervention but it doesn't show in a dialog, it is ended by clicking on New Problem button
+    // which comes in here.  We want to send back an InputResponse though becuase thats what TopicIntros should get back.
+    // TODO:  Probably should replace NewProblem button when a topic intro shows.  It could have the correct handler on it.
+	globals.curHint = null;
+	globals.hintSequence = null;
+    if (globals.lastProbType === TOPIC_INTRO_PROB_TYPE)
+        servletGet("InputResponseNextProblemIntervention",
+            {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,
+                destination:globals.destinationInterventionSelector},
+            processNextProblemResult) ;
+    // Normal Processing
+    else
+        servletGet("TranslateProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, langIndex: globals.Index, translateProbId: globals.probId}, processNextProblemResult);    	
+}
+
+
 // This function can only be called if the button is showing
 function selectProblemDialog () {
     $("#"+SELECT_PROBLEM_DIALOG).dialog('open');
@@ -308,6 +336,14 @@ function myprogress() {
     document.location.href = "/"+sysGlobals.wayangServletContext + "/TutorBrain?action=navigation&sessionId=" + globals.sessionId + "&elapsedTime=" + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&from=sat_hut&to=my_progress&topicId="+ globals.topicId +"&probId="+globals.probId + "&eventCounter="+ sysGlobals.eventCounter++ + "&var=b";
 }
 
+function switchLanguage() {
+    alert("in switchLanguage");
+    translateProb(globals, false);
+//    globals.lastProbType = globals.probType;
+//    globals.lastProbId = globals.probId;
+//    document.location.href = "/"+sysGlobals.wayangServletContext + "/TutorBrain?action=navigation&sessionId=" + globals.sessionId + "&elapsedTime=" + globals.elapsedTime + "&probElapsedTime=" + globals.probElapsedTime + "&from=sat_hut&to=my_progress&topicId="+ globals.topicId +"&probId="+globals.probId + "&eventCounter="+ sysGlobals.eventCounter++ + "&var=b";
+//    document.location.href = "#";
+}
 
 ///////////////////////////////////////////////////////////////////////
 ////  Buttons on left menu (read prob, hint, replay hint, solve prob, show ex, show vid, formulas, glossary
@@ -356,6 +392,13 @@ function showVideo (globals) {
     if (isHTML5Problem()) {
         updateTimers();
         servletGet("ShowVideo",{probElapsedTime: globals.probElapsedTime },processShowVideo);
+    }
+}
+
+function showLCList (globals) {
+    if (isHTML5Problem()) {
+        updateTimers();
+        servletGet("ShowLCList",{probElapsedTime: globals.probElapsedTime },processShowLCList);
     }
 }
 
@@ -457,6 +500,87 @@ function processShowVideo (responseText, textStatus, XMLHttpRequest) {
     }
 }
 
+var selectedLC = "";
+var lcName ="";
+var radioButtons = null;
+
+function clickLCButton() {
+	
+	if (!(radioButtons == null)) {
+		for (const radioButton of radioButtons) {
+		    if (radioButton.checked) {
+		        selectedLC = radioButton.value;
+		        break;
+		    }
+		}
+		
+		if (selectedLC == "") {
+			document.getElementById('lcSubmitBtn').style.visiblity = "hidden";			
+			alert("Select a learning companion or click 'close'");
+		}
+		else {
+			document.getElementById('lcSubmitBtn').style.visiblity = "visible";
+//			alert("LCid = " + selectedLC);
+		}
+	}
+
+}
+
+
+function processShowLCList (responseText, textStatus, XMLHttpRequest) {
+
+	checkError(responseText);
+
+	var lcArr = JSON.parse(responseText);
+
+    var lcHtml = "<div >";
+    var rowCount = 0;
+
+    
+    for (var i = 0; i <  lcArr.LCList.length; i++) {
+    	if ((i == 0) || (i%2 == 0)) {
+        	lcHtml = lcHtml  + "<div class='row'>";
+    	}
+		rowCount = rowCount + 1;    		
+    	lcHtml = lcHtml  + "<div class='col-md-3'><label class='radio-inline'>";
+    	lcHtml = lcHtml  + "<input type='radio' name='optLC' id='LC" + i + "' value='" + lcArr.LCList[i].id + "' " + lcArr.LCList[i].lcname + ">";
+   		lcHtml = lcHtml  + 	"<img src=" +lcArr.LCList[i].url + lcArr.LCList[i].lcshortname + "/character.png width='120px' height='150px'>";    	
+   		lcHtml = lcHtml  + 	"<span style='display:block; text-align: center;'>" + lcArr.LCList[i].lcshortname + " " + lcArr.LCList[i].lang + "</span>";
+   		lcHtml = lcHtml  + 	"</label>";
+   		lcHtml = lcHtml  + 	"</div>";
+	    if (rowCount == 3) {
+   	   		lcHtml = lcHtml  + 	"</div>";   
+   	   		rowCount = 0;
+   		}
+    }
+    lcHtml = lcHtml  + "</div>";
+    
+    document.getElementById("lcBody").innerHTML = lcHtml;
+    document.getElementById("lcBody").style.padding = "20px";
+
+    radioButtons = document.querySelectorAll('input[name="optLC"]');
+    
+    $('#lcModal').modal('show');    
+}
+
+function changeStudentLC() {
+	
+	console.log("Sending LC=" + selectedLC);
+	
+	/* change local variable */
+    servletGet("ChangeStudentLC",{probElapsedTime: globals.probElapsedTime, "LCid": selectedLC, "sessionId":globals.sessionId },processChangeStudentLC);
+		
+}
+
+function processChangeStudentLC (responseText, textStatus, XMLHttpRequest) {
+
+	// force an idle LC message
+	
+	console.log(responseText);
+    var resp = JSON.parse(responseText);
+	globals.learningCompanion = resp.LCNew;
+	showNewLearningCompanion(resp.LCNew);
+}	
 function processGazeWandering (responseText, textStatus, XMLHttpRequest) {
 
 
@@ -743,19 +867,74 @@ function checkError (responseText) {
     return false;
 }
 
+function checkTranslateProbError (responseText) {
+    var json = JSON.parse(responseText);
+    errType = json.error;
+    if (errType) {
+        if (json.fatal) {
+            console.log("Fatal Error reported by server " + json.message);
+            alert("Fatal Error reported by server.  Restart Mathspring in your browser. \n" + json.message);
+            // If its fatal we change the page to the login screen unless this is a dev env where we'd want to stay and debug it.
+            if (!sysGlobals.isDevEnv)
+                document.location.href = "/"+sysGlobals.wayangServletContext + "/WoLoginServlet?action=LoginK12_1";
+            return true;
+        }
+        else {
+            console.log("Error reported by server " + json.message);
+            alert(errType + ': ' + json.message + '  Click this message to continue.');
+            return false;
+        }
+
+    }
+    return false;
+}
+
+
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $("#next_prob_spinner").show();
    	$("#nextProb").addClass("disable_a_href");
-   	if (globals.experiment == "multi-lingual") {
-   		$("#nextProb1").addClass("disable_a_href");    	
-   	    $("#next_prob_spinner1").show();
-	}
-    checkError(responseText);
+   	checkTranslateProbError(responseText);
     $(PROBLEM_WINDOWID).attr("src","");
     // Replaceing the example div for the same reason as the above.
     $(EXAMPLE_CONTAINER_DIV_ID).html('<iframe id="'+EXAMPLE_FRAME+'" name="iframe2" width="650" height="650" src="" frameborder="no" scrolling="no"></iframe>');
     var activity = JSON.parse(responseText);
     console.log(responseText);
+
+    var altProdId = activity.altProbId;
+    
+    if( typeof altProdId === 'undefined' || altProdId === null ) {
+    	altProdId = 0;
+    }
+    else {
+    	altProdId = Number(activity.altProbId);
+    }
+    console.log("altProbId=" + altProdId);
+    console.log("pageLangIndex=" + pageLangIndex);
+	if (globals.experiment == "multi-lingual") {
+		if (altProdId > 0) {
+			// Show 'Translate problema' button using pageLangIndex
+//			if (pageLangIndex == 0) {
+//				document.getElementById("translateProbText").innerHTML =  translate_this_problem_alt;
+//			}
+//			else {
+//				document.getElementById("translateProbText").innerHTML =  translate_this_problem_pri;				
+//			}
+			$("#translateProb").removeClass("disable_a_href");
+			$("#translateProbWrapper").removeClass("not-allowed");
+			document.getElementById("translateProb").style.background = "White";
+		    $("trans_prob_spinner").show();
+		}
+		else {
+			document.getElementById("translateProb").style.color = "Black";
+			document.getElementById("translateProb").style.background = "LightGray";
+			$("#translateProb").addClass("disable_a_href");
+			$("#translateProbWrapper").addClass("not-allowed");
+		}
+		document.getElementById("translateProb").style.display = "block";			
+	}
+	else {
+		document.getElementById("translateProb").style.display = "none";					
+	}
     var mode = activity.mode;
     var activityType = activity.activityType;
     var type = activity.type;
@@ -776,11 +955,20 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
         if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
             var topicName = activity.topicName;   
             topic = topicName.en;
+            if (lang == "en") {
+                topic = topicName.en;                
+            }        
             if (lang == "es") {
                 topic = topicName.es;
             }        
         }
-        
+		if (activity.isTranslation == 1) {
+			probLang = "es"
+		}
+		else {
+			probLang = "en"
+		}
+            
         var standards = activity.standards;
         var varBindings = activity.parameters;
         setGlobalProblemInfo(activity);
@@ -908,9 +1096,10 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 	 $("#next_prob_spinner").hide();
 	 
 	 $("#nextProb").removeClass("disable_a_href");
-	   	if (globals.experiment == "multi-lingual") {
-	   		$("#nextProb1").removeClass("disable_a_href");
-	   	}
+//	   	if (globals.experiment == "multi-lingual") {
+//	   		$("#translateProb").removeClass("disable_a_href");
+//			document.getElementById("translateProb").style.background = 'white';
+//	   	}
 }
 
 function newBrowserWindow (url,w, h) {
@@ -999,7 +1188,11 @@ function showLearningCompanion (json) {
 	    if (file != globals.learningCompanionClip) {
 	        globals.learningCompanionClip = file;
 	        console.log("LC=" + file);
-	        if (file.indexOf("Isabel") >= 0) {
+	        if (lcName.length > 0) {
+		        var offset = file.indexOf("/");
+		        file = lcName + file.substring(offset)
+	        }
+		    if (file.indexOf("Isabel") >= 0) {
 	        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + file;
 	            httpHead(url, successfulLCResult, failureLCResult);
 	        }
@@ -1014,6 +1207,30 @@ function showLearningCompanion (json) {
         $(LEARNING_COMPANION_WINDOW_ID).attr("src","")
 	}    
 }
+
+function showNewLearningCompanion (lcNew) {
+
+    var url;
+
+    try {
+	    if (lcNew == "Isabel") {
+        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + lcNew + "/idle.html";
+            httpHead(url, successfulLCResult, failureLCResult);
+        }
+        else {
+            url = sysGlobals.problemContentPath + "/LearningCompanion/" + lcNew + "/idle.html";         	
+            httpHead(url, successfulLCResult, failureLCResult);
+        }
+    }
+	catch(err) {
+    	console.log(err.message + url);
+        $(LEARNING_COMPANION_WINDOW_ID).attr("src","")
+	}   
+    expandLC();
+    loadIframe(LEARNING_COMPANION_WINDOW_ID, url);
+
+}
+
 
 // when the lc dialog is closed we need remove the src of the iframe because
 // jquery retriggers the HTML5 file within to begin playing again.
@@ -1195,14 +1412,15 @@ function clickHandling () {
         }
         $("#next_prob_spinner").hide();
     });
-    $("#nextProb1").click(function () {
+    
+    $("#translateProb").click(function () {
        	if (globals.experiment == "multi-lingual") {
-	    	$("#next_prob_spinner1").show();
+	    	$("#trans_prob_spinner").show();
 	        if (!isWaiting()) {
 	        	globals.probLangIndex = 1;
-	            nextProb(globals)
+	            translateProb(globals)
 	        }
-	        $("#next_prob_spinner1").hide();
+	        $("#trans_prob_spinner").hide();
 	    }
     });
     $("#read").click(function () {
@@ -1243,6 +1461,9 @@ function clickHandling () {
     });
     $("#video").click(function () {
         showVideo(globals)
+    });
+    $("#showLCList").click(function () {
+        showLCList(globals)
     });
     $("#formulas").click(function () {
         showFormulas(globals)
@@ -1311,13 +1532,20 @@ function clickHandling () {
             $(EXAMPLE_CONTAINER_DIV_ID).css('overflow', 'scroll');
             var id_exists = document.getElementById('play_button');
             if (id_exists)  {
+                if (pageLangIndex == 0) {
+                	$("#play_button").text(example_problem_play_hints);
+                	//document.getElementById('pulsate_play_button').text = example_problem_play_hints;
+            	}
+        		else {
+                	$("#play_button").text(alt_example_problem_play_hints);
+//        			document.getElementById('pulsate_play_button').text = alt_example_problem_play_hints;    	
+        		}
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
-	        //showVideo(globals);
-			$("#exampleContainer").attr('title', watch_and_listen_instructions);
+            
+			
 			$("#exampleContainer").css('height','600px');
 			$("#exampleContainer").css('width','auto');
-			$("#pulsate_play_button").text(example_problem_play_hints);
 			$("#pulsate_play_button").css({
 				position: 'absolute',
     			top: '6%',
@@ -1392,6 +1620,11 @@ function clickHandling () {
     $("#myProg").click(function () {
         myprogress(globals)
     });
+    
+    $("#switchLanguage").click(function () {
+        switchLanguage(globals)
+    });
+
 }
 
 function showHTMLProblemAtStart () {

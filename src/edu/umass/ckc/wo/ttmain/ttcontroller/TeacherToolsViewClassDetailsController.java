@@ -521,5 +521,11 @@ public class TeacherToolsViewClassDetailsController {
     	return pvService.getStudentList(classId);
     }
 
+    @RequestMapping(value = "/tt/getStudentPairedList", method = RequestMethod.POST)
+    public @ResponseBody
+    String getStudentPairedList(@RequestParam(value = "classId") String classId) {
+    	return pvService.getStudentPairedList(classId);
+    }
+
    
 }

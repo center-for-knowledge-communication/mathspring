@@ -39,6 +39,7 @@ public class TopicSummary {
 
     int topicId;
     String topicName;
+    String topicSummary;
     int classId;
 
     int sessionId;
@@ -85,10 +86,11 @@ public class TopicSummary {
     boolean hasAvailableContent;
     private String reasonExhausted;
 
-    public TopicSummary(Topic t) {
+    public TopicSummary(Topic t, String pageLang) {
         topicId = t.getId();
-        topicName = t.getName();
-
+        topicName = t.getSummary();
+        
+        
     }
 
     public void loadStudentData(SessionManager smgr) throws Exception {
@@ -789,10 +791,10 @@ public class TopicSummary {
 
     public static List<TopicSummary> getTopicSummaries(SessionManager smgr) throws Exception {
 
-        List<Topic> topics = DbTopics.getClassPlayableTopics(smgr.getConnection(), smgr.getClassID(), smgr.showTestableContent());
+        List<Topic> topics = DbTopics.getClassPlayableTopics(smgr.getConnection(), smgr.getClassID(), smgr.showTestableContent(),smgr.getPageLocale().getLanguage());
         List<TopicSummary> topicSummaries = new ArrayList<TopicSummary>();
         for (Topic t : topics) {
-            TopicSummary s = new TopicSummary(t);
+            TopicSummary s = new TopicSummary(t, smgr.getPageLocale().getLanguage());
             s.loadStudentData(smgr);
             topicSummaries.add(s);
         }

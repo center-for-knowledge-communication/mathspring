@@ -28,6 +28,7 @@ public class CreateClassForm {
     private String classId;
     private String reportType;
     private String classLanguage;
+    private String altLanguage;
     private String maxProb;
     private String minProb;
     private String maxTime;
@@ -52,6 +53,14 @@ public class CreateClassForm {
 
 	public void setClassLanguage(String classLanguage) {
 		this.classLanguage = classLanguage;
+	}
+
+    public String getAltLanguage() {
+		return altLanguage;
+	}
+
+	public void setAltLanguage(String altLanguage) {
+		this.altLanguage = altLanguage;
 	}
 
 	public String getReportType() {

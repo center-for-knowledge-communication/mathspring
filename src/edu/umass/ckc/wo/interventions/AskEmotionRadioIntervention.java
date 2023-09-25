@@ -65,6 +65,7 @@ public class AskEmotionRadioIntervention extends InputResponseIntervention imple
     	ResourceBundle rb = null;
 
     	String str = "";
+    	String sname = "";
 
         try {           	
         		// Multi=lingual enhancement
@@ -82,10 +83,13 @@ public class AskEmotionRadioIntervention extends InputResponseIntervention imple
         		}
         		
         		str = "<div>  " + getFormOpen() + " <p>" + rb.getString("ask_emotion_radio_header") + "<br>" + rb.getString("ask_emotion_radio_question") + strEmo + ".";
-
-        		str += "<input type=\"hidden\" name=\"" + EMOTION + "\" value=\"" + emotion.getName() + "\"><br>";
-        		for (int i =0;i<emotion.getLabels().size();i++)
-        			str += "<input name=\"" + LEVEL + "\" type=\"radio\" value=\"" + emotion.getVals().get(i) + "\">" + emotion.getLabels().get(i) + "</input><br>";
+        		
+        		sname = rb.getString(emotion.getName());
+        		str += "<input type=\"hidden\" name=\"" + EMOTION + "\" value=\"" + sname + "\"><br>";
+        		for (int i =0;i<emotion.getLabels().size();i++) {
+        			String tstr = rb.getString(emotion.getLabels().get(i));
+        			str += "<input name=\"" + LEVEL + "\" type=\"radio\" value=\"" + emotion.getVals().get(i) + "\">" + tstr + "</input><br>";
+        		}
         		str += "<br>";
         		if (askWhy) {
        				str += rb.getString("why_is_that") + "<br>";

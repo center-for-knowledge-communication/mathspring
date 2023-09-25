@@ -2141,6 +2141,9 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "chatPrompt":
     			result = chatPrompt(conn, filter);
     			break;
+    		case "translatePrompt":
+    			result = translatePrompt(conn, filter);
+    			break;
     		default:
     			System.out.println("unrecognized command:" + command);
     			return "unrecognized command:" + command;
@@ -4127,6 +4130,31 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     }
 
+    public String translatePrompt(Connection conn, String filter) throws SQLException {
+	   	
+    	String result = "error";
+    	
+    	
+    	
+    	
+    	result =  "";
+    	
+    	listTokens();
+    	
+    	 
+    	
+    	String command[] = filter.split("~");
+    	
+    	
+    	
+    	result = prompts("translate to " + command[0] + ": '" + command[1] + "'");   	
+    	
+    	
+    	return result;
+    	
+    	
+    }
+
 
 
 
@@ -4186,7 +4214,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
 			con.setDoOutput(true);
 		//Make sure you put the right API Key saved earlier.
-			con.setRequestProperty("Authorization", "Bearer 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");
+			con.setRequestProperty("Authorization", "Bearer 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");
 			int responseCode = con.getResponseCode();
 			System.out.println("Response Code : " + responseCode);
 			BufferedReader in = new BufferedReader(
@@ -4202,8 +4230,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 			System.out.println(e.getMessage());
 		}
 	}
-	
-	
+
 	public String prompts(String question) {
 		try {
 			URL url = new URL("https://api.openai.com/v1/completions");
@@ -4215,7 +4242,7 @@ public class TTMiscServiceImpl implements TTMiscService {
 			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
 			con.setDoOutput(true);
 			//Make sure you put the right API Key saved earlier.
-			con.setRequestProperty("Authorization", "Bearer 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");
+			con.setRequestProperty("Authorization", "Bearer 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");
 			
         	JSONObject promptJson = new JSONObject();
         	promptJson.put("model","text-davinci-003");

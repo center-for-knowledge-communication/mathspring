@@ -20,27 +20,113 @@ try {
 }
 catch (Exception e) {
 	 System.out.println("teacherToolsMain ERROR");	 
-//	logger.error(e.getMessage());	
 }
 
 Locale loc = request.getLocale(); 
 Locale loc1 = request.getLocale(); 
 Locale loc2 = request.getLocale();
 
+
+
+int pageLangIndex = 0;
+
+try {
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
+
+String pageLang = (String) request.getAttribute("pageLang");
+
+String prob_lang = "en";
+int probLangIndex = 0;
+
+probLangIndex = (int) request.getAttribute("probLangIndex");
+
+
+
+	if (probLangIndex > 0) {
+		prob_lang = "es";
+	}
+	else {
+		prob_lang = "en";
+	}
+
+
 String lang = loc.getLanguage();
 String country = loc.getCountry();
 
+if ((pageLang != null) && pageLang.length() == 2) {
+	lang = pageLang;	
+}
+
 System.out.println("locale set to:" + lang + "-" + country );	
 
-if (lang.equals("en")) {
-	loc1 = new Locale("en","US");	
-	loc2 = new Locale("es","US");	
+String next_problem = "";
+String translate_this_problem = "";
+String problem_current_topic = "";
+String problem_standards = "";
+String hintText = "";
+String stepText = "";
+String replay_hints = "";
+String read_question = "";
+String show_example = "";
+String show_video = "";
+String formula = "";
+String report_error = "";
+String select_prob = "";
+String view_log = "";
+String example_problem_done = "";
+String my_garden = "";
+String my_progress = "";
+String practice_area = "";
+String logout = "";
+String step = "";
+
+String step_by_step_solution = "";
+String submit_answer = "";
+String alt_step_by_step_solution = "";
+String alt_submit_answer = "";
+String watch_and_listen_instructions = "";
+String alt_watch_and_listen_instructions = "";
+String example_problem_play_hints = "";
+String alt_example_problem_play_hints = "";
+
+
+
+try {
+	if (pageLangIndex == 0) {
+		if (lang.equals("en")) {
+			lang = "en";
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");	
+		}
+		else {
+			lang = "es";
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");		
+		}
+	}
+	else {
+		if (lang.equals("en")) {
+			lang = "es";
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");	
+		}
+		else {
+			lang = "en";
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");		
+		}	
+	}
 }
-else {
-	loc1 = new Locale("es","US");	
-	loc2 = new Locale("en","US");		
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
 }
-		
+
 ResourceBundle rb = null;
 
 ResourceBundle rb1 = null;
@@ -48,14 +134,14 @@ try {
 	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	System.out.println(e.getMessage());
 }
 ResourceBundle rb2 = null;
 try {
 	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	System.out.println(e.getMessage());
 }
 
 if (lang.equals("en")) {
@@ -64,6 +150,121 @@ if (lang.equals("en")) {
 else {
 	rb = rb2;	
 }
+
+
+	
+
+if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(lang.equals("en")))) ) {
+	next_problem = rb1.getString("next_problem");
+	translate_this_problem = rb1.getString("translate_this_problem");
+	problem_current_topic = rb1.getString("problem_current_topic");
+	problem_standards = rb1.getString("problem_standards");
+	hintText = rb1.getString("hint");
+	stepText = rb1.getString("step");
+	replay_hints = rb1.getString("replay_hints");
+	read_question = rb1.getString("read_question");
+	show_example = rb1.getString("show_example");
+	show_video = rb1.getString("show_video");
+	formula = rb1.getString("formula");
+	report_error = rb1.getString("report_error");
+	select_prob = rb1.getString("select_prob");
+	view_log = rb1.getString("view_log");
+	my_garden = rb1.getString("my_garden");
+	my_progress = rb1.getString("my_progress");
+	practice_area = rb1.getString("practice_area");
+	logout = rb1.getString("log_out");
+	watch_and_listen_instructions = rb1.getString("watch_and_listen_instructions");
+	example_problem_play_hints = rb1.getString("example_problem_play_hints");
+	
+	example_problem_done = rb1.getString("example_problem_done");
+	step = rb1.getString("step");
+}
+else {
+	next_problem = rb2.getString("next_problem");
+	translate_this_problem = rb2.getString("translate_this_problem");
+	problem_current_topic = rb2.getString("problem_current_topic");
+	problem_standards = rb2.getString("problem_standards");
+	hintText = rb2.getString("hint");
+	stepText = rb1.getString("step");
+	replay_hints = rb2.getString("replay_hints");
+	read_question = rb2.getString("read_question");
+	show_example = rb2.getString("show_example");
+	show_video = rb2.getString("show_video");
+	formula = rb2.getString("formula");
+	report_error = rb2.getString("report_error");
+	select_prob = rb2.getString("select_prob");
+	view_log = rb2.getString("view_log");
+	my_garden = rb2.getString("my_garden");
+	my_progress = rb2.getString("my_progress");
+	practice_area = rb2.getString("practice_area");
+	logout = rb2.getString("log_out");
+	watch_and_listen_instructions = rb2.getString("watch_and_listen_instructions");
+	example_problem_play_hints = rb2.getString("example_problem_play_hints");
+	example_problem_done = rb2.getString("example_problem_done");
+	step = rb2.getString("step");
+
+}
+
+Locale prob_loc1 = request.getLocale(); 
+Locale prob_loc2 = request.getLocale();
+
+try {
+	if (probLangIndex == 0) {
+		if (prob_lang.equals("en")) {
+			prob_lang = "en";
+			prob_loc1 = new Locale("en","US");	
+			prob_loc2 = new Locale("es","US");	
+		}
+		else {
+			prob_lang = "es";
+			prob_loc1 = new Locale("es","US");	
+			prob_loc2 = new Locale("en","US");		
+		}
+	}
+	else {
+		if (prob_lang.equals("en")) {
+			prob_lang = "es";
+			prob_loc1 = new Locale("es","US");	
+			prob_loc2 = new Locale("en","US");	
+		}
+		else {
+			prob_lang = "en";
+			prob_loc1 = new Locale("en","US");	
+			prob_loc2 = new Locale("es","US");		
+		}	
+	}
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+}
+
+ResourceBundle prob_rb = null;
+ResourceBundle prob_rb1 = null;
+try {
+	prob_rb1 = ResourceBundle.getBundle("MathSpring",prob_loc1);
+}
+catch (Exception e) {
+	System.out.println(e.getMessage());
+}
+ResourceBundle prob_rb2 = null;
+try {
+	prob_rb2 = ResourceBundle.getBundle("MathSpring",prob_loc2);
+}
+catch (Exception e) {
+	System.out.println(e.getMessage());
+}
+
+step_by_step_solution = prob_rb1.getString("step_by_step_solution");
+submit_answer = prob_rb1.getString("submit_answer");
+watch_and_listen_instructions = prob_rb1.getString("watch_and_listen_instructions");
+example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");
+
+alt_step_by_step_solution = prob_rb2.getString("step_by_step_solution");
+alt_submit_answer = prob_rb2.getString("submit_answer");
+alt_watch_and_listen_instructions = prob_rb2.getString("watch_and_listen_instructions");
+alt_example_problem_play_hints = prob_rb2.getString("example_problem_play_hints");
+
+
 %>
 
 <!DOCTYPE HTML>
@@ -140,7 +341,7 @@ else
 </c:if>
 
 <script type="text/javascript">
-	var lang = "<%=lang%>";
+	var lang = "en";
 	var stepText = "<%= rb.getString("step") %>";
 	var hintText = "<%= rb.getString("hint") %>";
 	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";
@@ -148,8 +349,6 @@ else
 	var no_instructions_to_show = "<%= rb.getString("no_instructions_to_show") %>";
 	var problem_current_topic = "<%= rb.getString("problem_current_topic") %>";
 	var problem_standards = "<%= rb.getString("problem_standards") %>";
-	var watch_and_listen_instructions = "<%= rb.getString("watch_and_listen_instructions") %>";
-	var example_problem_play_hints = "<%= rb.getString("example_problem_play_hints") %>";
 	var example_problem_done = "<%= rb.getString("example_problem_done") %>";
 	var hint_not_found = "<%= rb.getString("hint_not_found") %>"; 
 	var please_watch_video = "<%= rb.getString("please_watch_video") %>";
@@ -167,7 +366,37 @@ else
 	var waiting_for_partner = "<%= rb.getString("waiting_for_partner") %>";
 	var initializing_camera = "<%= rb.getString("initializing_camera") %>";
 	var wait_for_camera = "<%= rb.getString("wait_for_camera") %>";
-	var camera_initialized = "<%= rb.getString("camera_initialized") %>";	
+	var camera_initialized = "<%= rb.getString("camera_initialized") %>";
+	var next_problem = "<%= next_problem %>";
+	var translate_this_problem = "<%= translate_this_problem %>";
+
+	var hintText = "<%= hintText %>";
+	var stepText = "<%= stepText %>";
+	var replay_hints = "<%= replay_hints %>";
+	var read_question = "<%= read_question %>";
+	var show_example = "<%= show_example %>";
+	var show_video = "<%= show_video %>";
+	var formula = "<%= formula %>";
+	var report_error = "<%= report_error %>";
+	var select_prob = "<%= select_prob %>";
+	var view_log = "<%= view_log %>";
+	var my_garden = "<%= my_garden %>";
+	var my_progress = "<%= my_progress %>";
+	var practice_area = "<%= practice_area %>";
+	var logout = "<%= logout %>";
+	var example_problem_done = "<%= example_problem_done %>";	
+	var stepText = "<%= stepText %>";
+	window.probLang = "<%= prob_lang %>";
+	window.step_by_step_solution = "<%= step_by_step_solution %>";	
+	window.alt_step_by_step_solution = "<%= alt_step_by_step_solution %>";	
+	window.submit_answer = "<%= submit_answer %>";	
+	window.alt_submit_answer = "<%= alt_submit_answer %>";	
+	window.example_problem_play_hints = "<%= example_problem_play_hints %>";	
+	window.alt_example_problem_play_hints = "<%= alt_example_problem_play_hints %>";	
+	window.watch_and_listen_instructions = "<%= watch_and_listen_instructions %>";	
+	window.alt_watch_and_listen_instructions = "<%= alt_watch_and_listen_instructions %>";	
+
+		
 </script>
 
 
@@ -180,11 +409,11 @@ else
 <script type="text/javascript" src="js/devdialog.js?ver=<%=versions.getString("js_version")%>"></script>
 <script type="text/javascript" src="js/tutorintervention.js?ver=<%=versions.getString("js_version")%>"></script>
 <script type="text/javascript" src="js/intervhandlers_new.js?ver=<%=versions.getString("js_version")%>"></script>
-<script type="text/javascript" src="js/swfobject.js"></script>
 
 
 
 <script type="text/javascript">
+
 
 
         var globals = {
@@ -216,6 +445,8 @@ else
             probType: '${probType}',
             experiment : '${experiment}',
             probLangIndex : 0,
+            isTranslation: 0,
+            studentLangIndex : 1,
             exampleProbType : null,
             probId : ${probId},
             probMode: '${probMode}',
@@ -258,7 +489,7 @@ else
             problemContentPath : '${problemContentPath}',
             webContentPath : '${webContentPath}',
             webContentPath2 : '${webContentPath2}',
-            <%--servletContextPath : '${pageContext.request.contextPath}',--%>
+            servletContextPath : '${pageContext.request.contextPath}',
             servletName : '${servletName}',
             probplayerPath : '${probplayerPath}',
             wait: false,
@@ -301,7 +532,10 @@ else
                 $('.huytran-practice__character-window').width(250);
             }
         });
-    
+
+    	var pageLangIndexStr = "<%= pageLangIndex %>";
+   		var pageLangIndex = Number(pageLangIndexStr);
+        
     </script>
 
 
@@ -354,6 +588,10 @@ label {
 	color: #e1e1e1;
 }
 
+.not-allowed {
+     cursor: not-allowed! important;
+}
+
 </style>
 </head>
 <body>
@@ -389,7 +627,7 @@ label {
 
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="650" height="650"
-		title="<%= rb.getString("watch_and_listen_instructions")%>">
+		title="<%= rb.getString("watch_and_listen_instructions")%>"
 		<iframe id="exampleFrame" name="iframe2" width="650" height="650"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
@@ -416,52 +654,73 @@ label {
 
 			<div class="huytran-sitenav__main">
 				<input type="checkbox" class="huytran-sitenav__showmore-state"
-					id="post" /> <a href="#"
-					class="huytran-sitenav__button huytran-sitenav__button--first"
+					id="post" /> 
+				<a href="#"	class="huytran-sitenav__button huytran-sitenav__button--first"
 					id="nextProb"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-plus" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
+				</span> <span id = "nextProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
+				</a>
+				 
+				<div id="translateProbWrapper">
+					<a href="#" class="huytran-sitenav__button"
+						id="translateProb"> <span class="huytran-sitenav__icon"> <i
+							class="fa fa-plus" aria-hidden="true"></i>
+					</span> <span id= "translateProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("translate_this_problem") %></span>
+					<span id = "trans_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
+					</a>
+				</div>
+								
+				<a href="#"  id="read" class="huytran-sitenav__button"> 
+					<span class="huytran-sitenav__icon"> <i class="fa fa-bullhorn" aria-hidden="true"></i></span>
+					<span id="readText"class="huytran-sitenav__buttontitle"><%= rb.getString("read_question") %></span>
 				</a> 
-				<a href="#" class="huytran-sitenav__button huytran-sitenav__button--first"
-					id="nextProb1"> <span class="huytran-sitenav__icon"> <i
-						class="fa fa-plus" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb2.getString("next_problem") %></span>
-				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
-				</a>				<a href="#" class="huytran-sitenav__button" id="hint"> <span
-					class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o"
-						aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><span
-						id="hint_label"><%= rb.getString("hint") %></span></span>
-				</a> <a href="#" class="huytran-sitenav__button" id="replay"> <span
-					class="huytran-sitenav__icon"> <i class="fa fa-repeat"
-						aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("replay_hints") %></span>
-				</a> <a href="#" class="huytran-sitenav__button" id="read"> <span
-					class="huytran-sitenav__icon"> <i class="fa fa-bullhorn"
-						aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("read_question") %></span>
-				</a> <a href="#"
+				
+				<a href="#" id="hint" class="huytran-sitenav__button"> 
+					<span class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
+					<span id="hint_label" class="huytran-sitenav__buttontitle"><%= rb.getString("hint") %></span>
+				</a>
+				 
+				<a href="#" id="replay" class="huytran-sitenav__button" > 
+					<span class="huytran-sitenav__icon"> <i class="fa fa-repeat" aria-hidden="true"></i></span>
+					<span id="replayText" class="huytran-sitenav__buttontitle"><%= rb.getString("replay_hints") %></span>
+				</a>
+				 
+				<a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="example"> <span class="huytran-sitenav__icon"> <i
-						class="fa fa-question" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("show_example") %></span>
-				</a> <a href="#"
+						 class="fa fa-question" aria-hidden="true"></i>
+				</span> <span id="exampleText" class="huytran-sitenav__buttontitle"><%= rb.getString("show_example") %></span>
+				</a>
+				 
+				<a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="video"> <span class="huytran-sitenav__icon"> <i
 						class="fa fa-video-camera" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("show_video") %></span>
-				</a> <a href="#"
+				</span> <span id="videoText" class="huytran-sitenav__buttontitle"><%= rb.getString("show_video") %></span>
+				</a>
+				 
+				<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
+					id="showLCList" <span	class="huytran-sitenav__icon"> <i
+						class="fa fa-exclamation aria-hidden="true"></i>
+				</span> <span id="lcText" class="huytran-sitenav__buttontitle">Learning Companions</span>
+				</a>
+
+				<a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					id="formulas"> <span class="huytran-sitenav__icon"> <i
-						class="fa fa-magic" aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("formula") %></span>
-				</a> <a class="huytran-sitenav__button huytran-sitenav__showmore-target"
+						 class="fa fa-magic" aria-hidden="true"></i>
+					</span> <span id="formulaText" class="huytran-sitenav__buttontitle"><%= rb.getString("formula") %></span>
+				
+				</a>
+				 
+				<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
 					data-toggle="modal" data-target="#reportModal"> <span
 					class="huytran-sitenav__icon"> <i
 						class="fa fa-exclamation aria-hidden="true"></i>
-				</span> <span class="huytran-sitenav__buttontitle"><%= rb.getString("report_error") %></span>
+				</span> <span id="reportErrorText" class="huytran-sitenav__buttontitle"><%= rb.getString("report_error") %></span>
 				</a>
+				
 				<c:if test="${showProblemSelector}">
 					<a id="selectProb" href="#" class="huytran-sitenav__button"> <span
 						class="huytran-sitenav__icon"> <i class="fa fa-check"
@@ -483,11 +742,11 @@ label {
 		<div class="huytran-practice">
 			<div class="huytran-practice__menu">
 				<div class="huytran-practice__nav">
-					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> <a
-						class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> <a
-						class="huytran-practice__navitem" href="#"><%= rb.getString("practice_area") %></a>
+					<a class="huytran-practice__navitem" id="home"><%= rb.getString("my_garden") %></a> 
+					<a class="huytran-practice__navitem" id="myProg"><%= rb.getString("my_progress") %></a> 
+					<a class="huytran-practice__navitem" id="practiceArea" href="#"><%= rb.getString("practice_area") %></a>
 						
-				<a class="huytran-practice__navitem"
+				<a class="huytran-practice__navitem" id="logout"
 					href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
 					<%= rb.getString("log_out") %> &nbsp; 
 					<span class="fa fa-sign-out"></span>
@@ -574,6 +833,28 @@ label {
 			</div>
 		</div>
 	</div>
+
+	<div class="modal fade" height="500px" data-backdrop="static" id="lcModal" tabindex="-1" role="dialog"
+		aria-labelledby="lcModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="lcModalLabel">Learning companions</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div id="lcBody" class="modal-body">
+				</div>
+				<div class="modal-footer">
+					<button id="lcSubmitBtn" type="button" class="btn btn-secondary" onclick="changeStudentLC();"><%= rb.getString("submit")%></button>
+					<button                  type="button" class="btn btn-secondary" data-dismiss="modal"><%= rb.getString("close")%></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 
 	<div id="eventLogWindow" title="Event Logs" style="display: none;">
 		<div class="containers">
@@ -907,7 +1188,8 @@ label {
     }
 
     $(document).ready(function() {
-	    if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
+    	var pgContext = '${pageContext.request.contextPath}';
+    	if (globals.gazeParamsJSON.gazinterv_monitor_on === 1) {
 	    	document.getElementById("webcam").style.zIndex = "3";    	
 	    	document.getElementById("monitorBox").style.visibility = "visible";	    
 	    	document.getElementById("monitorBox").style.zIndex = "3";    	
@@ -920,13 +1202,39 @@ label {
 	    else {
     		document.getElementById("monitorBox").style.visibility = "hidden";
 	    }
-		if (globals.experiment == "multi-lingual") {
-			// Show 'Proxima problema' button
-		    document.getElementById("nextProb1").style.display = "block";
-		}
+
+		document.getElementById("translateProbText").innerHTML =  translate_this_problem;
+		document.getElementById("nextProbText").innerHTML =  next_problem;		
+		
+		document.getElementById("replayText").innerHTML =  replay_hints;
+		document.getElementById("readText").innerHTML =  read_question;
+		document.getElementById("exampleText").innerHTML =  show_example;
+		document.getElementById("videoText").innerHTML =  show_video;
+		document.getElementById("formulaText").innerHTML = formula;
+		document.getElementById("home").innerHTML =  my_garden;
+		document.getElementById("myProg").innerHTML =  my_progress;
+		document.getElementById("practiceArea").innerHTML =  practice_area;
+		document.getElementById("logout").innerHTML =  logout;
+		document.getElementById("reportErrorText").innerHTML =  report_error;
+//		document.getElementById("selectProb").innerHTML =  select_prob;
+//		document.getElementById("view_log").innerHTML =  view_log;
+		document.getElementById("exampleContainer").title =  watch_and_listen_instructions;
+		
+		problem_current_topic = "<%= problem_current_topic %>";
+		problem_standards = "<%= problem_standards %>";
+
+        if (pageLangIndex == 0) {
+            document.getElementById("exampleContainer").title = watch_and_listen_instructions;;
+    	}
 		else {
-		    document.getElementById("nextProb1").style.display = "none";			
+            document.getElementById("exampleContainer").title = "WTF";
 		}
+		
+        document.getElementById('lcModal').style.height = window.height / 2 ;
+
+        
+	    addEventListener("click", clickLCButton, false);
+	    
     });
     
     $(document).ready(function() {

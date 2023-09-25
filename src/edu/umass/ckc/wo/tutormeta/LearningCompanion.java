@@ -38,6 +38,7 @@ public abstract class LearningCompanion {
     public abstract Response processInputResponse (SessionManager smgr, InputResponseEvent e, Response r) throws Exception;
     public abstract Response processAttempt (SessionManager smgr, AttemptEvent e, AttemptResponse r) throws Exception;
     public abstract Response processHintRequest (SessionManager smgr, HintEvent e, HintResponse r) throws Exception;
+    public abstract Response processTranslateProblemRequest (SessionManager smgr, TranslateProblemEvent e, Response r) throws Exception;
     public abstract Response processNextProblemRequest (SessionManager smgr, NextProblemEvent e, Response r) throws Exception;
     public abstract Response processEndProblem (SessionManager smgr, EndProblemEvent e, Response r) throws Exception;
     public abstract Response processBeginProblem (SessionManager smgr, BeginProblemEvent e, Response r) throws Exception;
