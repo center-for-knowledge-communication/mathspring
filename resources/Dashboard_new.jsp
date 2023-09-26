@@ -11,6 +11,66 @@
 
 */
 
+Locale loc = request.getLocale(); 
+
+ResourceBundle rb = null;
+
+
+String lang = loc.getLanguage();
+String country = loc.getCountry();
+
+System.out.println("Browser locale set to:" + lang + "-" + country );	
+
+int pageLangIndex = 0;
+
+try {
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+
+	if (pageLangIndex == 0) {
+		if (lang.equals("en")) {
+			try {
+				rb = ResourceBundle.getBundle("MathSpring", new Locale("en","US"));
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		else {
+			lang = "es";
+			try {
+				rb = ResourceBundle.getBundle("MathSpring",new Locale("es","US"));
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	else {
+		if (lang.equals("en")) {
+			lang = "es";
+			try {
+				rb = ResourceBundle.getBundle("MathSpring", new Locale("es","US"));
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		else {
+			try {
+				rb = ResourceBundle.getBundle("MathSpring", new Locale("en","US"));
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}	
+	}
+
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
+
 ResourceBundle versions = null; 
 try {
 	 versions = ResourceBundle.getBundle("Versions");
@@ -21,17 +81,54 @@ catch (Exception e) {
 	 System.out.println("versions bundle ERROR");	 
 }
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
 
-ResourceBundle rb = null;
+	
+/*
+ResourceBundle rb1 = null;
 try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
+	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	System.out.println(e.getMessage());
 }
+ResourceBundle rb2 = null;
+try {
+	rb2 = ResourceBundle.getBundle("MathSpring",testloc);
+}
+catch (Exception e) {
+	
+	System.out.println(e.getMessage());
+}
+
+if (lang.equals("en")) {
+	try {
+		rb = ResourceBundle.getBundle("MathSpring",loc1);
+	}
+	catch (Exception e) {
+		System.out.println(e.getMessage());
+	}
+}
+else {
+	try {
+		rb = ResourceBundle.getBundle("MathSpring",loc2);
+	}
+	catch (Exception e) {
+		
+		System.out.println(e.getMessage());
+	}
+}
+*/
+
+
+
+
 %>
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -841,7 +938,7 @@ catch (Exception e) {
     	            if (challengeTopicLink !== "") {
     	                buttons[buttons.length] = $.extend({}, vex.dialog.buttons.NO, {
     	                    className: 'btn btn-lg mathspring-important-btn',
-    	                    text: 'Challenge',
+    	                    text: '<%= rb.getString("dashboard_challenge")%>',
     	                    click: function($vexContent, event) {
     	                        window.location = challengeTopicLink;
     	                    }
@@ -850,7 +947,7 @@ catch (Exception e) {
     	            if (reviewTopicLink !== "") {
     	                buttons[buttons.length] = $.extend({}, vex.dialog.buttons.NO, {
     	                    className: 'btn btn-lg mathspring-warning-btn',
-    	                    text: 'Review',
+    	                    text: '<%= rb.getString("dashboard_review")%>',
     	                    click: function($vexContent, event) {
     	                        window.location = reviewTopicLink;
     	                    }
@@ -859,7 +956,7 @@ catch (Exception e) {
     	            if (continueTopicLink !== "") {
     	                buttons[buttons.length] = $.extend({}, vex.dialog.buttons.NO, {
     	                    className: 'btn btn-lg mathspring-btn',
-    	                    text: 'Continue',
+    	                    text: '<%= rb.getString("dashboard_continue")%>',
     	                    click: function($vexContent, event) {
     	                        window.location = continueTopicLink;
     	                    }
@@ -885,7 +982,7 @@ catch (Exception e) {
     	                    '<div>',
     	                    '<h3 class="topic-title">' + title + '</h3>',
     	                    '<div class="visible num-questions">',
-    	                    '<p>' + numComplete + ' / ' + numTotal + ' problems done</p>',
+    	                    '<p>' + numComplete + ' / ' + numTotal + ' <%= rb.getString("problems_done")%></p>',
     	                    '</div>',
     	                    '<div class="progress overlay">',
     	                    '<div class="progress-bar ' + className + '" role="progressbar" aria-valuenow="' + percentage + '"',
@@ -1068,14 +1165,17 @@ catch (Exception e) {
             </a>
         </li>
         <li class="nav__item">
-            <c:choose>
+        <c:choose>
             <c:when test="${newSession}">
-            <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area")%></a>
+            	<a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area")%></a>
             </c:when>
             <c:otherwise>
-        <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'">Practice Area</a>
-        </c:otherwise>
+        		<a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'"><%= rb.getString("practice_area")%></a>
+        	</c:otherwise>
         </c:choose>
+        </li>
+        <li class="nav__item">
+            <a onclick="window.location='TutorBrain?action=ChangeLanguage&from=sat_Hut&to=sat_Hut&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
         </li>
         <li class="nav__item">
             <a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">

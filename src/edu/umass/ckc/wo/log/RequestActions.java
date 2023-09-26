@@ -51,6 +51,7 @@ public class RequestActions {
      public static final String MPP = "MyProgressPage";
     public static final String FORMALITY_EXTERNAL_ACTIVITY = "Formality_ExternalActivity";
     public static final String CHOOSE_PEDAGOGY = "choosePedagogy";
+    public static final String CHANGE_LANGUAGE = "changeLanguage";
 
     public static final String[] TUTOR_HUT_ACTIVITIES = { BEGIN_PROBLEM,FORMALITY_BEGIN_PROBLEM,END_PROBLEM, FORMALITY_END_PROBLEM,
             SHOW_INTERVENTION,END_INTERVENTION,  BEGIN_EXAMPLE,END_EXAMPLE, NEXT_PROBLEM,HINT,FORMALITY_HINT,SHOW_EXAMPLE,SHOW_VIDEO,

@@ -71,6 +71,9 @@ public class TutorPage {
         info.getRequest().setAttribute("sessionId",smgr.getSessionNum());
 
 
+        info.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
+        info.getRequest().setAttribute("pageLang",smgr.getLocale().getLanguage());
+        info.getRequest().setAttribute("probLangIndex",smgr.getProbLangIndex());
         // Path to the Flash client is given by web.xml param for WoTutorServlet
         info.getRequest().setAttribute("instructions",null);
         info.getRequest().setAttribute("studId",smgr.getStudentId());
@@ -229,9 +232,10 @@ public class TutorPage {
     public void createTutorPageForResumingPreviousProblem(long elapsedTime, long probElapsedTime, int topicId,
                                                           ProblemResponse problemResponse, String chalRevOrPracticeMode, String lastProbType,
                                                           boolean solved, String resource, String answer, boolean isBeginningOfSession, int lastProbId,
-                                                          boolean showMPP) throws Exception {
+                                                          boolean showMPP, String pageLang) throws Exception {
         setJavascriptVars(elapsedTime,probElapsedTime,topicId,problemResponse,chalRevOrPracticeMode,lastProbType,solved,resource,answer,isBeginningOfSession,lastProbId,showMPP);
         info.getRequest().setAttribute("resumeProblem",true);  // tells tutorhut to not send EndProblem followed by BeginProblem events.  Instead will send ResumeProblem
+        info.getRequest().setAttribute("pageLang",pageLang);  // tells tutorhut to not send EndProblem followed by BeginProblem events.  Instead will send ResumeProblem
         RequestDispatcher disp=null;
         disp = info.getRequest().getRequestDispatcher(isUsingNewUI() ? TUTOR_MAIN_JSP_NEW : TUTOR_MAIN_JSP);
         disp.forward(info.getRequest(),info.getResponse());

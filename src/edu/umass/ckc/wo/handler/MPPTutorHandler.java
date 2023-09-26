@@ -53,7 +53,7 @@ public class MPPTutorHandler {
                     // TODO:   The problem is that ending it causes the student model to update as if an incorrect problem were submitted.
                     if (!p.isIntro() && !state.isProblemSolved()) {
                         new TutorPage(info,smgr).createTutorPageForResumingPreviousProblem(e.getElapsedTime(), 0, e.getTopicId(), r, "practice", state.getCurProbType(),
-                                true, p.getResource(), null, false, p.getId(), this.showMPP);
+                                true, p.getResource(), null, false, p.getId(), this.showMPP,smgr.getPageLocale().getLanguage());
                         new TutorLogger(smgr).logMPPEvent(e,p.getId());
                         return;
                     }

@@ -86,7 +86,7 @@ m.build = function(activity, previewMode) {
             hint_thumb.id = hintId + "Thumb";
             hint_thumb.style.visibility = "hidden";
             var stepNumber = i+1;
-            hint_thumb.innerHTML = stepText + " " + stepNumber;
+            hint_thumb.innerHTML = "-- " + stepNumber + " --";
             hint_thumb.addEventListener("click",
                 //This looks weird but is necessary to save the hintLabel value properly
                 function(hint) {

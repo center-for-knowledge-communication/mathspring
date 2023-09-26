@@ -37,4 +37,7 @@ public interface TTProblemsViewService {
     public String isClassInUse(String classId);
     
     public String getStudentList(String classId);
+
+    public String getStudentPairedList(String classId);
+ 
 }

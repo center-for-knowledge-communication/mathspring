@@ -65,6 +65,8 @@ public class SessionManager {
     private Connection connection;
 
 
+    private int probLangIndex = 0;
+    private int pageLangIndex = 0;
     private int studId = -1;
     private int classId = -1;
     private String className = "";
@@ -355,9 +357,25 @@ public class SessionManager {
         this.studId = Integer.valueOf(fields[0]);
         this.classId = Integer.valueOf(fields[1]);
         String language = fields[2];
-   
+        int pageLangIndex = Integer.valueOf(fields[3]);
         ClassInfo cl = DbClass.getClass(connection, this.classId);
-        
+        if (pageLangIndex < 0) {
+	        if ((language.startsWith("en")) && (cl.getClassLanguageCode().contains("English"))) {
+	        	this.setPageLangIndex(0);
+	    	}
+	        else {
+		        if ((language.startsWith("es")) && (cl.getClassLanguageCode().contains("Spanish"))) {
+		        	this.setPageLangIndex(0);
+		    	}
+		        else {
+		        	this.setPageLangIndex(1);
+		        }
+	        }
+        }
+        else {
+        	this.setPageLangIndex(pageLangIndex);
+        	DbSession.updateSessionPageLangIndex(this.getConnection(),this.getSessionId(),this.getPageLangIndex());        	
+        }
         this.gazeDetectionOn = cl.getGazeDetectionOn();
         this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId, 0);
         this.experiment = cl.getExperiment();
@@ -1045,5 +1063,37 @@ public class SessionManager {
     	return this.experiment;
     }
     
+    public void setPageLangIndex(int pageLangIndex) {
+        this.pageLangIndex = pageLangIndex;
+    }
+    public int togglePageLangIndex() {
+    	if (this.pageLangIndex > 0) {
+    		this.pageLangIndex = 0;
+    	}
+    	else {
+    		this.pageLangIndex = 1;
+    	}
+    	return this.pageLangIndex;
+    }
+    public int getPageLangIndex() {
+    	return this.pageLangIndex;
+    }
     
+    public Locale getPageLocale() {
+    	if (this.pageLangIndex > 0) {
+    		return  new Locale("es","US");    		
+    	}
+    	else {
+    		return  new Locale("en","US");    		
+    	}
+    }
+
+    public void setProbLangIndex(int probLangIndex) {
+        this.probLangIndex = probLangIndex;
+    }
+    
+    public int getProbLangIndex() {
+    	return this.probLangIndex;
+    }
+        
 }

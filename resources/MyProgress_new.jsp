@@ -10,6 +10,51 @@
 * Frank	11-27-22	Merge jchart.js inline and apply multi-lingual algorithms
 
 */
+
+Locale loc = request.getLocale(); 
+Locale loc1 = request.getLocale(); 
+Locale loc2 = request.getLocale();
+
+
+
+
+String lang = loc.getLanguage();
+String country = loc.getCountry();
+
+System.out.println("locale set to:" + lang + "-" + country );	
+
+int pageLangIndex = 0;
+
+try {
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+
+	if (pageLangIndex == 0) {
+		if (lang.equals("en")) {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");	
+		}
+		else {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");		
+		}
+	}
+	else {
+		if (lang.equals("en")) {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");	
+		}
+		else {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");		
+		}	
+	}
+
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
+
 ResourceBundle versions = null; 
 try {
 	 versions = ResourceBundle.getBundle("Versions");
@@ -18,18 +63,42 @@ try {
 }
 catch (Exception e) {
 	 System.out.println("versions bundle ERROR");	 
-//	logger.error(e.getMessage());	
 }
 
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
+//Locale loc = request.getLocale();
+//String lang = loc.getDisplayLanguage();
+
+//ResourceBundle rb = null;
+//try {
+//	rb = ResourceBundle.getBundle("MathSpring",loc);
+//}
+//catch (Exception e) {
+//	logger.error(e.getMessage());
+//}
+
 
 ResourceBundle rb = null;
+
+ResourceBundle rb1 = null;
 try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
+	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	System.out.println(e.getMessage());
+}
+ResourceBundle rb2 = null;
+try {
+	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
+}
+catch (Exception e) {
+	System.out.println(e.getMessage());
+}
+
+if (lang.equals("en")) {
+	rb = rb1;
+}
+else {
+	rb = rb2;	
 }
 %>
 
@@ -1381,13 +1450,16 @@ $.extend({
             <li class="nav-item">
                 <c:choose>
                     <c:when test="${newSession}">
-                        <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'">Practice Area</a>
+                        <a onclick="window.location='TutorBrain?action=EnterTutor&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=0&var=b'"><%= rb.getString("practice_area") %></a>
                     </c:when>
                     <c:otherwise>
                         <a onclick="window.location='TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}'+'&elapsedTime=${elapsedTime}' + '&eventCounter=${eventCounter}' + '&probId=${probId}&topicId=-1' + '&learningCompanion=${learningCompanion}&var=b'"><%= rb.getString("practice_area") %></a>
                     </c:otherwise>
                 </c:choose>
             </li>
+	        <li class="nav-item">
+	            <a onclick="window.location='TutorBrain?action=navigation&from=my_progress&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
+	        </li>
             <li class="nav-item"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
             <li class="nav-item nav-item--last">
             	<a href="#" class="session-clock-item"> <span> <i class="fa fa-clock-o"

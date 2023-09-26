@@ -679,14 +679,30 @@ public class StudentState extends State implements TutorEventHandler {
     }
 
     public int getLangIndex() {
-        return problemState.getPojo().getLangIndex();
+        return problemState.getPojo().getProbLangIndex();
     }
 
-    public void setLangIndex(int langIndex) throws SQLException {
-        problemState.getPojo().setLangIndex(langIndex);
+    public void setLangIndex(int probLangIndex) throws SQLException {
+        problemState.getPojo().setProbLangIndex(probLangIndex);
     }
 
-    
+    public int getTranslateProbId() {
+        return problemState.getPojo().getTranslateProbId();
+    }
+
+    public void setTranslateProbId(int translateProbId) throws SQLException {
+        problemState.getPojo().setTranslateProbId(translateProbId);
+    }
+
+    public int getAltProbId() {
+        return problemState.getPojo().getAltProbId();
+    }
+
+    public void setAltProbId(int altProbId) throws SQLException {
+        problemState.getPojo().setAltProbId(altProbId);
+    }
+
+   
     /* end of problem state methods */
 
 

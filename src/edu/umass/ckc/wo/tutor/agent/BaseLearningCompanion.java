@@ -51,6 +51,12 @@ public class BaseLearningCompanion extends LearningCompanion {
         return r;
     }
 
+    public Response processTranslateProblemRequest (SessionManager smgr, TranslateProblemEvent e, Response r) throws Exception {
+        addEmotion("idle");
+        addLearningCompanionToResponse(r);
+        return r;
+    }
+
 
     public Response processNextProblemRequest (SessionManager smgr, NextProblemEvent e, Response r) throws Exception {
         addEmotion("idle");

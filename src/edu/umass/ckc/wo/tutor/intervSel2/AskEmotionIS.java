@@ -84,7 +84,7 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
             List<Element> emotElts = config.getChildren("emotion");
             if (emotElts != null) {
             	try {
-            		ResourceBundle rb = ResourceBundle.getBundle("MathSpring",smgr.getLocale());
+//            		ResourceBundle rb = ResourceBundle.getBundle("MathSpring",smgr.getLocale());
 	                for (Element em: emotElts) {
 	                    String n = em.getAttributeValue("name");
 	                    Emotion e = new Emotion(n);
@@ -92,9 +92,9 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
 	                    List<Element> labels = em.getChildren("label");
 	                    for (Element lab: labels) {
 	                    	String tLabel = lab.getTextTrim();
-	                    	tLabel = tLabel.replaceAll(" ","_");
-	                    	String mlLabel = rb.getString(tLabel);
-	                        e.addLabel(mlLabel,Integer.parseInt(lab.getAttributeValue("val")));
+	                    	//tLabel = tLabel.replaceAll(" ","_");
+	                    	//String mlLabel = rb.getString(tLabel);
+	                        e.addLabel(tLabel,Integer.parseInt(lab.getAttributeValue("val")));
 	                    }
 	                    emotions.add(e);
 	                }
@@ -164,7 +164,7 @@ public class AskEmotionIS extends NextProblemInterventionSelector  {
             }
             else   {
                 emotionToQuery= getEmotionToQueryRandom();
-                intervention = new AskEmotionRadioIntervention(emotionToQuery, this.askWhy, askAboutSkipping, skippedProblem, smgr.getLocale());
+                intervention = new AskEmotionRadioIntervention(emotionToQuery, this.askWhy, askAboutSkipping, skippedProblem, smgr.getPageLocale());
             }
 
             state.setTimeOfLastIntervention(now);

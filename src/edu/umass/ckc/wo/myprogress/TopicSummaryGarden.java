@@ -734,7 +734,7 @@ public class TopicSummaryGarden {
         List<Topic> topics = DbTopics.getClassPlayableTopics(smgr.getConnection(), smgr.getClassID(), smgr.showTestableContent());
         List<TopicSummary> topicSummaries = new ArrayList<TopicSummary>();
         for (Topic t : topics) {
-            TopicSummary s = new TopicSummary(t);
+            TopicSummary s = new TopicSummary(t, smgr.getPageLocale().getLanguage());
             s.loadStudentData(smgr);
             topicSummaries.add(s);
         }

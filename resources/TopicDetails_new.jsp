@@ -9,15 +9,84 @@
 *  Frank	11-27-22	Merge jchart.js inline and apply multi-lingual algorithms
 
 */
-Locale loc = request.getLocale();
-String lang = loc.getDisplayLanguage();
 
-ResourceBundle rb = null;
+Locale loc = request.getLocale(); 
+Locale loc1 = request.getLocale(); 
+Locale loc2 = request.getLocale();
+
+
+
+
+String lang = loc.getLanguage();
+String country = loc.getCountry();
+
+System.out.println("locale set to:" + lang + "-" + country );	
+
+int pageLangIndex = 0;
+
 try {
-	rb = ResourceBundle.getBundle("MathSpring",loc);
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+
+	if (pageLangIndex == 0) {
+		if (lang.equals("en")) {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");	
+		}
+		else {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");		
+		}
+	}
+	else {
+		if (lang.equals("en")) {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");	
+		}
+		else {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");		
+		}	
+	}
+
 }
 catch (Exception e) {
-//	logger.error(e.getMessage());
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
+
+ResourceBundle versions = null; 
+try {
+	 versions = ResourceBundle.getBundle("Versions");
+	 System.out.println("css_version=" + versions.getString("css_version"));
+	 System.out.println("js_version=" + versions.getString("js_version"));
+}
+catch (Exception e) {
+	 System.out.println("versions bundle ERROR");	 
+}
+
+
+ResourceBundle rb = null;
+
+ResourceBundle rb1 = null;
+try {
+	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
+}
+catch (Exception e) {
+	System.out.println(e.getMessage());
+}
+ResourceBundle rb2 = null;
+try {
+	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
+}
+catch (Exception e) {
+	System.out.println(e.getMessage());
+}
+
+if (lang.equals("en")) {
+	rb = rb1;
+}
+else {
+	rb = rb2;	
 }
 %>
 

@@ -78,6 +78,7 @@ public interface TTReportService {
     
     public String getClassTopicNamesList(Connection conn, String classId, String filter);
     
+    public String getTopicNamesListByClass(Connection conn, String classId, String filter);
     
     
 }

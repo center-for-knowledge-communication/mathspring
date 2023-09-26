@@ -62,7 +62,7 @@ public class Topic implements Comparable<Topic> {
 
     public Topic (int id, String name, String summary, String mlName, String mlDescription) {
         this(id,name);
-        setSummary(summary);
+        setSummary(mlDescription);
         setMlName(mlName);
         setMlDescription(mlDescription);
     }
@@ -135,7 +135,7 @@ public class Topic implements Comparable<Topic> {
     	return mlName;
     }
 
-    public String getMlName(String lang) {
+    public String getMlName(String lang) {    	
     	
     	String result = mlNameMap.get(lang);
         return result;

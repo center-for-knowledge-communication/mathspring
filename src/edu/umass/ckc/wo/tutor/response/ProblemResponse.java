@@ -19,19 +19,25 @@ import java.util.Random;
  * Time: 10:59:25 AM
  */
 public class ProblemResponse extends Response {
-    public static final ProblemResponse NO_MORE_PROBLEMS = new ProblemResponse(true,false,false);
-    public static final ProblemResponse NO_MORE_REVIEW_PROBLEMS = new ProblemResponse(false,true,false);
-    public static final ProblemResponse NO_MORE_CHALLENGE_PROBLEMS = new ProblemResponse(false,false,true);
+    public static final ProblemResponse NO_MORE_PROBLEMS = new ProblemResponse(true,false,false,false);
+    public static final ProblemResponse NO_MORE_REVIEW_PROBLEMS = new ProblemResponse(false,true,false,false);
+    public static final ProblemResponse NO_MORE_CHALLENGE_PROBLEMS = new ProblemResponse(false,false,true,false);
+    public static final ProblemResponse NO_PROBLEM_TRANSLATION = new ProblemResponse(false,false,false,true);
+    
     protected Problem prob;
     private String endPage = null;
     private Intervention intervention = null;
     private String params = null; // Specific bindings for student, if this problem is parametrized
-
+    private int altProbId = 0;
+    private int isTranslation = 0;
+    
     private boolean noMoreProblems=false;
     private boolean noMoreReviewProblems=false;
     private boolean noMoreChallengeProblems=false;
+    private boolean noProblemTranslation=false;
 
-
+    protected SessionManager smgr;
+    
     public ProblemResponse(Problem p, List<TopicMastery> topicMasteryLevels, int curTopic) {
         this.prob = p;
         this.topicMasteryLevels = topicMasteryLevels;
@@ -45,11 +51,17 @@ public class ProblemResponse extends Response {
         buildJSON();
     }
 
-    public ProblemResponse (boolean noMoreProblems, boolean noMoreReviewProblems, boolean noMoreChallengeProblems ) {
-        this.endPage = TutorPage.NO_MORE_CONTENT; // set some default end page.
+    public ProblemResponse (boolean noMoreProblems, boolean noMoreReviewProblems, boolean noMoreChallengeProblems, boolean noProblemTranslation ) {
+    	if (noProblemTranslation) {
+    		this.endPage = TutorPage.TUTOR_MAIN_JSP_NEW; // set some default end page.    		
+    	}
+    	else {
+    		this.endPage = TutorPage.NO_MORE_CONTENT; // set some default end page.
+    	}
         this.noMoreProblems=noMoreProblems;
         this.noMoreReviewProblems=noMoreReviewProblems;
         this.noMoreChallengeProblems=noMoreChallengeProblems;
+        this.noProblemTranslation=noProblemTranslation;
         buildJSON();
     }
 
@@ -57,6 +69,7 @@ public class ProblemResponse extends Response {
         buildJSON();
 
     }
+    
 
     public Intervention getIntervention() {
         return intervention;
@@ -96,7 +109,12 @@ public class ProblemResponse extends Response {
 
         else {
             prob.buildJSON(jsonObject);  //  problem generates its own json object so we add in character stuff
+            
+//            state.getAltProbId(altProbId);
+//            r.setAltProbId(altProbId);
 
+
+            
             return jsonObject;
         }
 
@@ -128,6 +146,22 @@ public class ProblemResponse extends Response {
         this.params = params;
     }
 
+    public int getAltProbId() {
+        return altProbId;
+    }
+
+    public void setAltProbId(int altProbId) {
+    	jsonObject.element("altProbId",altProbId);
+    }
+    
+    public int getIsTranslation() {
+        return isTranslation;
+    }
+    public void setIsTranslation(int isTranslation) {
+    	jsonObject.element("isTranslation",isTranslation);
+    }
+    
+    
     //This isn't used anywhere?
     public void setProblemBindings(SessionManager smgr) throws SQLException {
         Problem problem = this.getProblem();

@@ -84,6 +84,13 @@ public class TeacherToolsResearchController {
     	return miscService.cohortAdmin(cohortId, command, lang, filter);
     }
 
+    @RequestMapping(value = "/tt/msAdmin", method = RequestMethod.POST)
+    public @ResponseBody String msAdmin(ModelMap map, @RequestParam("command") String command,  @RequestParam("lang") String lang, @RequestParam("filter") String filter, HttpServletRequest request) throws TTCustomException {
+
+
+    	return miscService.msAdmin(command, lang, filter);
+    }
+
     
     @RequestMapping(value = "/tt/researcherViewClassReportCard", method = RequestMethod.GET)
     public String researcherViewClassReportCard(ModelMap map, HttpServletRequest request, @RequestParam("teacherId") String teacherId,  @RequestParam("classId") String classId  ) throws TTCustomException {
@@ -114,6 +121,32 @@ public class TeacherToolsResearchController {
         map.addAttribute("createClassForm", new CreateClassForm()); 
         session.setAttribute("classId",classId);
         return "teacherTools/researcherClassReportCard";
+    }
+
+    
+    @RequestMapping(value = "/tt/researcherMSAdmin", method = RequestMethod.GET)
+    public String researcherMSAdmin(ModelMap map, HttpServletRequest request  ) throws TTCustomException {
+
+	   	 Locale loc = request.getLocale(); 
+	   	 String lang = loc.getLanguage();
+	   	 String country = loc.getCountry();
+	
+	   	 System.out.println("locale set to:" + lang + "-" + country );	
+	
+	   	 if (!lang.equals("es")) {
+	   	 	loc = new Locale("en","US");	
+	   	 }	    	
+    	
+    	ResourceBundle rb = null;
+    	try {
+    		rb = ResourceBundle.getBundle("MathSpring",loc);
+    	}
+    	catch (Exception e) {
+//    		logger.error(e.getMessage());	
+    	}
+
+    	HttpSession session = request.getSession();
+        return "teacherTools/researcherMSAdmin";
     }
     
     
