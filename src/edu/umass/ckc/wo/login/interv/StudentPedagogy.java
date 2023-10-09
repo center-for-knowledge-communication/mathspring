@@ -47,10 +47,16 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
         	
     		if (smgr.getExperiment().indexOf("sameGenderLC") >= 0) {
-    			lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());    			
+    			if (smgr.getGender().equals("") || smgr.getGender().equals("O")) {
+       			 	lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+       			 	System.out.println("Missing gender");
+    			}
+    			else {    					
+    				lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());
+    			}
     		}
     		else {
-    			 lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());
+    			 lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
     		}
 /*        	
         	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
