@@ -49,6 +49,7 @@ public class StudentPedagogy extends LoginInterventionSelector {
     		if (smgr.getExperiment().indexOf("sameGenderLC") >= 0) {
     			if (smgr.getGender().equals("") || smgr.getGender().equals("O")) {
        			 	lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+       			 	System.out.println("Missing gender");
     			}
     			else {    					
     				lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());
