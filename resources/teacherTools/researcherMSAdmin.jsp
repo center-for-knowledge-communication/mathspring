@@ -128,7 +128,7 @@ div.scroll {
 }
 
 .tab-content {
-  	background-color: lightblue;
+  	background-color: #92DDA3;
 }
 
 .report_filters {
@@ -315,8 +315,9 @@ function addExperimentForm() {
             	//document.getElementById("add_experiment_hdr").innerHTML = "Experiment Id# " + newExperimentId;            	
 
             	document.getElementById("newExperimentId").value = newExperimentId;
-            	document.getElementById("experimentName").value = "";
-            	document.getElementById("experimentSchoolYear").value = "";
+            	document.getElementById("addExperimentName").value = "";
+            	document.getElementById("addExperimentSchoolYear").value = "";
+            	document.getElementById("addExperimentOptionString").value = "";
 
                 $('#addExperimentFormModalPopup').modal('show');
             
@@ -366,10 +367,10 @@ function editExperimentForm() {
             	jsonData = $.parseJSON(data);
             	var result = jsonData.result;
             	if (result == "success" ) {
-	            	document.getElementById("experimentId").value = jsonData.id;
-	            	document.getElementById("experimentName").value = jsonData.name;
-	            	document.getElementById("experimentSchoolYear").value = jsonData.schoolYear;
-	            	document.getElementById("experimentOptionString").value = jsonData.optionString;
+	            	document.getElementById("editExperimentId").value = jsonData.id;
+	            	document.getElementById("editExperimentName").value = jsonData.name;
+	            	document.getElementById("editExperimentSchoolYear").value = jsonData.schoolYear;
+	            	document.getElementById("editExperimentOptionString").value = jsonData.optionString;
 				
                 	$('#editExperimentFormModalPopup').modal('show');
             	}
@@ -1035,10 +1036,10 @@ function translateFormSubmit() {
 
 function editExperimentFormSubmit() {
 
-	var filter = document.getElementById("experimentId").value;
-	filter = filter + "~" + document.getElementById("experimentName").value;
-	filter = filter + "~" + document.getElementById("experimentSchoolYear").value;
-	filter = filter + "~" + document.getElementById("experimentOptionString").value;
+	var filter = document.getElementById("editExperimentId").value;
+	filter = filter + "~" + document.getElementById("editExperimentName").value;
+	filter = filter + "~" + document.getElementById("editExperimentSchoolYear").value;
+	filter = filter + "~" + document.getElementById("editExperimentOptionString").value;
 
 	$.ajax({
         type : "POST",
@@ -1054,7 +1055,7 @@ function editExperimentFormSubmit() {
             		alert(data);
         		}
         		else {
-        			alert(document.getElementById("experimentName").value + " changed successfully");
+        			alert(document.getElementById("editExperimentName").value + " changed successfully");
         			$('#editExperimentFormModalPopup').modal('hide');         			
         		}
         	}
@@ -1136,9 +1137,9 @@ function adminExperimentClasses(filter) {
 
 	  <ul class="nav nav-tabs">
 	<!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
-	    <li><a data-toggle="tab"  href="#MSAdminTools">MS Admin Tools</a></li>
-	    <li><a data-toggle="tab"  href="#MSExperimentTools">MS Experiment] Tools</a></li>
-	    <li><a data-toggle="tab"  href="#MSChatTools">MS Chat Tools</a></li>
+	    <li><a data-toggle="tab"  href="#MSAdminTools">Admin Tools</a></li>
+	    <li><a data-toggle="tab"  href="#MSExperimentTools">Experiments</a></li>
+	    <li><a data-toggle="tab"  href="#MSChatTools">Chat Tools</a></li>
 	    <li><a data-toggle="tab"  href="#MSAdminHelp">MS Admin Help</a></li>
 	    <li>
 	        <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
@@ -1508,6 +1509,66 @@ function adminExperimentClasses(filter) {
     </div>
 </div>
 
+<div id="addExperimentFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<div id="add_experiment_hdr">Update Experiment header</div>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="newExperimentId" style="width:100px">Experiment Id:</label><input id="newExperimentId" name="newExperimentId" style="width:300px readonly"></input>
+				</div>
+				<div>
+					<label for="addExperimentName" style="width:100px">Experiment Name:</label><input id="addExperimentName" name="addExperimentName" style="width:300px"></input>
+				</div>
+				<div>			
+					<label for="addExperimentSchoolYear" style="width:100px">School Year:</label><input id="addExperimentSchoolYear" name="addExperimentSchoolYear"style="width:60px"></input>
+				</div>
+				<div>
+					<label for="addExperimentOptionString" style="width:100px">Option String:</label><input id="addExperimentOptionString" name="addExperimentOptionString" style="width:300px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" onclick="addExperimentFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="editExperimentFormModalPopup" class="modal fade" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            	<h3><div id="edit_experiment_hdr"></div></h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+				<div>
+					<label for="editExperimentId" style="width:100px readonly">Experiment Id:</label><input id="editExperimentId" name="editExperimentId" style="width:300px"></input>
+				</div>
+				<div>
+					<label for="editExperimentName" style="width:100px">Experiment Name:</label><input id="editExperimentName" name="editExperimentName" style="width:300px"></input>
+				</div>
+				<div>			
+					<label for="editExperimentSchoolYear" style="width:100px">School Year:</label><input id="editExperimentSchoolYear" name="experimentSchoolYear"style="width:60px"></input>
+				</div>
+				<div>
+					<label for="editExperimentOptionString" style="width:100px">OptionString:</label><input id="editExperimentOptionString" name="editExperimentOptionString" style="width:300px"></input>
+				</div>
+            </div>
+            <div class="modal-footer">
+				<button type="button" class="btn btn-success" id="editExperimentFormSubmit" onclick="editExperimentFormSubmit();"><%= rb.getString("submit")%></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

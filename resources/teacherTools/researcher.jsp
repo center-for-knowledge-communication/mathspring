@@ -131,6 +131,10 @@ div.scroll {
   	background-color: lightblue;
 }
 
+#MSAdminLink {
+  	background-color: #92DDA3;
+}
+
 .report_filters {
 	color: #000000;
   	background-color: lightblue;
@@ -5039,13 +5043,13 @@ function updateAllCohortSlices() {
 
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
+	<li><a id="MSAdminLink" onclick="launchMSAdmin();">MS Admin Tools</a></li>
     <li><a data-toggle="tab" id="settings"  href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
     <li><a data-toggle="tab" id="li-population" class="li-disabled"   href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
     <li><a data-toggle="tab" id="li-ttActivityReports" class="li-disabled"  href="#ttActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomDashboard"  href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
 	<li><a id="reportCardLink" onclick="launchReportCard();"><%= rwrb.getString("class_report_card") %></a></li>
-	<li><a id="MSAdminLink" onclick="launchMSAdmin();">MS Admin Tools</a></li>
     <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
     <li><a data-toggle="tab"  href="#Help">Help</a></li>
     <li>

@@ -1136,17 +1136,19 @@ public class DbUser {
         }
     }
 
-    public static int setUserNames(Connection conn, int studentId, String fname, String lini) throws SQLException {
+    public static int setUserNames(Connection conn, int studentId, String fname, String lini, String language, String gender) throws SQLException {
         PreparedStatement stmt = null;
         try {
-            String q = "update student set fname=?, lname=?  where id=?";
+            String q = "update student set fname=?, lname=?, language=?, gender=?  where id=?";
             stmt = conn.prepareStatement(q);
             stmt.setString(1, fname);
             if (lini.length() > 2) {
             	lini = lini.substring(0, 2);
             }            
             stmt.setString(2, lini);
-            stmt.setInt(3, studentId);
+            stmt.setString(3, language);
+            stmt.setString(4, gender);
+            stmt.setInt(5, studentId);
             return stmt.executeUpdate();
         } finally {
             if (stmt != null)

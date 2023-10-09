@@ -183,9 +183,9 @@ function showHourglassCursor(b) {
 function displayHintCount () {
 	
     if (globals.numHints >= 0 && globals.numHintsSeen == 0) {
-        $("#hint_label").html(hintText + "(" + globals.numHints + ")");
+        $("#hint_label").html(hint_text + "(" + globals.numHints + ")");
     } else if (globals.numHintsSeen <= globals.numHints) {
-        $("#hint_label").html(hintText + "(" + globals.numHintsSeen + "/" + globals.numHints + ")");
+        $("#hint_label").html(hint_text + "(" + globals.numHintsSeen + "/" + globals.numHints + ")");
     }
 }
 
@@ -1192,12 +1192,12 @@ function showLearningCompanion (json) {
 		        var offset = file.indexOf("/");
 		        file = lcName + file.substring(offset)
 	        }
-		    if (file.indexOf("Isabel") >= 0) {
-	        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + file;
+		    if ((file.indexOf("Jane") >= 0) || (file.indexOf("Jake") >= 0)) {
+	            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
 	            httpHead(url, successfulLCResult, failureLCResult);
 	        }
 	        else {
-	            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
+	        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + file;
 	            httpHead(url, successfulLCResult, failureLCResult);
 	        }
 	    }
@@ -1213,12 +1213,12 @@ function showNewLearningCompanion (lcNew) {
     var url;
 
     try {
-	    if (lcNew == "Isabel") {
-        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + lcNew + "/idle.html";
+	    if ((lcNew == "Jane") || (lcNew == "Jake")){
+            url = sysGlobals.problemContentPath + "/LearningCompanion/" + lcNew + "/idle.html";         	
             httpHead(url, successfulLCResult, failureLCResult);
         }
         else {
-            url = sysGlobals.problemContentPath + "/LearningCompanion/" + lcNew + "/idle.html";         	
+        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + lcNew + "/idle.html";
             httpHead(url, successfulLCResult, failureLCResult);
         }
     }

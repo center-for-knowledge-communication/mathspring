@@ -42,18 +42,23 @@ String pageLang = (String) request.getAttribute("pageLang");
 
 String prob_lang = "en";
 int probLangIndex = 0;
+prob_lang = "en";
 
-probLangIndex = (int) request.getAttribute("probLangIndex");
+/*
+int testProbLangIndex = (int) request.getAttribute("probLangIndex");
 
-
-
+if (testProbLangIndex == null) {
+	System.out.println("Missing request param: probLangIndex ");
+}
+else {
 	if (probLangIndex > 0) {
 		prob_lang = "es";
 	}
 	else {
 		prob_lang = "en";
 	}
-
+}
+*/		
 
 String lang = loc.getLanguage();
 String country = loc.getCountry();
@@ -68,7 +73,7 @@ String next_problem = "";
 String translate_this_problem = "";
 String problem_current_topic = "";
 String problem_standards = "";
-String hintText = "";
+String hint_text = "";
 String stepText = "";
 String replay_hints = "";
 String read_question = "";
@@ -76,6 +81,7 @@ String show_example = "";
 String show_video = "";
 String formula = "";
 String report_error = "";
+String learning_companions= "";
 String select_prob = "";
 String view_log = "";
 String example_problem_done = "";
@@ -159,12 +165,13 @@ if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(
 	translate_this_problem = rb1.getString("translate_this_problem");
 	problem_current_topic = rb1.getString("problem_current_topic");
 	problem_standards = rb1.getString("problem_standards");
-	hintText = rb1.getString("hint");
+	hint_text = rb1.getString("hint");
 	stepText = rb1.getString("step");
 	replay_hints = rb1.getString("replay_hints");
 	read_question = rb1.getString("read_question");
 	show_example = rb1.getString("show_example");
 	show_video = rb1.getString("show_video");
+	learning_companions =  rb1.getString("learning_companions");
 	formula = rb1.getString("formula");
 	report_error = rb1.getString("report_error");
 	select_prob = rb1.getString("select_prob");
@@ -184,12 +191,13 @@ else {
 	translate_this_problem = rb2.getString("translate_this_problem");
 	problem_current_topic = rb2.getString("problem_current_topic");
 	problem_standards = rb2.getString("problem_standards");
-	hintText = rb2.getString("hint");
-	stepText = rb1.getString("step");
+	hint_text = rb2.getString("hint");
+	stepText = rb2.getString("step");
 	replay_hints = rb2.getString("replay_hints");
 	read_question = rb2.getString("read_question");
 	show_example = rb2.getString("show_example");
 	show_video = rb2.getString("show_video");
+	learning_companions =  rb1.getString("learning_companions");
 	formula = rb2.getString("formula");
 	report_error = rb2.getString("report_error");
 	select_prob = rb2.getString("select_prob");
@@ -343,7 +351,7 @@ else
 <script type="text/javascript">
 	var lang = "en";
 	var stepText = "<%= rb.getString("step") %>";
-	var hintText = "<%= rb.getString("hint") %>";
+	var hint_text = "<%= rb.getString("hint") %>";
 	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";
 	var no_video_to_show = "<%= rb.getString("no_video_to_show") %>";
 	var no_instructions_to_show = "<%= rb.getString("no_instructions_to_show") %>";
@@ -370,12 +378,11 @@ else
 	var next_problem = "<%= next_problem %>";
 	var translate_this_problem = "<%= translate_this_problem %>";
 
-	var hintText = "<%= hintText %>";
-	var stepText = "<%= stepText %>";
 	var replay_hints = "<%= replay_hints %>";
 	var read_question = "<%= read_question %>";
 	var show_example = "<%= show_example %>";
 	var show_video = "<%= show_video %>";
+	var learning_companions = "<%= learning_companions %>";
 	var formula = "<%= formula %>";
 	var report_error = "<%= report_error %>";
 	var select_prob = "<%= select_prob %>";
@@ -701,9 +708,9 @@ label {
 				</a>
 				 
 				<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
-					id="showLCList" <span	class="huytran-sitenav__icon"> <i
+					id="showLCList"> <span	class="huytran-sitenav__icon"> <i
 						class="fa fa-exclamation aria-hidden="true"></i>
-				</span> <span id="lcText" class="huytran-sitenav__buttontitle">Learning Companions</span>
+				</span> <span id="learningCompanionsText" class="huytran-sitenav__buttontitle"><%= rb.getString("learning_companions") %></span>
 				</a>
 
 				<a href="#"
@@ -1205,11 +1212,12 @@ label {
 
 		document.getElementById("translateProbText").innerHTML =  translate_this_problem;
 		document.getElementById("nextProbText").innerHTML =  next_problem;		
-		
+		document.getElementById("hint_label").innerHTML = 
 		document.getElementById("replayText").innerHTML =  replay_hints;
 		document.getElementById("readText").innerHTML =  read_question;
 		document.getElementById("exampleText").innerHTML =  show_example;
 		document.getElementById("videoText").innerHTML =  show_video;
+		document.getElementById("learningCompanionsText").innerHTML =  learning_companions;
 		document.getElementById("formulaText").innerHTML = formula;
 		document.getElementById("home").innerHTML =  my_garden;
 		document.getElementById("myProg").innerHTML =  my_progress;

@@ -32,8 +32,63 @@ catch (Exception e) {
         <input type="hidden" name="action" value="LoginInterventionInput"/>
         <input type="hidden" name="interventionClass" value="${interventionClass}"/>
 
-        <p><%= rb.getString("first_name")%>: <input type="text" name="fname" id="fname" /></p>
-        <p><%= rb.getString("last_initial")%>: <input type="text" name="lini" id="lini" /></p>
+        <div id="name">	       
+        	<h3>My name:</h3>
+			<div class="row">	
+				<div class="col-md-3">			    
+          			<span style=""style="width: 40px;"><%= rb.getString("first_name")%></span>: &nbsp;
+          			<input type="text" name="fname" id="fname" value="">
+	       		</div>
+				<div class="col-md-3">			    
+          			<span style="style="width: 12px;"><%= rb.getString("last_initial")%></span>: &nbsp;
+          			<input type="text" name="lini" id="lini" value="">
+	       		</div>
+			</div>
+		</div>
+		<br>
+        <div id="languageDiv">	       
+        	<h3>My language:</h3>
+			<div class="row">	
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optLanguage" id="optEnglish" value="English">
+	          			<span style="display:block; text-align: center;">"English"</span>
+	         		</label>
+	       		</div>
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optLanguage" id="optSpanish" value="Spanish">
+	          			<span style="display:block; text-align: center;">"Spanish"</span>
+	         		</label>
+	       		</div>
+			</div>
+		</div>
+		<br>
+        <div id="genderDiv">	       
+        	<h3>My gender:</h3>
+			<div class="row">	
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optGender" id="optFemale" value="M">
+	          			<span style="display:block; text-align: center;">"Boy"</span>
+	         		</label>
+	       		</div>
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optGender" id="optMalke" value="F">
+	          			<span style="display:block; text-align: center;">"Girl"</span>
+	         		</label>
+	       		</div>
+				<div class="col-md-2">			    
+	       			<label class="radio-inline">
+	          			<input type="radio" name="optGender" id="optOther" value="O">
+	          			<span style="display:block; text-align: center;">"Other"</span>
+	         		</label>
+	       		</div>
+			</div>
+		</div>
+		<br>
+
         <input class="btn mathspring-btn" type="submit" value="<%= rb.getString("submit")%>" />
     </form>
 </div>
