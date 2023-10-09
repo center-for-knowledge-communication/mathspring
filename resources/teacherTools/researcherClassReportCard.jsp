@@ -938,7 +938,7 @@ function populateTopicSelectionListEight() {
             for (var i = 0; i < topicData.length; i++) {
         		topicSelectionListEight += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
             }
-        	studentSelectionListEight += "</select>";
+        	topicSelectionListEight += "</select>";
         	document.getElementById("topicSelectionListEight").innerHTML=topicSelectionListEight; 
             
         },

@@ -147,9 +147,10 @@ public class DbSession {
     public static String[] setSessionInfo(Connection conn, int sessionId) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
-    	String[] res = new String[4];
+    	String[] res = new String[5];
         try {
-            String q = "select sess.studId, stud.classId, lang, pageLangIndex from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
+        	String q = "select sess.studId, stud.classId, lang, pageLangIndex, sess.gender from Session as sess, student as stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID;";
+//            String q = "select sess.studId, stud.classId, lang, pageLangIndex, sess.gender from Session sess, Student stud  where sess.id=? and sess.isActive=1 and sess.studId=stud.ID";
             ps = conn.prepareStatement(q);
             ps.setInt(1, sessionId);
             rs = ps.executeQuery();
@@ -158,6 +159,7 @@ public class DbSession {
                 res[1] = String.valueOf(rs.getInt(2));    // classId
                 res[2] = rs.getString(3);                 // lang abbr from locale
                 res[3] = String.valueOf(rs.getInt(4));    // page lang index for multi-lingual
+                res[4] = rs.getString(5);    // gender for multi-lingual
                 return res;
 //                this.curGUIState= rs.getString(2);
             } else throw new NoSessionException(sessionId);
@@ -185,8 +187,20 @@ public class DbSession {
     /* Return the session id. */
     public static int newSession(Connection conn, int studId, long sessBeginTime, boolean isAssistmentsUser, Locale loc) throws Exception {
 
-        String i = "insert into Session (studId, beginTime,isActive, lastAccessTime, endTime, ipAddr, isAssistmentsUser, lang) " +
-                "values (?,?,?,?,?,'',?,?)";
+
+    	String gender = "";
+    	String language = "English";
+        String q = "select gender, language from student where id=?";
+        PreparedStatement ps2 = conn.prepareStatement(q);
+        ps2.setInt(1, studId);
+        ResultSet rs2 = ps2.executeQuery();
+        if (rs2.next()) {
+        	gender = rs2.getString(1);
+        }         
+    	
+    	
+    	String i = "insert into Session (studId, beginTime,isActive, lastAccessTime, endTime, ipAddr, isAssistmentsUser, lang, gender) " +
+                "values (?,?,?,?,?,'',?,?,?)";
         PreparedStatement ps = conn.prepareStatement(i, Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, studId);
         Timestamp now = new Timestamp(sessBeginTime);
@@ -195,10 +209,17 @@ public class DbSession {
         ps.setTimestamp(4, now);
         ps.setNull(5, Types.TIMESTAMP);
         ps.setBoolean(6,isAssistmentsUser);
-      	String lang = loc.getLanguage();
+      	String lang = "en";
+        if (language.equals("English")) {
+        	lang = "en";        	
+        }
+        if (language.equals("Spanish")) {
+        	lang = "es";        	
+        }
       	String country = loc.getCountry();
       	String localeStr = lang + "-" + country;
         ps.setString(7,localeStr);
+        ps.setString(8,gender);
         ps.executeUpdate();
         ResultSet rs = ps.getGeneratedKeys();
         if (rs.next())

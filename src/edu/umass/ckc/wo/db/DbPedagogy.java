@@ -457,6 +457,59 @@ public class DbPedagogy {
 		return LCprofiles;
     }
 
+    public static Map<Integer, List<String>> getLCprofilesForGender(Connection conn, int classId, int currStudentPedId, String gender) throws SQLException {
+    	
+		Map<Integer, List<String>> LCprofiles = new HashMap<Integer, List<String>>();
+
+    	List<String> LCprofilesArr = new ArrayList<>();
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select cp.pedagogyId, p.name, p.shortName, p.lcsource, p.lang, p.gender from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+//        			"UNION\r\n" + 
+//        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            String checked = " ";
+            while (rs.next()) {
+            	String gen = rs.getString(6);
+            	if (gender.equals("O") || gender.equals(gen)) {
+	            	int pedId = rs.getInt(1);
+	            	if (pedId == currStudentPedId) {
+	            		checked = " checked='checked' ";
+	            	}
+	            	else {
+	            		checked = " ";           		
+	            	}
+	            	String lang = " (" + rs.getString(5) + ")";
+	            	String LCdef = pedId + "~" + rs.getString(2) + "~" + rs.getString(3) + "~" + lang + "~" + checked +  "~"  + rs.getString(4);
+	            	LCprofilesArr.add(LCdef);
+            	}
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        Collections.shuffle(LCprofilesArr);
+        
+        ListIterator <String> lit = LCprofilesArr.listIterator();
+        
+        while (lit.hasNext()) {
+        	String element = lit.next();
+        	String sp[] = element.split("~");
+        
+        	int pedid = Integer.valueOf(sp[0]);
+        	LCprofiles.put(pedid, new ArrayList<String>(Arrays.asList(sp[1], sp[2], sp[3], sp[4])));
+        }
+
+		return LCprofiles;
+    }
+
+
+    
     public static String getLShortname(Connection conn, int pedId) throws SQLException {
     	
 
@@ -515,6 +568,55 @@ public class DbPedagogy {
             	resultJson.put("url",url);
                 resultArr.add(resultJson);
            
+            }
+            Collections.shuffle(resultArr);
+            lcProfileStr = resultArr.toString();
+
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+
+		return lcProfileStr;
+    }
+    
+    public static String getLCprofilesJSONForGender(Connection conn, int classId, int currStudentPedId, String gender) throws SQLException {
+    	
+        JSONArray resultArr = new JSONArray();
+        String lcProfileStr = "";
+
+    	List<String> LCprofilesArr = new ArrayList<>();
+		ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+        	String q = "select cp.pedagogyId, p.name, p.shortName, p.lcsource, p.lang, p.gender from classpedagogies cp INNER JOIN pedagogy p ON cp.pedagogyId=p.id where cp.classid = ?"; 
+//        			"UNION\r\n" + 
+//        			"select pp.id, pp.name, pp.shortName from pedagogy pp where pp.id = 19";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            String checked = " ";
+            while (rs.next()) {
+           
+            	int id = rs.getInt(1);
+            	String url = Settings.webContentPath + "LearningCompanion/";
+            	if ((rs.getString(4).equals("webContentPath2"))){
+                	url = Settings.webContentPath2 + "LearningCompanion/";
+            	}
+           		String lang = " (" + rs.getString(5) + ")";
+            	JSONObject resultJson = new JSONObject();
+            	resultJson.put("id", String.valueOf(id));                       		
+            	resultJson.put("lcname", rs.getString(2));                       		
+            	resultJson.put("lcshortname", rs.getString(3));                       		
+            	resultJson.put("lang", lang);                 
+            	resultJson.put("url",url);
+            	String gen = rs.getString(6);
+        		resultJson.put("gender", gen);                 
+            	if (gender.equals("O") || gender.equals(gen)) {
+            		resultArr.add(resultJson);
+            	}
             }
             Collections.shuffle(resultArr);
             lcProfileStr = resultArr.toString();
