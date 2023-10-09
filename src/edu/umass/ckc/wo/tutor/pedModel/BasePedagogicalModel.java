@@ -380,9 +380,16 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
     @Override
     public Response processLCListRequest(ShowLCListEvent e) throws Exception {
         smgr.getStudentState().setProblemIdleTime(0);
-		
+        String lcprofiles = "";
+        
 		int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
-		String lcprofiles = DbPedagogy.getLCprofilesJSON(smgr.getConnection(), smgr.getClassID(), currentStudentPedagogyId);
+		if (smgr.getExperiment().indexOf("sameGenderLC") >= 0) {
+			
+			lcprofiles = DbPedagogy.getLCprofilesJSONForGender(smgr.getConnection(), smgr.getClassID(), currentStudentPedagogyId, smgr.getGender());
+		}
+		else {			
+			lcprofiles = DbPedagogy.getLCprofilesJSON(smgr.getConnection(), smgr.getClassID(), currentStudentPedagogyId);
+		}
 
 	
 
@@ -588,7 +595,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         if (p != null)
             studentModel.newProblem(state,p);
         int altProbId = 0;
-        if (smgr.getExperiment().equals("multi-lingual")) {
+        if (smgr.getExperiment().indexOf("multi-lingual") >= 0) {
        		altProbId = ProblemMgr.getProblemPair(Integer.valueOf(e.getProbId()));
     	}
 
@@ -720,7 +727,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         
         ProblemResponse r=null;
         if (curProb != null) {
-            if (smgr.getExperiment().equals("multi-lingual")) {
+        	if (smgr.getExperiment().indexOf("multi-lingual") >= 0) {
 //	        	if (state.getLangIndex() > 0) {
 	        		altProbId = ProblemMgr.getProblemPair(curProb.getId());
 //        		}

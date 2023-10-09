@@ -101,6 +101,7 @@ public class SessionManager {
     private int gazeDetectionOn=0;
     private String gazeParamsJSON="";
     private String experiment = "";
+    private String gender = "";
     
     public SessionManager(Connection connection) {
         this.connection = connection;
@@ -356,6 +357,7 @@ public class SessionManager {
         String[] fields = DbSession.setSessionInfo(connection, sessionId);
         this.studId = Integer.valueOf(fields[0]);
         this.classId = Integer.valueOf(fields[1]);
+        this.gender = fields[4];
         String language = fields[2];
         int pageLangIndex = Integer.valueOf(fields[3]);
         ClassInfo cl = DbClass.getClass(connection, this.classId);
@@ -1061,6 +1063,10 @@ public class SessionManager {
 
     public String getExperiment() {
     	return this.experiment;
+    }
+    
+    public String getGender() {
+    	return this.gender;
     }
     
     public void setPageLangIndex(int pageLangIndex) {

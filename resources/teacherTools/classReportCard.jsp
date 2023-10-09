@@ -695,7 +695,8 @@ function getStudentListEight() {
         success : function(response) {
         	console.log(response);
         	studentListEight = response;
-        },
+        	populateStudentSelectionListEight();
+       },
         error : function(e) {
             console.log(e);
         }
@@ -849,6 +850,47 @@ function getFilterThree() {
 	
 }
 
+var topicSelectionListEight = "";
+function populateTopicSelectionListEight() {
+
+	var topicFilter = "English";
+	if (languageSet == "es") {
+		topicFilter = "Spanish";
+	}
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getTeacherReports",
+        data : {
+            classId: classID,
+            teacherId: teacherID,
+            reportType: 'getTopicNamesListByClass',
+            lang: loc,
+            filter: topicFilter
+        },
+        success : function(data) {        
+        	var topicData = $.parseJSON(data);
+           	
+
+            for (var i = 0; i < topicData.length; i++) {
+            	topicNameMap.set(topicData[i].topicId, topicData[i].name);
+            }
+
+            topicSelectionListEight = "<select name='topics' id='topicsEight' size='5' style='width:220px' >"; 	
+
+            for (var i = 0; i < topicData.length; i++) {
+        		topicSelectionListEight += "<option value='" + topicData[i].topicId  + "'>" + topicData[i].name  + "</option>";
+            }
+        	topicSelectionListEight += "</select>";
+        	document.getElementById("topicSelectionListEight").innerHTML=topicSelectionListEight; 
+            
+        },
+        error : function(e) {
+            console.log(e);
+        }
+	});
+
+	
+}
 
 
 var studentSelectionListEight = "";
@@ -881,7 +923,7 @@ function addStudentEight2(item, index) {
 
 
 
-function getFilterEight() {
+function getFilterEight(submit) {
 	
 	//document.getElementById("daysFilterEight").value = "";
 		
@@ -928,18 +970,21 @@ function getFilterEight() {
 		}
 	}		
 	else {
-		if ((d1 + d2) == 0) {
+		if ( (d1 + d2) == 0 )  {
+			$('#calendarModalPopupEight').modal('hide');
 			document.getElementById("daysFilterEight").value = "";
-			filterEight = document.getElementById("standardsFilter").value + "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
 
+			filterEight = "~" + document.getElementById("daysFilterEight").value + "~" + showNamesState;
+			
+		
 			if (selectedStudentEight.length > 0) {
 				filterEight += "~" + selectedStudentEight;	
-			}
-			$('#calendarModalPopupEight').modal('hide');
-		
+			}		
 		}
-		else {
-			alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+		else {					
+			if (submit == "submit") {
+				alert("<%= rb.getString("must_select_a_day_from_each_calendar") %>");			
+			}
 		}
 	}
 	
@@ -2727,7 +2772,7 @@ var completeDataChart;
     $('#showReportEightBtn').on('click', function ()  {    	
 
  	   
-        getFilterEight();
+        getFilterEight('submit');
         
         var testFilterEight = filterEight.split("~");
         if (testFilterEight.length < 4) {
@@ -2776,7 +2821,15 @@ var completeDataChart;
                     else
                         return new Date(b[10]).getTime() - new Date(a[10]).getTime();
                 });
-*/                                          
+*/                 
+
+				var selectedTopicEight =  document.getElementById("topicsEight").value;
+				
+				var rptEightTitle = '<%= rb.getString("student_problem_solving_history")%>';
+				if (selectedTopicEight.length > 0) {
+					rptEightTitle = rptEightTitle + " ( Topic = " + topicNameMap.get(selectedTopicEight) + " )";
+				}
+
 				var problems = [];
 				var problemIds = [];
 				var hints = [];
@@ -2797,10 +2850,20 @@ var completeDataChart;
 				var prevMastery = 0.0;
 				var prevTopic = 0;
 				
-				var maxYaxis = 1;          		
+				var maxYaxis = 1;       
+				
+           		var useThisOne = true;
 			
 				$.each(outputStudentDataList, function (i, obj) {
-					if (!(obj[8] === "NO DATA")) {                		
+                	useThisOne = true;
+					var pTopic = obj[17];
+					if ((selectedTopicEight.length > 0) && (!(pTopic == selectedTopicEight))) {
+    					useThisOne = false;
+    				}
+                	if (obj[8] === "NO DATA") {                		
+    					useThisOne = false;
+    				}
+                	if (useThisOne) {                		
 				   		var p = "" + i + ": "+ obj[0];
 				   		var pHints = parseInt(obj[6]);
 				   		var pAttempts = parseInt(obj[7]);
@@ -3047,7 +3110,7 @@ var completeDataChart;
 				   		borderwidth: 1
 					},           	         
 					 	hovermode:'x',
-				     	title:'<%= rb.getString("student_problem_solving_history")%>',
+				     	title:rptEightTitle,
 				  	 	displayModeBar: false,
 				
 				};   
@@ -3064,7 +3127,8 @@ var completeDataChart;
 			        $("#studentProblemHistoryPopup").modal('show');
            		});
 
-              $("#studentProblemHistoryReport").show();
+           		populateTopicSelectionListEight();
+           		$("#studentProblemHistoryReport").show();
                 
             },
             error : function(e) {
@@ -3406,7 +3470,7 @@ var completeDataChart;
       	getFilterSix();
 
         getStudentListEight();           
-      	getFilterEight();
+      	getFilterEight('');
       	
         $('#reorg_prob_sets_handler').css('background-color', '');
         $('#reorg_prob_sets_handler').css('color', '#dddddd');
@@ -3416,6 +3480,7 @@ var completeDataChart;
         $("#report-wrapper2").show();
         $("#perStudentPerProblemSetReport").hide();
             
+        populateTopicSelectionListEight();
             
             $.ajax({
                 type : "POST",
@@ -3881,19 +3946,19 @@ var completeDataChart;
                         </div>
                         <div id="collapseEight" class="panel-collapse collapse">
 	                            <div class="panel-body report_filters">                           
-									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackAttempts" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Attempts</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackHints" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackHints" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Hints</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight();">
+									  <input id="trackVideos" type="checkbox" style="width:48px"  name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Videos</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackDifficulty" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Difficulty</label>
 									  &nbsp;|&nbsp;
-									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight();">
+									  <input id="trackMastery" type="checkbox" style="width:48px" name="" value="" onblur="getFilterEight('');">
 									  <label class="report_filters">Track Mastery</label>
 								</div>
 		                        <div class="panel-body report_filters">
@@ -3909,18 +3974,33 @@ var completeDataChart;
 								</div>
 							     <div class="panel-body report_filters">
 		                        	<div id="chooseStudentsEight" class="row">
-		                        		<div class="col-md-2 offset-md-1">                       
-						                	<button type="button" class="btn btn-primary" onclick="populateStudentSelectionListEight();" ><%= rb.getString("choose_student") %></button>
-						                </div>
-		                        		<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-5">                       
-											<select name='students' id='studentsEight' size='5' style='width:220px' >
-											</select>				                
+		                        		<div class="row">
+		                        			<div class="col-md-2 offset-md-1">
+												<label class="report_filters"><%= rb.getString("choose_student") %></label>		                        		
+		                        			</div>
+		                        			<div class="col-md-3">
+		                        			</div>
+		                        			<div class="col-md-3">
+												<label class="report_filters"><%= rb.getString("choose_topic") %></label>		                        		
+		                        			</div>
+		                        		</div>
+	                        			<div class="row">
+			                        		<div id="studentSelectionListEight" name="studentSelectionListEight" class="col-md-5">                       
+												<select name='students' id='studentsEight' size='5' style='width:220px' >
+												</select>				                
+											</div>
+		                        			<div class="col-md-3">
+		                        			</div>	                        		
+			                        		<div id="topicSelectionListEight" name="topicSelectionListEight" class="col-md-3">                       
+												<select name='topics' id='topicsEight' size='5' style='width:220px' >
+												</select>				                
+											</div>
 										</div>
 		 							</div>  
 		
 								</div>
 	                            <div class="panel-body report_filters hidden">
-	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight();"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
+	      							<input class="report_filters largerCheckbox" type="checkbox" id="showNamesEight" name="" value="Y"  onblur="getFilterEight('');"checked>&nbsp;&nbsp;<%= rb.getString("show_names") %>
 	                            </div>
 	                            <div class="panel-body report_filters">                           
 									  <input id="showReportEightBtn" class="btn btn-lg btn-primary" type="submit" value="<%= rb.getString("show_report") %>">
@@ -4477,7 +4557,7 @@ var completeDataChart;
            <div class="modal-footer">
 
           		<div class="offset-md-6">
-	                <button type="button" class="btn btn-success" onclick="getFilterEight();" ><%= rb.getString("submit") %></button>
+	                <button type="button" class="btn btn-success" onclick="getFilterEight('submit');" ><%= rb.getString("submit") %></button>
 	                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#calendarModalPopupEight').modal('hide');" ><%= rb.getString("cancel") %></button>
                 </div> 
          </div>

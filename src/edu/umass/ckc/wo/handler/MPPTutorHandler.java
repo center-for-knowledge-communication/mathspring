@@ -42,23 +42,26 @@ public class MPPTutorHandler {
         // If the MPPReturnToHut event comes in and the student had solved the problem they were on before going to MPP, get a next problem and show it
         if (e instanceof MPPReturnToHutEvent) {
 //            Response r = new ProblemResponse(p,smgr.getStudentModel().getTopicMasteries(),smgr.getStudentState().getCurTopic(), e.getElapsedTime());
-            String lastProbType = state.getCurProbType();
-            // If the last problem is resumable and not a topic intro
-            if (lastProbType != null && !((MPPReturnToHutEvent) e).getProbId().equals(Problem.TOPIC_INTRO_ID)) {
-
-                if (lastProbType.equalsIgnoreCase(Problem.FLASH_PROB_TYPE) || lastProbType.equalsIgnoreCase(Problem.HTML_PROB_TYPE) )  {
-                    Problem p = ProblemMgr.getProblem(Integer.parseInt(((MPPReturnToHutEvent) e).getProbId()));
-                    ProblemResponse r = new ProblemResponse(p);
-                    // if the last problem is not a topic intro and it isn't solved, resume it (which means ending it and beginning it again)
-                    // TODO:   The problem is that ending it causes the student model to update as if an incorrect problem were submitted.
-                    if (!p.isIntro() && !state.isProblemSolved()) {
-                        new TutorPage(info,smgr).createTutorPageForResumingPreviousProblem(e.getElapsedTime(), 0, e.getTopicId(), r, "practice", state.getCurProbType(),
-                                true, p.getResource(), null, false, p.getId(), this.showMPP,smgr.getPageLocale().getLanguage());
-                        new TutorLogger(smgr).logMPPEvent(e,p.getId());
-                        return;
-                    }
-                }
-            }
+        	// For now, don't resume translated problem
+        	if (state.getLangIndex() == 0) {
+	        	String lastProbType = state.getCurProbType();
+	            // If the last problem is resumable and not a topic intro
+	            if (lastProbType != null && !((MPPReturnToHutEvent) e).getProbId().equals(Problem.TOPIC_INTRO_ID)) {
+	
+	                if (lastProbType.equalsIgnoreCase(Problem.FLASH_PROB_TYPE) || lastProbType.equalsIgnoreCase(Problem.HTML_PROB_TYPE) )  {
+	                    Problem p = ProblemMgr.getProblem(Integer.parseInt(((MPPReturnToHutEvent) e).getProbId()));
+	                    ProblemResponse r = new ProblemResponse(p);
+	                    // if the last problem is not a topic intro and it isn't solved, resume it (which means ending it and beginning it again)
+	                    // TODO:   The problem is that ending it causes the student model to update as if an incorrect problem were submitted.
+	                    if (!p.isIntro() && !state.isProblemSolved()) {
+	                        new TutorPage(info,smgr).createTutorPageForResumingPreviousProblem(e.getElapsedTime(), 0, e.getTopicId(), r, "practice", state.getCurProbType(),
+	                                true, p.getResource(), null, false, p.getId(), this.showMPP,smgr.getPageLocale().getLanguage());
+	                        new TutorLogger(smgr).logMPPEvent(e,p.getId());
+	                        return;
+	                    }
+	                }
+	            }
+        	}
             //  Can't resume the last problem because it was solved or something else non-resumable.  Consider this a regular NextProblem event now.
             // Unfortunately,  this could result in either a problem or an intervention or topic intro which means the client needs to be given
             // the necessary info so it can start its page correctly.

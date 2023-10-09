@@ -3789,7 +3789,7 @@ public class TTMiscServiceImpl implements TTMiscService {
             	int lastId = rs.getInt("id");
             	lastId = lastId + 1;
                 JSONObject experimentJson = new JSONObject();            	
-                experimentJson.put("newExperimentId", String.valueOf(lastId));
+                experimentJson.put("newExperimentId", lastId);
             	result = experimentJson.toString();
             }
             stmt.close();
@@ -3993,24 +3993,24 @@ public class TTMiscServiceImpl implements TTMiscService {
         
 		// Get id from name
 		try {
-			String q2 = "select id from experiment where name = ?;";
+			String q1 = "select name,id,optionString from experiment where name = ?;";
 
-            stmt2 = conn.prepareStatement(q2);
-            stmt2.setString(1, name);
-            rs2 = stmt2.executeQuery();
-            if (rs2.next()) {
-            	experimentId = rs2.getInt("id");
+            stmt1 = conn.prepareStatement(q1);
+            stmt1.setString(1, name);
+            rs1 = stmt1.executeQuery();
+            if (rs1.next()) {
+            	experimentId = rs1.getInt("id");
             }
             else {
-            	return "error - " + name + " not found";
+            	return "error - experiment: " + name + " not found";
             }
-        	stmt2.close();
-            rs2.close();
+        	stmt1.close();
+            rs1.close();
         } finally {
-            if (stmt2 != null)
-                stmt2.close();
-            if (rs2 != null)
-                rs2.close();
+            if (stmt1 != null)
+                stmt1.close();
+            if (rs1 != null)
+                rs1.close();
         }
 
 		try {
@@ -4020,7 +4020,7 @@ public class TTMiscServiceImpl implements TTMiscService {
             stmt2.setInt(1, classId);
             rs2 = stmt2.executeQuery();
             if (!rs2.next()) {
-            	return "class " + strClassId + ":  not found";
+            	return "class " + strClassId + ":" + name + ":  not found";
             }
         	stmt2.close();
             rs2.close();
@@ -4035,37 +4035,16 @@ public class TTMiscServiceImpl implements TTMiscService {
     	if (cmd.equals("add")) {
 
     		
-    		// Check for already exists
-    		try {
-				String q1 = "select cme.experimentId as cmeId, exp.id as expId, exp.name as name, cls.id as classId from experiment as exp, class as cls, class_map_experiment as cme where cls.id = ? and cme.classId = ? and exp.id = ?;";
-
-	            stmt1 = conn.prepareStatement(q1);
-	            stmt1.setInt(1, classId);
-	            stmt1.setInt(2, classId);
-	            stmt1.setInt(3, experimentId);
-	            rs1 = stmt1.executeQuery();
-	            if (rs1.next()) {
-            		result  = "Class " + strClassId + " already added to experiment: " + name;
-	            	return result;
-	            }
-	        	stmt1.close();
-	            rs1.close();
-	        } finally {
-	            if (stmt1 != null)
-	                stmt1.close();
-	            if (rs1 != null)
-	                rs1.close();
-	        }
-    		// do the insert
+    		// do the update
 	        try {
-	            String q3 = "insert into class_map_experiment (experimentId, classid) values (?,?);";
+				String q3 = "update class set experiment = ? where id = ?;";
 	            stmt3 = conn.prepareStatement(q3);
-	            stmt3.setInt(1, experimentId);
+	            stmt3.setString(1, name);
 	            stmt3.setInt(2, classId);
 	            int sqlresult = stmt3.executeUpdate();
 	            
 	            if (sqlresult != 0) {
-	            	result = "Class added to cohort";
+	            	result = "Class added to experiment " + name;
 	            }
 	            else {
 	            	result = "error - class not added"; 
@@ -4083,9 +4062,9 @@ public class TTMiscServiceImpl implements TTMiscService {
 
 
         	try {
-	            String q4 = "delete from class_map_experiment where experimentId = ? and classid = ?;";
+				String q4 = "update class set experiment = ? where id = ?;";
 	            stmt4 = conn.prepareStatement(q4);
-	            stmt4.setInt(1, experimentId);
+	            stmt4.setString(1, "");
 	            stmt4.setInt(2, classId);
 	            int sqlresult = stmt4.executeUpdate();
 	            
@@ -4107,7 +4086,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     	return result;
     	
     }
-    
+
     
     public String chatPrompt(Connection conn, String filter) throws SQLException {
 	   	

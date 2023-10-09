@@ -39,11 +39,24 @@ public class StudentPedagogy extends LoginInterventionSelector {
         	return null;
         }
         else {
-            super.selectIntervention(e);
+
+        	Map<Integer, List<String>> lcprofile = null;
+        	super.selectIntervention(e);
         	String studentPedagogyUrl = JSP_NEW;
         	int classId = smgr.getClassID();
         	int currentStudentPedagogyId = DbUser.getStudentPedagogy(smgr.getConnection(), smgr.getStudentId());
-        	Map<Integer, List<String>> lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+        	
+    		if (smgr.getExperiment().indexOf("sameGenderLC") >= 0) {
+    			if (smgr.getGender().equals("") || smgr.getGender().equals("O")) {
+       			 	lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+    			}
+    			else {    					
+    				lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());
+    			}
+    		}
+    		else {
+    			 lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+    		}
 /*        	
         	int gazeDetectionOn = DbClass.getGazeDetectionOn(smgr.getConnection(),classId);
         	if (gazeDetectionOn > 0) {

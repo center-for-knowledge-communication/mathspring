@@ -122,7 +122,7 @@
             <interventionSelector onEvent="BeginningOfTopic" weight="2" class="DemoProblemIS">
                 <config>
                     <!-- legal values never, oncePerSession, always-->
-                    <demoFrequency>always</demoFrequency>
+                    <demoFrequency>oncePerSession</demoFrequency>
                 </config>
             </interventionSelector>
 

@@ -31,4 +31,6 @@ public class LoginParams {
     public static final String PRETEST_QUESTION = "pretestQuestion";
     public static final String LEARNING_COMPANION = "optLC";
     public static final String WORKSHEET_LOCATION = "optLocation";
+    public static final String LANGUAGE = "optLANGUAGE";
+    public static final String GENDER = "optGender";
 }

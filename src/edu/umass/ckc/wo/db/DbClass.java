@@ -52,13 +52,15 @@ public class DbClass {
         PreparedStatement s = null;
         ResultSet rs2 = null;
         PreparedStatement s2 = null;
+        ResultSet rs3 = null;
+        PreparedStatement s3 = null;
 
         try {
             String q = "select teacherId,school,schoolYear,name,town,section,teacher,propgroupid,logType,pretestPoolId," +
                     "f.statusReportIntervalDays, f.statusReportPeriodDays,f.studentEmailPeriodDays,f.studentEmailIntervalDays, c.experiment, c.grade," +
                     "f.simplelc, f.simplecollab, f.simplelowdiff, f.simplehighdiff, f.simplediffRate, f.showPostSurvey,f.pretest,class_language," +
                     "maxNumberProbsToShowPerTopic,minNumberProbsToShowPerTopic,maxTimeInTopic,minTimeInTopic," +
-                    "isActive, f.gaze_detection_on, f.hasClusters, f.isCluster, f.color, c.experiment from class c, classconfig f" +
+                    "isActive, f.gaze_detection_on, f.hasClusters, f.isCluster, f.color from class c, classconfig f" +
                     " where c.id=? and f.classid=c.id";
             s = conn.prepareStatement(q);
             s.setInt(1, classId);
@@ -78,7 +80,7 @@ public class DbClass {
                 int statusReportPeriodDays = rs.getInt(12);
                 int studentEmailPeriodDays = rs.getInt(13);
                 int studentEmailIntervalDays = rs.getInt(14);
-                String experiment = rs.getString(15); // k12 or college
+                String experiment = rs.getString(15);
                 String grade = rs.getString(16); // grade
                 String simpleLc = rs.getString(17);
                 String simpleCollab = rs.getString(18);
@@ -135,6 +137,16 @@ public class DbClass {
                      }
                 }
                 
+                if (experiment.length() > 0) {
+	            	String experimentQuery = "select optionString from experiment where name = ?";
+	            	s3 = conn.prepareStatement(experimentQuery);
+	                s3.setString(1, experiment);
+	                rs3 = s3.executeQuery();
+	                if (rs3.next()) {
+	                	experiment = experiment + ":" + rs3.getString("optionString");
+	                }                          
+                }
+                
                 if(getPreSurvey == null || ("".equals(getPreSurvey)))
                     showPreSurvey = false;
                 int isActive = rs.getInt(29);
@@ -144,9 +156,7 @@ public class DbClass {
                 String color = rs.getString(33);
                 
                 ClassInfo ci = new ClassInfo(sch,yr,name,town,sec,classId,teacherId,teacherName,propgroupid,logType,pretestPoolId,emailInterval, statusReportPeriodDays, studentEmailIntervalDays,studentEmailPeriodDays,experiment,grade, isActive, gazeDetectionOn,hasClusters,isCluster,color);
-                		
-                
-                
+            		                                
                 ci.setSimpleLC(simpleLc);
                 ci.setSimpleCollab(simpleCollab);
                 ci.setSimpleLowDiff(simpleLowDiff);
@@ -178,6 +188,10 @@ public class DbClass {
             	s2.close();
             if (rs2 != null)
             	rs2.close();
+            if (s3 != null)
+            	s3.close();
+            if (rs3 != null)
+            	rs3.close();
 
         }
     }
