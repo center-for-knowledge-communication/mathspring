@@ -382,16 +382,17 @@ public class SessionManager {
         this.gazeParamsJSON = DbGaze.getStudentParams(connection, this.studId, this.classId, 0);
         this.experiment = cl.getExperiment();
 
-
-        language = cl.getClassLanguageCode();
-        if (language.startsWith("es")) {
-        	language = "es";
-            this.locale = new Locale(language,"US");
-        }
-        
         this.user = DbUser.getStudent(connection, this.studId);
-        
-        // Issue #267 add teacher name and class name to problem display header
+
+        if (this.experiment.indexOf("multi-lingual") < 0) {
+	        language = cl.getClassLanguageCode();
+	        if (language.startsWith("es")) {
+	        	language = "es";
+	            this.locale = new Locale(language,"US");
+	        }
+        	this.gender = this.user.getGender();
+        }
+	        
         this.className = cl.getName();
         this.teacherName = cl.getTeacherName();
         String splitter[] = this.teacherName.split(" ");
@@ -1069,6 +1070,10 @@ public class SessionManager {
     	return this.gender;
     }
     
+    public void setGender(String gender) {
+    	this.gender = gender;
+    }
+
     public void setPageLangIndex(int pageLangIndex) {
         this.pageLangIndex = pageLangIndex;
     }

@@ -11,6 +11,7 @@ public class User {
     private String lname;
     private String uname;
     private String momname;
+    private String gender;
     private String email;
     private String password;
     private int id;
@@ -33,10 +34,11 @@ public class User {
         test, guest, student, coopStudent, coopStudentTest, externalTest, externalTempTest, externalTempNonTest, testStudent, tester
     }
 
-    public User(String fname, String lname, String uname, String email, String password, int id) {
+    public User(String fname, String lname, String uname, String gender, String email, String password, int id) {
         this.fname = fname;
         this.lname = lname;
         this.uname = uname;
+        this.gender = gender;
         this.email = email;
         this.momname=email; // this is for backward compatibility with ServerTestMgr which we don't even use anymore
         this.id = id;
@@ -107,6 +109,14 @@ public class User {
 
     public void setMomname(String momname) {
         this.momname = momname;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getEmail () {
