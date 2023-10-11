@@ -1385,7 +1385,7 @@ public class DbClass {
         	
         	String classesInCluster = DbClass.getStringClassesInCluster(conn, String.valueOf(classID));
         	
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ") order by fname,lname,username";
+            String q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid in (" + classesInCluster + ") order by fname,lname,username";
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             List<User> res = new ArrayList<User>();
@@ -1394,12 +1394,13 @@ public class DbClass {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);                
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);
@@ -1447,7 +1448,7 @@ public class DbClass {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=? order by fname asc, lname, username";
+            String q = "select id,fname,lname,username,gender, email,password,strategyId from student where classid=? order by fname asc, lname, username";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classID);
             rs = stmt.executeQuery();
@@ -1457,12 +1458,13 @@ public class DbClass {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);
