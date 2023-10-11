@@ -2760,7 +2760,7 @@ public class TTReportServiceImpl implements TTReportService {
     	String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ")";
 
         if (classesInCluster.length() == 0) {
-        	q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+        	q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid=?";
         }
     	
     	ResultSet rs = null;
@@ -2777,12 +2777,13 @@ public class TTReportServiceImpl implements TTReportService {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);
