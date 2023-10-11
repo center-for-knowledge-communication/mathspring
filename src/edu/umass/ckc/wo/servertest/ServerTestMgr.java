@@ -214,7 +214,7 @@ public class ServerTestMgr {
      * @throws SQLException
      */
     public List getBaseLineUsers() throws SQLException {
-        String q = "select id,fname,lname,userName,momsName from student where momsName=?";
+        String q = "select id,fname,lname,userName,gender, momsName from student where momsName=?";
         PreparedStatement ps = conn.prepareStatement(q);
         ps.setString(1,MOMS_NAME);
         ResultSet rs = ps.executeQuery();
@@ -224,8 +224,9 @@ public class ServerTestMgr {
             String fn = rs.getString("fname");
             String ln = rs.getString("lname");
             String un = rs.getString("userName");
+            String ge = rs.getString("gender");
             String mn = rs.getString("momsName");
-            results.add(new User(fn, ln, un, mn, "", id));
+            results.add(new User(fn, ln, un, ge, mn, "", id));
         }
         return results;
     }
