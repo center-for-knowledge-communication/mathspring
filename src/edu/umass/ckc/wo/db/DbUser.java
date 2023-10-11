@@ -50,9 +50,10 @@ public class DbUser {
                 String ln = rs.getString("lname");
                 String pw = rs.getString("password");
                 String un = rs.getString("username");
+                String ge = rs.getString("gender");                
                 String email = rs.getString("email");
                 int classId = rs.getInt("classId");
-                return new User(fn, ln, un, email, pw, studId);
+                return new User(fn, ln, un, ge, email, pw, studId);
             }
         } finally {
             if (stmt != null)
@@ -753,7 +754,7 @@ public class DbUser {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 int id = rs.getInt(4);
-                return new User(fname, lname, null, email, "", id);
+                return new User(fname, lname, null, "", email, "", id);
 
             } else return null;
         } finally {
