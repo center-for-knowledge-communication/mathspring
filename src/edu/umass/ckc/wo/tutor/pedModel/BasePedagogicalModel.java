@@ -676,7 +676,7 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
                 return r;
             }
         }
-        if (r ==null &&  smgr.getStudentState().isInReviewMode()) {
+        if (r == null &&  smgr.getStudentState().isInReviewMode()) {
             smgr.getStudentState().setInReviewMode(false);
             smgr.getStudentState().setInChallengeMode(false);
             e.clearTopicToForce(); // A topic is on the NextProb event because it is for review/challenge mode.  We clear it so the regular
@@ -728,12 +728,10 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         ProblemResponse r=null;
         if (curProb != null) {
         	if (smgr.getExperiment().indexOf("multi-lingual") >= 0) {
-//	        	if (state.getLangIndex() > 0) {
-	        		altProbId = ProblemMgr.getProblemPair(curProb.getId());
-//        		}
+        		altProbId = ProblemMgr.getProblemPair(curProb.getId());
         	}
             curProb.setMode(Problem.PRACTICE);
-
+            
             problemGiven(curProb); // inform pedagogical move listeners that a problem is given.
             // this call takes about 175 ms
             r = new ProblemResponse(curProb);
@@ -783,7 +781,56 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
              problemGiven(curProb); // inform pedagogical move listeners that a problem is given.
              // this call takes about 175 ms
              r = new ProblemResponse(curProb);
-             r.setIsTranslation(1);
+             
+             r.getJSON().element("isTranslation", 1);
+             r.getJSON().element("altProbId", altProbId);
+             r.getJSON().element("untranslateProbid", Integer.valueOf(e.getTranslateProbId()));
+             r.getJSON().element("isTranslation", 1);
+             //             r.setProblemBindings(smgr);
+         }
+         else {
+             r = ProblemResponse.NO_MORE_PROBLEMS;
+             // We clear the current topic from the workspace state so that later logins don't start at this topic
+             smgr.getStudentState().setCurTopic(-1);
+         }
+         return r;
+     }
+
+    /**
+      * Note that this always returns a non-null problem even if to just indicate no more problems
+      *
+      * @param e
+      * @return
+      * @throws Exception
+      */
+      public ProblemResponse untranslateProblem(TranslateProblemEvent e) throws Exception {
+         
+    	 int untranslateProbid = e.getTranslateProbId();
+ 		 Problem curProb  = null;
+         ProblemResponse r=null;
+    	 try {
+//    		  untranslateProbid = ProblemMgr.getProblemPairReversed(Integer.valueOf(e.getTranslateProbId()));
+//    		  if (untranslateProbid == 0 ) {
+//    			  return ProblemResponse.NO_PROBLEM_TRANSLATION;    			      			  
+//    		  } 
+//    		  else { 
+   	 		  	curProb  = ProblemMgr.getProblem(untranslateProbid);
+//    		  }
+    	 }
+    	 catch (Exception ex) {
+             return ProblemResponse.NO_PROBLEM_TRANSLATION;   		  
+    	 }
+ 		 
+         StudentState state = smgr.getStudentState();
+         smgr.setProbLangIndex(0);
+         if (curProb != null) {
+             curProb.setMode(Problem.PRACTICE);
+
+             problemGiven(curProb); // inform pedagogical move listeners that a problem is given.
+             // this call takes about 175 ms
+             r = new ProblemResponse(curProb);
+             r.getJSON().element("altProbId", 0);
+             r.getJSON().element("isTranslation", 0);
              //             r.setProblemBindings(smgr);
          }
          else {
@@ -925,6 +972,79 @@ public class BasePedagogicalModel extends PedagogicalModel implements Pedagogica
         }
 */
         r = translateProblem(e); // takes about 300 ms
+/*        
+        if (r == null) {
+            View er = new ErrorResponse("Translation error", "Problem has no translation available");
+            
+            r = new ProblemResponse.NO_PROBLEM_TRANSLATION;
+           
+            return r;
+        }
+*/
+        if (r != null && r instanceof ProblemResponse) {
+            curProb = ((ProblemResponse) r).getProblem();
+        }
+        if (learningCompanion != null )
+            learningCompanion.processTranslateProblemRequest(smgr,e,r);
+        if (curProb != null)  {
+            smgr.getStudentModel().newProblem(state, curProb);  // 120 ms
+            // 520 ms by this point
+        }
+        
+//        new TutorLogger(smgr).logTranslateProblem(e, r.getCharacterControl(), "PracticeProblem");
+        // about 30 ms to do the logging
+        StudentEffort eff = studentModel.getEffort();
+        r.setEffort(eff);
+        return r;
+    }
+
+
+    /**
+     * Process a request for a next problem
+     * @param  e  NextProblemEvent asks for the next problem
+     * @return
+     * @throws Exception
+     */
+    public Response processUntranslateProblemRequest(TranslateProblemEvent e) throws Exception {
+
+        // We have a fixed sequence which prefers forced problems, followed by topic intros, examples, interventions, regular problems.
+        // If we ever want something more customized (e.g. from a XML pedagogy defn),  this would have to operate based on that defn
+        long t = System.currentTimeMillis();
+        Response r=null;
+        StudentState state = smgr.getStudentState();
+        
+        Problem curProb=null;
+        // First grade the last practice problem which sets the lastProblemScore property of this class (used by subsequent code)
+        this.lastProblemScore = gradeLastProblem();
+
+        // NextProblem is an event that the lesson/topic models want to watch.   They may change their internal state or return EndOfLesson/Topic
+        // Many interventions are generated in this call because the Lesson Model wants to notify the student about beginnings of new
+        // lessons, endings of lessons, etc.
+        r = lessonModel.processUserEvent(e);  // If the lesson/topic is done we get a response (an internal event) and exit
+        // If the lessonModel didn't generate something, now we see if the pedagogical model wants to generate an intervention
+ /*       
+        if (r == null)  {
+            r = getNextProblemIntervention(e);
+        }
+        // less than 100 ms at this point
+
+        // Some interventions are designed to be shown while a problem is being shown (perhaps some GUI element is changed)
+        // For cases like this, the intervention's isBuildProblem is true.
+        // If the intervention requires a problem, get the next problem and return a Problem with the intervention as a property of a problem
+        if (r != null && r instanceof NextProblemInterventionResponse ) {
+            if (((NextProblemInterventionResponse) r).isBuildProblem()) {
+                ProblemResponse pr = getNextProblem(e);
+                pr.setIntervention(((NextProblemInterventionResponse) r).getIntervention());
+                r = pr;
+            }
+        }
+        if (r == null) {
+            r = getNextProblem(e); // takes about 300 ms
+            // 400 ms by this point
+
+        }
+*/
+        r = untranslateProblem(e); // takes about 300 ms
 /*        
         if (r == null) {
             View er = new ErrorResponse("Translation error", "Problem has no translation available");

@@ -108,10 +108,12 @@ public class ProblemResponse extends Response {
         }
 
         else {
+            jsonObject.element("altProbId", altProbId);
+            jsonObject.element("inTranslation", 0);
+            isTranslation = 0;
+            setAltProbId(altProbId);
             prob.buildJSON(jsonObject);  //  problem generates its own json object so we add in character stuff
             
-//            state.getAltProbId(altProbId);
-//            r.setAltProbId(altProbId);
 
 
             

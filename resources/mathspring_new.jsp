@@ -70,7 +70,10 @@ if ((pageLang != null) && pageLang.length() == 2) {
 System.out.println("locale set to:" + lang + "-" + country );	
 
 String next_problem = "";
+String no_translation = "";
 String translate_this_problem = "";
+String translate_to_spanish = "";
+String translate_to_english = "";
 String problem_current_topic = "";
 String problem_standards = "";
 String hint_text = "";
@@ -163,6 +166,9 @@ else {
 if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(lang.equals("en")))) ) {
 	next_problem = rb1.getString("next_problem");
 	translate_this_problem = rb1.getString("translate_this_problem");
+	no_translation = rb1.getString("no_translation");
+	translate_to_spanish = rb1.getString("translate_to_spanish");
+	translate_to_english = rb1.getString("translate_to_english");
 	problem_current_topic = rb1.getString("problem_current_topic");
 	problem_standards = rb1.getString("problem_standards");
 	hint_text = rb1.getString("hint");
@@ -189,6 +195,9 @@ if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(
 else {
 	next_problem = rb2.getString("next_problem");
 	translate_this_problem = rb2.getString("translate_this_problem");
+	no_translation = rb2.getString("no_translation");
+	translate_to_spanish = rb2.getString("translate_to_spanish");
+	translate_to_english = rb2.getString("translate_to_english");
 	problem_current_topic = rb2.getString("problem_current_topic");
 	problem_standards = rb2.getString("problem_standards");
 	hint_text = rb2.getString("hint");
@@ -377,6 +386,9 @@ else
 	var camera_initialized = "<%= rb.getString("camera_initialized") %>";
 	var next_problem = "<%= next_problem %>";
 	var translate_this_problem = "<%= translate_this_problem %>";
+	var no_translation = "<%= no_translation %>";
+	var translate_to_spanish = "<%= translate_to_spanish %>";
+	var translate_to_english = "<%= translate_to_english %>";
 
 	var replay_hints = "<%= replay_hints %>";
 	var read_question = "<%= read_question %>";
@@ -436,6 +448,7 @@ else
             hintSequence: null,
             exampleHintSequence: null,
             lastProbId: ${lastProbId},
+            untranslateProbId: 0,
             trace: false,
             debug: false,
             topicId: ${topicId},
@@ -668,16 +681,16 @@ label {
 				</span> <span id = "nextProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 				</a>
-				 
 				<div id="translateProbWrapper">
-					<a href="#" class="huytran-sitenav__button"
-						id="translateProb"> <span class="huytran-sitenav__icon"> <i
-							class="fa fa-plus" aria-hidden="true"></i>
-					</span> <span id= "translateProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("translate_this_problem") %></span>
+					<a href="#" id="translateProb" class="huytran-sitenav__button"> 
+					<span class="huytran-sitenav__icon"> <i class="fa fa-plus" aria-hidden="true"></i></span> 
+					<span id= "translateProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("no_translation") %></span>
 					<span id = "trans_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 					</a>
 				</div>
-								
+				
+				
+												
 				<a href="#"  id="read" class="huytran-sitenav__button"> 
 					<span class="huytran-sitenav__icon"> <i class="fa fa-bullhorn" aria-hidden="true"></i></span>
 					<span id="readText"class="huytran-sitenav__buttontitle"><%= rb.getString("read_question") %></span>
@@ -870,7 +883,7 @@ label {
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a class="accordion-toggle" data-toggle="collapse"
-								data-parent="#accordion" href="#collapseOne"> Event Log </a>
+								data-="#accordion" href="#collapseOne"> Event Log </a>
 						</h4>
 					</div>
 					<div id="collapseOne" class="panel-collapse collapse in">
@@ -1212,7 +1225,6 @@ label {
 
 		document.getElementById("translateProbText").innerHTML =  translate_this_problem;
 		document.getElementById("nextProbText").innerHTML =  next_problem;		
-		document.getElementById("hint_label").innerHTML = 
 		document.getElementById("replayText").innerHTML =  replay_hints;
 		document.getElementById("readText").innerHTML =  read_question;
 		document.getElementById("exampleText").innerHTML =  show_example;

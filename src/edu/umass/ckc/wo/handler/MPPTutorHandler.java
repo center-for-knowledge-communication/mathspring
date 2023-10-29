@@ -43,7 +43,7 @@ public class MPPTutorHandler {
         if (e instanceof MPPReturnToHutEvent) {
 //            Response r = new ProblemResponse(p,smgr.getStudentModel().getTopicMasteries(),smgr.getStudentState().getCurTopic(), e.getElapsedTime());
         	// For now, don't resume translated problem
-        	if (state.getLangIndex() == 0) {
+        	if (state.getProbLangIndex() == 0) {
 	        	String lastProbType = state.getCurProbType();
 	            // If the last problem is resumable and not a topic intro
 	            if (lastProbType != null && !((MPPReturnToHutEvent) e).getProbId().equals(Problem.TOPIC_INTRO_ID)) {

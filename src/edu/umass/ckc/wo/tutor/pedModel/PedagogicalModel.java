@@ -159,7 +159,7 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
 
 
         if (e instanceof AttemptEvent) {
-        	state.setLangIndex(e.getProbLangIndex());
+        	state.setProbLangIndex(e.getProbLangIndex());
             r = processAttempt((AttemptEvent) e);
             studentModel.save();
             return r;
@@ -170,16 +170,18 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
             NextProblemEvent ee = (NextProblemEvent)  e;
             long t = System.currentTimeMillis();
             //  I think the only way we arrive at this with forceProblem=true is from the tool for test-users that allows problem selection from dialog
+
+            state.setProbLangIndex(e.getProbLangIndex());
+
             if (ee.isForceProblem())
                 r = processStudentSelectsProblemRequest(ee);
             else if (ee.getMode().equalsIgnoreCase(CHALLENGE_MODE) || state.isInChallengeMode())
                 r = processChallengeModeNextProblemRequest(ee);
             else if (ee.getMode().equalsIgnoreCase(REVIEW_MODE) || state.isInReviewMode())
                 r = processReviewModeNextProblemRequest(ee);
-            else {
-            	state.setLangIndex(e.getProbLangIndex());
+            else
             	r = processNextProblemRequest((NextProblemEvent) e);
-            }
+            
             studentModel.save();
             System.out.println("Time to process NextProblem event " + (System.currentTimeMillis() - t));
             return r;
@@ -190,7 +192,24 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         	TranslateProblemEvent ee = (TranslateProblemEvent)  e;
             long t = System.currentTimeMillis();
 
-            state.setLangIndex(ee.getProbLangIndex());
+            state.setProbLangIndex(ee.getProbLangIndex());
+            state.setTranslateProbId(ee.getTranslateProbId());
+            if (ee.getProbLangIndex() == 0) {
+            	r = processTranslateProblemRequest((TranslateProblemEvent) ee);
+            }
+            else {
+            	r = processUntranslateProblemRequest((TranslateProblemEvent) ee);
+            }
+           	studentModel.save();
+            System.out.println("Time to process NextProblem event " + (System.currentTimeMillis() - t));
+            return r;
+        }
+
+        else if (e instanceof TranslateProblemEvent)  {
+        	TranslateProblemEvent ee = (TranslateProblemEvent)  e;
+            long t = System.currentTimeMillis();
+
+            state.setProbLangIndex(ee.getProbLangIndex());
             state.setTranslateProbId(ee.getTranslateProbId());
            	r = processTranslateProblemRequest((TranslateProblemEvent) ee);
 
@@ -251,11 +270,11 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
         else if (e instanceof BeginProblemEvent) {
             long t = System.currentTimeMillis();
             r = processBeginProblemEvent((BeginProblemEvent) e);
-            e.setProbLangIndex(state.getLangIndex());
+            e.setProbLangIndex(state.getProbLangIndex());
             e.setTranslateProbId(state.getTranslateProbId());
             studentModel.save();
             System.out.println("Time to process BeginProblem event " + (System.currentTimeMillis() - t));
-            System.out.println("probLangIndex in BeginProblem event " + String.valueOf(state.getLangIndex()));
+            System.out.println("probLangIndex in BeginProblem event " + String.valueOf(state.getProbLangIndex()));
 
             return r;
         }
@@ -441,6 +460,8 @@ public abstract class PedagogicalModel implements TutorEventProcessor { // exten
     // results: ProblemResponse | InterventionResponse
     
     public abstract Response processTranslateProblemRequest (TranslateProblemEvent e) throws Exception;
+    
+    public abstract Response processUntranslateProblemRequest (TranslateProblemEvent e) throws Exception;
     
     public abstract Response processNextProblemRequest (NextProblemEvent e) throws Exception;
 

@@ -69,6 +69,7 @@ public class ProblemMgr {
     private static int[] topicIds;
     private static boolean loaded=false;
     private static Map<Integer, Integer> allProblemPairs = new HashMap<Integer, Integer>();
+    private static Map<Integer, Integer> allProblemPairsReversed = new HashMap<Integer, Integer>();
 
 
     public static boolean isLoaded () {
@@ -80,6 +81,7 @@ public class ProblemMgr {
             loaded = true;
             problemIds = new ArrayList<Integer>();
             allProblemPairs = new HashMap<Integer, Integer>();
+            allProblemPairsReversed = new HashMap<Integer, Integer>();
             allProblems = new HashMap<Integer, Problem>();
             allTopics = new ArrayList<Topic>();
             probIdsByTopic = new HashMap<Integer,ArrayList<Integer>>();
@@ -629,7 +631,36 @@ public class ProblemMgr {
         }
     }
 
+    private static void loadAllProblemPairsReversed(Connection conn) throws Exception {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            String q = "select * from BaseProblemJoin";
+            ps = conn.prepareStatement(q);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                allProblemPairs.put(rs.getInt("problemID"), rs.getInt("baseProblemID"));
+            }
+        } finally {
+              if (ps != null)
+                   ps.close();
+              if (rs != null)
+                   rs.close();
+        }
+    }
+
     public static int getProblemPair(int curProb ) {
+    	int result = 0;
+    	try {
+    		result = allProblemPairs.get(curProb);  
+    	}
+    	catch (Exception e) {
+    		result = 0;
+    	}
+    	return result;
+    }
+
+    public static int getProblemPairReversed(int curProb ) {
     	int result = 0;
     	try {
     		result = allProblemPairs.get(curProb);  

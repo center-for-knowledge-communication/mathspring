@@ -39,12 +39,13 @@ public class TranslateProblemEvent extends IntraProblemEvent {
     private boolean isEnteringPracticeArea=false;  // true if this NPEvent is the first one on entering into the practice area from some other place.
     private String lastLocation="";  // one of: Login, Dashboard-ReviewTopic, Dashboard-ChallengeTopic, Dashboard-ContinueTopic, MPP-ChallengeTopic, MPP-ReviewTopic, MPP-ContinueTopic, MPP-TryProblem
     private boolean problemBroken = false; // added to support reporting on broken problems and getting a new problem in response
-
+    
     private Lesson lesson; // a way to force a Lesson
 
     public TranslateProblemEvent (ServletParams p) throws Exception {
         super(p);
-/*
+
+ /*
         String interv = p.getString(FORCE_INTERVENTION,"false");
         String intro = p.getString(FORCE_INTRO,"false");
         debugInterv = p.getString(DEBUG_INTERVENTION,null);
@@ -209,4 +210,5 @@ public class TranslateProblemEvent extends IntraProblemEvent {
     public boolean isProblemIsBroken() {
         return this.problemBroken;
     }
+    
 }
