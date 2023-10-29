@@ -360,7 +360,7 @@ public class SessionManager {
         this.gender = fields[4];
         String language = fields[2];
         int pageLangIndex = Integer.valueOf(fields[3]);
-        ClassInfo cl = DbClass.getClass(connection, this.classId);
+        ClassInfo cl = DbClass.getClass(connection, this.classId);        
         if (pageLangIndex < 0) {
 	        if ((language.startsWith("en")) && (cl.getClassLanguageCode().contains("English"))) {
 	        	this.setPageLangIndex(0);
@@ -386,6 +386,7 @@ public class SessionManager {
 
         if (this.experiment.indexOf("multi-lingual") < 0) {
 	        language = cl.getClassLanguageCode();
+	        
 	        if (language.startsWith("es")) {
 	        	language = "es";
 	            this.locale = new Locale(language,"US");

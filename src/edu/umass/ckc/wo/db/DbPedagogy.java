@@ -555,10 +555,7 @@ public class DbPedagogy {
             while (rs.next()) {
            
             	int id = rs.getInt(1);
-            	String url = Settings.webContentPath + "LearningCompanion/";
-            	if ((rs.getString(4).equals("webContentPath2"))){
-                	url = Settings.webContentPath2 + "LearningCompanion/";
-            	}
+            	String url = Settings.webContentPath2 + "LearningCompanion/";
            		String lang = " (" + rs.getString(5) + ")";
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", String.valueOf(id));                       		
@@ -601,10 +598,7 @@ public class DbPedagogy {
             while (rs.next()) {
            
             	int id = rs.getInt(1);
-            	String url = Settings.webContentPath + "LearningCompanion/";
-            	if ((rs.getString(4).equals("webContentPath2"))){
-                	url = Settings.webContentPath2 + "LearningCompanion/";
-            	}
+            	String url = Settings.webContentPath2 + "LearningCompanion/";
            		String lang = " (" + rs.getString(5) + ")";
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", String.valueOf(id));                       		
@@ -645,10 +639,7 @@ public class DbPedagogy {
             rs = stmt.executeQuery();
             while (rs.next()) {           	
             	int id = rs.getInt(1);
-            	String url = Settings.webContentPath + "LearningCompanion/";
-            	if ((rs.getString(4).equals("webContentPath2"))){
-                	url = Settings.webContentPath2 + "LearningCompanion/";
-            	}
+            	String url = Settings.webContentPath2 + "LearningCompanion/";
            		String lang = " (" + rs.getString(5) + ")";
             	JSONObject resultJson = new JSONObject();
             	resultJson.put("id", String.valueOf(id));                       		

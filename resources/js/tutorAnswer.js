@@ -69,6 +69,14 @@ function processAnswerChosenResult(responseText, textStatus, XMLHttpRequest) {
     if (showGrade == undefined || showGrade)
         callProblemGrader(isCorrect, transients);
     showLearningCompanion(json);
+    if (isCorrect == true) {
+		$("#translateProb").addClass("disable_a_href");
+		$("#translateProbWrapper").addClass("not-allowed");    	
+    }
+    	
+	$("#translateProb").addClass("disable_a_href");
+	$("#translateProbWrapper").addClass("not-allowed");
+
     processAttemptIntervention(interv);
 
 }
