@@ -920,6 +920,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     }
     console.log("altProbId=" + altProbId);
     console.log("pageLangIndex=" + pageLangIndex);
+    console.log("globals.experiment=" + globals.experiment);
 	if (globals.experiment.indexOf("multi-lingual") < 0) {
 		document.getElementById("translateProb").style.display = "none";
 	}
@@ -933,7 +934,17 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 //			else {
 //				document.getElementById("translateProbText").innerHTML =  translate_this_problem_pri;				
 //			}
+			// Add a mouseover event listener
+			document.getElementById("translateProb").addEventListener('mouseover', () => {
+			  // Change the button's background color
+  				document.getElementById("translateProb").style.backgroundColor = '#92DDA3';
+			});
 
+			// Add a mouseout event listener
+			document.getElementById("translateProb").addEventListener('mouseout', () => {
+			  // Change the button's background color back to its original color
+				document.getElementById("translateProb").style.backgroundColor = "White";
+			});
 			$("#translateProb").removeClass("disable_a_href");
 			$("#translateProbWrapper").removeClass("not-allowed");
 			document.getElementById("translateProb").style.background = "White";
@@ -1211,14 +1222,14 @@ function showLearningCompanion (json) {
 		        var offset = file.indexOf("/");
 		        file = lcName + file.substring(offset)
 	        }
-//		    if ((file.indexOf("Jane") >= 0) || (file.indexOf("Jake") >= 0)) {
-//	            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
-//	            httpHead(url, successfulLCResult, failureLCResult);
-//	        }
-//	        else {
+		    if ((file.indexOf("Jane") >= 0) || (file.indexOf("Jake") >= 0)) {
+	            url = sysGlobals.problemContentPath + "/LearningCompanion/" + file;         	
+	            httpHead(url, successfulLCResult, failureLCResult);
+	        }
+	        else {
 	        	url = sysGlobals.webContentPath2 + "LearningCompanion/" + file;
 	            httpHead(url, successfulLCResult, failureLCResult);
-//	        }
+	        }
 	    }
     }
 	catch(err) {
@@ -1232,13 +1243,14 @@ function showNewLearningCompanion (lcNew) {
     var url;
 
     try {
-//	    if ((lcNew == "Jane") || (lcNew == "Jake")){
-//            url = sysGlobals.problemContentPath + "/LearningCompanion/" + lcNew + "/idle.html";         	
-//            httpHead(url, successfulLCResult, failureLCResult);
-//        }
-//        else {
+	    if ((lcNew == "Jane") || (lcNew == "Jake")){
+            url = sysGlobals.problemContentPath + "/LearningCompanion/" + lcNew + "/idle.html";         	
+            httpHead(url, successfulLCResult, failureLCResult);
+        }
+        else {
         	url = sysGlobals.webContentPath2 + "LearningCompanion/" + lcNew + "/idle.html";
             httpHead(url, successfulLCResult, failureLCResult);
+        }
     }
 	catch(err) {
     	console.log(err.message + url);
