@@ -612,6 +612,11 @@ label {
      cursor: not-allowed! important;
 }
 
+#translateProbWrapper:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
 </style>
 </head>
 <body>
@@ -1222,8 +1227,13 @@ label {
 	    else {
     		document.getElementById("monitorBox").style.visibility = "hidden";
 	    }
+    	if (globals.experiment.indexOf("multi-lingual") < 0) {
+    		document.getElementById("translateProbWrapper").style.display = "none";
+    	}
+    	else {
+    		document.getElementById("translateProbText").innerHTML =  translate_this_problem;    		
+    	}
 
-		document.getElementById("translateProbText").innerHTML =  translate_this_problem;
 		document.getElementById("nextProbText").innerHTML =  next_problem;		
 		document.getElementById("replayText").innerHTML =  replay_hints;
 		document.getElementById("readText").innerHTML =  read_question;

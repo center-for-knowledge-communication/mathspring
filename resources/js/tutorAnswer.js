@@ -21,6 +21,12 @@ function processShortAnswerResult (responseText, textStatus, XMLHttpRequest) {
     debugAlert("processShortAnswerResult: Server returns " + responseText);
     var json = JSON.parse(responseText);
     var isCorrect = json.isCorrect;
+    if (isCorrect == true) {
+		$("#translateProb").addClass("disable_a_href");
+		$("#translateProbWrapper").addClass("not-allowed");
+		document.getElementById("translateProbText").innerHTML = no_translation;
+
+    }
     var showGrade = json.showGrade;
     var interv = json.intervention;
     if (showGrade == undefined || showGrade)
@@ -72,11 +78,9 @@ function processAnswerChosenResult(responseText, textStatus, XMLHttpRequest) {
     if (isCorrect == true) {
 		$("#translateProb").addClass("disable_a_href");
 		$("#translateProbWrapper").addClass("not-allowed");    	
+		document.getElementById("translateProbText").innerHTML = no_translation;
     }
     	
-	$("#translateProb").addClass("disable_a_href");
-	$("#translateProbWrapper").addClass("not-allowed");
-
     processAttemptIntervention(interv);
 
 }

@@ -194,6 +194,7 @@ public class MyProgressHandler {
         // Similarly for the topicId.   If they aren't passed in, then its the old system and we get them from the student state.
         int probId = (pid != null && pid.length() != 0) ? Integer.parseInt(pid) : smgr.getStudentState().getCurProblem();
         int topicId = (topid != null && topid.length() != 0) ? Integer.parseInt(topid) : smgr.getStudentState().getCurTopic();
+        request.setAttribute("experiment",smgr.getExperiment());
     	request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
         request.setAttribute("probId",probId);
         request.setAttribute("topicId",topicId);

@@ -88,6 +88,8 @@ public class DashboardHandler {
         // Similarly for the topicId.   If they aren't passed in, then its the old system and we get them from the student state.
         int probId = (pid != null) ? Integer.parseInt(pid) : state.getCurProblem();
         int topicId = (topid != null) ? Integer.parseInt(topid) :state.getCurTopic();
+        
+        request.setAttribute("experiment",smgr.getExperiment());
         request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
         request.setAttribute("studentFirstName", smgr.getStudentModel().getStudentFirstName());
         request.setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
