@@ -1474,13 +1474,11 @@ $.extend({
                     </c:otherwise>
                 </c:choose>
             </li>
-	        <li class="nav-item">
-	        	<div id="changeLanguageButton")
+	        <li id="changeLanguageButton" class="nav-item">
 		            <a onclick="window.location='TutorBrain?action=navigation&from=my_progress&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
-				</div>
 	        </li>
             <li class="nav-item"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
-            <li class="nav-item nav-item--last">
+            <li class="nav-item--last">
             	<a href="#" class="session-clock-item"> <span> <i class="fa fa-clock-o"
 							aria-hidden="true"></i>
 						</span> <span id="session_clock"></span> </a>
