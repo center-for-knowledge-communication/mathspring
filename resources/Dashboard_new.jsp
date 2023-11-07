@@ -1193,12 +1193,11 @@ else {
         	</c:otherwise>
         </c:choose>
         </li>
-        <li class="nav__item">
-        	<div id="changeLanguageButton")
-            	<a onclick="window.location='TutorBrain?action=ChangeLanguage&from=sat_Hut&to=sat_Hut&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
-            >
-            </div>
+
+        <li id="changeLanguageButton" class="nav__item">
+           	<a onclick="window.location='TutorBrain?action=ChangeLanguage&from=sat_Hut&to=sat_Hut&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
         </li>
+        
         <li class="nav__item">
             <a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=">
                 <%= rb.getString("log_out")%> &nbsp;
