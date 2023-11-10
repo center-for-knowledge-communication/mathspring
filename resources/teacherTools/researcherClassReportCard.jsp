@@ -3819,7 +3819,7 @@ function showChartNine(data, chartIndex) {
 
 				var rptNineTitle = '<%= rb.getString("student_problem_solving_history")%>';
 				if (chartIndex == 0) {
-					rptNineTitle = rptNineTitle + " - English ";
+					rptNineTitle = rptNineTitle + " - English";
 				}
 				else {
 					rptNineTitle = rptNineTitle + " - Spanish ";
@@ -5000,7 +5000,7 @@ function showChartNine(data, chartIndex) {
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a id="report_nine" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
-									<%= rb.getString("student_gradebook_problem_solving_history") %>
+									Student Gradebook Problem Solving History English / Spanish Comparison
                                 </a>
                                 <button id="nineButton" type="button" class="close" onclick="$('.collapse').collapse('hide')">&times;</button>                             
                             </h4>
