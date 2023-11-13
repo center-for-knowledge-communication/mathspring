@@ -30,13 +30,13 @@ public class ClassCloner {
      * @param newClassSection   The section of the new class
      * @return
      */
-    public static int cloneClass (Connection conn, int classId, String newClassName, String newClassSection, String newClassLanguage, String color) throws Exception {
+    public static int cloneClass (Connection conn, int classId, String newClassName, String newClassSection, String newClassLanguage, String newAltClassLanguage, String color) throws Exception {
         if (newClassName.trim().equals(""))
             return -1;
         ClassInfo info = DbClass.getClass(conn,classId);
         int newClassId= DbClass.insertClass(conn,newClassName,info.getSchool(), Integer.toString(info.getSchoolYear()),
                         info.getTown(),newClassSection, Integer.toString(info.getTeachid()),
-                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade(),newClassLanguage,color);
+                        info.getPropGroupId(), info.getPretestPoolId(), info.getGrade(),newClassLanguage,newAltClassLanguage,color);
          DbClass.removeConfig(conn,newClassId);
         if (newClassId != -1) {
             // clone the lesson plan (if there is one)
@@ -57,7 +57,7 @@ public class ClassCloner {
         try {
             Connection conn = DbUtil.getAConnection("cadmium.cs.umass.edu");
             int id = DbUser.getStudent(conn,"whole_1","whole");
-            ClassCloner.cloneClass(conn,415,"Clone of Class 415","section 2", "en:English", "green");
+            ClassCloner.cloneClass(conn,415,"Clone of Class 415","section 2", "en:English","es:Spanish", "green");
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
