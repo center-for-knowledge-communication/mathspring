@@ -104,7 +104,6 @@ String example_problem_play_hints = "";
 String alt_example_problem_play_hints = "";
 
 
-
 try {
 	if (pageLangIndex == 0) {
 		if (lang.equals("en")) {
@@ -360,7 +359,6 @@ else
 <script type="text/javascript">
 	var lang = "en";
 	var stepText = "<%= rb.getString("step") %>";
-	var hint_text = "<%= rb.getString("hint") %>";
 	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";
 	var no_video_to_show = "<%= rb.getString("no_video_to_show") %>";
 	var no_instructions_to_show = "<%= rb.getString("no_instructions_to_show") %>";
@@ -390,6 +388,7 @@ else
 	var translate_to_spanish = "<%= translate_to_spanish %>";
 	var translate_to_english = "<%= translate_to_english %>";
 
+	var hint_text = "<%= hint_text %>";
 	var replay_hints = "<%= replay_hints %>";
 	var read_question = "<%= read_question %>";
 	var show_example = "<%= show_example %>";
@@ -703,7 +702,7 @@ label {
 				
 				<a href="#" id="hint" class="huytran-sitenav__button"> 
 					<span class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
-					<span id="hint_label" class="huytran-sitenav__buttontitle"><%= rb.getString("hint") %></span>
+					<span id="hint_label" class="huytran-sitenav__buttontitle">hint_text</span>
 				</a>
 				 
 				<a href="#" id="replay" class="huytran-sitenav__button" > 
@@ -1238,6 +1237,7 @@ label {
 		document.getElementById("replayText").innerHTML =  replay_hints;
 		document.getElementById("readText").innerHTML =  read_question;
 		document.getElementById("exampleText").innerHTML =  show_example;
+		document.getElementById("hint_label").innerHTML =  hint_text;
 		document.getElementById("videoText").innerHTML =  show_video;
 		document.getElementById("learningCompanionsText").innerHTML =  learning_companions;
 		document.getElementById("formulaText").innerHTML = formula;

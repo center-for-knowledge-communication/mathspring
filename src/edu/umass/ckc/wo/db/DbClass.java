@@ -582,15 +582,27 @@ public class DbClass {
     
     public static int insertClass(Connection conn, String className,
                                   String school, String schoolYear,
-                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId, String color) throws Exception {
+                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId, String altLanguageId, String color) throws Exception {
         ResultSet newid = null;
         PreparedStatement s = null;
         try {
         	String languageDescription = languageId.split(":")[1];
-            String teacherName = getTeacherName(conn, Integer.parseInt(teacherId));
+        	String altLanguageDescription = altLanguageId.split(":")[1];
+            String altClassLanguageCode = "";            
+            String experiment = "";
+            
+            if("noLanguage".equals(altLanguageDescription)) {
+            	altClassLanguageCode = "";
+
+            } else {
+               	 altClassLanguageCode = altLanguageId;
+               	 experiment = "multi-lingual";
+            }            
+        	
+        	String teacherName = getTeacherName(conn, Integer.parseInt(teacherId));
             String q = "insert into Class (teacherId,school,schoolYear,name,town,section,isActive," +
-                    "teacher,propGroupId,logtype,pretestPoolId,grade,class_language) " +
-                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "teacher,propGroupId,logtype,pretestPoolId,grade,class_language,experiment) " +
+                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             s = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
             s.setString(1, teacherId);
             s.setString(2, school);
@@ -609,16 +621,11 @@ public class DbClass {
             s.setInt(11, pretestPool);
             s.setString(12,grade);
             s.setString(13,languageDescription);
+            s.setString(14,experiment);
             s.execute();
             newid = s.getGeneratedKeys();
             newid.next();
             int classId = newid.getInt(1);
-            String altClassLanguageCode = "";
-            if("English".equals(languageDescription)) {
-            	altClassLanguageCode = "es:Spanish";
-            } else {
-               	 altClassLanguageCode = "en:English";
-            }
             insertClassConfig(conn, classId, color, altClassLanguageCode);
             return newid.getInt(1);
         } catch (SQLException e) {

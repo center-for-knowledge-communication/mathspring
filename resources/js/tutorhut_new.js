@@ -982,16 +982,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 
         var topic = "";
         
-        if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
-            var topicName = activity.topicName;   
-            topic = topicName.en;
-            if (lang == "en") {
-                topic = topicName.en;                
-            }        
-            if (lang == "es") {
-                topic = topicName.es;
-            }        
-        }
+ //       if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
+        var topicName = activity.topicName;   
+        
 		if (activity.isTranslation == 1) {
 			probLang = "es"
 		}
@@ -1003,7 +996,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
         var varBindings = activity.parameters;
         setGlobalProblemInfo(activity);
 
-        showProblemInfo(pid,resource,topic,standards);
+        showProblemInfo(pid,resource,topicName,standards);
         showEffortInfo(activity.effort);
         if (globals.showAnswer) {
             // If server shuffles the answer to a different position, then newAnswer contains this position
