@@ -308,7 +308,7 @@ public class TeacherToolsViewClassDetailsController {
 
     	ccService.setTeacherInfo(map,String.valueOf(sTeacherId),classId);
         if (currentSelection.equals("classManageTopics")) {
-        	ccService.changeDefaultProblemSets(map,Integer.valueOf(classId));
+        	ccService.changeDefaultProblemSets(map,Integer.valueOf(classId), loc);
         }
     	map.addAttribute("createClassForm", new CreateClassForm());
         map.addAttribute("teacherId", String.valueOf(sTeacherId));
@@ -321,14 +321,17 @@ public class TeacherToolsViewClassDetailsController {
     
     @RequestMapping(value = "/tt/reOrderProblemSets", method = RequestMethod.POST)
     public @ResponseBody  String  reOrderProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "problemSets[]") List<String> problemSets, @RequestParam(value = "classid") String classid) throws TTCustomException {
-        List<Integer> sequenceNosToBeRemoved = new ArrayList<>();
+
+	   	 Locale loc = request.getLocale(); 
+    	
+    	List<Integer> sequenceNosToBeRemoved = new ArrayList<>();
         Map<Integer, Integer> insertSequences = new HashMap<>();
         for (String probsetEntries : problemSets) {
             String[] entries = probsetEntries.split("~~");
             insertSequences.put(Integer.valueOf(entries[0]), Integer.valueOf(entries[1]));
             sequenceNosToBeRemoved.add(Integer.valueOf(entries[2]));
         }
-        ccService.reOrderProblemSets(Integer.valueOf(classid), sequenceNosToBeRemoved, insertSequences);
+        ccService.reOrderProblemSets(Integer.valueOf(classid), sequenceNosToBeRemoved, insertSequences, loc);
 		HttpSession session = request.getSession();
 		int teacherId = (int) session.getAttribute("teacherId");
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
@@ -339,7 +342,10 @@ public class TeacherToolsViewClassDetailsController {
 
     @RequestMapping(value = "/tt/configureProblemSets", method = RequestMethod.POST)
     public @ResponseBody String activateProblemSets(ModelMap map, HttpServletRequest request, @RequestParam(value = "activateData[]") List<String> problemSets, @RequestParam(value = "classid") String classid,@RequestParam(value = "activateFlag") String activateFlag) throws TTCustomException {
-        List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
+
+	   	 Locale loc = request.getLocale(); 
+    	
+    	List<Integer> intProblemSets = problemSets.stream().map(Integer::parseInt).collect(Collectors.toList());
 		HttpSession session = request.getSession();
 		System.out.println(problemSets);
 		String logMsg = "{ ";
@@ -359,7 +365,7 @@ public class TeacherToolsViewClassDetailsController {
 		if ("Normal".equals((String) session.getAttribute("teacherLoginType"))) {
 			tLogger.logEntryWorker(teacherId, 0, classid, "reconfigureTopics", logMsg );
 		}
-        return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag);
+        return ccService.activateDeactivateProblemSets(Integer.valueOf(classid), intProblemSets,activateFlag, loc);
     }
     
     @RequestMapping(value = "/tt/continousContentApply", method = RequestMethod.POST)

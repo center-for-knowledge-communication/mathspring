@@ -1,22 +1,22 @@
 package edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * Created by nsmenon on 6/16/2017.
+ * Frank 11-08-23	Re-implemented using ResourceBundle and mathspring.properties.  Bundle location changed to match other translated resources in WEB-INF/classes folder.
  */
 public class TTCustomException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private String errorCode;
+	private ResourceBundle rb = null;
+
+	private String errorCode;
 
     private String errorMessage;
-
-    private Properties propertyLoader;
 
     public String getErrorMessage() {
         return errorMessage;
@@ -36,31 +36,35 @@ public class TTCustomException extends Exception {
     }
 
     public TTCustomException(String errorCode) {
-        Properties prop = new Properties();
-        InputStream input = null;
+
+    	Locale loc = new Locale("en","US");	
+
         try {
-            input = TTCustomException.class.getResourceAsStream("ErrorCodeMessage.properties");
-            // load a properties file
-            prop.load(input);
-            this.propertyLoader = prop;
-            showErrorMessage(errorCode);
-        } catch (IOException ex) {
+           	rb = ResourceBundle.getBundle("MathSpring",loc);
+            showErrorMessage(errorCode, loc);
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        	rb = null;
         }
-
     }
 
-    public String showErrorMessage(String errorCode) {
+    public TTCustomException(String errorCode, Locale loc) {
+
+        try {
+           	rb = ResourceBundle.getBundle("MathSpring",loc);
+            showErrorMessage(errorCode, loc);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+        	rb = null;
+        }
+    }
+    
+    
+    public String showErrorMessage(String errorCode, Locale loc) {
         this.errorCode = errorCode;
-        this.errorMessage = propertyLoader.getProperty(errorCode);
-        return propertyLoader.getProperty(errorCode);
+        this.errorMessage = rb.getString(errorCode);
+        return rb.getString(errorCode);
     }
 }

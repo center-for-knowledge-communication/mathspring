@@ -1,5 +1,7 @@
 package edu.umass.ckc.wo.ttmain.ttcontroller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -52,6 +54,7 @@ public class TeacherToolsCreateClassController {
     public String createNewClass( HttpServletRequest request, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
 
 		HttpSession session = request.getSession();
+		Locale loc = request.getLocale();
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
 
 		if (classForm.getHasClusters().equals("Y") ) {
@@ -61,24 +64,24 @@ public class TeacherToolsCreateClassController {
 			classForm.setHasClusters("0");
 		}
         //Basic Class Setup
-        int newClassId = createClassAssistService.createNewClass(classForm, teacherId);
+        int newClassId = createClassAssistService.createNewClass(classForm, teacherId, loc);
         //Set Default Pedagogy
-        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(newClassId, classForm, "create");
+        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(newClassId, classForm, "create", loc);
         //Add Student Roster and Finish setup
         
         if (!("".equals(classForm.getUserPrefix())) && classForm.getUserPrefix() != null
                 && !("".equals(classForm.getPasswordToken())) && classForm.getPasswordToken() != null
                 && classForm.getNoOfStudentAccountsForClass() > 0)
-            createClassAssistService.createStudentRoster(newClassId, newClassInfo, classForm);
+            createClassAssistService.createStudentRoster(newClassId, newClassInfo, classForm, loc);
         
         // Creating Test Users for class
         int testUserCount = 2;
-        createClassAssistService.createTestUsers(newClassId,newClassInfo, testUserCount);
+ //       createClassAssistService.createTestUsers(newClassId,newClassInfo, testUserCount, loc);
         
-        createClassAssistService.changeDefaultProblemSets(model, newClassId);
+        createClassAssistService.changeDefaultProblemSets(model, newClassId, loc);
         
         if (classForm.getHasClusters().equals("1")) {
-        	createClassAssistService.addNewMasterClass(newClassId);
+        	createClassAssistService.addNewMasterClass(newClassId, loc);
         }
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), teacherLoginType);
@@ -99,18 +102,19 @@ public class TeacherToolsCreateClassController {
     public String editClass( HttpServletRequest request, @RequestParam("teacherId") String teacherId, @RequestParam("classId") String classId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
 
 		HttpSession session = request.getSession();
+		Locale loc = request.getLocale();
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
 		
     	int intClassId = Integer.valueOf(classId.trim());
 
         //Basic Class Setup
-        boolean update = createClassAssistService.editClass(classForm, teacherId, intClassId);
+        boolean update = createClassAssistService.editClass(classForm, teacherId, intClassId, loc);
 
         if (update) {
         //Set Default Pedagogy
-        	ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(intClassId, classForm, "edit");
+        	ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(intClassId, classForm, "edit", loc);
         }
-        createClassAssistService.changeDefaultProblemSets(model, intClassId);
+        createClassAssistService.changeDefaultProblemSets(model, intClassId, loc);
         //Control Back to DashBoard with new Class visible
         loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId),teacherLoginType);
         model.addAttribute("createClassForm", new CreateClassForm());
@@ -129,17 +133,17 @@ public class TeacherToolsCreateClassController {
     public String cloneExistingClass(@RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
         //Clone Existing Class
     	
-    	
-    	
+    	Locale loc = new Locale("en","US");
+    	;
         //Set Default Pedagogy
-        //ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(Integer.valueOf(classId) , classForm, "create");
-        int result = createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
+        ClassInfo newClassInfo = createClassAssistService.addDefaultPedagogy(Integer.valueOf(classId) , classForm, "create", loc);
+        int result = createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm, loc);
 
         if (result == 0) {
         	return "*** clone error";
         }
         else {
-//        createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm);
+        	createClassAssistService.cloneExistingClass(Integer.valueOf(classId.trim()), classForm, loc);
         	return loginService.populateClassInfoForTeacher(model, Integer.valueOf(teacherId), "Normal");
         }
     }
@@ -147,10 +151,13 @@ public class TeacherToolsCreateClassController {
 
     @RequestMapping(value = "/tt/ttResetSurvey", method = RequestMethod.POST)
     public String resetSurveySettings(HttpServletRequest request, @RequestParam("classId") String classId, @RequestParam("teacherId") String teacherId, @ModelAttribute("createClassForm") CreateClassForm classForm, ModelMap model) throws TTCustomException {
-        //Clone Existing Class
-         createClassAssistService.restSurveySettings(Integer.valueOf(classId.trim()), classForm);
-     	int intTeacherId = Integer.valueOf(teacherId);
+
 		HttpSession session = request.getSession();
+		Locale loc = request.getLocale();
+
+    	//Clone Existing Class
+    	createClassAssistService.resetSurveySettings(Integer.valueOf(classId.trim()), classForm, loc);
+     	int intTeacherId = Integer.valueOf(teacherId);
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
 		if ("Normal".equals(teacherLoginType)) {    	
 			tLogger.logEntryWorker(intTeacherId, 0, classId, "resetSurvey", "");

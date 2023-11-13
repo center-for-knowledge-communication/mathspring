@@ -125,14 +125,15 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException {
 
-        try {
-        	
-    		// Multi=lingual enhancement
+		// Multi=lingual enhancement
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","US");	
+    	}        	
 
-        	Locale loc = new Locale("en","US");	
-        	if (lang.substring(0,2).equals("es")) {
-        		loc = new Locale("es","US");	
-        	}        	
+    	try {
+        	
+
 //    		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
@@ -669,11 +670,11 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         } catch (IOException e) {
            logger.error(e.getMessage());
-           throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
+           throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED, loc);
         }
         catch (MissingResourceException e) {
         	logger.error(e.getMessage());
-        	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
+        	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED, loc);
         }
     	System.out.println("Unknown report type: " + reportType);
         return null;

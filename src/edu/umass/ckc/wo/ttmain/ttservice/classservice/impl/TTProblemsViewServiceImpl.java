@@ -68,7 +68,15 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
 
     @Override
     public ProblemsView viewProblemSetsInGivenProblem(Integer problemId, Integer classId, String lang) throws TTCustomException {
-        ProblemsView view= new ProblemsView();
+
+    	System.out.println("viewProblemSetsInGivenProblem - lang=" + lang);
+		// Multi=lingual enhancement
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","US");	
+    	}
+    	
+    	ProblemsView view= new ProblemsView();
         DbProblem dbProb = new DbProblem();
         try {
             Topic topic = ProblemMgr.getTopic(problemId);
@@ -87,7 +95,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.FAILED_TO_LOAD_PROBLEMS);
+            throw new TTCustomException(ErrorCodeMessageConstants.FAILED_TO_LOAD_PROBLEMS, loc);
         }
         return view;
     }
@@ -162,7 +170,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA, loc);
         }
     	System.out.println("resetStudentData - message=" + message);
         return message;
@@ -190,7 +198,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_OCCURRED_WHILE_UPDATING_STUDENT_DATA, loc);
         }
     	System.out.println("deleteInactiveStudents - message=" + message);
         return message;
@@ -294,7 +302,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST, loc);
             
         }
         if (result > 0) {
@@ -326,7 +334,7 @@ public class TTProblemsViewServiceImpl implements TTProblemsViewService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST, loc);
             
         }
         return msg;
