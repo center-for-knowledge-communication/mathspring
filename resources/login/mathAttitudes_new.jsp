@@ -82,7 +82,7 @@ catch (Exception e) {
 
 
     <br>
-    <p><b><%= rb.getString("how_frutstrated_question")%>:</b></p>
+    <p><b><%= rb.getString("how_frustrated_question")%>:</b></p>
     <label class="radio-inline">
         <input type="radio" name="frustration" value="1"><%= rb.getString("not_at_all")%>
     </label>
