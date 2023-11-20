@@ -3481,7 +3481,7 @@ var completeDataChart;
         $("#perStudentPerProblemSetReport").hide();
             
         populateTopicSelectionListEight();
-            
+/*            
             $.ajax({
                 type : "POST",
                 url : pgContext+"/tt/tt/getTeacherReports",
@@ -3504,7 +3504,7 @@ var completeDataChart;
     	            console.log(e);
     	        }
         	});
-            
+*/            
                      
             $('#activeSurveyList').DataTable({
                 "bPaginate": false,
