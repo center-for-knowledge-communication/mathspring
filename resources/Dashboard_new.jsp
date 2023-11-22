@@ -27,7 +27,7 @@ String strExperiment = "";
 try {
 	strExperiment = (String) request.getAttribute("experiment");
 	
-	if (strExperiment.equals("multi-lingual")) {
+	if (strExperiment.indexOf("multi-lingual") < 0) {
 		pageLangIndex = 0;
 	}
 	else {

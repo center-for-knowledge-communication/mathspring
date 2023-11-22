@@ -198,14 +198,15 @@ public class TTReportServiceImpl implements TTReportService {
                 	}                	
 
                 	String tmpClassId = classId;
-            		String selectedStudent = filters[3].trim();
-            		String classStudentArr[] = selectedStudent.split(":");
-
-            		if (classStudentArr.length == 2) {
-            			tmpClassId = classStudentArr[0];
-            			selectedStudent = classStudentArr[1];
-            		}
-            		
+                	if (filters.length > 3) {
+	            		String selectedStudent = filters[3].trim();
+	            		String classStudentArr[] = selectedStudent.split(":");
+	
+	            		if (classStudentArr.length == 2) {
+	            			tmpClassId = classStudentArr[0];
+	            			selectedStudent = classStudentArr[1];
+	            		}
+        			}
                 	
                 	
             		if ("Normal".equals(teacherLoginType)) {
@@ -1353,19 +1354,18 @@ public class TTReportServiceImpl implements TTReportService {
    			tsToDate = defaultToDate();    		    			    		
     	}
     	
-
     	String tmpClassId = classId;
-		String selectedStudent = filters[3].trim();
-		String classStudentArr[] = selectedStudent.split(":");
-
-		if (classStudentArr.length == 2) {
-			tmpClassId = classStudentArr[0];
-			selectedStudent = classStudentArr[1];
-		}
-		
-    	if (filters.length  <= 3) {
-    		selectedStudent = "";
+    	String selectedStudent = "";
+    	if (filters.length > 3) {
+    		selectedStudent= filters[3].trim();
+    		String classStudentArr[] = selectedStudent.split(":");
+    	
+			if (classStudentArr.length == 2) {
+				tmpClassId = classStudentArr[0];
+				selectedStudent = classStudentArr[1];
+			}
     	}
+
     	try {
 	        Map<String, Object> studentFirstParams = new HashMap<String, Object>();
 	        studentFirstParams.put("tsFromDate", tsFromDate);
