@@ -75,7 +75,7 @@ catch (Exception e) {
 	       		</div>
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
-	          			<input type="radio" name="optGender" id="optFemale" value="M">
+	          			<input type="radio" name="optGender" id="optMale" value="M">
 	          			<span style="display:block; text-align: center;"><%= rb.getString("student_gender_male")%></span>
 	         		</label>
 	       		</div>

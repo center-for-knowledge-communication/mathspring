@@ -887,7 +887,7 @@ label {
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a class="accordion-toggle" data-toggle="collapse"
-								data-="#accordion" href="#collapseOne"> Event Log </a>
+								data-parent="#accordion" href="#collapseOne"> Event Log </a>
 						</h4>
 					</div>
 					<div id="collapseOne" class="panel-collapse collapse in">
