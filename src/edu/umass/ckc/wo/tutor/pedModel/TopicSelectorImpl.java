@@ -137,32 +137,94 @@ public class TopicSelectorImpl implements TopicSelector {
 
         Problem p = ProblemMgr.getProblem(pid);
         // If the problem doesn't have hints,  its not good to use for a demo
-        if (p.getNumHints() > 0 && p.isUsableAsExample()) {
-            smgr.getStudentState().setCurProblemIndexInTopic((probs.size()-1)/2);
-            return p;
-        }
-        else {   // the middle problem didn't have hints,  go away from the middle problem (first easier, then harder) looking for the
-            // closest one that can be a demo.
-            int offset = 1;
-            do {
-                pid = probs.get(ix - offset);
-                p = ProblemMgr.getProblem(pid);
-                if (p.getNumHints() > 0 && p.isUsableAsExample()) {
-                    smgr.getStudentState().setCurProblemIndexInTopic(ix - offset);
-                    return p;
-                }
-                pid = probs.get(ix + offset);
-                p = ProblemMgr.getProblem(pid);
-                if (p.getNumHints() > 0 && p.isUsableAsExample()) {
-                    smgr.getStudentState().setCurProblemIndexInTopic(ix + offset);
-                    return p;
-                }
-                offset++;
-            } while (ix-offset > 0 && ix+offset < probs.size());
+        
+        if (smgr.getExperiment().indexOf("multi-lingual") < 0) {
+	        if (p.getNumHints() > 0 && p.isUsableAsExample()) {
+	            smgr.getStudentState().setCurProblemIndexInTopic((probs.size()-1)/2);
+	            return p;
+	        }
+	        else {   // the middle problem didn't have hints,  go away from the middle problem (first easier, then harder) looking for the
+	            // closest one that can be a demo.
+	            int offset = 1;
+	            do {
+	                pid = probs.get(ix - offset);
+	                p = ProblemMgr.getProblem(pid);
+	                if (p.getNumHints() > 0 && p.isUsableAsExample()) {
+	                    smgr.getStudentState().setCurProblemIndexInTopic(ix - offset);
+	                    return p;
+	                }
+	                pid = probs.get(ix + offset);
+	                p = ProblemMgr.getProblem(pid);
+	                if (p.getNumHints() > 0 && p.isUsableAsExample()) {
+	                    smgr.getStudentState().setCurProblemIndexInTopic(ix + offset);
+	                    return p;
+	                }
+	                offset++;
+	            } while (ix-offset > 0 && ix+offset < probs.size());
+	
+	            return null; // can't find one.
+	        }
 
-            return null; // can't find one.
+        }
+        else {
+        	int altid = -1;
+            if (smgr.getPageLangIndex() > 0) {
+           		altid = ProblemMgr.getProblemPair(pid);
+            }
+        	if (p.getNumHints() > 0 && p.isUsableAsExample() && (altid > 0) && (smgr.getPageLangIndex() > 0)) {
+       			p = ProblemMgr.getProblem(altid);               			
+	            smgr.getStudentState().setCurProblemIndexInTopic((probs.size()-1)/2);
+                return p;
+        	}  
+	        else {   // the middle problem didn't have hints,  go away from the middle problem (first easier, then harder) looking for the
+	            int offset = 1;
+	            do {
+	                pid = probs.get(ix - offset);
+	                p = ProblemMgr.getProblem(pid);	                
+	                altid = -1;
+	                if (smgr.getPageLangIndex() > 0) {
+	               		altid = ProblemMgr.getProblemPair(pid);
+	                }
+	                pid = probs.get(ix - offset);
+	                p = ProblemMgr.getProblem(pid);
+	                if (p.getNumHints() > 0 && p.isUsableAsExample() && (altid > 0)  && (smgr.getPageLangIndex() > 0)) {
+	                    if (smgr.getPageLangIndex() > 0) {
+	                   		int altpid = ProblemMgr.getProblemPair(pid);
+	                   		if (altpid > 0) {
+		               			p = ProblemMgr.getProblem(altpid);               			
+		                        smgr.getStudentState().setCurProblemIndexInTopic(ix - offset);
+		                        return p;
+	                   		}
+	                    }
+	                }
+	                pid = probs.get(ix + offset);
+	                p = ProblemMgr.getProblem(pid);
+	            	altid = -1;
+	                if (smgr.getPageLangIndex() > 0) {
+	               		altid = ProblemMgr.getProblemPair(pid);
+	                }
+	                if (p.getNumHints() > 0 && p.isUsableAsExample() && (altid > 0)  && (smgr.getPageLangIndex() > 0)) {
+	                    smgr.getStudentState().setCurProblemIndexInTopic(ix + offset);
+	                    if (smgr.getPageLangIndex() > 0) {
+	                   		int altpid = ProblemMgr.getProblemPair(pid);
+	                   		if (altpid > 0) {
+	                   			p = ProblemMgr.getProblem(altpid);               			
+	                            smgr.getStudentState().setCurProblemIndexInTopic(ix - offset);
+	                            return p;
+	                   		}
+	                    }
+	                }
+	                offset++;
+	            } while (ix-offset > 0 && ix+offset < probs.size());
+	        }
+            // can't find one, use the middle problem as a last resort
+        	pid = probs.get((probs.size()-1)/2);
+        	p = ProblemMgr.getProblem(pid);
+        	return p; // can't find one.  
         }
     }
+        
+    
 
 
     /**

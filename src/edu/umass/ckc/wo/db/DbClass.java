@@ -587,11 +587,13 @@ public class DbClass {
         PreparedStatement s = null;
         try {
         	String languageDescription = languageId.split(":")[1];
-        	String altLanguageDescription = altLanguageId.split(":")[1];
+        	String altLanguageDescription = "noAltLanguage";
+        	if (altLanguageId.indexOf(":") > 0)
+        		altLanguageDescription = altLanguageId.split(":")[1];
             String altClassLanguageCode = "";            
             String experiment = "";
             
-            if("noLanguage".equals(altLanguageDescription)) {
+            if("noAltLanguage".equals(altLanguageDescription)) {
             	altClassLanguageCode = "";
 
             } else {

@@ -99,7 +99,6 @@ String submit_answer = "";
 String alt_step_by_step_solution = "";
 String alt_submit_answer = "";
 String watch_and_listen_instructions = "";
-String alt_watch_and_listen_instructions = "";
 String example_problem_play_hints = "";
 String alt_example_problem_play_hints = "";
 
@@ -186,8 +185,7 @@ if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(
 	practice_area = rb1.getString("practice_area");
 	logout = rb1.getString("log_out");
 	watch_and_listen_instructions = rb1.getString("watch_and_listen_instructions");
-	example_problem_play_hints = rb1.getString("example_problem_play_hints");
-	
+	example_problem_play_hints = rb1.getString("example_problem_play_hints");	
 	example_problem_done = rb1.getString("example_problem_done");
 	step = rb1.getString("step");
 }
@@ -272,12 +270,11 @@ catch (Exception e) {
 
 step_by_step_solution = prob_rb1.getString("step_by_step_solution");
 submit_answer = prob_rb1.getString("submit_answer");
-watch_and_listen_instructions = prob_rb1.getString("watch_and_listen_instructions");
 example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");
+
 
 alt_step_by_step_solution = prob_rb2.getString("step_by_step_solution");
 alt_submit_answer = prob_rb2.getString("submit_answer");
-alt_watch_and_listen_instructions = prob_rb2.getString("watch_and_listen_instructions");
 alt_example_problem_play_hints = prob_rb2.getString("example_problem_play_hints");
 
 
@@ -388,6 +385,7 @@ else
 	var translate_to_spanish = "<%= translate_to_spanish %>";
 	var translate_to_english = "<%= translate_to_english %>";
 
+	var watch_and_listen_instructions = "<%= watch_and_listen_instructions%>";
 	var hint_text = "<%= hint_text %>";
 	var replay_hints = "<%= replay_hints %>";
 	var read_question = "<%= read_question %>";
@@ -404,15 +402,16 @@ else
 	var logout = "<%= logout %>";
 	var example_problem_done = "<%= example_problem_done %>";	
 	var stepText = "<%= stepText %>";
+	
+	
 	window.probLang = "<%= prob_lang %>";
+	window.pageLang = "<%= lang %>";
 	window.step_by_step_solution = "<%= step_by_step_solution %>";	
 	window.alt_step_by_step_solution = "<%= alt_step_by_step_solution %>";	
 	window.submit_answer = "<%= submit_answer %>";	
 	window.alt_submit_answer = "<%= alt_submit_answer %>";	
 	window.example_problem_play_hints = "<%= example_problem_play_hints %>";	
 	window.alt_example_problem_play_hints = "<%= alt_example_problem_play_hints %>";	
-	window.watch_and_listen_instructions = "<%= watch_and_listen_instructions %>";	
-	window.alt_watch_and_listen_instructions = "<%= alt_watch_and_listen_instructions %>";	
 
 		
 </script>
@@ -651,7 +650,7 @@ label {
 
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="650" height="650"
-		title="<%= rb.getString("watch_and_listen_instructions")%>"
+		title="<%= watch_and_listen_instructions %>" 
 		<iframe id="exampleFrame" name="iframe2" width="650" height="650"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
@@ -1248,17 +1247,9 @@ label {
 		document.getElementById("reportErrorText").innerHTML =  report_error;
 //		document.getElementById("selectProb").innerHTML =  select_prob;
 //		document.getElementById("view_log").innerHTML =  view_log;
-		document.getElementById("exampleContainer").title =  watch_and_listen_instructions;
 		
 		problem_current_topic = "<%= problem_current_topic %>";
 		problem_standards = "<%= problem_standards %>";
-
-        if (pageLangIndex == 0) {
-            document.getElementById("exampleContainer").title = watch_and_listen_instructions;;
-    	}
-		else {
-            document.getElementById("exampleContainer").title = "WTF";
-		}
 		
         document.getElementById('lcModal').style.height = window.height / 2 ;
 
