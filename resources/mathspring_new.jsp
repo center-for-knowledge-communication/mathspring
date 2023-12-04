@@ -723,11 +723,13 @@ label {
 				</span> <span id="videoText" class="huytran-sitenav__buttontitle"><%= rb.getString("show_video") %></span>
 				</a>
 				 
-				<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
-					id="showLCList"> <span	class="huytran-sitenav__icon"> <i
-						class="fa fa-exclamation aria-hidden="true"></i>
-				</span> <span id="learningCompanionsText" class="huytran-sitenav__buttontitle"><%= rb.getString("learning_companions") %></span>
-				</a>
+				<div id="learningCompanionWrapper">
+					<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
+						id="showLCList"> <span	class="huytran-sitenav__icon"> <i
+							class="fa fa-exclamation aria-hidden="true"></i>
+					</span> <span id="learningCompanionsText" class="huytran-sitenav__buttontitle"><%= rb.getString("learning_companions") %></span>
+					</a>
+				</div>
 
 				<a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
@@ -1253,8 +1255,12 @@ label {
 		
         document.getElementById('lcModal').style.height = window.height / 2 ;
 
-        
-	    addEventListener("click", clickLCButton, false);
+		if (globals.learningCompanion.length > 0)   {      
+	    	addEventListener("click", clickLCButton, false);
+		}
+		else {
+    		document.getElementById("learningCompanionWrapper").style.display = "none";			
+		}
 	    
     });
     
