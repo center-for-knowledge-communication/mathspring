@@ -295,9 +295,11 @@ public class TutorBrainHandler {
             else if (e instanceof GetQuickAuthProblemSkeletonEvent) {
                 RequestDispatcher disp=null;
                 Problem p = ProblemMgr.getProblem(((GetQuickAuthProblemSkeletonEvent) e).getProbId());
+				String mode = ((GetQuickAuthProblemSkeletonEvent) e).getMode();
                 String quickAuthJSP = "quickAuthProblem.jsp";
                 disp = servletInfo.getRequest().getRequestDispatcher(quickAuthJSP);
                 servletInfo.getRequest().setAttribute("problem",p);
+                servletInfo.getRequest().setAttribute("mode",mode);				
                 servletInfo.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
                 servletInfo.getRequest().setAttribute("pageLang",smgr.getPageLocale().getLanguage());
                 servletInfo.getRequest().setAttribute("sessionId",smgr.getSessionNum());
