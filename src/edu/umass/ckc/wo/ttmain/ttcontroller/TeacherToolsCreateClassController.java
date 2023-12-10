@@ -55,6 +55,14 @@ public class TeacherToolsCreateClassController {
 
 		HttpSession session = request.getSession();
 		Locale loc = request.getLocale();
+
+		if (classForm.getClassLanguage().equals("es:Spanish")) {
+			loc = new Locale("es","US");
+		}
+		else {
+			loc = new Locale("en","US");			
+		}
+		
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
 
 		if (classForm.getHasClusters().equals("Y") ) {
@@ -103,6 +111,15 @@ public class TeacherToolsCreateClassController {
 
 		HttpSession session = request.getSession();
 		Locale loc = request.getLocale();
+		
+		if (classForm.getClassLanguage().equals("es:Spanish")) {
+			loc = new Locale("es","US");
+		}
+		else {
+			loc = new Locale("en","US");			
+		}
+
+		
 		String teacherLoginType = (String) session.getAttribute("teacherLoginType");
 		
     	int intClassId = Integer.valueOf(classId.trim());
