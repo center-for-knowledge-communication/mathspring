@@ -1857,6 +1857,29 @@ public class DbClass {
         return 0.85; // in case of a failure this default value will work.
     }
 
+    public static String getClassPrimaryLanguage(Connection conn, int classId) throws SQLException {
+        
+    	String lang = "English";
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select class_language from class where id=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                lang = rs.getString(1);
+                return lang;
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        return lang; // in case of a failure this default value will work.
+    }
+    
 
     public static void setSimpleConfig(Connection conn, int classId, String lc, String collab, String diffRate, String lowDiff, String highDiff) throws SQLException {
         PreparedStatement s = null;

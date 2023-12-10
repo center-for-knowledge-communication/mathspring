@@ -289,8 +289,8 @@ public class DbTopics {
             		"from classlessonplan, problemgroup topic, problemgroup_description_multi_language pgl where "
             		+(isDefault ? "isDefault=1 " : "classid=? ")+ 
             		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
-            		"and topic.id=probGroupId and seqPos > 0 and topic.active=1 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
-            		"order by seqPos;";
+            		"and topic.id=probGroupId and seqPos > 0 and  topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
+            		"order by seqPos;";            
             stmt = conn.prepareStatement(q);
             stmt.setInt(1,classId);
             stmt.setInt(2,classId);
@@ -322,8 +322,36 @@ public class DbTopics {
 
     }
 
+/*    
+    private static int numProblemsInTopic (Connection conn, int classId, int topicId) throws SQLException {
+        
+    	int count = 0;
+        ResultSet rs=null;
+        PreparedStatement stmt=null;
 
-
+        
+        String lang = DbClass.getClassPrimaryLanguage(conn, classId);
+        lang = "%" + lang.substring(1) + "%";        
+        try {
+	        String q2 = "select COUNT(pg.id) as tot from problemGroup as pg, probprobgroup as ppg, problem as p where ppg.pgroupId = pg.id and ppg.probId = p.id and pg.id = ? and p.status = 'ready' and p.language like ? GROUP by pg.id;";          
+	        stmt = conn.prepareStatement(q2);
+	        stmt.setInt(1,topicId);
+	        stmt.setString(2,lang);
+	
+	        rs = stmt.executeQuery();
+	        while (rs.next()) {
+	        	count = rs.getInt("tot");
+	        }   
+	    }
+	    finally {
+	        if (stmt != null)
+	            stmt.close();
+	        if (rs != null)
+	            rs.close();
+	    }
+        return count;
+    }
+*/
     /** Gets topics for a class that are active and have problems that are ready.
      *  Takes an additional flag (includeTestableProblems ) which will also include a topic
      *  in the return list if it has testable problems
@@ -376,7 +404,7 @@ public class DbTopics {
             		"and pgl.pg_pg_grp_id=probGroupId\r\n" + 
             		"and topic.id=probGroupId and seqPos > 0 and topic.active=1 and topic.id in (select distinct pgroupid from probprobgroup) \r\n" + 
             		"order by seqPos;";
-
+            
             
             stmt = conn.prepareStatement(q);
             if (!isDefault)
@@ -394,16 +422,9 @@ public class DbTopics {
                 topicNameStr = topicNameStr.substring(offset);
                 int length = topicNameStr.indexOf("~");
                 String topicName = topicNameStr.substring(0,length-1);
-                
-
             	Topic t = new Topic(rs.getInt(1),topicName);
                 t.setSeqPos(rs.getInt(3));
                 t.setOldSeqPos(t.getSeqPos());
-
-                
-                
-                
-                
                 String topicSummaryStr = rs.getString("description");
                 topicSummaryStr = topicSummaryStr.replace("{", "");                
                 topicSummaryStr = topicSummaryStr.replaceAll("\"", "~");                
