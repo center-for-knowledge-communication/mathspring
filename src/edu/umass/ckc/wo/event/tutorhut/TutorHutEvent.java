@@ -34,8 +34,16 @@ public abstract class TutorHutEvent extends SessionEvent {
         String et = p.getString(ELAPSED_TIME,"0");
         this.eventCounter = p.getInt("eventCounter",-1);
         this.clickTime = p.getLong("clickTime",0);
-        this.probLangIndex = p.getInt("probLangIndex",0);
-        this.translateProbId = p.getInt("translateProbId",0);
+        try {
+        	this.probLangIndex = p.getInt("probLangIndex",0);
+        } catch (Exception e) {
+        	this.probLangIndex=0;
+        }
+        try {
+            this.translateProbId = p.getInt("translateProbId",0);
+        } catch (Exception e) {
+        	this.translateProbId=0;
+        }
         long etl=0;
         try {
             etl = Long.parseLong(et);

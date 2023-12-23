@@ -49,6 +49,7 @@ public class StudentPedagogy extends LoginInterventionSelector {
     		if (smgr.getExperiment().indexOf("sameGenderLC") >= 0) {
     			if (smgr.getGender().equals("") || smgr.getGender().equals("O")) {
        			 	lcprofile = DbPedagogy.getLCprofiles(smgr.getConnection(), classId, currentStudentPedagogyId);
+       			 	System.out.println("Missing gender");
     			}
     			else {    					
     				lcprofile = DbPedagogy.getLCprofilesForGender(smgr.getConnection(), classId, currentStudentPedagogyId,smgr.getGender());
@@ -100,7 +101,9 @@ public class StudentPedagogy extends LoginInterventionSelector {
         DbUser.setStudentPedagogy(conn, smgr.getStudentId(), lcIntValue);
     	String WorksheetLocation = params.getString(LoginParams.WORKSHEET_LOCATION);
         DbUser.setStudentWorksheetLocation(conn, smgr.getStudentId(), WorksheetLocation);
-        new TutorLogger(smgr).logChoosePedagogy(learningCompanion);
+        if (!(lcIntValue == 19)) {
+        	new TutorLogger(smgr).logChoosePedagogy(learningCompanion);
+        }
         return null;
     }
 

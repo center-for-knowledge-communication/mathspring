@@ -24,10 +24,18 @@ String country = loc.getCountry();
 System.out.println("locale set to:" + lang + "-" + country );	
 
 int pageLangIndex = 0;
+String strExperiment = "";
 
 try {
-	pageLangIndex = (int) request.getAttribute("pageLangIndex");
-
+	strExperiment = (String) request.getAttribute("experiment");
+	
+	if (strExperiment.indexOf("multi-lingual") < 0) {
+		pageLangIndex = 0;
+	}
+	else {
+		pageLangIndex = (int) request.getAttribute("pageLangIndex");
+	}	
+	
 	if (pageLangIndex == 0) {
 		if (lang.equals("en")) {
 			loc1 = new Locale("en","US");	
@@ -119,7 +127,7 @@ else {
     <script src="js/jquery-1.10.2.js"></script>
     
     <script>
-
+    var experiment = "<%= strExperiment %>";
     var Chart = {
     /**
      * The graph object. Short-hand for "this". Set in the init-method.
@@ -1165,6 +1173,15 @@ $.extend({
 
         $(document).ready(function() {
 
+	        var changeBtn = document.getElementById('changeLanguageButton');
+	    	
+	       	if (experiment.indexOf('multi-lingual') < 0) {
+	       		changeBtn.style.display = 'none';
+	       	}
+	       	else {
+	       		changeBtn.style.display = 'block';       		
+	       	}
+
             // Set up mouse tracking if the mouseSaveInterval is positive (our indicator that mouse tracking is desired)
             if (globals.mouseSaveInterval > 0)
                 setInterval(sendMouseData, 1000 * globals.mouseSaveInterval); // send mouse data to server every # of seconds
@@ -1457,11 +1474,11 @@ $.extend({
                     </c:otherwise>
                 </c:choose>
             </li>
-	        <li class="nav-item">
-	            <a onclick="window.location='TutorBrain?action=navigation&from=my_progress&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
+	        <li id="changeLanguageButton" class="nav-item">
+		            <a onclick="window.location='TutorBrain?action=navigation&from=my_progress&to=my_progress&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
 	        </li>
             <li class="nav-item"><a href="TutorBrain?action=Logout&sessionId=${sessionId}&elapsedTime=${elapsedTime}&var=b"><%= rb.getString("log_out") %> &nbsp;<span class="fa fa-sign-out"></a></span>
-            <li class="nav-item nav-item--last">
+            <li class="nav-item--last">
             	<a href="#" class="session-clock-item"> <span> <i class="fa fa-clock-o"
 							aria-hidden="true"></i>
 						</span> <span id="session_clock"></span> </a>

@@ -31,8 +31,18 @@ catch (Exception e) {
 
 String pageLang = (String) request.getAttribute("pageLang");
 
-
 Locale loc = request.getLocale();
+
+String mode = "";
+
+try {
+	mode = (String) request.getAttribute("mode");
+}
+catch (Exception e) {
+	 System.out.println("mode not found " + e.getMessage());
+	 mode = "problem";
+}
+
 
 
 try {
@@ -70,6 +80,8 @@ String ctx = request.getContextPath();
         <link rel="stylesheet" type="text/css" href="css/quickAuthProblem.css?ver=<%=versions.getString("css_version")%>"/>
         <script src="js/jquery-1.10.2.js"></script>
         <script>
+              
+        	var mode = 				"undef";
 	    	var submitText =        "undef";
     		var stepText =          "undef";
     		var correctAnswerText = "undef";
@@ -78,8 +90,13 @@ String ctx = request.getContextPath();
     		var playhintText =      "undef";
 	    	var step_by_step_solution =        "undef";
     		
-	        $(document).ready(function () {
+
+	    	$(document).ready(function () {
+	    		
+	        	
+	        	
 	        	contextPath = "<%=ctx%>";
+	        	mode =          	"<%=mode%>";
 	        	submitText =        "<%= rb.getString("submit") %>";
 	        	stepText =          "<%= rb.getString("step") %>";
 	        	correctAnswerText = "<%= rb.getString("correct_answer") %>";
@@ -87,8 +104,50 @@ String ctx = request.getContextPath();
 	        	hintText =          "<%= rb.getString("hint") %>";
 	        	playhintText =      "<%= rb.getString("play_hint") %>";
 	        	step_by_step_solution = "<%= rb.getString("step_by_step_solution") %>";
-	        });
+				document.getElementById("HintHeader").innerHTML =  "<%= rb.getString("step_by_step_solution") %>";
+				document.getElementById("submit_answer").innerHTML =  "<%= rb.getString("submit_answer") %>";
 
+				console.log("ready");
+				console.log("mode: " + mode);
+				console.log('window.parent.probLang: ' + window.parent.probLang);
+				console.log('window.parent.pageLang: ' + window.parent.pageLang);
+				console.log('heading: ' + window.parent.step_by_step_solution);
+				console.log('altheading: ' + window.parent.alt_step_by_step_solution);
+				console.log('submit button: ' + window.parent.submit_answer);
+				console.log('alt submit button: ' + window.parent.alt_submit_answer);		
+				
+				if (mode === 'problem') {					
+					if (window.parent.probLang === 'en') {
+						document.getElementById("HintHeader").innerHTML =  window.parent.step_by_step_solution;
+					}
+					else {
+						document.getElementById("HintHeader").innerHTML =  window.parent.alt_step_by_step_solution;
+					}
+				}
+				else {
+					if (window.parent.pageLang === 'en') {
+						document.getElementById("HintHeader").innerHTML =  window.parent.step_by_step_solution;
+					}
+					else {
+						document.getElementById("HintHeader").innerHTML =  window.parent.alt_step_by_step_solution;
+					}					
+				}
+
+				if (mode === 'example') {					
+					document.getElementById("submit_answer").style.display = "none";
+				}
+				else {
+					if (window.parent.probLang === 'en') {
+						document.getElementById("submit_answer").innerHTML =  window.parent.submit_answer;
+					}
+					else {
+						document.getElementById("submit_answer").innerHTML =  window.parent.alt_submit_answer;
+					}					
+				}
+				
+				
+	        });
+	        
         </script>
         <script src="js/quickAuth/format2json.js?ver=<%=versions.getString("js_version")%>"></script>
         <script src="js/quickAuth/formatBuilder.js?ver=<%=versions.getString("js_version")%>"></script>
@@ -103,24 +162,6 @@ String ctx = request.getContextPath();
                 TeX: {extensions: ["color.js"]}
             });
     	
-			$(document).ready(function() {
-				console.log("ready");
-				console.log('window.parent.probLang: ' + window.parent.probLang);
-				console.log('heading: ' + window.parent.step_by_step_solution);
-				console.log('button: ' + window.parent.submit_answer);
-				console.log('altheading: ' + window.parent.alt_step_by_step_solution);
-				console.log('altbutton: ' + window.parent.alt_submit_answer);
-				if (window.parent.probLang == 'en') {
-					document.getElementById("HintHeader").innerHTML =  window.parent.step_by_step_solution;
-					document.getElementById("submit_answer").innerHTML =  window.parent.submit_answer;
-
-
-				}
-				else {
-					document.getElementById("HintHeader").innerHTML =  window.parent.alt_step_by_step_solution;
-					document.getElementById("submit_answer").innerHTML =  window.parent.alt_submit_answer;
-				}
-	        });
 
         </script>
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>

@@ -255,7 +255,7 @@ function nextProb(globals,isSessionBegin=false) {
             processNextProblemResult) ;
     // Normal Processing
     else
-        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, langIndex: globals.probLangIndex}, processNextProblemResult);    	
+        servletGet("NextProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, probLangIndex: globals.probLangIndex}, processNextProblemResult);    	
 }
 
 
@@ -274,14 +274,15 @@ function translateProb(globals,isSessionBegin=false) {
     // TODO:  Probably should replace NewProblem button when a topic intro shows.  It could have the correct handler on it.
 	globals.curHint = null;
 	globals.hintSequence = null;
-    if (globals.lastProbType === TOPIC_INTRO_PROB_TYPE)
-        servletGet("InputResponseNextProblemIntervention",
-            {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,
-                destination:globals.destinationInterventionSelector},
-            processNextProblemResult) ;
+	
+//    if (globals.lastProbType === TOPIC_INTRO_PROB_TYPE)
+//        servletGet("InputResponseNextProblemIntervention",
+//            {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,
+//                destination:globals.destinationInterventionSelector},
+//            processNextProblemResult) ;
     // Normal Processing
-    else
-        servletGet("TranslateProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, langIndex: globals.Index, translateProbId: globals.probId}, processNextProblemResult);    	
+//    else
+        servletGet("TranslateProblem", {probElapsedTime: globals.probElapsedTime, mode: globals.tutoringMode,lastLocation: 'Login', isEnteringPracticeArea: isSessionBegin, probLangIndex: globals.probLangIndex, translateProbId: globals.probId}, processNextProblemResult);    	
 }
 
 
@@ -732,7 +733,7 @@ function showQuickAuthProblem (pid, solution, resource, mode, questType) {
         openExampleDialog(solution);
 
     if (!isDemo)  {
-        loadIframe(PROBLEM_WINDOWID, getTutorServletURL("GetQuickAuthProblemSkeleton","&probId="+pid));
+        loadIframe(PROBLEM_WINDOWID, getTutorServletURL("GetQuickAuthProblemSkeleton","&probId="+pid+"&mode=problem"));
 //        loadIframe(PROBLEM_WINDOWID, "quickAuthProblem.jsp?stmt="+ encodeURIComponent(globals.statementHTML) +
 //            "&figure=" +  encodeURIComponent(globals.questionImage) +
 //            "&audio="+ encodeURIComponent(globals.questionAudio) +
@@ -749,7 +750,7 @@ function showQuickAuthProblem (pid, solution, resource, mode, questType) {
         $(PROBLEM_WINDOWID).attr("domain", sysGlobals.problemContentDomain);
     }
     else
-        loadIframe(EXAMPLE_FRAMEID, getTutorServletURL("GetQuickAuthProblemSkeleton","&probId="+pid));
+        loadIframe(EXAMPLE_FRAMEID, getTutorServletURL("GetQuickAuthProblemSkeleton","&probId="+pid+"&mode=example"));
 //        loadIframe(EXAMPLE_FRAMEID, "quickAuthProblem.jsp?stmt="+ encodeURIComponent(globals.statementHTML) +
 //            "&figure=" +  encodeURIComponent(globals.questionImage) +
 //            "&audio="+ encodeURIComponent(globals.questionAudio) +
@@ -889,6 +890,7 @@ function checkTranslateProbError (responseText) {
     return false;
 }
 
+var altProbId = 0;
 
 function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     $("#next_prob_spinner").show();
@@ -900,18 +902,31 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
     var activity = JSON.parse(responseText);
     console.log(responseText);
 
-    var altProdId = activity.altProbId;
-    
-    if( typeof altProdId === 'undefined' || altProdId === null ) {
-    	altProdId = 0;
+    if (activity.isTranslation == 1) {
+    	globals.isTranslation = 1;
+    	globals.probLangIndex = 1;    	
     }
     else {
-    	altProdId = Number(activity.altProbId);
+        globals.untranslateProbid = activity.id;
+    	globals.probLangIndex = 0;    	    	
     }
-    console.log("altProbId=" + altProdId);
+    altProbId = activity.altProbId;
+    
+    if( typeof altProbId === 'undefined' || altProbId === null ) {
+    	altProbId = 0;
+    }
+    else {
+    	altProbId = Number(activity.altProbId);
+    }
+    console.log("altProbId=" + altProbId);
     console.log("pageLangIndex=" + pageLangIndex);
-	if (globals.experiment == "multi-lingual") {
-		if (altProdId > 0) {
+    console.log("globals.experiment=" + globals.experiment);
+	if (globals.experiment.indexOf("multi-lingual") < 0) {
+		document.getElementById("translateProb").style.display = "none";
+	}
+	else {
+		if (altProbId > 0) {
+			
 			// Show 'Translate problema' button using pageLangIndex
 //			if (pageLangIndex == 0) {
 //				document.getElementById("translateProbText").innerHTML =  translate_this_problem_alt;
@@ -919,9 +934,26 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 //			else {
 //				document.getElementById("translateProbText").innerHTML =  translate_this_problem_pri;				
 //			}
+			// Add a mouseover event listener
+			document.getElementById("translateProb").addEventListener('mouseover', () => {
+			  // Change the button's background color
+  				document.getElementById("translateProb").style.backgroundColor = '#92DDA3';
+			});
+
+			// Add a mouseout event listener
+			document.getElementById("translateProb").addEventListener('mouseout', () => {
+			  // Change the button's background color back to its original color
+				document.getElementById("translateProb").style.backgroundColor = "White";
+			});
 			$("#translateProb").removeClass("disable_a_href");
 			$("#translateProbWrapper").removeClass("not-allowed");
 			document.getElementById("translateProb").style.background = "White";
+		    if (activity.isTranslation == 1) {
+				document.getElementById("translateProbText").innerHTML = translate_to_english;
+		    }
+		    else {
+				document.getElementById("translateProbText").innerHTML =  translate_to_spanish;		    	
+		    }
 		    $("trans_prob_spinner").show();
 		}
 		else {
@@ -929,11 +961,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 			document.getElementById("translateProb").style.background = "LightGray";
 			$("#translateProb").addClass("disable_a_href");
 			$("#translateProbWrapper").addClass("not-allowed");
+			document.getElementById("translateProbText").innerHTML = no_translation;
 		}
-		document.getElementById("translateProb").style.display = "block";			
-	}
-	else {
-		document.getElementById("translateProb").style.display = "none";					
+		document.getElementById("translateProb").style.display = "block";
 	}
     var mode = activity.mode;
     var activityType = activity.activityType;
@@ -952,16 +982,9 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
 
         var topic = "";
         
-        if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
-            var topicName = activity.topicName;   
-            topic = topicName.en;
-            if (lang == "en") {
-                topic = topicName.en;                
-            }        
-            if (lang == "es") {
-                topic = topicName.es;
-            }        
-        }
+ //       if (activity.topicName != null && activity.topicName != undefined && activity.topicName != "" && activity.topicName != " ") {
+        var topicName = activity.topicName;   
+        
 		if (activity.isTranslation == 1) {
 			probLang = "es"
 		}
@@ -973,7 +996,7 @@ function processNextProblemResult(responseText, textStatus, XMLHttpRequest) {
         var varBindings = activity.parameters;
         setGlobalProblemInfo(activity);
 
-        showProblemInfo(pid,resource,topic,standards);
+        showProblemInfo(pid,resource,topicName,standards);
         showEffortInfo(activity.effort);
         if (globals.showAnswer) {
             // If server shuffles the answer to a different position, then newAnswer contains this position
@@ -1408,17 +1431,25 @@ function clickHandling () {
     	$("#next_prob_spinner").show();
         if (!isWaiting()) {
         	globals.probLangIndex = 0;
-            nextProb(globals)
+            nextProb(globals);
         }
         $("#next_prob_spinner").hide();
     });
     
     $("#translateProb").click(function () {
-       	if (globals.experiment == "multi-lingual") {
+       	if (globals.experiment.indexOf("multi-lingual") >= 0) {
 	    	$("#trans_prob_spinner").show();
 	        if (!isWaiting()) {
-	        	globals.probLangIndex = 1;
-	            translateProb(globals)
+	        	var saveId = globals.probId;
+	        	if (globals.isTranslation == 1) {
+	        		globals.probId = globals.untranslateProbid;
+	        	}
+	            translateProb(globals);
+	            globals.probId = saveId;
+	        	if (globals.isTranslation == 1) {
+		        	globals.isTranslation = 0;
+		        	globals.probLangIndex = 0;    	
+	        	}
 	        }
 	        $("#trans_prob_spinner").hide();
 	    }

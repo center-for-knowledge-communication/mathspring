@@ -125,14 +125,15 @@ public class TTReportServiceImpl implements TTReportService {
     @Override
     public String generateTeacherReport(String teacherId, String classId, String reportType, String lang, String filter, String teacherLoginType) throws TTCustomException {
 
-        try {
-        	
-    		// Multi=lingual enhancement
+		// Multi=lingual enhancement
+    	Locale loc = new Locale("en","US");	
+    	if (lang.substring(0,2).equals("es")) {
+    		loc = new Locale("es","US");	
+    	}        	
 
-        	Locale loc = new Locale("en","US");	
-        	if (lang.substring(0,2).equals("es")) {
-        		loc = new Locale("es","US");	
-        	}        	
+    	try {
+        	
+
 //    		ploc = loc;
     		rb = ResourceBundle.getBundle("MathSpring",loc);
 
@@ -197,14 +198,15 @@ public class TTReportServiceImpl implements TTReportService {
                 	}                	
 
                 	String tmpClassId = classId;
-            		String selectedStudent = filters[3].trim();
-            		String classStudentArr[] = selectedStudent.split(":");
-
-            		if (classStudentArr.length == 2) {
-            			tmpClassId = classStudentArr[0];
-            			selectedStudent = classStudentArr[1];
-            		}
-            		
+                	if (filters.length > 3) {
+	            		String selectedStudent = filters[3].trim();
+	            		String classStudentArr[] = selectedStudent.split(":");
+	
+	            		if (classStudentArr.length == 2) {
+	            			tmpClassId = classStudentArr[0];
+	            			selectedStudent = classStudentArr[1];
+	            		}
+        			}
                 	
                 	
             		if ("Normal".equals(teacherLoginType)) {
@@ -669,11 +671,11 @@ public class TTReportServiceImpl implements TTReportService {
         	}
         } catch (IOException e) {
            logger.error(e.getMessage());
-           throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
+           throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED, loc);
         }
         catch (MissingResourceException e) {
         	logger.error(e.getMessage());
-        	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED);
+        	throw new TTCustomException(ErrorCodeMessageConstants.DATABASE_CONNECTION_FAILED, loc);
         }
     	System.out.println("Unknown report type: " + reportType);
         return null;
@@ -1352,19 +1354,18 @@ public class TTReportServiceImpl implements TTReportService {
    			tsToDate = defaultToDate();    		    			    		
     	}
     	
-
     	String tmpClassId = classId;
-		String selectedStudent = filters[3].trim();
-		String classStudentArr[] = selectedStudent.split(":");
-
-		if (classStudentArr.length == 2) {
-			tmpClassId = classStudentArr[0];
-			selectedStudent = classStudentArr[1];
-		}
-		
-    	if (filters.length  <= 3) {
-    		selectedStudent = "";
+    	String selectedStudent = "";
+    	if (filters.length > 3) {
+    		selectedStudent= filters[3].trim();
+    		String classStudentArr[] = selectedStudent.split(":");
+    	
+			if (classStudentArr.length == 2) {
+				tmpClassId = classStudentArr[0];
+				selectedStudent = classStudentArr[1];
+			}
     	}
+
     	try {
 	        Map<String, Object> studentFirstParams = new HashMap<String, Object>();
 	        studentFirstParams.put("tsFromDate", tsFromDate);
@@ -2760,7 +2761,7 @@ public class TTReportServiceImpl implements TTReportService {
     	String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ")";
 
         if (classesInCluster.length() == 0) {
-        	q = "select id,fname,lname,username,email,password,strategyId from student where classid=?";
+        	q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid=?";
         }
     	
     	ResultSet rs = null;
@@ -2777,12 +2778,13 @@ public class TTReportServiceImpl implements TTReportService {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);

@@ -70,7 +70,10 @@ if ((pageLang != null) && pageLang.length() == 2) {
 System.out.println("locale set to:" + lang + "-" + country );	
 
 String next_problem = "";
+String no_translation = "";
 String translate_this_problem = "";
+String translate_to_spanish = "";
+String translate_to_english = "";
 String problem_current_topic = "";
 String problem_standards = "";
 String hint_text = "";
@@ -96,10 +99,8 @@ String submit_answer = "";
 String alt_step_by_step_solution = "";
 String alt_submit_answer = "";
 String watch_and_listen_instructions = "";
-String alt_watch_and_listen_instructions = "";
 String example_problem_play_hints = "";
 String alt_example_problem_play_hints = "";
-
 
 
 try {
@@ -163,6 +164,9 @@ else {
 if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(lang.equals("en")))) ) {
 	next_problem = rb1.getString("next_problem");
 	translate_this_problem = rb1.getString("translate_this_problem");
+	no_translation = rb1.getString("no_translation");
+	translate_to_spanish = rb1.getString("translate_to_spanish");
+	translate_to_english = rb1.getString("translate_to_english");
 	problem_current_topic = rb1.getString("problem_current_topic");
 	problem_standards = rb1.getString("problem_standards");
 	hint_text = rb1.getString("hint");
@@ -181,14 +185,16 @@ if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(
 	practice_area = rb1.getString("practice_area");
 	logout = rb1.getString("log_out");
 	watch_and_listen_instructions = rb1.getString("watch_and_listen_instructions");
-	example_problem_play_hints = rb1.getString("example_problem_play_hints");
-	
+	example_problem_play_hints = rb1.getString("example_problem_play_hints");	
 	example_problem_done = rb1.getString("example_problem_done");
 	step = rb1.getString("step");
 }
 else {
 	next_problem = rb2.getString("next_problem");
 	translate_this_problem = rb2.getString("translate_this_problem");
+	no_translation = rb2.getString("no_translation");
+	translate_to_spanish = rb2.getString("translate_to_spanish");
+	translate_to_english = rb2.getString("translate_to_english");
 	problem_current_topic = rb2.getString("problem_current_topic");
 	problem_standards = rb2.getString("problem_standards");
 	hint_text = rb2.getString("hint");
@@ -264,12 +270,11 @@ catch (Exception e) {
 
 step_by_step_solution = prob_rb1.getString("step_by_step_solution");
 submit_answer = prob_rb1.getString("submit_answer");
-watch_and_listen_instructions = prob_rb1.getString("watch_and_listen_instructions");
 example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");
+
 
 alt_step_by_step_solution = prob_rb2.getString("step_by_step_solution");
 alt_submit_answer = prob_rb2.getString("submit_answer");
-alt_watch_and_listen_instructions = prob_rb2.getString("watch_and_listen_instructions");
 alt_example_problem_play_hints = prob_rb2.getString("example_problem_play_hints");
 
 
@@ -351,7 +356,6 @@ else
 <script type="text/javascript">
 	var lang = "en";
 	var stepText = "<%= rb.getString("step") %>";
-	var hint_text = "<%= rb.getString("hint") %>";
 	var no_example_to_show = "<%= rb.getString("no_example_to_show") %>";
 	var no_video_to_show = "<%= rb.getString("no_video_to_show") %>";
 	var no_instructions_to_show = "<%= rb.getString("no_instructions_to_show") %>";
@@ -377,7 +381,12 @@ else
 	var camera_initialized = "<%= rb.getString("camera_initialized") %>";
 	var next_problem = "<%= next_problem %>";
 	var translate_this_problem = "<%= translate_this_problem %>";
+	var no_translation = "<%= no_translation %>";
+	var translate_to_spanish = "<%= translate_to_spanish %>";
+	var translate_to_english = "<%= translate_to_english %>";
 
+	var watch_and_listen_instructions = "<%= watch_and_listen_instructions%>";
+	var hint_text = "<%= hint_text %>";
 	var replay_hints = "<%= replay_hints %>";
 	var read_question = "<%= read_question %>";
 	var show_example = "<%= show_example %>";
@@ -393,15 +402,16 @@ else
 	var logout = "<%= logout %>";
 	var example_problem_done = "<%= example_problem_done %>";	
 	var stepText = "<%= stepText %>";
+	
+	
 	window.probLang = "<%= prob_lang %>";
+	window.pageLang = "<%= lang %>";
 	window.step_by_step_solution = "<%= step_by_step_solution %>";	
 	window.alt_step_by_step_solution = "<%= alt_step_by_step_solution %>";	
 	window.submit_answer = "<%= submit_answer %>";	
 	window.alt_submit_answer = "<%= alt_submit_answer %>";	
 	window.example_problem_play_hints = "<%= example_problem_play_hints %>";	
 	window.alt_example_problem_play_hints = "<%= alt_example_problem_play_hints %>";	
-	window.watch_and_listen_instructions = "<%= watch_and_listen_instructions %>";	
-	window.alt_watch_and_listen_instructions = "<%= alt_watch_and_listen_instructions %>";	
 
 		
 </script>
@@ -436,6 +446,7 @@ else
             hintSequence: null,
             exampleHintSequence: null,
             lastProbId: ${lastProbId},
+            untranslateProbId: 0,
             trace: false,
             debug: false,
             topicId: ${topicId},
@@ -599,6 +610,11 @@ label {
      cursor: not-allowed! important;
 }
 
+#translateProbWrapper:hover {
+  background: #92DDA3;
+  cursor: pointer;
+}
+
 </style>
 </head>
 <body>
@@ -634,7 +650,7 @@ label {
 
 	<%-- This div is a dialog that is shown when the user clicks on Show Example.  It plays an example problem in the dialog--%>
 	<div id="exampleContainer" width="650" height="650"
-		title="<%= rb.getString("watch_and_listen_instructions")%>"
+		title="<%= watch_and_listen_instructions %>" 
 		<iframe id="exampleFrame" name="iframe2" width="650" height="650"
 			src="" frameborder="no" scrolling="no"> </iframe>
 	</div>
@@ -668,16 +684,16 @@ label {
 				</span> <span id = "nextProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("next_problem") %></span>
 				<span id = "next_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 				</a>
-				 
 				<div id="translateProbWrapper">
-					<a href="#" class="huytran-sitenav__button"
-						id="translateProb"> <span class="huytran-sitenav__icon"> <i
-							class="fa fa-plus" aria-hidden="true"></i>
-					</span> <span id= "translateProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("translate_this_problem") %></span>
+					<a href="#" id="translateProb" class="huytran-sitenav__button"> 
+					<span class="huytran-sitenav__icon"> <i class="fa fa-plus" aria-hidden="true"></i></span> 
+					<span id= "translateProbText" class="huytran-sitenav__buttontitle"><%= rb.getString("no_translation") %></span>
 					<span id = "trans_prob_spinner" class="huytran-sitenav__icon" style="display: none"><i class="fa fa-refresh fa-spin" style="font-size:16px;color:green"></i></span>
 					</a>
 				</div>
-								
+				
+				
+												
 				<a href="#"  id="read" class="huytran-sitenav__button"> 
 					<span class="huytran-sitenav__icon"> <i class="fa fa-bullhorn" aria-hidden="true"></i></span>
 					<span id="readText"class="huytran-sitenav__buttontitle"><%= rb.getString("read_question") %></span>
@@ -685,7 +701,7 @@ label {
 				
 				<a href="#" id="hint" class="huytran-sitenav__button"> 
 					<span class="huytran-sitenav__icon"> <i class="fa fa-lightbulb-o" aria-hidden="true"></i></span>
-					<span id="hint_label" class="huytran-sitenav__buttontitle"><%= rb.getString("hint") %></span>
+					<span id="hint_label" class="huytran-sitenav__buttontitle">hint_text</span>
 				</a>
 				 
 				<a href="#" id="replay" class="huytran-sitenav__button" > 
@@ -707,11 +723,13 @@ label {
 				</span> <span id="videoText" class="huytran-sitenav__buttontitle"><%= rb.getString("show_video") %></span>
 				</a>
 				 
-				<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
-					id="showLCList"> <span	class="huytran-sitenav__icon"> <i
-						class="fa fa-exclamation aria-hidden="true"></i>
-				</span> <span id="learningCompanionsText" class="huytran-sitenav__buttontitle"><%= rb.getString("learning_companions") %></span>
-				</a>
+				<div id="learningCompanionWrapper">
+					<a class="huytran-sitenav__button huytran-sitenav__showmore-target"
+						id="showLCList"> <span	class="huytran-sitenav__icon"> <i
+							class="fa fa-exclamation aria-hidden="true"></i>
+					</span> <span id="learningCompanionsText" class="huytran-sitenav__buttontitle"><%= rb.getString("learning_companions") %></span>
+					</a>
+				</div>
 
 				<a href="#"
 					class="huytran-sitenav__button huytran-sitenav__showmore-target"
@@ -1209,13 +1227,18 @@ label {
 	    else {
     		document.getElementById("monitorBox").style.visibility = "hidden";
 	    }
+    	if (globals.experiment.indexOf("multi-lingual") < 0) {
+    		document.getElementById("translateProbWrapper").style.display = "none";
+    	}
+    	else {
+    		document.getElementById("translateProbText").innerHTML =  translate_this_problem;    		
+    	}
 
-		document.getElementById("translateProbText").innerHTML =  translate_this_problem;
 		document.getElementById("nextProbText").innerHTML =  next_problem;		
-		document.getElementById("hint_label").innerHTML = 
 		document.getElementById("replayText").innerHTML =  replay_hints;
 		document.getElementById("readText").innerHTML =  read_question;
 		document.getElementById("exampleText").innerHTML =  show_example;
+		document.getElementById("hint_label").innerHTML =  hint_text;
 		document.getElementById("videoText").innerHTML =  show_video;
 		document.getElementById("learningCompanionsText").innerHTML =  learning_companions;
 		document.getElementById("formulaText").innerHTML = formula;
@@ -1226,22 +1249,18 @@ label {
 		document.getElementById("reportErrorText").innerHTML =  report_error;
 //		document.getElementById("selectProb").innerHTML =  select_prob;
 //		document.getElementById("view_log").innerHTML =  view_log;
-		document.getElementById("exampleContainer").title =  watch_and_listen_instructions;
 		
 		problem_current_topic = "<%= problem_current_topic %>";
 		problem_standards = "<%= problem_standards %>";
-
-        if (pageLangIndex == 0) {
-            document.getElementById("exampleContainer").title = watch_and_listen_instructions;;
-    	}
-		else {
-            document.getElementById("exampleContainer").title = "WTF";
-		}
 		
         document.getElementById('lcModal').style.height = window.height / 2 ;
 
-        
-	    addEventListener("click", clickLCButton, false);
+		if (globals.learningCompanion.length > 0)   {      
+	    	addEventListener("click", clickLCButton, false);
+		}
+		else {
+    		document.getElementById("learningCompanionWrapper").style.display = "none";			
+		}
 	    
     });
     

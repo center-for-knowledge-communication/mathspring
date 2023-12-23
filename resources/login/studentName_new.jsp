@@ -33,7 +33,7 @@ catch (Exception e) {
         <input type="hidden" name="interventionClass" value="${interventionClass}"/>
 
         <div id="name">	       
-        	<h3>My name:</h3>
+        	<h3><%= rb.getString("enter_student_name")%>:</h3>
 			<div class="row">	
 				<div class="col-md-3">			    
           			<span style=""style="width: 40px;"><%= rb.getString("first_name")%></span>: &nbsp;
@@ -47,49 +47,80 @@ catch (Exception e) {
 		</div>
 		<br>
         <div id="languageDiv">	       
-        	<h3>My language:</h3>
+        	<h3><%= rb.getString("select_student_language")%>:</h3>
 			<div class="row">	
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
 	          			<input type="radio" name="optLanguage" id="optEnglish" value="English">
-	          			<span style="display:block; text-align: center;">"English"</span>
+	          			<span style="display:block; text-align: center;"><%= rb.getString("english")%></span>
 	         		</label>
 	       		</div>
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
 	          			<input type="radio" name="optLanguage" id="optSpanish" value="Spanish">
-	          			<span style="display:block; text-align: center;">"Spanish"</span>
+	          			<span style="display:block; text-align: center;"><%= rb.getString("spanish")%></span>
 	         		</label>
 	       		</div>
 			</div>
 		</div>
 		<br>
         <div id="genderDiv">	       
-        	<h3>My gender:</h3>
+        	<h3><%= rb.getString("select_student_gender")%>:</h3>
 			<div class="row">	
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
-	          			<input type="radio" name="optGender" id="optFemale" value="M">
-	          			<span style="display:block; text-align: center;">"Boy"</span>
+	          			<input type="radio" name="optGender" id="optFemale" value="F">
+	          			<span style="display:block; text-align: center;"><%= rb.getString("student_gender_female")%></span>
 	         		</label>
 	       		</div>
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
-	          			<input type="radio" name="optGender" id="optMalke" value="F">
-	          			<span style="display:block; text-align: center;">"Girl"</span>
+	          			<input type="radio" name="optGender" id="optMale" value="M">
+	          			<span style="display:block; text-align: center;"><%= rb.getString("student_gender_male")%></span>
 	         		</label>
 	       		</div>
 				<div class="col-md-2">			    
 	       			<label class="radio-inline">
 	          			<input type="radio" name="optGender" id="optOther" value="O">
-	          			<span style="display:block; text-align: center;">"Other"</span>
+	          			<span style="display:block; text-align: center;"><%= rb.getString("student_gender_other")%></span>
 	         		</label>
 	       		</div>
 			</div>
 		</div>
 		<br>
 
-        <input class="btn mathspring-btn" type="submit" value="<%= rb.getString("submit")%>" />
+        <input class="btn mathspring-btn" type="submit" onclick="return checkValues()" value="<%= rb.getString("submit")%>" />
     </form>
 </div>
      	
+<script>
+
+function checkValues() {
+	
+	var result1 = false;
+	var result2 = false;
+	
+    var languages = document.getElementsByName("optLanguage");
+    for (const language of languages) {
+        if (language.checked) {
+            result1 = true;
+            break;
+        }
+    }
+    var genders = document.getElementsByName("optGender");
+    for (const gender of genders) {
+        if (gender.checked) {
+            result2 = true;
+            break;
+        }
+    }
+    	
+    if ((result1 == true) && (result2 == true)) {
+    	return true;
+    }
+    else {
+    	alert("Please answer all questions");
+    	return false;
+    }
+}
+</script>

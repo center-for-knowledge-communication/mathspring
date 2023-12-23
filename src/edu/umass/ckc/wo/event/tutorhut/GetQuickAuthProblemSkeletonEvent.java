@@ -16,9 +16,15 @@ public class GetQuickAuthProblemSkeletonEvent extends TutorHutEvent {
     public GetQuickAuthProblemSkeletonEvent(ServletParams p) throws Exception {
         super(p);
         probId = p.getInt("probId");
+        mode = p.getString("mode");
     }
 
     public int getProbId() {
         return probId;
     }
+
+    public String getMode() {
+        return mode;
+    }
+
 }

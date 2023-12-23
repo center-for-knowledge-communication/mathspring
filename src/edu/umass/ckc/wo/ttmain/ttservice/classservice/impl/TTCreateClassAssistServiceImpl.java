@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -83,30 +84,32 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
     }
 
     @Override
-    public Integer createNewClass(CreateClassForm createForm, String tid) throws TTCustomException {
-        try {
-            // Make sure to check initial fields of create class are validated before proceeding ahead
+    public Integer createNewClass(CreateClassForm createForm, String tid, Locale loc) throws TTCustomException {
+
+
+    	try {
+        	// Make sure to check initial fields of create class are validated before proceeding ahead
             int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
             int newid = DbClass.insertClass(connection.getConnection(), createForm.getClassName(), createForm.getSchoolName(), createForm.getSchoolYear(), createForm.getTown(), createForm.getGradeSection(), tid,
-                    defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage(), createForm.getColor());
+                    defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage(), createForm.getAltLanguage(), createForm.getColor());
             if (newid != -1) {
                 DbTopics.insertLessonPlanWithDefaultTopicSequence(connection.getConnection(), newid);
                 ClassInfo info = DbClass.getClass(connection.getConnection(), newid);
                 info.setSimpleConfigDefaults("selectable");
             } else {
-                throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
+                throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST,loc);
             }
             return newid;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
+            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST,loc);
         }
 
     }
 
     @Override
-    public boolean editClass(CreateClassForm createForm, String tid, int classId) throws TTCustomException {
+    public boolean editClass(CreateClassForm createForm, String tid, int classId, Locale loc) throws TTCustomException {
         boolean update = false;
         try {
         	
@@ -145,27 +148,27 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-//            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST);
+//            throw new TTCustomException(ErrorCodeMessageConstants.CLASS_ALREADY_EXIST, loc);
         }
         return update;
     }
     
     
     @Override
-    public Integer cloneExistingClass(Integer classId, CreateClassForm createForm) throws TTCustomException {
+    public Integer cloneExistingClass(Integer classId, CreateClassForm createForm, Locale loc) throws TTCustomException {
     	
     	int result = 0;
     	try {
     		 
     		boolean inUse = DbClass.isClassNameInUse(connection.getConnection(), createForm.getClassName());
     		if (inUse) {
-    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);    			
+    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS, loc);    			
     		}
     		
     		ClassInfo ciPrev = DbClass.getClass(connection.getConnection(), classId);
             createForm.setClassGrade(ciPrev.getGrade());
             
-    		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getClassLanguage(),createForm.getColor());
+    		int newClassId = ClassCloner.cloneClass(connection.getConnection(),classId,createForm.getClassName(),createForm.getGradeSection(),createForm.getClassLanguage(),createForm.getAltLanguage(),createForm.getColor());
     		if (newClassId > 0) {
     			if (ciPrev.getClassLanguageCode().equals(createForm.getClassLanguage())) {
     				List<Integer> newClassIdList = new ArrayList<Integer>();
@@ -180,19 +183,19 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 	    		result = newClassId;
     		}
     		else {
-    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);    			
+    			throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS, loc);    			
     		}
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_CLONNING_EXISTING_CLASS, loc);
 
         }
     	return result;
     }
 
     @Override
-    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm, String action) throws TTCustomException {
+    public ClassInfo addDefaultPedagogy(Integer classId, CreateClassForm createForm, String action, Locale loc) throws TTCustomException {
         try {
         	if (action.equals("create")) {
         		DbClass.setSimpleConfig(connection.getConnection(), classId, createForm.getSimpleLC(), createForm.getSimpleCollab(), createForm.getProbRate(), createForm.getLowEndDiff(), createForm.getHighEndDiff());
@@ -206,13 +209,13 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.DEFAULT_PEDAGOGY_SETTING_ERROR);
+            throw new TTCustomException(ErrorCodeMessageConstants.DEFAULT_PEDAGOGY_SETTING_ERROR, loc);
         }
 
     }
 
 	@Override
-	public void createStudentRoster(Integer classId, ClassInfo info, CreateClassForm createForm)
+	public void createStudentRoster(Integer classId, ClassInfo info, CreateClassForm createForm, Locale loc)
 			throws TTCustomException {
 		try {
 			String password = createForm.getPasswordToken();
@@ -224,38 +227,38 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
-			throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+			throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST, loc);
 		}
 
 	}
 
     @Override
-    public void createTestUsers(Integer classId, ClassInfo info, int userCount) throws TTCustomException {
+    public void createTestUsers(Integer classId, ClassInfo info, int userCount, Locale loc) throws TTCustomException {
         try {
             DbClass.createTestUsers(connection.getConnection(),info,classId.toString(),userCount);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST, loc);
         }
 
     }
 
 
     @Override
-    public void addNewMasterClass(Integer classId) throws TTCustomException {
+    public void addNewMasterClass(Integer classId, Locale loc) throws TTCustomException {
         try {
             DbClass.addNewMasterClass(connection.getConnection(),classId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST);
+            throw new TTCustomException(ErrorCodeMessageConstants.USER_ALREADY_EXIST, loc);
         }
 
     }
 
     @Override
-    public void changeDefaultProblemSets(ModelMap map, Integer classId) throws TTCustomException {
+    public void changeDefaultProblemSets(ModelMap map, Integer classId, Locale loc) throws TTCustomException {
         try {
             DbProblem probMgr = new DbProblem();
 
@@ -292,12 +295,12 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_CONFIGURING_PROBLEMSETS);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_CONFIGURING_PROBLEMSETS, loc);
         }
     }
 
 	@Override
-    public boolean reOrderProblemSets(Integer classId, List<Integer> sequencesNosToBeRemoved,Map<Integer,Integer> sequenceNosToBeAdded) throws TTCustomException {
+    public boolean reOrderProblemSets(Integer classId, List<Integer> sequencesNosToBeRemoved,Map<Integer,Integer> sequenceNosToBeAdded, Locale loc) throws TTCustomException {
         try {
 
         //Delete Records Given Sequence Nos
@@ -321,12 +324,12 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_REORDERING_PROBLEMSETS);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_REORDERING_PROBLEMSETS, loc);
         }
     }
 
     @Override
-    public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder, String activateFlag) throws TTCustomException {
+    public String activateDeactivateProblemSets(Integer classId, List<Integer> problemSetsToReorder, String activateFlag, Locale loc) throws TTCustomException {
     	Map<String, Integer> insertParams = null;
     	try {    		
             if ("deactivate".equals(activateFlag)) {
@@ -367,13 +370,13 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_ACTIVATE_DEACTIVATE_PROBLEMSETS);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_ACTIVATE_DEACTIVATE_PROBLEMSETS, loc);
         }
 
     }
 
     @Override
-    public boolean restSurveySettings(Integer classId, CreateClassForm createForm) throws TTCustomException {
+    public boolean resetSurveySettings(Integer classId, CreateClassForm createForm, Locale loc) throws TTCustomException {
         try {
             DbClass.setClassConfigShowPostSurvey(connection.getConnection(), classId, createForm.isShowPostSurvey());
             DbClass.setClassConfigShowPreSurvey(connection.getConnection(), classId, createForm.isShowPreSurvey());
@@ -381,7 +384,7 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_RESETTING_SURVEY_SETTINGS);
+            throw new TTCustomException(ErrorCodeMessageConstants.ERROR_WHILE_RESETTING_SURVEY_SETTINGS, loc);
         }
 
     }

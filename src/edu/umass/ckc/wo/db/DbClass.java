@@ -582,15 +582,29 @@ public class DbClass {
     
     public static int insertClass(Connection conn, String className,
                                   String school, String schoolYear,
-                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId, String color) throws Exception {
+                                  String town, String section, String teacherId, int propGroupId, int pretestPool, String grade, String languageId, String altLanguageId, String color) throws Exception {
         ResultSet newid = null;
         PreparedStatement s = null;
         try {
         	String languageDescription = languageId.split(":")[1];
-            String teacherName = getTeacherName(conn, Integer.parseInt(teacherId));
+        	String altLanguageDescription = "noAltLanguage";
+        	if (altLanguageId.indexOf(":") > 0)
+        		altLanguageDescription = altLanguageId.split(":")[1];
+            String altClassLanguageCode = "";            
+            String experiment = "";
+            
+            if("noAltLanguage".equals(altLanguageDescription)) {
+            	altClassLanguageCode = "";
+
+            } else {
+               	 altClassLanguageCode = altLanguageId;
+               	 experiment = "multi-lingual";
+            }            
+        	
+        	String teacherName = getTeacherName(conn, Integer.parseInt(teacherId));
             String q = "insert into Class (teacherId,school,schoolYear,name,town,section,isActive," +
-                    "teacher,propGroupId,logtype,pretestPoolId,grade,class_language) " +
-                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    "teacher,propGroupId,logtype,pretestPoolId,grade,class_language,experiment) " +
+                    "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             s = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
             s.setString(1, teacherId);
             s.setString(2, school);
@@ -609,16 +623,11 @@ public class DbClass {
             s.setInt(11, pretestPool);
             s.setString(12,grade);
             s.setString(13,languageDescription);
+            s.setString(14,experiment);
             s.execute();
             newid = s.getGeneratedKeys();
             newid.next();
             int classId = newid.getInt(1);
-            String altClassLanguageCode = "";
-            if("English".equals(languageDescription)) {
-            	altClassLanguageCode = "es:Spanish";
-            } else {
-               	 altClassLanguageCode = "en:English";
-            }
             insertClassConfig(conn, classId, color, altClassLanguageCode);
             return newid.getInt(1);
         } catch (SQLException e) {
@@ -1385,7 +1394,7 @@ public class DbClass {
         	
         	String classesInCluster = DbClass.getStringClassesInCluster(conn, String.valueOf(classID));
         	
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ") order by fname,lname,username";
+            String q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid in (" + classesInCluster + ") order by fname,lname,username";
             stmt = conn.prepareStatement(q);
             rs = stmt.executeQuery();
             List<User> res = new ArrayList<User>();
@@ -1394,12 +1403,13 @@ public class DbClass {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);                
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);
@@ -1447,7 +1457,7 @@ public class DbClass {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {
-            String q = "select id,fname,lname,username,email,password,strategyId from student where classid=? order by fname asc, lname, username";
+            String q = "select id,fname,lname,username,gender, email,password,strategyId from student where classid=? order by fname asc, lname, username";
             stmt = conn.prepareStatement(q);
             stmt.setInt(1, classID);
             rs = stmt.executeQuery();
@@ -1457,12 +1467,13 @@ public class DbClass {
                 String fname = rs.getString(2);
                 String lname = rs.getString(3);
                 String uname = rs.getString(4);
-                String email = rs.getString(5);
-                String pw = rs.getString(6);
-                int strategyId = rs.getInt(7);  // can be NULL
+                String gender = rs.getString(5);
+                String email = rs.getString(6);
+                String pw = rs.getString(7);
+                int strategyId = rs.getInt(8);  // can be NULL
                 if (rs.wasNull())
                     strategyId = -1;
-                User u = new User(fname, lname, uname, email, pw, id);
+                User u = new User(fname, lname, uname, gender, email, pw, id);
                 if (strategyId != -1)
                     u.setStrategyId(strategyId);
                 res.add(u);
@@ -1846,6 +1857,29 @@ public class DbClass {
         return 0.85; // in case of a failure this default value will work.
     }
 
+    public static String getClassPrimaryLanguage(Connection conn, int classId) throws SQLException {
+        
+    	String lang = "English";
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            String q = "select class_language from class where id=?";
+            stmt = conn.prepareStatement(q);
+            stmt.setInt(1, classId);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                lang = rs.getString(1);
+                return lang;
+            }
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+        return lang; // in case of a failure this default value will work.
+    }
+    
 
     public static void setSimpleConfig(Connection conn, int classId, String lc, String collab, String diffRate, String lowDiff, String highDiff) throws SQLException {
         PreparedStatement s = null;

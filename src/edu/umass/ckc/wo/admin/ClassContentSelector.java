@@ -94,6 +94,15 @@ public class ClassContentSelector {
     private void setClassPedagogies(int classId, String simpleLC, String simpleCollab, String selectedLCs) throws SQLException {
         Pedagogy p=null;
         
+        if (simpleLC.equals("selectable")) {
+        	if (selectedLCs.indexOf("~") < 0) {
+		        DbClassPedagogies.removeClassPedagogies(conn, classId);
+        		selectedLCs = "No Learning Companion";
+        		p = getPedagogyByName("No Learning Companion");
+            	DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
+            	return;
+        	}        	
+        }
         if (selectedLCs.length() > 0 ) {
 	        DbClassPedagogies.removeClassPedagogies(conn, classId);
 	
@@ -115,6 +124,7 @@ public class ClassContentSelector {
 	                p = getPedagogyByName("Jane Learning Companion");
 	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
 	                p = getPedagogyByName("Jake Learning Companion");
+	                DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
 	            }
 	            else if (simpleLC.equals("multi-lingual")) {
 	                p = getPedagogyByName("Lucas Learning Companion");
@@ -149,7 +159,7 @@ public class ClassContentSelector {
 	            }
 	            DbClassPedagogies.setClassPedagogy(conn, classId, p.getId());
 	        }
-    	}
+        }
     }
 
     private int gradeToNum (String grade) {
