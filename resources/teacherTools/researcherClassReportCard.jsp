@@ -5118,6 +5118,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5157,6 +5159,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5218,6 +5222,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5257,6 +5263,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5318,6 +5326,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5357,6 +5367,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5419,6 +5431,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5458,6 +5472,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5500,17 +5516,6 @@ function showChartNine(data, chartIndex) {
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay" name="selectDay">
    				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
-			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar" data-lang="en">
-			              <thead id="thead-month"></thead>
-			              <tbody id="calendar-body"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month" onchange="jump()">
@@ -5531,8 +5536,21 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
-			              </select>       
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
+			              </select>       			          
 			          </div>
+			          
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
+			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar" data-lang="en">
+			              <thead id="thead-month"></thead>
+			              <tbody id="calendar-body"></tbody>
+			          </table>
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
@@ -5559,6 +5577,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5622,6 +5642,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5661,6 +5683,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5722,6 +5746,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -5761,6 +5787,8 @@ function showChartNine(data, chartIndex) {
 			                  <option value=2020>2020</option>
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
+			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			        </div>
