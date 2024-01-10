@@ -779,8 +779,8 @@ catch (Exception e) {
                         validators: {
 
                             between: {
-                                min: new Date().getFullYear(),
-                                max: 2050,
+                                min: (new Date().getFullYear()-1),
+                                max: (new Date().getFullYear()+1),
                                 message: '<%= rb.getString("emsg_schoolYearRange") %>'
                             },
 
@@ -1538,8 +1538,7 @@ function registerAllEvents(){
                                         <springForm:select path="altLanguage" class="form-control" id="altLanguage"
                                                            name="altLanguage">
                                             <springForm:option value="">(For bi-lingual) <%= rb.getString("select_alt_language_for_class") %>)</springForm:option>
-                                            <springForm:option id="altEnglish" value="en:English"><%= rb.getString("english") %></springForm:option>
-                                            <springForm:option id="altSPanish" value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
+                                            <springForm:option id="altSpanish" value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
@@ -1578,10 +1577,8 @@ function registerAllEvents(){
                                         <springForm:select path="schoolYear" class="form-control" id="schoolYear"
                                                            name="schoolYear">
                                             <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-                                            <springForm:option value="2021">2020/2021</springForm:option>
-                                            <springForm:option value="2022">2021/2022</springForm:option>
-                                            <springForm:option value="2023">2022/2023</springForm:option>
                                             <springForm:option value="2023">2023/2024</springForm:option>
+                                            <springForm:option value="2024">2024/2025</springForm:option>
                                         </springForm:select>
                                     </div>
                                 </div>
