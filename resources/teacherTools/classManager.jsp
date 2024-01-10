@@ -437,8 +437,8 @@ function getFilterLandingTwo() {
 	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
 	var m2 =  parseInt(document.getElementById("month").value) + 1;
 
-	document.getElementById("year_cal2").value = "2023";
-	document.getElementById("year").value = "2023";
+	document.getElementById("year_cal2").value = new Date().getFullYear();
+	document.getElementById("year").value = new Date().getFullYear();
 	
 	if ((d1 > 0) && (d2 > 0)) {
 		$('#calendarModalPopup').modal('hide');
@@ -3216,6 +3216,7 @@ function registerAllEvents(){
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
 			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -3256,6 +3257,7 @@ function registerAllEvents(){
 			                  <option value=2021>2021</option>
 			                  <option value=2022>2022</option>			              
 			                  <option value=2023>2023</option>			              
+			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			        </div>
