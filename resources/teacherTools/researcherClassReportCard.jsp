@@ -908,6 +908,32 @@ function getFilterThree(submit) {
 	
 }
 
+function populateCalendarYearDropdown() {
+	
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var yearOptionHTML = "";
+	
+	for(yr = 2019; yr <= currentYear; yr++ ) {
+		yearOptionHTML = yearOptionHTML + "<option value=" + yr + ">" + yr + "</option><br>";
+	}
+	document.getElementById("year").innerHTML = yearOptionHTML;
+	document.getElementById("year_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r1_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r1_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r3_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r3_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r4_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r4_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r6_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r6_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r8_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r8_cal2").innerHTML = yearOptionHTML;
+	document.getElementById("year_r9_cal1").innerHTML = yearOptionHTML;
+	document.getElementById("year_r9_cal2").innerHTML = yearOptionHTML;
+	
+}
+
 var topicSelectionListEight = "";
 function populateTopicSelectionListEight() {
 
@@ -4528,6 +4554,8 @@ function showChartNine(data, chartIndex) {
             handleclickHandlers();
             $("#content-conatiner").children().hide();
         
+            populateCalendarYearDropdown();
+            
             getFilterOne('');
             getFilterFour('');
 
@@ -5115,11 +5143,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r6_cal1" onchange="jump_r6_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5156,11 +5179,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r6_cal2" onchange="jump_r6_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5219,11 +5237,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r1_cal1" onchange="jump_r1_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5260,11 +5273,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r1_cal2" onchange="jump_r1_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5323,11 +5331,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r4_cal1" onchange="jump_r4_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5364,11 +5367,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r4_cal2" onchange="jump_r4_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5428,11 +5426,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r3_cal1" onchange="jump_r3_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5469,11 +5462,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r3_cal2" onchange="jump_r3_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5533,11 +5521,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year" onchange="jump()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       			          
 			          </div>
 			          
@@ -5574,11 +5557,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_cal2" onchange="jump_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5639,11 +5617,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r8_cal1" onchange="jump_r8_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			          <div class="button-container-calendar">
@@ -5680,11 +5653,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r8_cal2" onchange="jump_r8_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			          <div class="button-container-calendar">
@@ -5743,11 +5711,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r9_cal1" onchange="jump_r9_cal1()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -5784,11 +5747,6 @@ function showChartNine(data, chartIndex) {
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_r9_cal2" onchange="jump_r9_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			        </div>
