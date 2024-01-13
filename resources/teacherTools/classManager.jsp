@@ -2137,7 +2137,7 @@ function registerAllEvents(){
     	var currentYear = currentDate.getFullYear();
     	var yearOptionHTML = "";
     	
-    	for(yr = currentYear-1; yr <= currentYear; yr++ ) {
+    	for(yr = 2019; yr <= currentYear; yr++ ) {
     		yearOptionHTML = yearOptionHTML + "<option value=" + yr + ">" + yr + "</option><br>";
     	}
     	document.getElementById("year").innerHTML = yearOptionHTML;
@@ -3197,17 +3197,6 @@ function registerAllEvents(){
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay" name="selectDay">
    				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
-			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar" data-lang="en">
-			              <thead id="thead-month"></thead>
-			              <tbody id="calendar-body"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month" onchange="jump()">
@@ -3227,22 +3216,23 @@ function registerAllEvents(){
 			              <select id="year" onchange="jump()">
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
+			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar" data-lang="en">
+			              <thead id="thead-month"></thead>
+			              <tbody id="calendar-body"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_cal2" name="selectDay_cal_2">
 				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
-			              <thead id="thead-month_cal2"></thead>
-			              <tbody id="calendar-body_cal2"></tbody>
-			          </table>
 			          
 			          <div class="footer-container-calendar">
 			              <label for="month_cal2"><%= rb.getString("jump_to") %>: </label>
@@ -3263,6 +3253,16 @@ function registerAllEvents(){
 			              <select id="year_cal2" onchange="jump_cal2()">
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
+			              <thead id="thead-month_cal2"></thead>
+			              <tbody id="calendar-body_cal2"></tbody>
+			          </table>
 			        </div>
             	</div>
             </div>

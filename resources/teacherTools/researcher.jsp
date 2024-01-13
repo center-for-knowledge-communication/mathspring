@@ -505,7 +505,7 @@ function populateCalendarYearDropdown() {
 	var currentYear = currentDate.getFullYear();
 	var yearOptionHTML = "";
 	
-	for(yr = currentYear-1; yr <= currentYear; yr++ ) {
+	for(yr = 2019; yr <= currentYear; yr++ ) {
 		yearOptionHTML = yearOptionHTML + "<option value=" + yr + ">" + yr + "</option><br>";
 	}
 	document.getElementById("year_r1_cal1").innerHTML = yearOptionHTML;
@@ -6261,16 +6261,6 @@ function updateAllCohortSlices() {
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal1" name="selectDay_r1_cal1">
    				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
-			              <thead id="thead-month_r1_cal1"></thead>
-			              <tbody id="calendar-body_r1_cal1"></tbody>
-			          </table>
 			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal1"><%= rb.getString("jump_to") %>: </label>
@@ -6291,22 +6281,22 @@ function updateAllCohortSlices() {
 			              <select id="year_r1_cal1" onchange="jump_r1_cal1()">
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal1" onclick="previous_r1_cal1()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal1"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal1" onclick="next_r1_cal1()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal1" data-lang="en">
+			              <thead id="thead-month_r1_cal1"></thead>
+			              <tbody id="calendar-body_r1_cal1"></tbody>
+			          </table>
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_r1_cal2" name="selectDay_r1_cal2">
 				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
-			              <thead id="thead-month_r1_cal2"></thead>
-			              <tbody id="calendar-body_r1_cal2"></tbody>
-			          </table>
 			          
 			          <div class="footer-container-calendar">
 			              <label for="month_r1_cal2"><%= rb.getString("jump_to") %>: </label>
@@ -6327,6 +6317,16 @@ function updateAllCohortSlices() {
 			              <select id="year_r1_cal2" onchange="jump_r1_cal2()">
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_r1_cal2" onclick="previous_r1_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_r1_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_r1_cal2" onclick="next_r1_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_r1_cal2" data-lang="en">
+			              <thead id="thead-month_r1_cal2"></thead>
+			              <tbody id="calendar-body_r1_cal2"></tbody>
+			          </table>
 			        </div>
             	</div>
             </div>
