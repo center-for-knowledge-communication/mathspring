@@ -1986,7 +1986,7 @@ function registerAllEvents(){
             } 
             var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
    		
-        	generate_year_range(2021,2023);
+    		populateCalendarYearDropdown();
             registerAllEvents();
             handleclickHandlers();
 
@@ -2131,6 +2131,19 @@ function registerAllEvents(){
     var classChoices = [];
     var clusterChoices = [];
 
+    function populateCalendarYearDropdown() {
+    	
+    	var currentDate = new Date();
+    	var currentYear = currentDate.getFullYear();
+    	var yearOptionHTML = "";
+    	
+    	for(yr = currentYear-1; yr <= currentYear; yr++ ) {
+    		yearOptionHTML = yearOptionHTML + "<option value=" + yr + ">" + yr + "</option><br>";
+    	}
+    	document.getElementById("year").innerHTML = yearOptionHTML;
+    	document.getElementById("year_cal2").innerHTML = yearOptionHTML;    	
+    }
+    
     function selectTeacherCluster(myClassId) {
 
     	var txtClassId = "" + myClassId;
@@ -3212,11 +3225,6 @@ function registerAllEvents(){
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year" onchange="jump()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
 			      </div>			      
@@ -3253,11 +3261,6 @@ function registerAllEvents(){
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_cal2" onchange="jump_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
 			        </div>
