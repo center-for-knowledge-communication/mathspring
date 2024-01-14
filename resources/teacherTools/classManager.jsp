@@ -437,8 +437,8 @@ function getFilterLandingTwo() {
 	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
 	var m2 =  parseInt(document.getElementById("month").value) + 1;
 
-	document.getElementById("year_cal2").value = new Date().getFullYear();
-	document.getElementById("year").value = new Date().getFullYear();
+//	document.getElementById("year_cal2").value = new Date().getFullYear();
+//	document.getElementById("year").value = new Date().getFullYear();
 	
 	if ((d1 > 0) && (d2 > 0)) {
 		$('#calendarModalPopup').modal('hide');
@@ -1986,7 +1986,7 @@ function registerAllEvents(){
             } 
             var displayem = gradesLevelsUsedInThisClass.replaceAll("."," ");
    		
-        	generate_year_range(2021,2023);
+    		populateCalendarYearDropdown();
             registerAllEvents();
             handleclickHandlers();
 
@@ -2131,6 +2131,19 @@ function registerAllEvents(){
     var classChoices = [];
     var clusterChoices = [];
 
+    function populateCalendarYearDropdown() {
+    	
+    	var currentDate = new Date();
+    	var currentYear = currentDate.getFullYear();
+    	var yearOptionHTML = "";
+    	
+    	for(yr = 2019; yr <= currentYear; yr++ ) {
+    		yearOptionHTML = yearOptionHTML + "<option value=" + yr + ">" + yr + "</option><br>";
+    	}
+    	document.getElementById("year").innerHTML = yearOptionHTML;
+    	document.getElementById("year_cal2").innerHTML = yearOptionHTML;    	
+    }
+    
     function selectTeacherCluster(myClassId) {
 
     	var txtClassId = "" + myClassId;
@@ -3184,17 +3197,6 @@ function registerAllEvents(){
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay" name="selectDay">
    				      <div><h3><%= rb.getString("most_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
-			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar" data-lang="en">
-			              <thead id="thead-month"></thead>
-			              <tbody id="calendar-body"></tbody>
-			          </table>
-			          
 			          <div class="footer-container-calendar">
 			              <label for="month"><%= rb.getString("jump_to") %>: </label>
 			              <select id="month" onchange="jump()">
@@ -3212,29 +3214,25 @@ function registerAllEvents(){
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year" onchange="jump()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous" onclick="previous()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear"></h3></div>
+			              <div class=col-md-2><button id="next" onclick="next()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar" data-lang="en">
+			              <thead id="thead-month"></thead>
+			              <tbody id="calendar-body"></tbody>
+			          </table>
+			          
 			      </div>			      
 			    </div> 
 			    <div class="wrapper-calender col-sm-6">
 			      <div class="container-calendar">
                         <input type="hidden" id="selectDay_cal2" name="selectDay_cal_2">
 				      <div><h3><%= rb.getString("least_recent") %>:</h3></div>
-			          <div class="button-container-calendar">
-			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
-       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
-			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
-			          </div>
-			          
-			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
-			              <thead id="thead-month_cal2"></thead>
-			              <tbody id="calendar-body_cal2"></tbody>
-			          </table>
 			          
 			          <div class="footer-container-calendar">
 			              <label for="month_cal2"><%= rb.getString("jump_to") %>: </label>
@@ -3253,13 +3251,18 @@ function registerAllEvents(){
 			                  <option value=11><%= rb.getString("Dec") %></option>
 			              </select>
 			              <select id="year_cal2" onchange="jump_cal2()">
-			                  <option value=2020>2020</option>
-			                  <option value=2021>2021</option>
-			                  <option value=2022>2022</option>			              
-			                  <option value=2023>2023</option>			              
-			                  <option value=2024>2024</option>			              
 			              </select>       
 			          </div>			 
+			          <div class="button-container-calendar">
+			              <div class=col-md-2><button id="previous_cal2" onclick="previous_cal2()">&#8249;&#8249;</button></div>
+       							  <div class=col-md-8 center-text><h3 id="monthAndYear_cal2"></h3></div>
+			              <div class=col-md-2><button id="next_cal2" onclick="next_cal2()">&#8250;&#8250;</button></div>							          
+			          </div>
+			          
+			          <table class="table-calendar" id="calendar_cal2" data-lang="en">
+			              <thead id="thead-month_cal2"></thead>
+			              <tbody id="calendar-body_cal2"></tbody>
+			          </table>
 			        </div>
             	</div>
             </div>
