@@ -437,8 +437,8 @@ function getFilterLandingTwo() {
 	var m1 = parseInt(document.getElementById("month_cal2").value) + 1;
 	var m2 =  parseInt(document.getElementById("month").value) + 1;
 
-	document.getElementById("year_cal2").value = new Date().getFullYear();
-	document.getElementById("year").value = new Date().getFullYear();
+//	document.getElementById("year_cal2").value = new Date().getFullYear();
+//	document.getElementById("year").value = new Date().getFullYear();
 	
 	if ((d1 > 0) && (d2 > 0)) {
 		$('#calendarModalPopup').modal('hide');
