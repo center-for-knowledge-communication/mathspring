@@ -2758,7 +2758,7 @@ public class TTReportServiceImpl implements TTReportService {
     
     public List<User> getClassStudentIDs(Connection conn, int classID, String classesInCluster) throws SQLException {
   
-    	String q = "select id,fname,lname,username,email,password,strategyId from student where classid in (" + classesInCluster + ")";
+    	String q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid in (" + classesInCluster + ")";
 
         if (classesInCluster.length() == 0) {
         	q = "select id,fname,lname,username,gender,email,password,strategyId from student where classid=?";
