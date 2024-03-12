@@ -537,31 +537,35 @@ function processShowLCList (responseText, textStatus, XMLHttpRequest) {
     var lcHtml = "<div >";
     var rowCount = 0;
 
+    if (lcArr.LCList.length > 0) {
     
-    for (var i = 0; i <  lcArr.LCList.length; i++) {
-    	if ((i == 0) || (i%2 == 0)) {
-        	lcHtml = lcHtml  + "<div class='row'>";
-    	}
-		rowCount = rowCount + 1;    		
-    	lcHtml = lcHtml  + "<div class='col-md-3'><label class='radio-inline'>";
-    	lcHtml = lcHtml  + "<input type='radio' name='optLC' id='LC" + i + "' value='" + lcArr.LCList[i].id + "' " + lcArr.LCList[i].lcname + ">";
-   		lcHtml = lcHtml  + 	"<img src=" +lcArr.LCList[i].url + lcArr.LCList[i].lcshortname + "/character.png width='120px' height='150px'>";    	
-   		lcHtml = lcHtml  + 	"<span style='display:block; text-align: center;'>" + lcArr.LCList[i].lcshortname + " " + lcArr.LCList[i].lang + "</span>";
-   		lcHtml = lcHtml  + 	"</label>";
-   		lcHtml = lcHtml  + 	"</div>";
-	    if (rowCount == 3) {
-   	   		lcHtml = lcHtml  + 	"</div>";   
-   	   		rowCount = 0;
-   		}
-    }
-    lcHtml = lcHtml  + "</div>";
-    
-    document.getElementById("lcBody").innerHTML = lcHtml;
-    document.getElementById("lcBody").style.padding = "20px";
+	    for (var i = 0; i <  lcArr.LCList.length; i++) {
+	    	if ((i == 0) || (i%2 == 0)) {
+	        	lcHtml = lcHtml  + "<div class='row'>";
+	    	}
+			rowCount = rowCount + 1;    		
+	    	lcHtml = lcHtml  + "<div class='col-md-3'><label class='radio-inline'>";
+	    	lcHtml = lcHtml  + "<input type='radio' name='optLC' id='LC" + i + "' value='" + lcArr.LCList[i].id + "' " + lcArr.LCList[i].lcname + ">";
+	   		lcHtml = lcHtml  + 	"<img src=" +lcArr.LCList[i].url + lcArr.LCList[i].lcshortname + "/character.png width='120px' height='150px'>";    	
+	   		lcHtml = lcHtml  + 	"<span style='display:block; text-align: center;'>" + lcArr.LCList[i].lcshortname + " " + lcArr.LCList[i].lang + "</span>";
+	   		lcHtml = lcHtml  + 	"</label>";
+	   		lcHtml = lcHtml  + 	"</div>";
+		    if (rowCount == 3) {
+	   	   		lcHtml = lcHtml  + 	"</div>";   
+	   	   		rowCount = 0;
+	   		}
+	    }
+	    lcHtml = lcHtml  + "</div>";
+	    
+	    document.getElementById("lcBody").innerHTML = lcHtml;
+	    document.getElementById("lcBody").style.padding = "20px";
+	
+	    radioButtons = document.querySelectorAll('input[name="optLC"]');
 
-    radioButtons = document.querySelectorAll('input[name="optLC"]');
-    
-    $('#lcModal').modal('show');    
+    	addEventListener("click", clickLCButton, false);
+	    
+	    $('#lcModal').modal('show');
+    }
 }
 
 function changeStudentLC() {
