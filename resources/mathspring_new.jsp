@@ -1254,14 +1254,15 @@ label {
 		problem_standards = "<%= problem_standards %>";
 		
         document.getElementById('lcModal').style.height = window.height / 2 ;
-
-		if (globals.learningCompanion.length > 0)   {      
-	    	addEventListener("click", clickLCButton, false);
-		}
-		else {
-    		document.getElementById("learningCompanionWrapper").style.display = "none";			
-		}
-	    
+        
+        if (globals.className.indexOf("GuestUserClass") >= 0) {
+	   		document.getElementById("learningCompanionWrapper").style.display = "none";			
+    	}
+        else {
+	    	if (globals.learningCompanion.length > 0)   {      
+		    	addEventListener("click", clickLCButton, false);
+			}
+    	}
     });
     
     $(document).ready(function() {
