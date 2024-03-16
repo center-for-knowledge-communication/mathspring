@@ -181,9 +181,8 @@ public class TutorPage {
         info.getRequest().setAttribute("answer", answer);
         appendLogMsg("answer",answer);
         if (smgr.getLearningCompanion() != null) {
-            if (Settings.isDevelopmentEnv) {
-
-//                info.getRequest().setAttribute("learningCompanionMovie",  Settings.devWebContentPath + "/LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+        	String name = smgr.getLearningCompanion().getCharactersName();
+   		    if ((name.indexOf("Jane") >= 0) || (name.indexOf("Jake") >= 0)) {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName() + "/idle.html");
             } else {
            		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
@@ -270,7 +269,8 @@ public class TutorPage {
         info.getRequest().setAttribute("activityJSON", intervResponse.getJSON().toString());
         appendLogMsg("activity",intervResponse.getJSON().toString());
         if (smgr.getLearningCompanion() != null) {
-            if (Settings.isDevelopmentEnv) {
+        	String name = smgr.getLearningCompanion().getCharactersName();
+   		    if ((name.indexOf("Jane") >= 0) || (name.indexOf("Jake") >= 0)) {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath +  "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
             }
             else {
@@ -337,8 +337,10 @@ public class TutorPage {
         info.getRequest().setAttribute("activityJSON", response.getJSON().toString());
         appendLogMsg("activity",response.getJSON().toString());
         if (smgr.getLearningCompanion() != null) {
-            if (Settings.isDevelopmentEnv)
+        	String name = smgr.getLearningCompanion().getCharactersName();
+   		    if ((name.indexOf("Jane") >= 0) || (name.indexOf("Jake") >= 0)) {
                 info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath  + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");
+   		    }
             else {
 	    		info.getRequest().setAttribute("learningCompanionMovie", Settings.webContentPath2 + "LearningCompanion/" + smgr.getLearningCompanion().getCharactersName()+ "/idle.html");            		
             }
