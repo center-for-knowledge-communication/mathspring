@@ -1033,49 +1033,51 @@ $.extend({
             chart.giveFeedbackAndPlant ("remarks_"+topicId,"plant_"+topicId,topicState,studentState_disengaged,topicMastery,problemsDoneWithEffort,SHINT_SOF_sequence,SOF_SOF_sequence,neglectful_count,problemsDone,problemsSolved);
 
 //			console.log(topicId);
-            var effortsForGraph = "${ts.effortsForGraph}";
-            if (effortsForGraph.length == 0) {
-            	return;
-            }
-//			console.log(effortsForGraph);
-			var effortValueArr = effortsForGraph.split(',');
-			
-    		var line = [];
-  			
-  			for (j=7;j>=0;j = j - 1) {
-  				var eff = [];
-	  			eff.push(effort_legend_labels[j],Number(effortValueArr[j]));
-//	  			console.log(effort_legend_labels[j] + " " + effortValueArr[j]);
-	  			line.push(eff);
-  			}
-			var canvasName = 'pie_' + topicId;
-			
-			plot_live_dashboard = $.jqplot(canvasName, [line], {
-		    seriesDefaults: {
-              renderer: $.jqplot.PieRenderer,
-		      rendererOptions: {
-		        showDataLabels: true,
-			    startAngle: -90,
-			    padding: 10,
-		        sliceMargin: 4,
-			    seriesColors: effort_series_colors
-		      },
-		    },
-//		    legend:{
-//	            show:true, 
-//	            location:'e',
-//	            fontSize: '8pt'
-//	        },
-		    highlighter: {
-		        show: true,
-		        useAxesFormatters: false,
-	            location:'n',
-	            fontSize: '12pt',
-		        tooltipFormatString: '%s%2d'
 
-		      }
-		 
-		  });
+            var effortsForGraph = "${ts.effortsForGraph}";
+            
+            if (effortsForGraph.length > 0) {
+				var effortValueArr = effortsForGraph.split(',');
+				
+	    		var line = [];
+	  			
+	  			for (j=7;j>=0;j = j - 1) {
+	  				var eff = [];
+		  			eff.push(effort_legend_labels[j],Number(effortValueArr[j]));
+	//	  			console.log(effort_legend_labels[j] + " " + effortValueArr[j]);
+		  			line.push(eff);
+	  			}
+				var canvasName = 'pie_' + topicId;
+				
+				plot_live_dashboard = $.jqplot(canvasName, [line], {
+			    seriesDefaults: {
+	              renderer: $.jqplot.PieRenderer,
+			      rendererOptions: {
+			        showDataLabels: true,
+				    startAngle: -90,
+				    padding: 10,
+			        sliceMargin: 4,
+				    seriesColors: effort_series_colors
+			      },
+			    },
+	//		    legend:{
+	//	            show:true, 
+	//	            location:'e',
+	//	            fontSize: '8pt'
+	//	        },
+			    highlighter: {
+			        show: true,
+			        useAxesFormatters: false,
+		            location:'n',
+		            fontSize: '12pt',
+			        tooltipFormatString: '%s%2d'
+	
+			      }
+			 
+			  });
+           }
+
+
             </c:forEach>
         }
 
