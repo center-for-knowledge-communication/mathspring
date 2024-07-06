@@ -1,0 +1,11 @@
+body {
+	overflow: auto !important;
+}
+
+body:after {
+	display: none !important;
+}
+
+#main > .inner {
+	opacity: 1.0 !important;
+}
