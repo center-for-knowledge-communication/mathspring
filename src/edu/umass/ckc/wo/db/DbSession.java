@@ -30,6 +30,7 @@ import java.util.Locale;
  * Time: 12:43 PM
  * To change this template use File | Settings | File Templates.
  * Frank	01-21-22	Issue #610 - Save session  locale in DB for use by interventions 
+ * Frank	08-22-24	Issue #781R7 on new session cration get language from browser 
  */
 public class DbSession {
     private static final Logger logger = Logger.getLogger(DbSession.class);
@@ -189,7 +190,7 @@ public class DbSession {
 
 
     	String gender = "";
-    	String language = "English";
+//    	String language = "English";
         String q = "select gender, language from student where id=?";
         PreparedStatement ps2 = conn.prepareStatement(q);
         ps2.setInt(1, studId);
@@ -209,13 +210,15 @@ public class DbSession {
         ps.setTimestamp(4, now);
         ps.setNull(5, Types.TIMESTAMP);
         ps.setBoolean(6,isAssistmentsUser);
-      	String lang = "en";
-        if (language.equals("English")) {
+      	String lang = loc.getLanguage();
+/*
+      	if (language.equals("English")) {
         	lang = "en";        	
         }
         if (language.equals("Spanish")) {
         	lang = "es";        	
         }
+*/
       	String country = loc.getCountry();
       	String localeStr = lang + "-" + country;
         ps.setString(7,localeStr);

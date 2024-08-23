@@ -9,6 +9,8 @@
  * Frank 07-17-2020 issue #122 added classId to signup() function 
  * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
  * Frank 01-10-21 Issue #289 re-org Welcome.html interface
+ * Frank 08/22/24 issue #781R7 add Spanish Guest signin
+
 */
 ResourceBundle versions = null; 
 try {
@@ -165,13 +167,24 @@ catch (Exception e) {
 	                                    onClick="javascript:signup();"
 	                            ><%= rb.getString("signup_student") %></button>
 	                        </form>
+	                        <br>
 	                        <form name="guest" action="${pageContext.request.contextPath}/WoLoginServlet">
 	                            <input type="hidden" name="action" value="GuestLogin"/>
 	                            <input type="hidden" name="clientType" value="${clientType}"/>
+	                            <input type="hidden" name="lang" value="en"/>
 	                            <input type="hidden" name="var" value="b"/>
 	                            <button
 	                                    class="btn btn-danger btn-lg btn-block signup-btn guest-try-out-btn"
-	                                    type="submit"><%= rb.getString("signup_guest") %></button>
+	                                    type="submit"><%= rb.getString("signup_guest") %> (in English)</button>
+	                        </form>
+	                        <form name="guest" action="${pageContext.request.contextPath}/WoLoginServlet">
+	                            <input type="hidden" name="action" value="GuestLogin"/>
+	                            <input type="hidden" name="clientType" value="${clientType}"/>
+	                            <input type="hidden" name="lang" value="es"/>
+	                            <input type="hidden" name="var" value="b"/>
+	                            <button
+	                                    class="btn btn-danger btn-lg btn-block signup-btn guest2-try-out-btn"
+	                                    type="submit"><%= rb.getString("signup_guest") %> (en Español)</button>
 	                        </form>
 	                    </div>
 	

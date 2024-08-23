@@ -8,7 +8,7 @@
 * Frank 12-18-20 Issue #336 added cache-busting for selected .js and .css files
 * Kartik 04-22-21 Issue #390 Added session clock functionality
 * Frank	11-27-22	Merge jchart.js inline and apply multi-lingual algorithms
-
+* Frank	08-22-24	Issue # 781R7	Use pageLang, pageLanIndex and experiment in multi-lingual algorithms
 */
 
 Locale loc = request.getLocale(); 
@@ -25,43 +25,73 @@ System.out.println("locale set to:" + lang + "-" + country );
 
 int pageLangIndex = 0;
 String strExperiment = "";
+String pageLang = "";
+
+try {
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
 
 try {
 	strExperiment = (String) request.getAttribute("experiment");
+}
+catch (Exception e) {
+	 System.out.println("experiment " + e.getMessage());
+}
+
+try {
+	pageLang = (String) request.getAttribute("pageLang");
+}
+catch (Exception e) {
+	 System.out.println("pageLang " + e.getMessage());
+	 pageLang = "en";
+}
 	
-	if (strExperiment.indexOf("multi-lingual") < 0) {
-		pageLangIndex = 0;
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	pageLangIndex = -1;
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
 	}
 	else {
-		pageLangIndex = (int) request.getAttribute("pageLangIndex");
-	}	
-	
-	if (pageLangIndex == 0) {
-		if (lang.equals("en")) {
-			loc1 = new Locale("en","US");	
-			loc2 = new Locale("es","US");	
-		}
-		else {
-			loc1 = new Locale("es","US");	
-			loc2 = new Locale("en","US");		
-		}
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
+else {
+	pageLangIndex = 0;
+}	
+
+if (pageLangIndex == 0) {
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
 	}
 	else {
-		if (lang.equals("en")) {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
+else {
+	if (pageLangIndex == 1) {
+		if (pageLang.equals("en")) {
 			loc1 = new Locale("es","US");	
 			loc2 = new Locale("en","US");	
 		}
 		else {
 			loc1 = new Locale("en","US");	
 			loc2 = new Locale("es","US");		
-		}	
+		}
 	}
+	else {
+		loc1 = new Locale(pageLang,"US");	
+		loc2 = new Locale(pageLang,"US");			
+	}
+}
 
-}
-catch (Exception e) {
-	 System.out.println("pageLangIndex " + e.getMessage());
-	 pageLangIndex = 0;
-}
 
 ResourceBundle versions = null; 
 try {
@@ -102,16 +132,26 @@ catch (Exception e) {
 	System.out.println(e.getMessage());
 }
 
-if (lang.equals("en")) {
-	rb = rb1;
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	if (pageLang.equals("en")) {
+		rb = rb1;
+	}
+	else {
+		rb = rb2;	
+	}
 }
 else {
-	rb = rb2;	
+	if (pageLang.equals("en")) {
+		rb = rb1;
+	}
+	else {
+		rb = rb2;	
+	}
 }
 %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>MathSpring | <%= rb.getString("my_progress") %></title>
@@ -1033,7 +1073,6 @@ $.extend({
             chart.giveFeedbackAndPlant ("remarks_"+topicId,"plant_"+topicId,topicState,studentState_disengaged,topicMastery,problemsDoneWithEffort,SHINT_SOF_sequence,SOF_SOF_sequence,neglectful_count,problemsDone,problemsSolved);
 
 //			console.log(topicId);
-
             var effortsForGraph = "${ts.effortsForGraph}";
             
             if (effortsForGraph.length > 0) {
@@ -1076,8 +1115,6 @@ $.extend({
 			 
 			  });
            }
-
-
             </c:forEach>
         }
 

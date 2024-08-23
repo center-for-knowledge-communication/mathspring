@@ -19,6 +19,7 @@ public class LoginIntervention implements Intervention {
     private String view;  // name of JSP
     private String url;   // URL which will be shown in a separate browser window   
     private String url2;   // URL which will be shown in a separate browser window   
+    private String experiment;
     private Map<Integer, List<String>> LCprofile;
     private boolean separateWindow =false; // tells whether to display the URL in a separate window      -- DM 8/16 not seeing evidence of this being used
     private boolean topLevel = false; // indicates if the JSP should be within an outer JSP or not
@@ -61,7 +62,11 @@ public class LoginIntervention implements Intervention {
         return this.url2;
     }
     
-	public Map<Integer, List<String>> getLCprofile() {
+    public String getExperiment () {
+        return this.experiment;
+    }
+
+    public Map<Integer, List<String>> getLCprofile() {
 		return LCprofile;
 	}
 
@@ -77,6 +82,10 @@ public class LoginIntervention implements Intervention {
 		this.url2 = url;
 	}
 
+	public void setExperiment(String experiment) {
+		this.experiment = experiment;
+	}
+	
 	@Override
     public String getName() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.

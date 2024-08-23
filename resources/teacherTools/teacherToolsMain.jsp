@@ -33,6 +33,7 @@
  *  Frank 	02-04-23    Issue #723 - Added class clustering
  *  Frank 	02-04-23    Issue #723 - Added create class validation on cluster y/n
  *  Frank	05-13-23	Issue #763 - make LCs selectable by class
+ *	Frank	11-22-24	Issue #781R7 - add LC selection and alt language selection
  */
 
  System.out.println("teacherToolsMain starting");
@@ -286,7 +287,9 @@ catch (Exception e) {
             $("#form-wrapper").hide();
             $("#message-wrapper").hide();
             $("#edit-teacher-wrapper").hide();
-          
+
+            lcProfileArr = ${lcProfileStr};
+            
             var noClass = ${noClass};
             if (noClass == false) {
 	            classNameIdArr = ${classNameIdArrayStr};
@@ -296,7 +299,6 @@ catch (Exception e) {
 				}
 	              
 	            homePageClassArr = ${homePageClassArrayStr};
-	            lcProfileArr = ${lcProfileStr};
 
 	            teacherId =  ${teacherId};
 				var myHTML = "";
@@ -421,40 +423,6 @@ catch (Exception e) {
 	            
 				document.getElementById('report-wrapper').innerHTML = myHTML;
 
-				var fullLCDiv = '<br><div class="row">';
-				var itemsinrow = 4;
-				var itemcount = 0;
-
-				for (let index = 0; index < lcProfileArr.length; index++) {
-					if (itemcount == itemsinrow) {
-						fullLCDiv += "</div>";
-						fullLCDiv += '<br><div class="row">';
-						itemcount = 0;
-					}
-					  
-					itemcount = itemcount + 1;
-					myLCDiv = '<div class="col-md-2" style="border:black; border-width:2px; border-style:solid;outline-style: solid;outline-color: white;outline-width: 3px;">';			    
-					var id = 'LC' + (index + 1);
-					var lcname = lcProfileArr[index].lcname;
-					var lcshortname = lcProfileArr[index].lcshortname;
-					var lang = lcProfileArr[index].lang;
-					var url = lcProfileArr[index].url;
-
-
-//					myLCDiv += 'option  id="' + id + '" + value="' + lcProfileArr[index].id + '"></option>';                                            
-
-					myLCDiv += '<input type="checkbox" name="' + id + '" id="' + id + '" value="' + lcProfileArr[index].id + '" />';
-					myLCDiv += '<label for=' + id + '>';			
-					myLCDiv += '<img src="' + url +  lcshortname + '/character.png" width="120px" height="150px" />';
-					myLCDiv += '<span style="display:block; text-align: center;">' + lcshortname + lang + '</span>';		
-					myLCDiv += "</label>";
-					myLCDiv += "</div>";
-					console.log(myLCDiv);
-					fullLCDiv += myLCDiv;
-				}			
-				fullLCDiv += "</div>";
-				
-				document.getElementById('learning_companions').innerHTML = fullLCDiv;
             }
             else {
 				myHTML  = '<div class="loader" style="display: none" ></div>';               
@@ -467,6 +435,40 @@ catch (Exception e) {
         		x.style.display = "none";
             }
 		
+			var fullLCDiv = '<br><div class="row">';
+			var itemsinrow = 4;
+			var itemcount = 0;
+
+			for (let index = 0; index < lcProfileArr.length; index++) {
+				if (itemcount == itemsinrow) {
+					fullLCDiv += "</div>";
+					fullLCDiv += '<br><div class="row">';
+					itemcount = 0;
+				}
+				  
+				itemcount = itemcount + 1;
+				myLCDiv = '<div class="col-md-2" style="border:black; border-width:2px; border-style:solid;outline-style: solid;outline-color: white;outline-width: 3px;">';			    
+				var id = 'LC' + (index + 1);
+				var lcname = lcProfileArr[index].lcname;
+				var lcshortname = lcProfileArr[index].lcshortname;
+				var lang = lcProfileArr[index].lang;
+				var url = lcProfileArr[index].url;
+
+
+//				myLCDiv += 'option  id="' + id + '" + value="' + lcProfileArr[index].id + '"></option>';                                            
+
+				myLCDiv += '<input type="checkbox" name="' + id + '" id="' + id + '" value="' + lcProfileArr[index].id + '" />';
+				myLCDiv += '<label for=' + id + '>';			
+				myLCDiv += '<img src="' + url +  lcshortname + '/character.png" width="120px" height="150px" />';
+				myLCDiv += '<span style="display:block; text-align: center;">' + lcshortname + lang + '</span>';		
+				myLCDiv += "</label>";
+				myLCDiv += "</div>";
+				console.log(myLCDiv);
+				fullLCDiv += myLCDiv;
+			}			
+			fullLCDiv += "</div>";
+			
+			document.getElementById('learning_companions').innerHTML = fullLCDiv;
             
             var pause = ${teacherPauseStudentUse};
             if (pause == "1")
@@ -1537,7 +1539,8 @@ function registerAllEvents(){
                                                 class="glyphicon glyphicon-education"></i></span>
                                         <springForm:select path="altLanguage" class="form-control" id="altLanguage"
                                                            name="altLanguage">
-                                            <springForm:option value="">(For bi-lingual) <%= rb.getString("select_alt_language_for_class") %>)</springForm:option>
+                                            <springForm:option value=""><%= rb.getString("select_alt_language_for_class") %>)</springForm:option>
+                                            <springForm:option id="priEnglish" value="en:English"><%= rb.getString("english") %></springForm:option>
                                             <springForm:option id="altSpanish" value="es:Spanish"><%= rb.getString("spanish") %></springForm:option>
                                         </springForm:select>
                                     </div>

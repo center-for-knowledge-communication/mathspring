@@ -40,7 +40,7 @@ import java.util.List;
  * Frank 08-12-2020 issue #194 Send along the first unsolved problem encountered for 'Practice Area' link
  * Frank 08-20-20	Issue #194 correction fetch current problem from smgr for Practice Area link 
  * Kartik 04-22-21 Issue #390 Added session clock functionality
-
+ * Frank  08-22-24 Issue #781R7 set pageLang, pageLangIndex request params
  */
 public class MyProgressHandler {
 
@@ -89,7 +89,8 @@ public class MyProgressHandler {
             int totalProblems= ee.getTotalProblems();
 
             String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
-        	request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
+            request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
+            request.setAttribute("pageLang",smgr.getLocale().getLanguage());
             request.setAttribute("clientPath", null);
             request.setAttribute("learningCompanion", learningCompanion);
             request.setAttribute("backToVillageURL", null);
@@ -196,6 +197,7 @@ public class MyProgressHandler {
         int topicId = (topid != null && topid.length() != 0) ? Integer.parseInt(topid) : smgr.getStudentState().getCurTopic();
         request.setAttribute("experiment",smgr.getExperiment());
     	request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
+    	request.setAttribute("pageLang",smgr.getLocale().getLanguage());
         request.setAttribute("probId",probId);
         request.setAttribute("topicId",topicId);
         request.setAttribute("sessionId",smgr.getSessionNum());

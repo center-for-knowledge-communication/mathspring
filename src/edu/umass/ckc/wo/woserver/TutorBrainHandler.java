@@ -47,6 +47,7 @@ import java.util.Map;
 /**
  * 
  * Frank	03-08-21	Handle NoSession case by forwarding to student login page
+ * Frank	08-22-24	Pass along experiment value for 'Change Language' Action
  *
  */
 
@@ -236,6 +237,7 @@ public class TutorBrainHandler {
             	smgr.togglePageLangIndex();
             	DbSession.updateSessionPageLangIndex(smgr.getConnection(),smgr.getSessionId(),smgr.getPageLangIndex());
             	servletInfo.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
+            	servletInfo.getRequest().setAttribute("experiment",smgr.getExperiment());
 
             	
                 if (Settings.useNewGUI()) {
@@ -302,6 +304,7 @@ public class TutorBrainHandler {
                 servletInfo.getRequest().setAttribute("mode",mode);				
                 servletInfo.getRequest().setAttribute("pageLangIndex",smgr.getPageLangIndex());
                 servletInfo.getRequest().setAttribute("pageLang",smgr.getPageLocale().getLanguage());
+            	servletInfo.getRequest().setAttribute("experiment",smgr.getExperiment());
                 servletInfo.getRequest().setAttribute("sessionId",smgr.getSessionNum());
                 servletInfo.getRequest().setAttribute("eventCounter",smgr.getEventCounter());
                 servletInfo.getRequest().setAttribute("elapsedTime",((GetQuickAuthProblemSkeletonEvent) e).getElapsedTime());

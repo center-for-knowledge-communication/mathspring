@@ -13,6 +13,7 @@
 // Frank 03-01-21 Issue #399 and #400 remove Flash message from problem window
 // Kartik 04-22-21 Issue #390 Added session clock functionality
 // Frank	06-29-21 Added gaze functionality
+// Frank	08-22-24	Issue # 781R7	Use pageLang, pageLanIndex and experiment in multi-lingual algorithms
 
 ResourceBundle versions = null; 
 try {
@@ -29,6 +30,9 @@ Locale loc2 = request.getLocale();
 
 
 int pageLangIndex = 0;
+String strExperiment = "";
+String pageLang = "en";
+
 
 try {
 	pageLangIndex = (int) request.getAttribute("pageLangIndex");
@@ -38,27 +42,26 @@ catch (Exception e) {
 	 pageLangIndex = 0;
 }
 
-String pageLang = (String) request.getAttribute("pageLang");
+try {
+	strExperiment = (String) request.getAttribute("experiment");
+}
+catch (Exception e) {
+	 System.out.println("experiment " + e.getMessage());
+}
+
+try {
+	pageLang = (String) request.getAttribute("pageLang");
+}
+catch (Exception e) {
+	 System.out.println("pageLang " + e.getMessage());
+	 pageLang = "en";
+}
+
+
 
 String prob_lang = "en";
 int probLangIndex = 0;
 prob_lang = "en";
-
-/*
-int testProbLangIndex = (int) request.getAttribute("probLangIndex");
-
-if (testProbLangIndex == null) {
-	System.out.println("Missing request param: probLangIndex ");
-}
-else {
-	if (probLangIndex > 0) {
-		prob_lang = "es";
-	}
-	else {
-		prob_lang = "en";
-	}
-}
-*/		
 
 String lang = loc.getLanguage();
 String country = loc.getCountry();
@@ -104,29 +107,39 @@ String alt_example_problem_play_hints = "";
 
 
 try {
-	if (pageLangIndex == 0) {
-		if (lang.equals("en")) {
-			lang = "en";
-			loc1 = new Locale("en","US");	
-			loc2 = new Locale("es","US");	
-		}
-		else {
-			lang = "es";
-			loc1 = new Locale("es","US");	
-			loc2 = new Locale("en","US");		
-		}
+
+	if (strExperiment.indexOf("multi-lingual") < 0) {		
+		loc1 = new Locale(pageLang,"US");	
+		loc2 = new Locale(pageLang,"US");			
+
 	}
 	else {
-		if (lang.equals("en")) {
-			lang = "es";
-			loc1 = new Locale("es","US");	
-			loc2 = new Locale("en","US");	
+		if (pageLangIndex == 0) {
+			if (pageLang.equals("en")) {
+				pageLang = "en";
+				loc1 = new Locale("en","US");	
+				loc2 = new Locale("es","US");	
+			}
+			else {
+				pageLang = "es";
+				loc1 = new Locale("es","US");	
+				loc2 = new Locale("en","US");		
+			}
 		}
 		else {
-			lang = "en";
-			loc1 = new Locale("en","US");	
-			loc2 = new Locale("es","US");		
-		}	
+			if (pageLangIndex == 1) {
+				if (pageLang.equals("en")) {
+					pageLang = "es";
+					loc1 = new Locale("es","US");	
+					loc2 = new Locale("en","US");	
+				}
+				else {
+					pageLang = "en";
+					loc1 = new Locale("en","US");	
+					loc2 = new Locale("es","US");		
+				}	
+			}
+		}
 	}
 }
 catch (Exception e) {
@@ -151,17 +164,28 @@ catch (Exception e) {
 	System.out.println(e.getMessage());
 }
 
-if (lang.equals("en")) {
-	rb = rb1;
+
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	if (pageLang.equals("en")) {
+		rb = rb1;
+	}
+	else {
+		rb = rb2;	
+	}
 }
 else {
-	rb = rb2;	
+	if (pageLang.equals("es")) {
+		rb = rb1;
+	}
+	else {
+		rb = rb2;	
+	}
 }
 
 
 	
 
-if ( (pageLangIndex == 0) && (lang.equals("en")) || ((pageLangIndex == 1) && (!(lang.equals("en")))) ) {
+if ( (pageLangIndex == 0) && (pageLang.equals("en")) || ((pageLangIndex == 1) && (!(pageLang.equals("en"))))  || (pageLangIndex == -1) && (pageLang.equals("en")) ) {
 	next_problem = rb1.getString("next_problem");
 	translate_this_problem = rb1.getString("translate_this_problem");
 	no_translation = rb1.getString("no_translation");
@@ -267,7 +291,7 @@ try {
 catch (Exception e) {
 	System.out.println(e.getMessage());
 }
-
+ 
 step_by_step_solution = prob_rb1.getString("step_by_step_solution");
 submit_answer = prob_rb1.getString("submit_answer");
 example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");

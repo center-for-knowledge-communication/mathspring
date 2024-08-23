@@ -8,6 +8,7 @@
 * Frank 01-16-21 Issue #378R2 move correct answers element to top
 * Frank 02-17-21 Issue #383R2 get context for buildProblems.js
 * Boming 08-30-21 Issue #421 Circle answer before submission
+* Frank	08-22-24	Issue # 781R7	Use pageLang, pageLanIndex and experiment in multi-lingual algorithms
 */
 ResourceBundle versions = null; 
 try {
@@ -19,7 +20,7 @@ catch (Exception e) {
 }
 
 int pageLangIndex = 0;
-
+String pageLang = "en";
 try {
 	pageLangIndex = (int) request.getAttribute("pageLangIndex");
 }
@@ -28,8 +29,14 @@ catch (Exception e) {
 	 pageLangIndex = 0;
 }
 
+try {
+	pageLang = (String) request.getAttribute("pageLang");
+}
+catch (Exception e) {
+	 System.out.println("pageLang " + e.getMessage());
+	 pageLang = "en";
+}
 
-String pageLang = (String) request.getAttribute("pageLang");
 
 Locale loc = request.getLocale();
 

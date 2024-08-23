@@ -7,7 +7,7 @@
  * Frank 05-18-2020 issue #117 restrict thumbnail sixe to 500px x 500px
  * Frank 08-20-2020 issue $194 fix link to Practice Area
 *  Frank	11-27-22	Merge jchart.js inline and apply multi-lingual algorithms
-
+* Frank	08-22-24	Issue # 781R7	Use pageLang, pageLanIndex and experiment in multi-lingual algorithms
 */
 
 Locale loc = request.getLocale(); 
@@ -23,21 +23,64 @@ String country = loc.getCountry();
 System.out.println("locale set to:" + lang + "-" + country );	
 
 int pageLangIndex = 0;
+String strExperiment = "";
+String pageLang = "";
 
 try {
 	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+}
+catch (Exception e) {
+	 System.out.println("pageLangIndex " + e.getMessage());
+	 pageLangIndex = 0;
+}
 
-	if (pageLangIndex == 0) {
-		if (lang.equals("en")) {
-			loc1 = new Locale("en","US");	
-			loc2 = new Locale("es","US");	
-		}
-		else {
-			loc1 = new Locale("es","US");	
-			loc2 = new Locale("en","US");		
-		}
+try {
+	strExperiment = (String) request.getAttribute("experiment");
+}
+catch (Exception e) {
+	 System.out.println("experiment " + e.getMessage());
+	 strExperiment = "";
+}
+
+try {
+	pageLang = (String) request.getAttribute("pageLang");
+}
+catch (Exception e) {
+	 System.out.println("pageLang " + e.getMessage());
+	 pageLang = "en";
+}
+
+
+
+	
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	pageLangIndex = -1;
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
 	}
 	else {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+
+}
+else {
+	pageLangIndex = 0;		
+}	
+
+if (pageLangIndex == 0) {
+	if (lang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
+	}
+	else {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
+else {
+	if (pageLangIndex == 1) {
 		if (lang.equals("en")) {
 			loc1 = new Locale("es","US");	
 			loc2 = new Locale("en","US");	
@@ -45,14 +88,14 @@ try {
 		else {
 			loc1 = new Locale("en","US");	
 			loc2 = new Locale("es","US");		
-		}	
+		}
 	}
+	else {
+		loc1 = new Locale(pageLang,"US");	
+		loc2 = new Locale(pageLang,"US");			
+	}
+}
 
-}
-catch (Exception e) {
-	 System.out.println("pageLangIndex " + e.getMessage());
-	 pageLangIndex = 0;
-}
 
 ResourceBundle versions = null; 
 try {

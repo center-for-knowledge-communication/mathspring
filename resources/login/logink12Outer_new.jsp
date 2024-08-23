@@ -1,6 +1,7 @@
 <%--
   Frank	09-01-20	Issue #230 and IDs to form fields to allow initialization
   Frank	08-03-21	Added suppport for worksheet location and class message
+  Frank	08-22-24	Issue # 781R7 added language and gender selection
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -85,6 +86,8 @@ catch (Exception e) {
         $(document).ready(function() {
         	
         	var inner = "${innerjsp}";
+
+        	console.log("inner = " + inner);
         	if (inner.indexOf('studentName_new.jsp?') >= 0) {
         		var urlSplitter = inner.split("?");
         		if (urlSplitter[1].indexOf("&") >= 0) {
@@ -97,6 +100,24 @@ catch (Exception e) {
 		           	if (!(lnameArr[1] == "none")) {
     		       		document.getElementById("lini").value = lnameArr[1];
         		   	}
+        			var languageArr = paramListArr[2].split("=");
+		           	if (languageArr[1] == "none") {
+		           		console.log("languageDiv=none");
+		           		document.getElementById("languageDiv").style.display = "none";
+        		   	}
+		           	else {
+		           		console.log("languageDiv=" + languageArr[1]);
+		           		document.getElementById("languageDiv").style.display = "block";
+		           	}
+        			var genderArr = paramListArr[3].split("=");
+		           	if (genderArr[1] == "none") {
+		           		console.log("genderDiv=none");
+		           		document.getElementById("genderDiv").style.display = "none";
+        		   	}
+		           	else {
+		           		console.log("genderDiv=" + genderArr[1]);
+		           		document.getElementById("genderDiv").style.display = "block";
+		           	}
         		}
         	}
         	

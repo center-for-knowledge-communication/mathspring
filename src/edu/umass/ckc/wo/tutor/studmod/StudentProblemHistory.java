@@ -24,6 +24,7 @@ import java.util.*;
  * Note: A problem shown to the student more than once has multiple entries.   It is stored with the most recent entry on the end of the list.
  * 
  * Kartik 03-01-21	issue #286 Mastery Update is Incorrect, goes down to 0.1 due to incorrect topicId. Fixed topicId retrieval. 
+ * Frank  08-22-24	Issue 781R7 - set begin effort to SKIP - will be overwritten if student revisits
  */
 public class StudentProblemHistory {
 
@@ -49,6 +50,7 @@ public class StudentProblemHistory {
     public StudentProblemData beginProblem (SessionManager smgr, BeginProblemEvent e) throws SQLException {
         StudentState state = smgr.getStudentState();
         long now = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis() + 5000;
         // if student forced a problem + topic we log that topic, o/w we use the topic that the student is actually in
         int topicId = (state.getStudentSelectedTopic() != -1) ? state.getStudentSelectedTopic() : state.getCurTopic();
         // in some situations (e.g. student comes into tutor without being in a topic) we won't have a legal topic.  Thus
@@ -74,7 +76,7 @@ public class StudentProblemHistory {
 
         DbStudentProblemHistory.beginProblem(smgr.getConnection(), e.getSessionId(), smgr.getStudentId(), state.getCurProblem(), topicId,
             now, timeInSessionSec, timeInTutorMin, state.getCurProblemMode(), params, smgr.getCollaboratingWith(),
-                p.getDifficulty());
+                p.getDifficulty(), endTime, "SKIP");
 
         curProb = new StudentProblemData(state.getCurProblem(),state.getCurTopic(),e.getSessionId(),
                 now,timeInSessionSec, timeInTutorMin,state.getCurProblemMode());

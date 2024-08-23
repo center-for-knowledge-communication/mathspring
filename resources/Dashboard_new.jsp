@@ -8,10 +8,13 @@
 /**
 * Kartik 04-22-21 Issue #390 Added session clock functionality
 * Frank	11-27-22	Merge jchart_new.js inline and apply multi-lingual algorithms
+* Frank	08-22-24	Issue # 781R7 Use pageLang, pageLanIndex and experiment in multi-lingual algorithms
 
 */
 
 Locale loc = request.getLocale(); 
+Locale loc1 = request.getLocale(); 
+Locale loc2 = request.getLocale();
 
 ResourceBundle rb = null;
 
@@ -23,61 +26,74 @@ System.out.println("Browser locale set to:" + lang + "-" + country );
 
 int pageLangIndex = 0;
 String strExperiment = "";
+String pageLang = "";
 
 try {
-	strExperiment = (String) request.getAttribute("experiment");
-	
-	if (strExperiment.indexOf("multi-lingual") < 0) {
-		pageLangIndex = 0;
-	}
-	else {
-		pageLangIndex = (int) request.getAttribute("pageLangIndex");
-	}
-	
-	if (pageLangIndex == 0) {
-		if (lang.equals("en")) {
-			try {
-				rb = ResourceBundle.getBundle("MathSpring", new Locale("en","US"));
-			}
-			catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		}
-		else {
-			lang = "es";
-			try {
-				rb = ResourceBundle.getBundle("MathSpring",new Locale("es","US"));
-			}
-			catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		}
-	}
-	else {
-		if (lang.equals("en")) {
-			lang = "es";
-			try {
-				rb = ResourceBundle.getBundle("MathSpring", new Locale("es","US"));
-			}
-			catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		}
-		else {
-			try {
-				rb = ResourceBundle.getBundle("MathSpring", new Locale("en","US"));
-			}
-			catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		}	
-	}
-
+	pageLangIndex = (int) request.getAttribute("pageLangIndex");
 }
 catch (Exception e) {
 	 System.out.println("pageLangIndex " + e.getMessage());
 	 pageLangIndex = 0;
 }
+
+try {
+	strExperiment = (String) request.getAttribute("experiment");
+}
+catch (Exception e) {
+	 System.out.println("experiment " + e.getMessage());
+}
+
+try {
+	pageLang = (String) request.getAttribute("pageLang");
+}
+catch (Exception e) {
+	 System.out.println("pageLang " + e.getMessage());
+	 pageLang = "en";
+}
+
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	pageLangIndex = -1;
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
+	}
+	else {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
+else {
+	pageLangIndex = 0;
+}	
+
+if (pageLangIndex == 0) {
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
+	}
+	else {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
+else {
+	if (pageLangIndex == 1) {
+		if (pageLang.equals("en")) {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");	
+		}
+		else {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");		
+		}
+	}
+	else {
+		loc1 = new Locale(pageLang,"US");	
+		loc2 = new Locale(pageLang,"US");			
+	}	
+}	
+		
+
 
 ResourceBundle versions = null; 
 try {
@@ -89,9 +105,6 @@ catch (Exception e) {
 	 System.out.println("versions bundle ERROR");	 
 }
 
-
-	
-/*
 ResourceBundle rb1 = null;
 try {
 	rb1 = ResourceBundle.getBundle("MathSpring",loc1);
@@ -101,39 +114,32 @@ catch (Exception e) {
 }
 ResourceBundle rb2 = null;
 try {
-	rb2 = ResourceBundle.getBundle("MathSpring",testloc);
+	rb2 = ResourceBundle.getBundle("MathSpring",loc2);
 }
 catch (Exception e) {
-	
 	System.out.println(e.getMessage());
 }
 
-if (lang.equals("en")) {
-	try {
-		rb = ResourceBundle.getBundle("MathSpring",loc1);
+if (strExperiment.indexOf("multi-lingual") < 0) {
+	if (pageLang.equals("en")) {
+		rb = rb1;
 	}
-	catch (Exception e) {
-		System.out.println(e.getMessage());
+	else {
+		rb = rb2;	
 	}
 }
 else {
-	try {
-		rb = ResourceBundle.getBundle("MathSpring",loc2);
+	if (pageLang.equals("en")) {
+		rb = rb1;
 	}
-	catch (Exception e) {
-		
-		System.out.println(e.getMessage());
+	else {
+		rb = rb2;	
 	}
 }
-*/
-
-
-
 
 %>
 
-
-
+	
 
 
 

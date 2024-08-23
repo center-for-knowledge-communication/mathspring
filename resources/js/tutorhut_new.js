@@ -9,7 +9,7 @@
 // Kartik 04-22-21 Issue #390 Removed previous display of current time in the problems screen
 // Frank	07-03-21	v1..0.1 processGazeWandering ignore empty reposnse messages
 // Frank	10-18-21	Fix Example window going off screen when window is less than 768 in height
-
+// Frank 08/22/24	Issue # 781R7 fix example container pageLangIndex
 var globals;
 var sysGlobals;
 var transients;
@@ -1567,7 +1567,7 @@ function clickHandling () {
             $(EXAMPLE_CONTAINER_DIV_ID).css('overflow', 'scroll');
             var id_exists = document.getElementById('play_button');
             if (id_exists)  {
-                if (pageLangIndex == 0) {
+                if (pageLangIndex <= 0) {
                 	$("#play_button").text(example_problem_play_hints);
                 	//document.getElementById('pulsate_play_button').text = example_problem_play_hints;
             	}

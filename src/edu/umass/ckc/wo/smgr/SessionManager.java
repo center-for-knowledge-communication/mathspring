@@ -45,6 +45,7 @@ import java.util.ResourceBundle;
  * Frank	10-07-20  	Issue #261 change problem header
  * Frank	06-26-21	Added gaze detection support
  * Frank	01-21-22	Issue #610 - Save session  locale in DB for use by interventions 
+ * Frank	08-22-24	ISSUE #781r7 - Fix session pageLangIndex (was reversed)
  */
 
 public class SessionManager {
@@ -252,8 +253,8 @@ public class SessionManager {
     /**
      * Constructor only used when the user is logging in as guest.
      */
-    public SessionManager guestLoginSession(int studId) throws Exception {
-        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), false, new Locale("en","US"));
+    public SessionManager guestLoginSession(int studId, String lang) throws Exception {
+        int newSessId = DbSession.newSession(connection, studId, System.currentTimeMillis(), false, new Locale(lang,"US"));
         timeInSession = 0;
         loginResult = new LoginResult(newSessId, null);
         sessionId = loginResult.getSessId();
@@ -367,10 +368,10 @@ public class SessionManager {
 	    	}
 	        else {
 		        if ((language.startsWith("es")) && (cl.getClassLanguageCode().contains("Spanish"))) {
-		        	this.setPageLangIndex(0);
+		        	this.setPageLangIndex(1);
 		    	}
 		        else {
-		        	this.setPageLangIndex(1);
+		        	this.setPageLangIndex(0);
 		        }
 	        }
         }

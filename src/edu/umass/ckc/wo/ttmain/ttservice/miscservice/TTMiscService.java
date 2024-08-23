@@ -1,5 +1,6 @@
 package edu.umass.ckc.wo.ttmain.ttservice.miscservice;
 
+import java.sql.Connection;
 import java.util.List;
 
 import edu.umass.ckc.wo.ttmain.ttconfiguration.errorCodes.TTCustomException;
@@ -21,7 +22,10 @@ public interface TTMiscService {
 
     public String cohortAdmin(String cohortId, String reportType, String lang, String filter) throws TTCustomException;
 
-    public String getCohortHelp(String helpTopic, String lang, String filter) throws TTCustomException;
+    public String getResearcherHelp(String helpTopic, String lang, String filter) throws TTCustomException;
     
     public String msAdmin(String reportType, String lang, String filter) throws TTCustomException;
+    
+    public String getTopicNamesList(Connection conn, String classId, String filter);
+
 }

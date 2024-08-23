@@ -4,7 +4,7 @@ package edu.umass.ckc.wo.login.interv;
  * 
  * Frank	08-03-21	Issue 150 and 487 Added test for gaze, Worksheet location and class Messages
  * Frank	05-13-23	Issue #763 make LCs selectable by class
- */
+ * Frank    08-22-24    Issue #781R7 - pass along 'experiment' veariable */
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -89,6 +89,7 @@ public class StudentPedagogy extends LoginInterventionSelector {
             li.setUrl(Settings.webContentPath + "LearningCompanion");
             li.setUrl2(Settings.webContentPath2 + "LearningCompanion");
             li.setLCprofile(lcprofile);
+            li.setExperiment(smgr.getExperiment());
         	return li;                    
         }
     }

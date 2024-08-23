@@ -46,6 +46,7 @@ import java.util.Map;
  * Frank	01-21-22	Issue #610 - compute numProblems for inactive topics
  * Frank 	02-04-23    Issue #723 - handle class clustering
  * Frank	05-13-23	Issue #763 make LCs selectable by class
+ * Frank    08-22-24    Issue #781R7 - reject same language choice for primary and alt 
  */
 
 @Service
@@ -88,7 +89,18 @@ public class TTCreateClassAssistServiceImpl implements TTCreateClassAssistServic
 
 
     	try {
-        	// Make sure to check initial fields of create class are validated before proceeding ahead
+    	    if (createForm.getClassLanguage().equals(createForm.getAltLanguage())) {
+                throw new TTCustomException(ErrorCodeMessageConstants.LANGUAGES_MUST_BE_DIFFERENT,loc);    			
+    	    }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new TTCustomException(ErrorCodeMessageConstants.LANGUAGES_MUST_BE_DIFFERENT,loc);
+        }
+
+    	try {
+    		
+    	    // Make sure to check initial fields of create class are validated before proceeding ahead
             int defaultPropGroup = DbClass.getPropGroupWithName(connection.getConnection(), "default");
             int newid = DbClass.insertClass(connection.getConnection(), createForm.getClassName(), createForm.getSchoolName(), createForm.getSchoolYear(), createForm.getTown(), createForm.getGradeSection(), tid,
                     defaultPropGroup, 0, createForm.getClassGrade(),createForm.getClassLanguage(), createForm.getAltLanguage(), createForm.getColor());
