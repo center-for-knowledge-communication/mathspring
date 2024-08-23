@@ -30,6 +30,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  * 
  * Kartik 04-22-21 Issue #390 Added session clock functionality
+ * Frank  08-22-24 Issue #781R7 set pageLang request param from smgr locale
  * 
  */
 public class DashboardHandler {
@@ -91,6 +92,7 @@ public class DashboardHandler {
         
         request.setAttribute("experiment",smgr.getExperiment());
         request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
+        request.setAttribute("pageLang",smgr.getLocale().getLanguage());
         request.setAttribute("studentFirstName", smgr.getStudentModel().getStudentFirstName());
         request.setAttribute("studentLastName", smgr.getStudentModel().getStudentLastName());
         request.setAttribute("teacherName", smgr.getClassTeacher());

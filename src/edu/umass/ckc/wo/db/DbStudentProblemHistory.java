@@ -16,7 +16,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  *
  * Frank	02-01-22	Issue #424 - add new method to update the 'emotionAsked' column in the latest problem history record.
- *
+ * Frank	08-22-24	Issue #781R7 - on insert include endTime and effort
+ * 
  * Methods for accessing the studentProblemHistory table
  *
  *  The assumption for now is that each time a problem is presented, a new row gets inserted in this table.
@@ -96,15 +97,15 @@ public class DbStudentProblemHistory {
      * If this is a return to a problem that was previously unsolved (the only reason for  */
     public static int beginProblem(Connection conn, int sessId, int studId, int probId, int topicId, long startTime,
                                    long timeInSession, long timeInTutor, String mode, String p, int collabWithStudId,
-                                   double probDifficulty) throws SQLException {
+                                   double probDifficulty, long endTime, String effort) throws SQLException {
         ResultSet rs=null;
         PreparedStatement stmt=null;
         try {
 
 
             String q = "insert into " +SPHTBL+
-                    " (problemID, studID, sessionID, topicID, problemBeginTime, timeInTutor, timeInSession, mode,collaboratedWith, probDiff) " +
-                    "values (?,?,?,?,?,?,?,?,?,?)";
+                    " (problemID, studID, sessionID, topicID, problemBeginTime, timeInTutor, timeInSession, mode,collaboratedWith, probDiff, problemEndTime, effort) " +
+                    "values (?,?,?,?,?,?,?,?,?,?,?,?)";
             stmt = conn.prepareStatement(q, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1,probId);
             stmt.setInt(2, studId);
@@ -118,6 +119,9 @@ public class DbStudentProblemHistory {
                 stmt.setInt(9,collabWithStudId);
             else stmt.setNull(9,Types.INTEGER);
             stmt.setDouble(10,probDifficulty);
+            stmt.setTimestamp(11, new Timestamp(endTime));
+            stmt.setString(12,effort);
+            
             stmt.execute();
             rs = stmt.getGeneratedKeys();
             rs.next();

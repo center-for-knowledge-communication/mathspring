@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
  * Frank    09-15-20    issue #242 fix test for valid email address 
  * Frank	10-29-21	issue #526 validate user entry fields
  * Frank 	02-04-23    Issue #723 - Added class clusters
+ * Frank    08-22-24    Issue #781R7 ped id to 66 (Isabel) for  Spanish Guest account
  */
 public class UserRegistrationHandler {
     public static final String TEST_DEVELOPER_USER = "testDeveloper";
@@ -393,6 +394,9 @@ public class UserRegistrationHandler {
         // that the class uses.
         int pedId = PedagogyAssigner.assignPedagogy(conn,studId, classId);
         // store the pedagogy id in the student table row for this user.
+        if (className.endsWith("-es")) {
+        	pedId = 66;
+        }
         DbUser.setStudentPedagogy(conn,studId,pedId);
         return studId;
     }

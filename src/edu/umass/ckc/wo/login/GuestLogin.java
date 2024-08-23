@@ -13,13 +13,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
-
+import java.util.Locale;
 /**
  * Created by IntelliJ IDEA.
  * User: david
  * Date: Jul 12, 2012
  * Time: 10:40:55 PM
  * To change this template use File | Settings | File Templates.
+ *  
+ * Frank    08-22-24    Issue #781R7 - setup Spanish user profile
  */
 public class GuestLogin implements LoginServletAction {
 
@@ -28,8 +30,17 @@ public class GuestLogin implements LoginServletAction {
         ServletParams params = servletInfo.getParams();
         HttpServletRequest req = servletInfo.getRequest();
 
-        int studId = UserRegistrationHandler.registerTemporaryUser(conn, edu.umass.ckc.wo.db.DbClass.GUEST_USER_CLASS_NAME, User.UserType.guest);
-        SessionManager smgr = new SessionManager(conn).guestLoginSession(studId);
+        String lang = params.getString("lang");
+        String className = edu.umass.ckc.wo.db.DbClass.GUEST_USER_CLASS_NAME;
+        if (!lang.equals("en")) {
+        	className = className + "-" + lang;
+        }
+        int studId = UserRegistrationHandler.registerTemporaryUser(conn, className, User.UserType.guest);
+
+        
+        java.util.Locale myloc = new java.util.Locale(lang,"US");
+        SessionManager smgr = new SessionManager(conn).guestLoginSession(studId, lang);
+        smgr.setLocale(myloc);
         DbSession.setClientType(conn, smgr.getSessionNum(), params.getString(LoginParams.CLIENT_TYPE));
         LearningCompanion lc = smgr.getLearningCompanion();
         req.setAttribute("sessionId", smgr.getSessionNum());

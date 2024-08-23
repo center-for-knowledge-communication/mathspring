@@ -19,11 +19,14 @@ import java.sql.SQLException;
  * To change this template use File | Settings | File Templates.
  * Frank	09-01-20	Issue #230	Add params for fname & lname to login intervemtion
  * Frank    05-20-21  	Issue #473 crop lname
+ * Frank    08-22-24    Issue #781R7 - handle language preference and gender presentations
  */
 public class StudentName extends LoginInterventionSelector {
 
     private static final String JSP = "studentName.jsp";
     private static final String JSP_NEW = "studentName_new.jsp";
+    private boolean divLanguage=false;
+    private boolean divGender=false;
 
     public StudentName(SessionManager smgr) throws SQLException {
         super(smgr);
@@ -58,6 +61,21 @@ public class StudentName extends LoginInterventionSelector {
             else {
             	studentNameUrl = studentNameUrl + "&lname=none";            	            	
             }
+            String experiment = smgr.getExperiment();
+            if (experiment.indexOf("languageByStudent") == -1) {
+            	studentNameUrl = studentNameUrl + "&languageDiv=none";            	
+            }
+            else {
+            	studentNameUrl = studentNameUrl + "&languageDiv=visible";
+            	divLanguage = true;
+            }
+            if (experiment.indexOf("sameGenderLC") == -1) {
+            	studentNameUrl = studentNameUrl + "&genderDiv=none";
+            }
+            else {
+            	studentNameUrl = studentNameUrl + "&genderDiv=visible";
+            	divGender = true;
+            }
         	return new LoginIntervention(studentNameUrl);                    
         }
     }
@@ -69,9 +87,16 @@ public class StudentName extends LoginInterventionSelector {
         if ((fname.length() > 0) && (lini.length() > 2)) {
         	lini = lini.substring(0, 2);
         }
-        String language = params.getString("optLanguage");
-        String gender = params.getString("optGender");
-
+        
+        // Handle optional fields
+        String language = "";
+        String gender = "";
+       	language = params.getString("optLanguage");
+        if (language.length() <= 0)
+        	language = "English";
+       	gender = params.getString("optGender");
+        if (gender.length() <= 0)
+        	gender = " ";
         
         DbUser.setUserNames(servletInfo.getConn(), smgr.getStudentId(), fname, lini,language,gender);
         smgr.setGender(gender);

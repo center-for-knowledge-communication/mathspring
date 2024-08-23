@@ -5,6 +5,7 @@
   Time: 3:49 PM
   To change this template use File | Settings | File Templates.
   Frank	09-01-20	Issue #230 and IDs to form fields to allow initialization
+  Frank	08-22-24	Issue # 781R7 added language and gender selection
 --%>
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.util.ResourceBundle"%>
@@ -23,6 +24,7 @@ catch (Exception e) {
 %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <div>
     <form method="post" name="login"
           action="${pageContext.request.contextPath}/WoLoginServlet">
@@ -45,8 +47,8 @@ catch (Exception e) {
 	       		</div>
 			</div>
 		</div>
-		<br>
-        <div id="languageDiv">	       
+		<br>		
+        <div id="languageDiv" hidden>	       
         	<h3><%= rb.getString("select_student_language")%>:</h3>
 			<div class="row">	
 				<div class="col-md-2">			    
@@ -64,7 +66,7 @@ catch (Exception e) {
 			</div>
 		</div>
 		<br>
-        <div id="genderDiv">	       
+        <div id="genderDiv" hidden>	       
         	<h3><%= rb.getString("select_student_gender")%>:</h3>
 			<div class="row">	
 				<div class="col-md-2">			    
@@ -89,38 +91,6 @@ catch (Exception e) {
 		</div>
 		<br>
 
-        <input class="btn mathspring-btn" type="submit" onclick="return checkValues()" value="<%= rb.getString("submit")%>" />
+        <input class="btn mathspring-btn" type="submit" value="<%= rb.getString("submit")%>" />
     </form>
 </div>
-     	
-<script>
-
-function checkValues() {
-	
-	var result1 = false;
-	var result2 = false;
-	
-    var languages = document.getElementsByName("optLanguage");
-    for (const language of languages) {
-        if (language.checked) {
-            result1 = true;
-            break;
-        }
-    }
-    var genders = document.getElementsByName("optGender");
-    for (const gender of genders) {
-        if (gender.checked) {
-            result2 = true;
-            break;
-        }
-    }
-    	
-    if ((result1 == true) && (result2 == true)) {
-    	return true;
-    }
-    else {
-    	alert("Please answer all questions");
-    	return false;
-    }
-}
-</script>

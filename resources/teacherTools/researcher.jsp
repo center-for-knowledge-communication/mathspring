@@ -6,7 +6,7 @@
 <% 
 /** 
 * Frank 	08-03-21	Initial version 
-
+* Frank		08-22-24	Issue # 781R7
 
 
 I think we are most likely to want to see the last 1,2,3 or 4 weeks (or month), but also "from the start"currentCohortId (or maybe "all semester").
@@ -212,6 +212,34 @@ th, td {
    text-align: center;
 }
 </style>
+<style>
+.popup .popuptext {
+visibility: hidden;
+background-color: #555;
+color: #fff;
+text-align: center;
+border-radius: 6px;
+padding: 8px 0;
+z-index: 1;
+bottom: 125%;
+left: 50%;
+margin-left: 15px;
+}
+.popup .show {
+visibility: visible;
+-webkit-animation: fadeIn 1s;
+animation: fadeIn 1s;
+}
+@-webkit-keyframes fadeIn {
+from {opacity: 0;} 
+to {opacity: 1;}
+}
+@keyframes fadeIn {
+from {opacity: 0;}
+to {opacity:1 ;}
+}
+
+</style>
 
 
 
@@ -400,37 +428,34 @@ function launchMSAdmin() {
 
 
 function launchCohortSlicesHelp() {
-
-	displayHelpPopup('cohort_slices','Weekly Slices');
+	
+	
+	displayTextHelpPopup('cohort_slices','Weekly Slices');
 	
 }
 
 function launchCreateCohortHelp() {
 	
-//		var a_href = '${pageContext.request.contextPath}';
-//		a_href = a_href + "/img/video_help_add_cohort.mp4";
-//		document.getElementById("createCohortHelpLink").href = a_href;
-//		document.getElementById("createCohortHelpLink").click();
-		
-	
-	displayHelpPopup('cohort_admin','Admin Commands');
+
+	displayTextHelpPopup('cohort_admin','Admin Commands');
 }
 
-function displayHelpPopup(helpTopic, helpHdr) {
+
+function displayTextHelpPopup(helpTopic, helpHdr) {
 	
 
-	document.getElementById("cohort_help_hdr").innerHTML = "Cohort Help - " + helpHdr;
-
+	document.getElementById("help_hdr").innerHTML = helpHdr;
+	
 	var helpDivContent = "";
 
 	
     $.ajax({
         type : "POST",
-        url : pgContext+"/tt/tt/getCohortHelp",
+        url : pgContext+"/tt/tt/getResearcherHelp",
         data : {
             helpTopic: helpTopic,
             lang: loc,
-            filter: ''
+            filter: 'text'
         },
         success : function(data) {
         	if (data) {
@@ -445,8 +470,10 @@ function displayHelpPopup(helpTopic, helpHdr) {
             		helpDivContent += "<p>" + jsonData[i].paragraph + "<p>";
             		helpDivContent += "</div";
                 }
-        		document.getElementById("cohortHelpPopupBody").innerHTML = helpDivContent;
-        		$('#cohortHelpModalPopup').modal('show');         			
+                $("#videoHelpLink").hide();
+        		document.getElementById("helpPopupBody").innerHTML = helpDivContent;
+        		$("#helpPopupBody").show();
+        		$('#helpModalPopup').modal('show');         			
 
         	}
         	else {
@@ -455,6 +482,97 @@ function displayHelpPopup(helpTopic, helpHdr) {
         },
         error : function(e) {
         	alert("error");
+            console.log(e);
+        }
+
+    });
+}
+
+function myfunction() { 
+	alert("myfunction");
+	
+	var popup = document.getElementById("myPopup");
+	if (popup.paused) { 
+		popup.paused = false;
+	}
+	else {
+		popup.paused = true;		
+	}
+}
+
+function showVideoHelp(src,type) {
+
+	var popup = document.getElementById("myPopup");
+	popup.setAttribute("src", src);
+	popup.setAttribute("type", type);
+	
+			
+	$("#helpPopupBody").hide();
+	
+	popup.classList.toggle("show");
+
+	popup.play();
+/**
+	if (popup.paused){ 
+	    popup.play(); 
+	    }
+	  else{ 
+	    popup.pause();
+	    }
+*/	 
+	$('#helpModalPopup').modal('show');
+}
+
+function closeVideoHelp() {
+
+	var popup = document.getElementById("myPopup");
+	popup.setAttribute("src", "");
+	popup.setAttribute("type", "");
+			
+	$("#helpPopupBody").hide();
+	
+	popup.classList.toggle("show");
+
+	$('#helpModalPopup').modal('hide');
+}
+
+function displayVideoPopup(helpTopic, helpHdr) {
+
+	document.getElementById("help_hdr").innerHTML = helpHdr;
+	var helpDivContent = "";
+
+	
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getResearcherHelp",
+        data : {
+            helpTopic: helpTopic,
+            lang: loc,
+            filter: 'video'
+        },
+        success : function(data) {
+        	if (data) {
+
+            	var jsonData = $.parseJSON(data);	
+               	
+            	
+//            	var src = "/ms/img/video_help_add_cohort.mp4";
+//            	var type = "video/mp4";
+            	var srcVideo = jsonData[0].src;
+            	var typeVideo = "video/mp4";
+            	showVideoHelp(srcVideo,typeVideo);
+            	//popup.setAttribute("src", "/ms/img/video_help_add_cohort.mp4");
+            	//popup.setAttribute("type", "video/mp4");
+                $("#videoHelpLink").show();
+        		$('#helpModalPopup').modal('show');         			
+
+        	}
+        	else {
+        		alert("error:" + data);
+        	}
+        },
+        error : function(e) {
+        	alert("comm error");
             console.log(e);
         }
 
@@ -5057,14 +5175,14 @@ function updateAllCohortSlices() {
 
   <ul class="nav nav-tabs">
 <!-- <li class="active"><a data-toggle="tab" href="#home" onclick="gotoSettingsPane();">Home</a></li>  -->   
-	<li><a id="MSAdminLink" onclick="launchMSAdmin();">MS Admin Tools</a></li>
+	<li><a id="MSAdminLink" onclick="launchMSAdmin();">Admin Workbench</a></li>
     <li><a data-toggle="tab" id="settings"  href="#Settings" onclick="gotoSettingsPane();"><%= rwrb.getString("settings") %></a></li>
     <li><a data-toggle="tab" id="li-population" class="li-disabled"   href="#Population"><%= rwrb.getString("status_and_population") %></a></li>
     <li><a data-toggle="tab" id="li-ttActivityReports" class="li-disabled"  href="#ttActivityReports"><%= rwrb.getString("teacher_tools_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomTrends" class="li-disabled"  href="#classroomTrends"><%= rwrb.getString("classroom_activities") %></a></li>
     <li><a data-toggle="tab" id="li-classroomDashboard"  href="#classroomDashboard"><%= rwrb.getString("classroom_dashboard") %></a></li>
 	<li><a id="reportCardLink" onclick="launchReportCard();"><%= rwrb.getString("class_report_card") %></a></li>
-    <li><a data-toggle="tab"  href="#CohortAdminTools">Cohort <%= rwrb.getString("admin_tools") %></a></li>
+    <li><a data-toggle="tab"  href="#CohortAdminTools"><%= rwrb.getString("cohort_tools") %></a></li>
     <li><a data-toggle="tab"  href="#Help">Help</a></li>
     <li>
         <a id="logout_selector" href="<c:out value="${pageContext.request.contextPath}"/>/tt/tt/logout"><i
@@ -5889,7 +6007,7 @@ function updateAllCohortSlices() {
 				</div>
 			</div>			
 	        <h2 class="page-header">
-	            <%= rwrb.getString("admin_tools") %>
+	            <%= rwrb.getString("cohort_tools") %>
 	        </h2>
 	
 	        <div id="admin-container" class="container-fluid">
@@ -6041,7 +6159,7 @@ function updateAllCohortSlices() {
 	                        <div class="panel-heading">
 	                            <h4 class="panel-title">
 	                                <a id="hrlp_one" class="accordion-toggle" data-toggle="collapse" data-parent="#helpCommands" href="#help1">
-	                                    Display Cohort Help
+	                                    Display MS Cohort Help Pages
 	                                </a>
 	                               	<button type="button" class="close" onclick="$('.collapseHelp').collapse('hide')">&times;</button>                             
 	                            </h4>
@@ -6056,9 +6174,10 @@ function updateAllCohortSlices() {
 										<div class="dropdown">
 										  <button class="btn btn-basic dropdown-toggle" type="button" data-toggle="dropdown">Select Topic
 										  <span class="caret"></span></button>
-										  <ul class="dropdown-menu">
-										    <li onclick="launchCreateCohortHelp();"><a id="createCohortHelpLink"></a>Creating a New Cohort</li>
-										    <li onclick="launchCohortSlicesHelp();"><a id="cohortSlicesHelpLink"></a>About Cohort Slices</li>
+										  <ul class="dropdown-menu">		
+											<li><a href="#" onclick="launchCreateCohortHelp();">Creating a New Cohort</a></li>							  
+										    <li><a href="#" onclick="launchCohortSlicesHelp();">About Cohort Slices</a></li>								  
+										    <li><a href="#" onclick="displayVideoPopup('createCohort','Create a cohort');">Create a cohort</a></li>	
 										  </ul>
 										</div>
 									</div>
@@ -6100,64 +6219,6 @@ function updateAllCohortSlices() {
     <footer class="footer">
         &copy; <%= rb.getString("researcher_copyright")%>
     </footer>
-
-<div id="showSessionProblemsModalPopup" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-            	<h3><div id="table4b_session_hdr"></div></h3>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-	           	<div id="table_4b_session_panel" class="col-md-12" style="width:900px; height:400px;overflow-x: auto;overflow-y: auto;">
-	           	   <table align = "center"
-	       				id="table4b_session" border="1">
-					</table>
-	           	</div>           	
-            </div>
-            <br>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<div id="updateProblemStatusModalPopup" class="modal fade" role="dialog" style="display: none;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-            	<h3><div id="table4b_update_hdr"></div></h3>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-				<div>
-					<label for="message-text" ><%= rb.getString("message")%>:</label>
-					<br>
-					<textarea id="message-text" name="message" style="width:500px; height:200px;overflow-x: auto;overflow-y: auto;"></textarea>
-				</div>
-				<div class="form-group">
-					<label class="radio-inline"><input id="radio4bReported"  value="Reported" type="radio" name="optRadio4bContent">Reported</label>
-					<label class="radio-inline"><input id="radio4bBroken"  value="Broken" type="radio" name="optRadio4bContent">Broken</label>
-					<label class="radio-inline"><input id="radio4bFixed"   value="Fixed" type="radio" name="optRadio4bContent">Fixed</label>
-					<label class="radio-inline"><input id="radio4bIgnore"  value="Ignore" type="radio" name="optRadio4bContent">Ignore</label>
-				</div>                            
-				<div> 
-					<input type="hidden" id="hiddentEventId">
-					<input type="hidden" id="hiddenHistoryId">
-				</div>
-            </div>
-            <div class="modal-footer">
-				<button type="button" class="btn btn-success" onclick="updateProblemStatusSubmit();"><%= rb.getString("submit")%></button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
-            </div>
-        </div>
-
-    </div>
-</div>
 
 <div id="addCohortFormModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
@@ -6229,18 +6290,24 @@ function updateAllCohortSlices() {
 
 
 
-<div id="cohortHelpModalPopup" class="modal fade" role="dialog" style="display: none;">
+<div id="helpModalPopup" class="modal fade" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-            	<h3><div id="cohort_help_hdr" style="center-text"></div></h3>
+            	<h3><div id="help_hdr" style="center-text"></div></h3>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div id="cohortHelpPopupBody"class="modal-body">
+            <div id="helpPopupBody"class="modal-body">
+            </div>
+            <div id="videoHelpLink" class="modal-body">
+	  			<div class="popup" onclick="myFunction()">
+    				<video width="750px" height="400px" controls class="popuptext" id="myPopup">
+    				</video>
+    			</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal"><%= rb.getString("close") %></button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="closeVideoHelp();"><%= rb.getString("close") %></button>
             </div>
 
         </div>

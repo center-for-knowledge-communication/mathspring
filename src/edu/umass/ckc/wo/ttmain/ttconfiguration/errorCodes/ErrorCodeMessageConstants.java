@@ -26,4 +26,6 @@ public class ErrorCodeMessageConstants {
     public static final String ERROR_OCCURED_ON_AUTHENTICATE = "1011";
     public static final String ERROR_OCCURED_ON_LOADING_TEACHER_DATA = "1012";
 
+    public static final String LANGUAGES_MUST_BE_DIFFERENT = "1013";
+
 }

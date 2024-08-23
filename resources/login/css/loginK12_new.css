@@ -72,6 +72,18 @@
     border-color: #ed5060;
 }
 
+.guest2-try-out-btn,
+.guest2-try-out-btn:active,
+.gues2t-try-out-btn:focus {
+    background: #99ccff;
+    border-color: #99ccff;
+}
+
+.guest2-try-out-btn:hover {
+    background: #66ccff;
+    border-color: #66ccff;
+}
+
 .sign-in-btn,
 .sign-in-btn:active,
 .sign-in-btn:focus {

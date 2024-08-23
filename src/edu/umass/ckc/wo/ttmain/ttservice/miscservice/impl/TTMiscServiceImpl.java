@@ -1183,6 +1183,200 @@ public class TTMiscServiceImpl implements TTMiscService {
         return resultArr.toString();    	
     }
 
+    public String getMathProblemsEffortDashboard(Connection conn, String filter) throws SQLException {
+        
+
+    	String filterSplitter[] = filter.split(",");
+
+    	String probId = filterSplitter[0];
+    	String topicId = filterSplitter[1];
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int currentActionTotal = 0;
+        try {
+        	String q = "select count(effort) as theCount, effort from studentproblemhistory where problemID = ? and topicID = ? and not effort = '' group by effort order by theCount desc";
+
+/**        	
+        	16	ATT
+        	45	GIVEUP
+        	6	GUESS
+        	16	SHINT
+        	48	SKIP
+        	66	SOF
+*/        	
+            //String q = "SELECT tcs.classId AS classId, tcs.className as className, sum(tcs.SOF) as SOF, sum(tcs.ATT) as ATT, sum(tcs.SHINT) as SHINT, sum(tcs.SHELP) as SHELP, sum(tcs.GUESS) as GUESS, sum(tcs.NOTR) as NOTR, sum(tcs.SKIP) as SKIP,sum(tcs.GIVEUP) as GIVEUP, sum(tcs.NODATA) as NODATA FROM teacher_class_slices as tcs, class_map_cohorts as cmc where tcs.classId = cmc.classid and tcs.cohortId = ? and cmc.researchcohortid = ? and tcs.classId = ? GROUP BY classId";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1, probId);
+            stmt.setString(2, topicId);
+            
+            rs = stmt.executeQuery();
+        	JSONArray bodyArr = new JSONArray();
+        	JSONArray resultArr = new JSONArray();        	
+        	JSONObject resultJson = new JSONObject(); 
+        	while (rs.next()) {
+            	String effort = rs.getString("effort");
+            	int count = rs.getInt("theCount");
+           		resultJson.put(rs.getString("effort"), rs.getInt("theCount"));
+            }            
+            stmt.close();
+            rs.close();
+            
+        	bodyArr.add(resultJson);
+        	resultArr.add(bodyArr);
+            
+            return resultArr.toString();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+    public String getMathProblemsHistoryDashboard(Connection conn, String filter) throws SQLException {
+        
+   	
+    	String filterSplitter[] = filter.split("~");
+
+    	String probId = filterSplitter[2];
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+        JSONArray resultArr = new JSONArray(); 
+        
+        try {
+//        	SELECT distinct probDiff FROM studentproblemhistory h, student 
+//        	WHERE student.trialUser=0 and h.problemId = 2452 and h.mode != 'demo' and h.effort != '' and student.id = h.studId and problemBegintime > '2022-09-26' order by problemBeginTime;
+
+        	
+        	String q = "select h.* from studentproblemhistory h, student where student.trialUser=0 and h.problemId = ? and h.mode != 'demo' and h.effort != '' and student.id = h.studId and problemBegintime > '2022-09-26' order by student.id, h.id";
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1, probId);
+            rs = stmt.executeQuery();
+        	
+        	JSONObject resultJson = new JSONObject(); 
+        	while (rs.next()) {
+            	resultJson = new JSONObject(); 
+           		resultJson.put("timeToSolve", String.valueOf(rs.getInt("timeToSolve")));
+           		resultJson.put("numHints", String.valueOf(rs.getInt("numHints")));
+           		resultJson.put("numAttemptsToSolve", String.valueOf(rs.getInt("numAttemptsToSolve")));
+           		resultJson.put("videoSeen", String.valueOf(rs.getInt("videoSeen")));
+           		resultJson.put("isSolved", String.valueOf(rs.getInt("isSolved")));
+           		resultJson.put("timeToFirstAttempt", String.valueOf(rs.getInt("timeToFirstAttempt")));
+           		resultJson.put("effort", rs.getString("effort"));
+           		resultJson.put("probDiff", String.valueOf(rs.getDouble("probDiff")));
+           		resultArr.add(resultJson);
+            }            
+            stmt.close();
+            rs.close();
+            return resultArr.toString();                        
+        }
+    	catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        	return e.getMessage();    	
+        } finally {
+            if (stmt != null)
+                stmt.close();
+            if (rs != null)
+                rs.close();
+        }
+    }
+
+
+    public String getTopicNamesList(Connection conn, String filter) {
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();            
+    	String strTopics = "";
+    	
+    	try {
+    		int count = 0;
+    		ResultSet rs1 = null;
+    		PreparedStatement stmt1 = null;
+    		String q1 = "select id,active from problemgroup where active = 1;";
+
+    		stmt1 = conn.prepareStatement(q1);
+    		rs1 = stmt1.executeQuery();
+            while (rs1.next()) {
+            	
+            	try {
+            		int topic = rs1.getInt("id");
+                	String q = "select json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = ?))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = ?))) as summary from problemgroup_description_multi_language pgl where pgl.pg_pg_grp_id = ?;";
+
+                    stmt = conn.prepareStatement(q);
+                    stmt.setString(1, filter);
+                    stmt.setString(2, filter);
+                    stmt.setInt(3, topic);
+                    rs = stmt.executeQuery();
+
+                	JSONObject resultJson = new JSONObject();
+                    while (rs.next()) {
+                    	resultJson = new JSONObject();
+                		resultJson.put("name", rs.getString("summary"));
+                		resultJson.put("description", rs.getString("description"));
+                		resultJson.put("topicId", String.valueOf(topic));
+                    	resultArr.add(resultJson);
+                    }
+                    stmt.close();
+                    rs.close();
+                }
+                catch (Exception e) {
+                	System.out.println(e.getMessage());        
+                }
+
+            }
+            stmt1.close();
+            rs1.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        }
+    	System.out.println(strTopics);        
+    	
+    	
+        return resultArr.toString();
+    }    
+    
+    public String getProblemNamesList(Connection conn, String filter) {
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();            
+    	int topicId = Integer.valueOf(filter);
+    	
+    	try {
+    		String q1 = "";
+    		if ( topicId > 0) {
+        		q1 = "select p.id, p.name, p.nickname, p.status from problem as p, problemgroup as pg, probprobgroup as ppg where pg.active = 1 and pg.id = ? and ppg.pgroupid = ? and p.id = ppg.probId and p.status = 'ready' order by p.name asc;";
+        		stmt = conn.prepareStatement(q1);
+                stmt.setInt(1, topicId);    		
+                stmt.setInt(2, topicId);    		
+    		}
+    		else {
+        		q1 = "select id,name,status from problem where status = 'ready' order by p.id asc;";    			
+        		stmt = conn.prepareStatement(q1);
+    		}
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	JSONObject resultJson = new JSONObject();
+            	int problemId = rs.getInt(1);
+        		resultJson.put("problemId", String.valueOf(problemId));
+        		resultJson.put("name", rs.getString(2));
+        		resultJson.put("nickname", rs.getString(3));
+            	resultArr.add(resultJson);
+            }
+            stmt.close();
+            rs.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        }
+
+        return resultArr.toString();
+    }    
+    
     
     public String teacherClassCount(Connection conn, int cohortId) throws SQLException {
         ResultSet rs = null;
@@ -1979,7 +2173,19 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "getClassProblemsEffortDashboard":
 				result = getClassProblemsEffortDashboard(conn, Integer.valueOf(cohortId), filter);  
 				break;
-    		case "getClassProblemsSolvedDashboard":
+    		case "getTopicNamesList":
+				result = getTopicNamesList(conn, filter);  
+				break;
+    		case "getProblemNamesList":
+				result = getProblemNamesList(conn, filter);  
+				break;
+    		case "getMathProblemsEffortDashboard":
+				result = getMathProblemsEffortDashboard(conn, filter);  
+				break;
+    		case "getMathProblemsHistoryDashboard":
+				result = getMathProblemsHistoryDashboard(conn, filter);  
+				break;				
+			case "getClassProblemsSolvedDashboard":
     			result = getClassProblemsSolvedDashboard(conn, Integer.valueOf(cohortId), filter);
     			break;
     		case "getClassProblemsEffortRpt":
@@ -2049,48 +2255,61 @@ public class TTMiscServiceImpl implements TTMiscService {
     	return result;
     };
 
-    public String getCohortHelp(String helpTopic, String lang, String filter) throws TTCustomException {
-    	
-    	
-    	ArrayList<String> helpMsgs = new ArrayList<String>();
-    	String helpMsg = null;
+    public String getResearcherHelp(String helpTopic, String lang, String filter) throws TTCustomException {
+
         JSONObject resultJson = new JSONObject();
     	JSONArray resultArr = new JSONArray();
-    	int i=1;
-    	boolean done = false;
-    	
-    	do {
-    		String key = helpTopic + "_" + String.valueOf(i);
-    		try {
-    			helpMsg = rhrb.getString(key);
-    			helpMsgs.add(helpMsg);
-    			i++;
-    		}
-    		catch (Exception e) {
-    			done = true;
-    		}
-    	
-    	}
-    	while (!done);
-    	
-    	
-    	if (helpMsgs.size() > 0) {
-            for (int j = 0; j < helpMsgs.size(); j++) {
-                System.out.println(helpMsgs.get(j));
-    			resultJson = new JSONObject();
-    			String rawMsg = helpMsgs.get(j);
-    			String splitter[] = rawMsg.split("~");
-        		resultJson.put("label", splitter[0]);
-                resultJson.put("paragraph", splitter[1]);
-                resultArr.add(resultJson);       	            
-            }
+
+    	if (filter.equals("text")) {
+	    	ArrayList<String> helpMsgs = new ArrayList<String>();
+	    	String helpMsg = null;
+	    	int i=1;
+	    	boolean done = false;
+	    	
+	    	do {
+	    		String key = helpTopic + "_" + String.valueOf(i);
+	    		try {
+	    			helpMsg = rhrb.getString(key);
+	    			helpMsgs.add(helpMsg);
+	    			i++;
+	    		}
+	    		catch (Exception e) {
+	    			done = true;
+	    		}
+	    	
+	    	}
+	    	while (!done);
+	    	
+	    	
+	    	if (helpMsgs.size() > 0) {
+	            for (int j = 0; j < helpMsgs.size(); j++) {
+	                System.out.println(helpMsgs.get(j));
+	    			resultJson = new JSONObject();
+	    			String rawMsg = helpMsgs.get(j);
+	    			String splitter[] = rawMsg.split("~");
+	        		resultJson.put("label", splitter[0]);
+	                resultJson.put("paragraph", splitter[1]);
+	                resultArr.add(resultJson);       	            
+	            }
+	    	}
+	    	else {
+	    		return "No help found";
+	    	}
+	        return resultArr.toString();    	    	
     	}
     	else {
-    		return "No help found";
+    		if (helpTopic.equals("createCohort")) {
+	    		resultJson.put("src", "/ms/img/video_help_add_cohort.mp4");
+	            resultArr.add(resultJson);       	            
+				resultJson = new JSONObject();
+	            resultJson.put("type", "video/mp4");
+	            resultArr.add(resultJson);       	            
+		        return resultArr.toString();
+    		}
+    		else {
+	    		return "No help found";    			
+    		}
     	}
-    	
-        return resultArr.toString();    
-    	
     }
 /*
     public String getCohortHelpold(Connection conn) throws SQLException {
@@ -2138,12 +2357,19 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "adminExperimentClasses":
     			result = adminExperimentClasses(conn, filter);
     			break;
-    		case "chatPrompt":
-    			result = chatPrompt(conn, filter);
-    			break;
-    		case "translatePrompt":
-    			result = translatePrompt(conn, filter);
-    			break;
+//    		case "chatPrompt":
+//    			result = chatPrompt(conn, filter);
+//    			break;
+//    		case "translatePrompt":
+//    			result = translatePrompt(conn, filter);
+//    			break;
+            case "getTopicNamesList":
+                String topicNameList = getTopicNamesList(conn, filter);
+                return topicNameList ;
+                
+            case "getProblemNamesList":
+                String problemNameList = getProblemNamesList(conn, filter);
+                return problemNameList ;
     		default:
     			System.out.println("unrecognized command:" + command);
     			return "unrecognized command:" + command;
@@ -4087,169 +4313,39 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     }
 
+    public String getTopicNamesList(Connection conn, String classId, String filter) {
+    	
+    	ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();            
+
+    	try {
+
+        	String q = "select distinct(probGroupId),json_unquote(json_extract(pgl.pg_lanuage_description, (select concat('$.',language_code) from ms_language where language_name = ?))) as description, json_unquote(json_extract(pgl.pg_language_name, (select concat('$.',language_code) from ms_language where language_name = ?))) as summary,seqPos from classlessonplan,problemgroup_description_multi_language pgl where probGroupId=pgl.pg_pg_grp_id group by probGroupId order by probGroupId;";
+
+            stmt = conn.prepareStatement(q);
+            stmt.setString(1, filter);
+            stmt.setString(2, filter);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+            	JSONObject resultJson = new JSONObject();
+        		resultJson.put("name", rs.getString("summary"));
+        		resultJson.put("description", rs.getString("description"));
+        		int pgid = rs.getInt("probGroupId");
+        		resultJson.put("topicId", String.valueOf(pgid));
+            	resultArr.add(resultJson);
+            }
+            stmt.close();
+            rs.close();
+        }
+        catch (Exception e) {
+        	System.out.println(e.getMessage());        
+        }
+        return resultArr.toString();
+
+    }    
     
-    public String chatPrompt(Connection conn, String filter) throws SQLException {
-	   	
-    	String result = "error";
-    	
-    	
-    	
-    	
-    	result =  "";
-    	
-    	listTokens();
-    	
-    	
-    	
-    	result = prompts(filter);   	
-    	
-    	
-    	return result;
-    	
-    	
-    }
-
-    public String translatePrompt(Connection conn, String filter) throws SQLException {
-	   	
-    	String result = "error";
-    	
-    	
-    	
-    	
-    	result =  "";
-    	
-    	listTokens();
-    	
-    	 
-    	
-    	String command[] = filter.split("~");
-    	
-    	
-    	
-    	result = prompts("translate to " + command[0] + ": '" + command[1] + "'");   	
-    	
-    	
-    	return result;
-    	
-    	
-    }
-
-
-
-
-	public String readLinesAsString(File file) {
-		List<String> returnLines = new LinkedList<String>();
-		String text = "";
-		try {
-			text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())),
-					StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return text;
-	}
-	public List<String> readLines(File file) {
-		List<String> returnLines = new LinkedList<String>();
-		try {
-			String text = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())),
-					StandardCharsets.UTF_8);
-			String[] lines = text.split("\n");
-			for (String line : lines) {
-				returnLines.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return returnLines;
-	}
-	public void writeStringToFile(String line, File file) {
-		try {
-			FileWriter myWriter = null;
-			if (file.exists()) {
-				myWriter = new FileWriter(file, true);//if file exists append to file. Works fine.
-			} else {
-				System.out.println("Could not find the file " + file + ". Creating it again");
-				file.createNewFile();
-				myWriter = new FileWriter(file);
-			}
-			myWriter.write(line);
-			myWriter.close();
-			// System.out.println("Successfully wrote to the file. "+file.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("An error occurred in writing to file " + file + " e=" + e);
-		}
-	}
-
-	public  void listTokens() {
-		try {
-		//This API will fetch the models available.
-			URL url = new URL("https://api.openai.com/v1/models");
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-			con.setRequestProperty("Content-Type", "application/json");
-			con.setRequestProperty("Accept", "application/json");
-		//Make sure you put the right Organization key saved earlier.
-			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
-			con.setDoOutput(true);
-		//Make sure you put the right API Key saved earlier.
-			con.setRequestProperty("Authorization", "Bearer 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");
-			int responseCode = con.getResponseCode();
-			System.out.println("Response Code : " + responseCode);
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			System.out.println(response);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-	public String prompts(String question) {
-		try {
-			URL url = new URL("https://api.openai.com/v1/completions");
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("POST");
-			con.setRequestProperty("Content-Type", "application/json");
-			con.setRequestProperty("Accept", "application/json");
-			//Make sure you put the right Organization key saved earlier.
-			con.setRequestProperty("OpenAI-Organization", "org-DfsvNX4CsgFpH2m6LxFBqFJu");
-			con.setDoOutput(true);
-			//Make sure you put the right API Key saved earlier.
-			con.setRequestProperty("Authorization", "Bearer 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");
-			
-        	JSONObject promptJson = new JSONObject();
-        	promptJson.put("model","text-davinci-003");
-        	promptJson.put("prompt",question);
-        	promptJson.put("max_tokens",1024);
-        	promptJson.put("temperature",0.5);
-        	String jsonInputString = promptJson.toString();
-        	
-			try (OutputStream os = con.getOutputStream()) {
-				byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-				os.write(input, 0, input.length);
-			}
-			int responseCode = con.getResponseCode();
-			System.out.println("Response Code : " + responseCode);
-			BufferedReader in = new BufferedReader(
-					new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			System.out.println(response);
-			String result = response.toString();
-			return result;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			return e.getMessage();
-		}
-	}    
+    
+    
 }

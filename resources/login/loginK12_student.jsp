@@ -5,6 +5,7 @@
 /**
 
  * Frank 01-10-21 Issue #289 new file cloned from loginK12_new.jsp for re-org Welcome.html interface - provides 'student only' login page
+ * Frank 08/22/24 issue #781R7 add Spanish Guest signin
 
  */
 ResourceBundle versions = null; 
@@ -142,10 +143,20 @@ catch (Exception e) {
 	                        <form name="guest" action="${pageContext.request.contextPath}/WoLoginServlet">
 	                            <input type="hidden" name="action" value="GuestLogin"/>
 	                            <input type="hidden" name="clientType" value="${clientType}"/>
+	                            <input type="hidden" name="lang" value="en"/>
 	                            <input type="hidden" name="var" value="b"/>
 	                            <button
 	                                    class="btn btn-danger btn-lg btn-block signup-btn guest-try-out-btn"
-	                                    type="submit"><%= rb.getString("signup_guest") %></button>
+	                                    type="submit"><%= rb.getString("signup_guest") %> (in English)</button>
+	                        </form>
+	                        <form name="guest" action="${pageContext.request.contextPath}/WoLoginServlet">
+	                            <input type="hidden" name="action" value="GuestLogin"/> 
+	                            <input type="hidden" name="clientType" value="${clientType}"/>
+	                            <input type="hidden" name="lang" value="es"/>
+	                            <input type="hidden" name="var" value="b"/>
+	                            <button
+	                                    class="btn btn-danger btn-lg btn-block signup-btn guest2-try-out-btn"
+	                                    type="submit"><%= rb.getString("signup_guest") %> (en Español)</button>
 	                        </form>
 	                    </div>
 	

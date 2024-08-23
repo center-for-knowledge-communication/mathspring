@@ -40,6 +40,7 @@ import edu.umass.ckc.wo.db.DbProblem;
  * Frank 	03-22-21  	Issue #391 change date selection to use BETWEEN for date range
  * Frank	05-11-21	Issue #463 add between dates clause to some queries for filtering
  * Frank 	02-04-23    Issue #723 - handle class clustering
+ * Frank	08-22-24	Issue 781R7 - added PER_PROBLEM_QUERY_SIXTH
  */
 public class TTUtil {
     private static TTUtil util = new TTUtil();
@@ -93,6 +94,7 @@ public class TTUtil {
     public static final String PER_PROBLEM_QUERY_THIRD = "select sh.effort from studentproblemhistory sh where sh.studid in (select id from student where classId=(:classId)) and sh.problemId =(:problemId) and sh.effort != 'null' and sh.effort != '' ";
     public static final String PER_PROBLEM_QUERY_FOURTH = "select h.* from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and h.effort != 'null' and h.effort != '' and student.id = h.studId order by student.id, h.id";
     public static final String PER_PROBLEM_QUERY_FIFTH = "select count(distinct h.studId) as noOfStudents from studentproblemhistory h, student where student.trialUser=0 and student.classId=(:classId) and  h.problemId=(:problemId) and h.mode != 'demo' and student.id = h.studId;";
+    public static final String PER_PROBLEM_QUERY_SIXTH = "select h.* from studentproblemhistory h, student where student.trialUser=0 and h.problemId = ? and h.mode != 'demo' and h.effort != 'null' and h.effort != '' and student.id = h.studId order by student.id, h.id";
 
     public static final String PER_STANDARD_QUERY_FIRST = "select distinct(std.clusterId),cc.categoryCode,cc.clusterCCName,cc.displayName,count(distinct(h.problemId)) as noOfProblemsInCluster ,SUM((h.numHints)) as totalHintsViewedPerCluster, problemBeginTime from studentproblemhistory h, standard std, problem p, cluster cc where studid in (select id from student where classId in ( CLASSID_TOKEN )) and std.clusterID = cc.id and h.mode != 'demo' and std.id=p.standardID and p.id=h.problemId and h.problemBeginTime BETWEEN (:tsFromDate) AND (:tsToDate) group by std.clusterID";
 //    public static final String PER_STANDARD_QUERY_SECOND = "select std.clusterId,count(distinct(h.problemId)) as noOfProblems from studentproblemhistory h, standard std, problem p where studid in (select id from student where classId  in ( CLASSID_TOKEN )) and mode='practice' and std.id=p.standardID and p.id=h.problemId and h.numAttemptsToSolve = 1 group by std.clusterID";

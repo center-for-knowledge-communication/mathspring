@@ -31,6 +31,8 @@ import java.util.Locale;
  * Date: 4/13/15
  * Time: 3:52 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * Frank    08-22-24    Issue #781R7 - pass 'experiment' requester param
  */
 public class LoginSequence {
     public static final String INNERJSP = "innerjsp";
@@ -41,6 +43,7 @@ public class LoginSequence {
     public static final String LCPROFILE = "lcprofile";
     public static final String URL = "url";
     public static final String URL2 = "url2";
+    public static final String EXPERIMENT = "experiment";
     
     private static Logger logger = Logger.getLogger(LoginSequence.class);
     private SessionManager smgr;
@@ -112,6 +115,7 @@ public class LoginSequence {
     public void processAction (ServletParams params, LoginIntervention li) throws Exception {
 
         if (li != null) {
+        	logger.info("processAction>>" + params.toString());
             final boolean isUsingNewUI = Settings.useNewGUI();
             String innerJSP = li.getView();
             String skin = params.getString(SKIN);
@@ -129,6 +133,8 @@ public class LoginSequence {
             servletInfo.getRequest().setAttribute(LCPROFILE, li.getLCprofile());
             servletInfo.getRequest().setAttribute(URL, li.getURL());
             servletInfo.getRequest().setAttribute(URL2, li.getURL2());
+            servletInfo.getRequest().setAttribute(EXPERIMENT, smgr.getExperiment());
+            
             RequestDispatcher disp = servletInfo.getRequest().getRequestDispatcher(loginJSP);
             logger.debug("<< forward to JSP " + loginJSP);
             disp.forward(servletInfo.getRequest(),servletInfo.getResponse());
