@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<Context path="/">
+	<Resource name="jdbc/wodbaws" type="javax.sql.DataSource"
+		auth="Container" description="Mysql database for Mathforum"
+		maxActive="100" maxIdle="30" maxWait="10000" username="altUser"
+		password="devckcumassm4th" removeAbandoned="true" removeAbandonedTimeout="60"
+		logAbandoned="true" testWhileIdle="true" testOnBorrow="true"
+		testOnReturn="true" timeBetweenEvictionRunMillis="600000"
+		numTestsPerEvictionRun="10" validationQuery="SELECT 1"
+		driverClassName="com.mysql.jdbc.Driver"
+		url="jdbc:mysql://dev-wayangoutpostdb.com5thrjrv4i.us-east-1.rds.amazonaws.com:3306/wayangoutpostdb?autoReconnect=true" />
+
+</Context>
