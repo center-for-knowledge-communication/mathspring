@@ -4,7 +4,7 @@
   If you use an older version of Tomcat, you should alter the below version 2.4.  You will know if things are working
    by using the admin pages to set up classes.  JSP will not work if there is an incompatibility in config.  -->
 <!-- change http content setting to https once the https server is available -->   
-<!-- set datasource to wodbrose -->
+<!-- set datasource to wodbrose 08/25/2024-->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <description>MathSpring web application</description>
   <resource-ref>
@@ -24,7 +24,7 @@
   </context-param>
   <context-param>
     <param-name>wodb.datasource</param-name>
-    <param-value>jdbc/wodbaws</param-value>
+    <param-value>jdbc/wodbrose</param-value>
   </context-param>
   <context-param>
     <param-name>pedagogiesFile</param-name>
