@@ -91,6 +91,7 @@ public class MyProgressHandler {
             String learningCompanion = smgr.getPedagogicalModel().getLearningCompanion() != null ? smgr.getPedagogicalModel().getLearningCompanion().getCharactersName(): "none";
             request.setAttribute("pageLangIndex",smgr.getPageLangIndex());
             request.setAttribute("pageLang",smgr.getLocale().getLanguage());
+            request.setAttribute("experiment",smgr.getExperiment());
             request.setAttribute("clientPath", null);
             request.setAttribute("learningCompanion", learningCompanion);
             request.setAttribute("backToVillageURL", null);

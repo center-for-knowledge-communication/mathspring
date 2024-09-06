@@ -44,9 +44,13 @@ catch (Exception e) {
 
 try {
 	strExperiment = (String) request.getAttribute("experiment");
+	if (strExperiment == null) {
+		strExperiment = "";
+	}
 }
 catch (Exception e) {
 	 System.out.println("experiment " + e.getMessage());
+		strExperiment = "";
 }
 
 try {
@@ -108,7 +112,7 @@ String alt_example_problem_play_hints = "";
 
 try {
 
-	if (strExperiment.indexOf("multi-lingual") < 0) {		
+	if (strExperiment.indexOf("multi-lingual") == -1) {		
 		loc1 = new Locale(pageLang,"US");	
 		loc2 = new Locale(pageLang,"US");			
 

@@ -30,6 +30,7 @@ String pageLang = "";
 
 try {
 	pageLangIndex = (int) request.getAttribute("pageLangIndex");
+	
 }
 catch (Exception e) {
 	 System.out.println("pageLangIndex " + e.getMessage());
@@ -50,9 +51,11 @@ catch (Exception e) {
 	 System.out.println("pageLang " + e.getMessage());
 	 pageLang = "en";
 }
-
-if (strExperiment.indexOf("multi-lingual") < 0) {
-	pageLangIndex = -1;
+	
+if (strExperiment.indexOf("multi-lingual") == -1) {
+		pageLangIndex = 0;
+}
+else {
 	if (pageLang.equals("en")) {
 		loc1 = new Locale("en","US");	
 		loc2 = new Locale("es","US");	
@@ -62,9 +65,6 @@ if (strExperiment.indexOf("multi-lingual") < 0) {
 		loc2 = new Locale("en","US");		
 	}
 }
-else {
-	pageLangIndex = 0;
-}	
 
 if (pageLangIndex == 0) {
 	if (pageLang.equals("en")) {
@@ -90,10 +90,8 @@ else {
 	else {
 		loc1 = new Locale(pageLang,"US");	
 		loc2 = new Locale(pageLang,"US");			
-	}	
-}	
-		
-
+	}
+}
 
 ResourceBundle versions = null; 
 try {

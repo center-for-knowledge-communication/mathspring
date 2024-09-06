@@ -36,6 +36,9 @@ catch (Exception e) {
 
 try {
 	strExperiment = (String) request.getAttribute("experiment");
+	if (strExperiment == null) {
+		strExperiment = "";
+	}
 }
 catch (Exception e) {
 	 System.out.println("experiment " + e.getMessage());
@@ -51,10 +54,10 @@ catch (Exception e) {
 }
 
 
-
-	
-if (strExperiment.indexOf("multi-lingual") < 0) {
-	pageLangIndex = -1;
+if (strExperiment.indexOf("multi-lingual") == -1) {
+	pageLangIndex = 0;
+}
+else {
 	if (pageLang.equals("en")) {
 		loc1 = new Locale("en","US");	
 		loc2 = new Locale("es","US");	
@@ -63,14 +66,10 @@ if (strExperiment.indexOf("multi-lingual") < 0) {
 		loc1 = new Locale("es","US");	
 		loc2 = new Locale("en","US");		
 	}
-
 }
-else {
-	pageLangIndex = 0;		
-}	
 
 if (pageLangIndex == 0) {
-	if (lang.equals("en")) {
+	if (pageLang.equals("en")) {
 		loc1 = new Locale("en","US");	
 		loc2 = new Locale("es","US");	
 	}
@@ -81,7 +80,7 @@ if (pageLangIndex == 0) {
 }
 else {
 	if (pageLangIndex == 1) {
-		if (lang.equals("en")) {
+		if (pageLang.equals("en")) {
 			loc1 = new Locale("es","US");	
 			loc2 = new Locale("en","US");	
 		}
@@ -96,6 +95,8 @@ else {
 	}
 }
 
+
+	
 
 ResourceBundle versions = null; 
 try {
@@ -1039,30 +1040,7 @@ $.extend({
         }
 
         $(document).ready(function(){
-            // Set up mouse tracking if the mouseSaveInterval is positive (our indicator that mouse tracking is desired)
-            if (globals.mouseSaveInterval > 0)
-                setInterval(sendMouseData, 1000 * globals.mouseSaveInterval); // send mouse data to server every # of seconds
-            // Only set up event listeners on the body of the page if the mouseSaveInterval is positive (our indication that mouse tracking is desired)
-            if (globals.mouseSaveInterval > 0) {
-                $("body").mousemove(function (e) {
-                    // var $body = $('body');
-                    // var offset = $body.offset();
-                    // var x = e.clientX - offset.left;
-                    // var y = e.clientY - offset.top;
-                    var x = e.pageX;
-                    var y = e.pageY;
-                    // console.log(e.pageX +  "," + e.pageY);
-                    saveMouse(x, y);
 
-                });
-
-                $("body").bind('click', function (e) {
-                    var x = e.pageX;
-                    var y = e.pageY;
-                    saveMouseClick(x, y);
-                    // console.log(e.pageX +  "," + e.pageY);
-                });
-            }
             initiateElapsedTime();
             initChart();
 
@@ -1116,7 +1094,7 @@ $.extend({
                         console.log("CCSS: " + problemList[index-1][6]);
                     } else {
                         $("#js-problem-view").text(currentProblem);
-                        $("#js-problem-view").append("<iframe id='formalityProblemFrame' width='600' height='300'> </iframe>");
+                        //$("#js-problem-view").append("<iframe id='formalityProblemFrame' width='600' height='300'> </iframe>");
                         problemImagePath="http://cadmium.cs.umass.edu/formality/FormalityServlet?fxn=questionSnapshot&qID="+formalityId;
                         document.getElementById("formalityProblemFrame").src = problemImagePath;
                         console.log("CCSS: " + problemList[index-1][6]);
@@ -1145,6 +1123,31 @@ $.extend({
                     $.get("${pageContext.request.contextPath}/TutorBrain?action=MPPReturnToHut&sessionId=${sessionId}&eventCounter=${eventCounter + 1}&topicId="+currentTopicId+"&studentAction=backToSatHut&var=b&comment=",returnToHutComplete);
                 }
             });
+
+            if (globals.mouseSaveInterval > 0)
+                setInterval(sendMouseData, 1000 * globals.mouseSaveInterval); // send mouse data to server every # of seconds
+            // Only set up event listeners on the body of the page if the mouseSaveInterval is positive (our indication that mouse tracking is desired)
+            if (globals.mouseSaveInterval > 0) {
+                $("body").mousemove(function (e) {
+                    // var $body = $('body');
+                    // var offset = $body.offset();
+                    // var x = e.clientX - offset.left;
+                    // var y = e.clientY - offset.top;
+                    var x = e.pageX;
+                    var y = e.pageY;
+                    // console.log(e.pageX +  "," + e.pageY);
+                    saveMouse(x, y);
+
+                });
+
+                $("body").bind('click', function (e) {
+                    var x = e.pageX;
+                    var y = e.pageY;
+                    saveMouseClick(x, y);
+                    // console.log(e.pageX +  "," + e.pageY);
+                });
+            }
+            
             
         });
     </script>
