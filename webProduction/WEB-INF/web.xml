@@ -3,7 +3,7 @@
 <!-- N.B.  This web-app element only works with Tomcat 6.0.  This is what runs on Cadmium - our production server.
   If you use an older version of Tomcat, you should alter the below version 2.4.  You will know if things are working
    by using the admin pages to set up classes.  JSP will not work if there is an incompatibility in config.  -->
-<!-- testing 08/16/21 -->
+<!-- touch on 08/25/24 -->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <description>MathSpring web application</description>
   <resource-ref>
@@ -41,7 +41,7 @@
 		<!-- <param-value>http://msadmin-prod/mscontent/</param-value> -->
 
 		<!-- <param-value>http://rose.cs.umass.edu/mathspring/mscontent/</param-value> -->
-		<param-value>https://ckc.mathspring.org/MSContent/</param-value>
+		<param-value>https://dev.mathspring.org/MSContent/</param-value>
 	</context-param>
 	
   <context-param>
