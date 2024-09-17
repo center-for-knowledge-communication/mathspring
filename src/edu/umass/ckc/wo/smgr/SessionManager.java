@@ -260,6 +260,8 @@ public class SessionManager {
         sessionId = loginResult.getSessId();
         buildSession(connection, loginResult.getSessId());
         studState.getSessionState().initializeState();
+        // no multi-language for guest users
+        DbSession.updateSessionPageLangIndex(connection,newSessId,0);
         return this;
     }
 
@@ -1093,12 +1095,26 @@ public class SessionManager {
     }
     
     public Locale getPageLocale() {
-    	if (this.pageLangIndex > 0) {
-    		return  new Locale("es","US");    		
-    	}
-    	else {
-    		return  new Locale("en","US");    		
-    	}
+
+        if (this.experiment.indexOf("multi-lingual") < 0) {
+        	try {
+        		ClassInfo cl = DbClass.getClass(connection, this.classId);        
+            	String langCode = cl.getClassLanguageCode();
+            	String splitter[] = langCode.split(":");
+            	return  new Locale(splitter[0],"US");
+        	}
+        	catch (Exception e) {
+        		return  new Locale("en","US");
+        	}
+        }        
+        else {
+	    	if (this.pageLangIndex > 0) {
+	    		return  new Locale("es","US");    		
+	    	}
+	    	else {
+	    		return  new Locale("en","US");    		
+	    	}
+        }	
     }
 
     public void setProbLangIndex(int probLangIndex) {
