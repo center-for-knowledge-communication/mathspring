@@ -53,7 +53,47 @@ catch (Exception e) {
 	 pageLang = "en";
 }
 
+if (strExperiment.indexOf("multi-lingual") == -1) {
+	pageLangIndex = 0;
+	loc1 = new Locale(pageLang,"US");	
+	loc2 = new Locale(pageLang,"US");			
+}
+else {
+	if (pageLang.equals("en")) {
+		loc1 = new Locale("en","US");	
+		loc2 = new Locale("es","US");	
+	}
+	else {
+		loc1 = new Locale("es","US");	
+		loc2 = new Locale("en","US");		
+	}
+}
 
+if (!(strExperiment.indexOf("multi-lingual") == -1)) {
+	if (pageLangIndex == 0) {
+		if (pageLang.equals("en")) {
+			loc1 = new Locale("en","US");	
+			loc2 = new Locale("es","US");	
+		}
+		else {
+			loc1 = new Locale("es","US");	
+			loc2 = new Locale("en","US");		
+		}
+	}
+	else {
+		if (pageLangIndex == 1) {
+			if (pageLang.equals("en")) {
+				loc1 = new Locale("es","US");	
+				loc2 = new Locale("en","US");	
+			}
+			else {
+				loc1 = new Locale("en","US");	
+				loc2 = new Locale("es","US");		
+			}
+		}
+	}
+}
+/*
 if (strExperiment.indexOf("multi-lingual") == -1) {
 	pageLangIndex = 0;
 }
@@ -94,7 +134,7 @@ else {
 		loc2 = new Locale(pageLang,"US");			
 	}
 }
-
+*/
 
 	
 
