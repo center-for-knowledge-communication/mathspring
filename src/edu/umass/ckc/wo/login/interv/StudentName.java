@@ -92,10 +92,10 @@ public class StudentName extends LoginInterventionSelector {
         String language = "";
         String gender = "";
        	language = params.getString("optLanguage");
-        if (language.length() <= 0)
+        if ((language == null) || (language.length() <= 0))
         	language = "English";
        	gender = params.getString("optGender");
-        if (gender.length() <= 0)
+        if ((gender == null) || (gender.length() <= 0))
         	gender = " ";
         
         DbUser.setUserNames(servletInfo.getConn(), smgr.getStudentId(), fname, lini,language,gender);

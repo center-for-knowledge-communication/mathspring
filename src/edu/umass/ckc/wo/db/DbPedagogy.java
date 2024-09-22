@@ -474,7 +474,7 @@ public class DbPedagogy {
             String checked = " ";
             while (rs.next()) {
             	String gen = rs.getString(6);
-            	if (gender.equals("O") || gender.equals(gen)) {
+            	if (gender.equals("O") || gender.equals(" ") || gender.equals(gen)) {
 	            	int pedId = rs.getInt(1);
 	            	if (pedId == currStudentPedId) {
 	            		checked = " checked='checked' ";
@@ -614,7 +614,7 @@ public class DbPedagogy {
             	resultJson.put("url",url);
             	String gen = rs.getString(6);
         		resultJson.put("gender", gen);                 
-            	if (gender.equals("O") || gender.equals(gen)) {
+            	if (gender.equals("O") || gender.equals(" ") || gender.equals(gen)) {
             		resultArr.add(resultJson);
             	}
             }
