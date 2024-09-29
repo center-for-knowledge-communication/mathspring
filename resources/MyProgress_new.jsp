@@ -1213,13 +1213,14 @@ $.extend({
 
 	        var changeBtn = document.getElementById('changeLanguageButton');
 	    	
-	       	if (experiment.indexOf('multi-lingual') < 0) {
+	        var test = experiment.indexOf("transPage");
+	       	if (test < 0) {
 	       		changeBtn.style.display = 'none';
 	       	}
 	       	else {
 	       		changeBtn.style.display = 'block';       		
-	       	}
-
+	       	}	       	
+	       	
             // Set up mouse tracking if the mouseSaveInterval is positive (our indicator that mouse tracking is desired)
             if (globals.mouseSaveInterval > 0)
                 setInterval(sendMouseData, 1000 * globals.mouseSaveInterval); // send mouse data to server every # of seconds

@@ -88,25 +88,29 @@ public class TopicSelectorImpl implements TopicSelector {
         }
         // studentID and classID were set in setServletInfo method.
         List<Integer> topicProbs = getClassTopicProblems(theTopicId, classId, includeTestProblems);
+        List<Integer> tempProbs = new ArrayList<Integer>();
         List<StudentProblemData> probEncountersInTopic = getHistoryProblemsInTopic(smgr, theTopicId);
         List<Integer> recentProbs = smgr.getExtendedStudentState().getRecentExamplesAndCorrectlySolvedProblems(probEncountersInTopic);
                 
         // If a recent problem is an altProblem then lookup the use altProbID to get priProbId and add it to recent problems solved
 
         if (smgr.getExperiment().indexOf("multi-lingual" ) >= 0) {
-            List<Integer>altProbsToRemove = new ArrayList<Integer>();
             Iterator<Integer> rp = recentProbs.iterator();
 	        while (rp.hasNext()) {
-	            int recentProb = rp.next();
-	        	int primaryProb = ProblemMgr.getProblemPairReversed(recentProb);
-	        	if (primaryProb > 0) {
-	        		recentProb = primaryProb;
+	            int mostRecentProb = rp.next();
+	        	int priProb = ProblemMgr.getProblemPairReversed(mostRecentProb);
+	        	if (priProb > 0) {
+	        		tempProbs.add(priProb);
+	        		tempProbs.add(mostRecentProb);
 	        	}
-	        	altProbsToRemove.add(recentProb);
+	        	else {
+	        		tempProbs.add(mostRecentProb);
+	        	}
 	        }
-	        recentProbs	= altProbsToRemove;
         }
-        topicProbs.removeAll(recentProbs);
+        if (tempProbs.size() > 0) {
+        	topicProbs.removeAll(tempProbs);
+        }
         return topicProbs;
     }
 
