@@ -76,7 +76,7 @@ public class StudentProblemHistory {
 
         DbStudentProblemHistory.beginProblem(smgr.getConnection(), e.getSessionId(), smgr.getStudentId(), state.getCurProblem(), topicId,
             now, timeInSessionSec, timeInTutorMin, state.getCurProblemMode(), params, smgr.getCollaboratingWith(),
-                p.getDifficulty(), endTime, "SKIP");
+                p.getDifficulty(), endTime, "NODATA");
 
         curProb = new StudentProblemData(state.getCurProblem(),state.getCurTopic(),e.getSessionId(),
                 now,timeInSessionSec, timeInTutorMin,state.getCurProblemMode());

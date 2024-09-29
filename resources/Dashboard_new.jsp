@@ -160,6 +160,7 @@ else {
     
     <script>
     var experiment = "<%= strExperiment %>";
+
     var Chart = {
 
     	    /**
@@ -1088,7 +1089,8 @@ else {
 				       	
 	        var changeBtn = document.getElementById('changeLanguageButton');
 	
-	       	if (experiment.indexOf('multi-lingual') < 0) {
+	        var test = experiment.indexOf("transPage");
+	       	if (test < 0) {
 	       		changeBtn.style.display = 'none';
 	       	}
 	       	else {
@@ -1202,7 +1204,8 @@ else {
         </c:choose>
         </li>
 
-        <li id="changeLanguageButton" class="nav__item">
+
+        <li id="changeLanguageButton" class="nav__item" style="display: none;">
            	<a onclick="window.location='TutorBrain?action=ChangeLanguage&from=sat_Hut&to=sat_Hut&elapsedTime=0&sessionId=${sessionId}'+ '&eventCounter=${eventCounter}' + '&topicId=-1&probId=${probId}&probElapsedTime=0&var=b'"><%= rb.getString("change_language")%></a>
         </li>
         
