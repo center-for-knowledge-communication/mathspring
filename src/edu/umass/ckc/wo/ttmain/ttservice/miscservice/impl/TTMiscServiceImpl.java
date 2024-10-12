@@ -1835,6 +1835,44 @@ public class TTMiscServiceImpl implements TTMiscService {
     	return resultArr.toString();    
    	}
 
+    public String getExperimentList(Connection conn, int cohort, String filter) throws SQLException {
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+    	JSONArray resultArr = new JSONArray();
+    	
+
+    	String q = "select id, name, schoolYear, optionString, active from experiment order by id";
+
+        
+	         try {
+	        	
+	        	stmt = conn.prepareStatement(q);
+	            
+	            rs = stmt.executeQuery();
+	            
+	            while (rs.next()) {
+	            	int active = rs.getInt("active");
+	            	if (active == 1 ) {
+		            	JSONObject resultJson = new JSONObject();
+		            	resultJson.put("id", String.valueOf(rs.getInt("id")));
+		        		resultJson.put("name", rs.getString("name"));
+		            	resultJson.put("schoolYear", String.valueOf(rs.getInt("schoolYear")));
+		        		resultJson.put("optionString", rs.getString("optionString"));
+		            	resultArr.add(resultJson);
+	            	}
+	            }            
+	            stmt.close();
+	            rs.close();
+	        } finally {
+	            if (stmt != null)
+	                stmt.close();
+	            if (rs != null)
+	                rs.close();
+	        }
+    	
+    	
+    	return resultArr.toString();    
+   	}
     
     public String getProblemHistoryErrorData(Connection conn, int cohort, String filter) throws SQLException {
         ResultSet rs = null;
@@ -2226,6 +2264,10 @@ public class TTMiscServiceImpl implements TTMiscService {
     		case "getTeacherFeedback":
 				result = getTeacherFeedback(conn, Integer.valueOf(cohortId), filter);  
 				break;
+
+    		case "getExperimentList":
+				result = getExperimentList(conn, Integer.valueOf(cohortId), filter);  
+				break;
 				
     		case "updateProblemHistoryErrorData":
 				result = updateProblemHistoryErrorData(conn, Integer.valueOf(cohortId), filter);  
@@ -2342,8 +2384,8 @@ public class TTMiscServiceImpl implements TTMiscService {
     	try {
     		Connection conn = connection.getConnection();
     		switch (command) {
-    		case "getExperimentInfo":
-    			result = getExperimentInfo(conn, filter);
+    		case "getExperimentInfoById":
+    			result = getExperimentInfoById(conn, filter);
     			break;
     		case "getNewExperimentId":
     			result = getNewExperimentId(conn, filter);
@@ -4032,7 +4074,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     	
     }
     
-    public String getExperimentInfo(Connection conn, String filter) throws SQLException {
+    public String getExperimentInfoById(Connection conn, String filter) throws SQLException {
 	   	
     	
         JSONObject experimentJson = new JSONObject();
@@ -4041,7 +4083,7 @@ public class TTMiscServiceImpl implements TTMiscService {
     	ResultSet rs = null;
         PreparedStatement stmt = null;    	
 	    	
-    	String q = "select id, name, schoolYear, optionString from  experiment where name = ?;";
+    	String q = "select id, name, schoolYear, optionString from  experiment where id = ?;";
         try {        	
         	stmt = conn.prepareStatement(q);
             stmt.setString(1, filter);
