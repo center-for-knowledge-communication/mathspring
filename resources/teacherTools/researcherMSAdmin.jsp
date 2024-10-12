@@ -312,6 +312,7 @@ var selectedProblemEight = "";
 var eachProblemData = [];
 
 var topicSelectionListOne = "";
+
 function setSelectedTopicOne(topic) {
 	selectedTopicOne = topic;		
 	populateProblemSelectionListOne();
@@ -536,7 +537,7 @@ function addExperimentForm() {
                	
             	jsonData = $.parseJSON(data);	
             	var newExperimentId  = jsonData.newExperimentId;
-            	//document.getElementById("add_experiment_hdr").innerHTML = "Experiment Id# " + newExperimentId;            	
+            	document.getElementById("add_experiment_hdr").innerHTML = "Experiment Id# " + newExperimentId;            	
 
             	document.getElementById("newExperimentId").value = newExperimentId;
             	document.getElementById("addExperimentName").value = "";
@@ -559,30 +560,19 @@ function addExperimentForm() {
 
 }
 
-function editExperimentForm() {
+function editExperimentForm(id) {
 
 	$('#editExperimentFormModalPopup').modal('hide');
 	
-	var filter = "0";
-    
     var jsonData = null;
 
-	var name;
-	
-   	name = prompt("Enter experiment name","");
-   	if (name.length == 0) {
-   		alert('Must enter experiment name');
-   		return;
-   	}
-	
-       
     $.ajax({
         type : "POST",
         url : pgContext+"/tt/tt/msAdmin",
         data : {
-            command: 'getExperimentInfo',
+            command: 'getExperimentInfoById',
             lang: loc,
-            filter: name 
+            filter: id 
        
         },
         success : function(data) {
@@ -1094,6 +1084,63 @@ function showTable4c() {
                         }
                     }
                 }              
+        	}
+        	else {
+        		alert('<%= rwrb.getString("response_data_null") %>');
+        	}
+        },
+        error : function(e) {
+        	alert("error");
+            console.log(e);
+        }
+    });
+
+
+}
+
+var experimentSelectionList = "";
+
+function addExperimentToList(id, name) {
+	experimentSelectionList += "<option value='" + id  + "'>" + name + "</option>";
+}
+
+
+function listExperiments() {
+
+	var filter = "";
+	experimentSelectionList = "";
+    var jsonData_experiment_list = null;
+    experiment_list.innerHTML = "";
+    
+	$('#experiment-loader').show();
+    
+    $.ajax({
+        type : "POST",
+        url : pgContext+"/tt/tt/getCohortReport",
+        data : {
+            cohortId: 0,
+            reportType: 'getExperimentList',
+            lang: loc,
+            filter: filter 
+        },
+        success : function(data) {
+        	if (data) {    		
+        		
+        		$('#experiment-loader ').hide();
+        		
+				document.getElementById("select_experiment_hdr").innerHTML="Select an experiment to edit";
+        		document.getElementById("edit_experiment_hdr").innerHTML="Update Experiment Definition";
+        		jsonData_experiment_list = $.parseJSON(data);	
+               	
+            	experimentSelectionList = "<select name='experimentList' id='experimentList' onchange='editExperimentForm(value);' size='8' style='width:400px' >"; 	
+                for (var i = jsonData_experiment_list.length-1; i >= 0 ; i--) {
+                	var id = jsonData_experiment_list[i].id;
+                	var name = jsonData_experiment_list[i].name;
+                	addExperimentToList(id,name);
+                }
+                experimentSelectionList += "</select>";
+            	document.getElementById("experiment_list").innerHTML=experimentSelectionList; 
+
         	}
         	else {
         		alert('<%= rwrb.getString("response_data_null") %>');
@@ -2073,15 +2120,24 @@ function showReportProb8() {
                        <div id="admin7" class="panel-collapse collapse">  
                            <div class="panel-body report_filters">                           
 							  <input class="btn btn-lg btn-primary" onclick="addExperimentForm();" type="submit" value="<%= rwrb.getString("add") %>">
-							  <input class="btn btn-lg btn-primary" onclick="editExperimentForm();" type="submit" value="<%= rwrb.getString("edit_view") %>">
-							  <input class="btn btn-lg btn-primary" onclick="listExperimentForm();" type="submit" value="List">
+							  <input class="btn btn-lg btn-primary" onclick="listExperiments();" type="submit" value="<%= rwrb.getString("list_experiments") %>">
                            </div>
 
-                           <div class="panel-body">
-                               <div id="adminExperimentForm" class="table table-striped table-bordered hover display nowrap" width="100%">
-
-                               </div>
-                           </div>	
+                            <div id="experiment-loader" class="loader" style="display: none"></div>
+                            
+                            <div class="panel-body report_filters">
+								<div id="select_experiment_hdr" class="col-md-4">
+								</div>
+	                            <div class="panel-body report_filters col-md-8">	                            
+    	                        </div>
+							</div>
+                            <div class="panel-body report_filters">
+				            	<div class= "col-md-4" style="background-color: lightblue;" id="experiment_list" >
+				            	</div> 
+	                            <div class="panel-body report_filters col-md-8" style="background-color: lightblue;">
+	                            
+    	                        </div>
+                            </div>
                        </div>
                    </div>                   
 
@@ -2598,8 +2654,9 @@ function showReportProb8() {
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
+
             <div class="modal-header">
-            	<h3><div id="edit_experiment_hdr"></div></h3>
+            	<h3><div id="edit_experiment_hdr"> </div></h3>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
