@@ -295,7 +295,7 @@ try {
 catch (Exception e) {
 	System.out.println(e.getMessage());
 }
- 
+/*
 step_by_step_solution = prob_rb1.getString("step_by_step_solution");
 submit_answer = prob_rb1.getString("submit_answer");
 example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");
@@ -304,7 +304,7 @@ example_problem_play_hints = prob_rb1.getString("example_problem_play_hints");
 alt_step_by_step_solution = prob_rb2.getString("step_by_step_solution");
 alt_submit_answer = prob_rb2.getString("submit_answer");
 alt_example_problem_play_hints = prob_rb2.getString("example_problem_play_hints");
-
+*/
 
 %>
 
