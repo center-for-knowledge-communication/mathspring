@@ -1567,14 +1567,24 @@ function clickHandling () {
             $(EXAMPLE_CONTAINER_DIV_ID).css('overflow', 'scroll');
             var id_exists = document.getElementById('play_button');
             if (id_exists)  {
-                if (pageLangIndex <= 0) {
-                	$("#play_button").text(example_problem_play_hints);
-                	//document.getElementById('pulsate_play_button').text = example_problem_play_hints;
+            	if (globals.experiment.indexOf("multi-lingual") < 0) {
+            		if  ((pageLangIndex == -1) && (pageLang.equals("en")) {
+	                	$("#play_button").text(example_problem_play_hints);            			
+            		}
+            		else {
+	                	$("#play_button").text(alt_example_problem_play_hints);            			
+            		}
             	}
-        		else {
-                	$("#play_button").text(alt_example_problem_play_hints);
-//        			document.getElementById('pulsate_play_button').text = alt_example_problem_play_hints;    	
-        		}
+            	else {
+	                if (pageLangIndex <= 0) {
+	                	$("#play_button").text(example_problem_play_hints);
+	                	//document.getElementById('pulsate_play_button').text = example_problem_play_hints;
+	            	}
+	        		else {
+	                	$("#play_button").text(alt_example_problem_play_hints);
+	//        			document.getElementById('pulsate_play_button').text = alt_example_problem_play_hints;    	
+	        		}
+            	}
                 document.getElementById('play_button').id = 'pulsate_play_button';
             }
             
