@@ -395,7 +395,7 @@ public class UserRegistrationHandler {
         int pedId = PedagogyAssigner.assignPedagogy(conn,studId, classId);
         // store the pedagogy id in the student table row for this user.
         if (className.endsWith("-es")) {
-        	pedId = 66;
+        	pedId = 65;  //Lucas
         }
         DbUser.setStudentPedagogy(conn,studId,pedId);
         return studId;
