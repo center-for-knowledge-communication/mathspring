@@ -1568,7 +1568,7 @@ function clickHandling () {
             var id_exists = document.getElementById('play_button');
             if (id_exists)  {
             	if (globals.experiment.indexOf("multi-lingual") < 0) {
-            		if  ((pageLangIndex == -1) && (pageLang.equals("en")) {
+            		if  ((pageLangIndex == -1) && (pageLang.equals("en"))) {
 	                	$("#play_button").text(example_problem_play_hints);            			
             		}
             		else {
