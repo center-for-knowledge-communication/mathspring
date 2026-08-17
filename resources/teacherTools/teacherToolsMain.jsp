@@ -33,7 +33,12 @@
  *  Frank 	02-04-23    Issue #723 - Added class clustering
  *  Frank 	02-04-23    Issue #723 - Added create class validation on cluster y/n
  *  Frank	05-13-23	Issue #763 - make LCs selectable by class
+ *  Boming with Codex 08-17-26 Issue #844 - generate school year options dynamically
  */
+
+ int currentCalendarYear = java.time.Year.now().getValue();
+ int earliestSchoolYear = currentCalendarYear - 1;
+ int latestSchoolYear = currentCalendarYear + 1;
 
  System.out.println("teacherToolsMain starting");
  ResourceBundle versions = null; 
@@ -779,8 +784,8 @@ catch (Exception e) {
                         validators: {
 
                             between: {
-                                min: (new Date().getFullYear()-1),
-                                max: (new Date().getFullYear()+1),
+                                min: <%= earliestSchoolYear %>,
+                                max: <%= latestSchoolYear %>,
                                 message: '<%= rb.getString("emsg_schoolYearRange") %>'
                             },
 
@@ -1577,8 +1582,9 @@ function registerAllEvents(){
                                         <springForm:select path="schoolYear" class="form-control" id="schoolYear"
                                                            name="schoolYear">
                                             <springForm:option value=""><%= rb.getString("select_year") %></springForm:option>
-                                            <springForm:option value="2023">2023/2024</springForm:option>
-                                            <springForm:option value="2024">2024/2025</springForm:option>
+                                            <% for (int schoolYear = earliestSchoolYear; schoolYear <= latestSchoolYear; schoolYear++) { %>
+                                                <springForm:option value="<%= schoolYear %>"><%= schoolYear - 1 %>/<%= schoolYear %></springForm:option>
+                                            <% } %>
                                         </springForm:select>
                                     </div>
                                 </div>
